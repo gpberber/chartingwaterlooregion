@@ -6,11 +6,15 @@ website:
   navbar:
     right:
       - about.qmd
+      - icon: linkedin
+        href: https://www.linkedin.com/in/greg-berberich/
       - icon: github
-        href: https://github.com/
+        href: https://github.com/gpberber/deadicated-to-data
 format:
   html:
-    theme: lux
+    theme: 
+      - simply
+      - custom.scss
     css: styles.css
 
 editor: visual

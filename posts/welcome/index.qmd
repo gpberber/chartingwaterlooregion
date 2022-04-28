@@ -1,6 +1,6 @@
 ---
 title: "Welcome To My Blog"
-author: "Tristan O'Malley"
+author: "Greg Berberich"
 date: "2022-04-24"
 categories: [news]
 ---
