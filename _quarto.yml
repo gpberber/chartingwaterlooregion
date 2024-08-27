@@ -16,6 +16,8 @@ format:
       - simply
       - custom.scss
     css: styles.css
+    grid: 
+      body-width: 1000px
 
 editor: visual
 

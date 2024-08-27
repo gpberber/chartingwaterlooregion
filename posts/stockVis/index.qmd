@@ -1,0 +1,25 @@
+---
+title: "Stock Price Visualization Tool"
+date: "2024-08-27"
+categories: [Interactive, Visualization, Stocks]
+warning: false
+message: false
+---
+
+Welcome to my stock-price visualization tool!
+
+![](thumbnail.jpg)
+
+This simple tool pulls stock price data from [Yahoo Finance](https://finance.yahoo.com/) for the stock symbol and date range you specify (see the Yahoo Finance page to look up symbols for the stocks you wish to visualize). 
+
+You also have the option to view the prices on a logarithmic scale and to adjust the historical prices to their present values using CPI data from [FRED](https://fred.stlouisfed.org/).
+
+Happy charting!
+
+
+```{=html}
+<iframe id="example1" src="https://deadicated-to-data.shinyapps.io/stockVis"
+style="border: non; width: 1000px; height: 700px"
+frameborder="0">
+</iframe>
+```

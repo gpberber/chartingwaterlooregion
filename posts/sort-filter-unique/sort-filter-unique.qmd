@@ -48,3 +48,9 @@ style="border: non; width: 1000px; height: 700px"
 frameborder="0">
 </iframe>
 ```
+
+
+```<scala>
+=MAX(A1,A2)
+```
+=MAX(A1,A2)
