@@ -1,8 +1,9 @@
 ---
 title: "Welcome To My Blog"
-author: "Greg Berberich"
-date: "2022-04-24"
-categories: [news]
+date: "2022-04-27"
+categories: [Tutorial,R,Excel]
+warning: false
+message: false
 ---
 
 This is the first post in a Quarto blog. Welcome!
@@ -10,3 +11,40 @@ This is the first post in a Quarto blog. Welcome!
 ![](thumbnail.jpg)
 
 Since this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.
+
+```{r}
+#| label: load-packages
+
+library(tidyverse)  # for data prep and visualization
+library(lubridate)  # for working with dates
+```
+
+```{r}
+#| label: load-data
+
+# read data from csv into tibble named 'sales'
+sales <- as_tibble(read.csv('data/AdventureWorks.csv')) |> 
+  # reformat date to yyyy-mm-dd and change type to date
+  mutate(order_date = mdy(order_date))
+
+glimpse(sales)
+```
+
+```{r}
+#| label: add-columns
+
+#add sales amount, total cost, and profit columns for each order item
+sales <- sales |> 
+  mutate(sales_amount = order_quantity * product_sales_price,
+         total_cost = order_quantity * product_standard_cost,
+         profit = sales_amount - total_cost)
+
+head(sales)
+```
+
+```{=html}
+<iframe id="example1" src="https://deadicated-to-data.shinyapps.io/stockVis"
+style="border: non; width: 1000px; height: 700px"
+frameborder="0">
+</iframe>
+```
