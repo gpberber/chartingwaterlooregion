@@ -16,9 +16,7 @@ You also have the option to view the prices on a logarithmic scale and to adjust
 
 Happy charting!
 
-```{=html}
 <iframe id="example1" src="https://deadicated-to-data.shinyapps.io/stockVis"
 style="border: non; width: 1000px; height: 700px"
 frameborder="0">
 </iframe>
-```

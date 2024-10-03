@@ -1,0 +1,63 @@
+---
+title: "Canadian Temporary Foreign Worker Data"
+date: "2024-10-02"
+categories: [Interactive, Visualization, Open Data]
+warning: false
+message: false
+echo: false
+---
+
+```{r load-libraries}
+library(tidyverse)
+library(gt)
+library(DataExplorer)
+library(here)
+library(scales)
+```
+
+```{r load-tfw-data}
+
+tfw_data <- read_csv(here("posts", "tfw-program", "data", "tfw_data_clean.csv")) |> 
+  mutate(across(c(id, year), as.character))
+```
+
+```{r introduce-data}
+
+tfw_data |> 
+  introduce() |> 
+  pivot_longer(everything()) |> 
+  gt()
+```
+
+```{r plot-introduction}
+plot_intro(tfw_data)
+```
+
+```{r plot-missing-data}
+plot_missing(
+  tfw_data,
+  ggtheme = theme_minimal()
+  )
+```
+
+```{r plot-discrete}
+plot_bar(tfw_data)
+
+```
+
+```{r drop-organization_type}
+clean_tfw_data <- tfw_data |> 
+  select(-organization_type)
+```
+
+```{r}
+clean_tfw_data |>
+  group_by(year) |>
+  summarise(
+    across(
+      quarter:city_original,
+      ~ percent(mean(is.na(.)), accuracy = 0.1)
+    )
+  ) |>
+  gt()
+```

@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/tfw-program/analysis/index.html",
       "/posts/sort-filter-unique/sort-filter-unique.html",
       "/posts/stockVis/index.html"
     ]
