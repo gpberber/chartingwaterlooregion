@@ -61,3 +61,7 @@ clean_tfw_data |>
   ) |>
   gt()
 ```
+
+```{r output-clean-data}
+write_csv(clean_tfw_data, here("posts/tfw-program/data/tfw-app-data.csv"))
+```
