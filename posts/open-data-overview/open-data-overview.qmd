@@ -1,0 +1,30 @@
+---
+title: "Open Data Overview"
+date: "2024-10-03"
+categories: [Tutorial, Open Data]
+warning: false
+message: false
+echo: false
+---
+
+# Open Data Principles
+
+The [Open Data Charter specifies six principles](https://opendatacharter.org/principles/ "ODC principles") that should guide the provision of open data:
+
+1.  **Open by Default** - we shouldn't have to ask officials for the data we want
+
+2.  **Timely and Comprehensive** - we need relevant data in its complete, unmodified form
+
+3.  **Accessible and Usable** - we need easy-to-find, machine-readable data
+
+4.  **Comparable and Interoperable** - we need data that can easily talk to each other
+
+5.  **For Improved Governance and Citizen Engagement** - we need data to hold officials to account
+
+6.  **For Inclusive Development and Innovation** - we need data to spur inclusive economic development
+
+## Accessible and Usable Data
+
+The ODC guidance on implementing Principle 3 focuses more on accessibility than usability, emphasizing that data should be easily discoverable, accessible, and barrier-free. To these ends, it asks providers to pledge they will release free, unrestricively licensed data in multiple open, standardized formats on a central portal that permits anonymous access and downloading. These four pledges are very specific and relatively easy to implement, but they do very little to enhance data's usability (open, standardized formats help most with this). Only the fifth and final pledge stresses that providers should ensure data can be used effectively by the widest range of users, and goes on to suggest this can be achieved by promoting data literacy, building capacity for effective use of open data, and helping people effectively understand how public resources are used. All three suggestions are vague, difficult to implement, and, most important, *place the onus on users to get better at using the data* rather than on providers to get better at making the data more usable, regardless of users' data literacy. To implement a suggestion like, "Governments may provide educational and training resources for citizens, government employees, and civil society and private sector representatives to ensure they have the skills necessary to access, read, understand, and manipulate data," governments would have to invest significant sums of money to achieve a goal that could only ever hope to be achieved in the very long term, and even then with a very low chance of success given persistent difficulties in raising citizens' financial literacy and ongoing problems with basic literacy and numeracy among Canada's youth.
+
+## Features of Usable Data

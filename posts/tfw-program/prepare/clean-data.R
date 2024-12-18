@@ -1,4 +1,4 @@
-here::i_am("posts/tfw-program/prepare/clean-data.R")
+#here::i_am("posts/tfw-program/prepare/clean-data.R")
 
 library(here)
 library(fuzzyjoin)
@@ -276,3 +276,4 @@ tfw_data_clean <- rbind(intermediate_tfw_data_clean_cities, intermediate_tfw_dat
   rename("city_clean" = "city")
 
 write_csv(tfw_data_clean, here("posts", "tfw-program", "data", "tfw_data_clean.csv"))
+saveRDS(tfw_data_clean, file = here("posts", "tfw-program", "data", "tfw_data_clean.RDS"))

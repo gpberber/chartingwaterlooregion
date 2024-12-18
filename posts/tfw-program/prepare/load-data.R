@@ -5,6 +5,8 @@ library(janitor)
 library(openxlsx)
 library(here)
 
+# source: https://open.canada.ca/data/en/dataset/90fed587-1364-4f33-a9ee-208181dc0b97
+
 data_urls <- read_csv(here("posts", "tfw-program", "data", "data-urls.csv"))
 
 new_col_names <- c(occupation = "occupations_under_noc_2011",
@@ -53,7 +55,7 @@ tfw_data <- bind_rows(data_csv, data_xlsx) |>
     "num_lmias_requested" = "requested_lmi_as"
   ))
 
-write_csv(tfw_data_dirty, here("posts", "tfw-program", "data", "tfw_data_dirty.csv"))
+write_csv(tfw_data, here("posts", "tfw-program", "data", "tfw_data_dirty.csv"))
 
 # source_main: https://www.serviceobjects.com/blog/free-zip-code-and-postal-code-database-with-geocoordinates/ 
 # source_supp: https://raw.githubusercontent.com/ccnixon/postalcodes/master/CanadianPostalCodes.csv

@@ -1,0 +1,30 @@
+---
+title: "Kitchener School Collisions"
+date: "2024-12-18"
+categories: [Open Data, R, ]
+warning: false
+message: false
+---
+
+## Collisions Within 250m of Kitchener Schools (Jan 2015-June 2022)
+
+```{r}
+#| label: load-packages-sources
+
+source("collision_functions.R")
+```
+
+```{r}
+#| label: load-data
+
+all_collisions <- read_csv("data/collisions_with_proximity_to_schools.csv")
+summary_collisions_near_schools <- read_csv("data/schools_collision_summary.csv")
+```
+
+```{r}
+#| label: map-collisions
+
+map <- create_school_collision_map(summary_collisions_near_schools)
+
+map
+```
