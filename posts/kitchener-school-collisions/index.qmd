@@ -23,6 +23,8 @@ all_collisions <- read_csv("data/collisions_with_proximity_to_schools.csv")
 summary_collisions_near_schools <- read_csv("data/schools_collision_summary.csv")
 ```
 
+The interactive map below reports the types and number of collisions within 250m of schools in Kitchener. Hover over a bubble to see the school name and click on it to see collision details. Bubbles containing a number indicate multiple schools. Click on them to zoom in and see bubbles for the individual schools.
+
 ```{r}
 #| label: map-collisions
 
