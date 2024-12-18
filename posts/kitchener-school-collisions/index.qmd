@@ -1,9 +1,10 @@
 ---
 title: "Kitchener School Collisions"
 date: "2024-12-18"
-categories: [Open Data, R, ]
+categories: [Open Data, R, Policy]
 warning: false
 message: false
+echo: false
 ---
 
 ## Collisions Within 250m of Kitchener Schools (Jan 2015-June 2022)
