@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2024-10-03">
 
-<title>Deadicated to Data</title>
+<title>Open Data Overview – Deadicated to Data</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +24,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +67,19 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Deadicated to Data</span>
     </a>
   </div>
@@ -149,7 +90,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About Deadicated to Data</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,229 +113,64 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Deadicated to Data</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Open Data Overview</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Tutorial</div>
+                <div class="quarto-category">Open Data</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 3, 2024</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="Excel">Excel <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Interactive">Interactive <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Open Data">Open Data <span class="quarto-category-count">(3)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Stocks">Stocks <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Tutorial">Tutorial <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Visualization">Visualization <span class="quarto-category-count">(2)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="open-data-principles" class="level1">
+<h1>Open Data Principles</h1>
+<p>The <a href="https://opendatacharter.org/principles/" title="ODC principles">Open Data Charter specifies six principles</a> that should guide the provision of open data:</p>
+<ol type="1">
+<li><p><strong>Open by Default</strong> - we shouldn’t have to ask officials for the data we want</p></li>
+<li><p><strong>Timely and Comprehensive</strong> - we need relevant data in its complete, unmodified form</p></li>
+<li><p><strong>Accessible and Usable</strong> - we need easy-to-find, machine-readable data</p></li>
+<li><p><strong>Comparable and Interoperable</strong> - we need data that can easily talk to each other</p></li>
+<li><p><strong>For Improved Governance and Citizen Engagement</strong> - we need data to hold officials to account</p></li>
+<li><p><strong>For Inclusive Development and Innovation</strong> - we need data to spur inclusive economic development</p></li>
+</ol>
+<section id="accessible-and-usable-data" class="level2">
+<h2 class="anchored" data-anchor-id="accessible-and-usable-data">Accessible and Usable Data</h2>
+<p>The ODC guidance on implementing Principle 3 focuses more on accessibility than usability, emphasizing that data should be easily discoverable, accessible, and barrier-free. To these ends, it asks providers to pledge they will release free, unrestricively licensed data in multiple open, standardized formats on a central portal that permits anonymous access and downloading. These four pledges are very specific and relatively easy to implement, but they do very little to enhance data’s usability (open, standardized formats help most with this). Only the fifth and final pledge stresses that providers should ensure data can be used effectively by the widest range of users, and goes on to suggest this can be achieved by promoting data literacy, building capacity for effective use of open data, and helping people effectively understand how public resources are used. All three suggestions are vague, difficult to implement, and, most important, <em>place the onus on users to get better at using the data</em> rather than on providers to get better at making the data more usable, regardless of users’ data literacy. To implement a suggestion like, “Governments may provide educational and training resources for citizens, government employees, and civil society and private sector representatives to ensure they have the skills necessary to access, read, understand, and manipulate data,” governments would have to invest significant sums of money to achieve a goal that could only ever hope to be achieved in the very long term, and even then with a very low chance of success given persistent difficulties in raising citizens’ financial literacy and ongoing problems with basic literacy and numeracy among Canada’s youth.</p>
+</section>
+<section id="features-of-usable-data" class="level2">
+<h2 class="anchored" data-anchor-id="features-of-usable-data">Features of Usable Data</h2>
 
 
+</section>
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Open Data,R" data-listing-date-sort="1734498000000" data-listing-file-modified-sort="1734543310933" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="13">
-<div class="thumbnail">
-<p><a href="./posts/kitchener-school-collisions/index.html" class="no-external"></a></p><a href="./posts/kitchener-school-collisions/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/kitchener-school-collisions/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/kitchener-school-collisions/index.html" class="no-external">Kitchener School Collisions</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/kitchener-school-collisions/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Open Data'); return false;">
-Open Data
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/kitchener-school-collisions/index.html" class="no-external">
-
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu">source</span>(<span class="st">"collision_functions.R"</span>)</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">all_collisions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/collisions_with_proximity_to_schools.csv"</span>)</span>
-<span id="cb2-2">summary_collisions_near_schools <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/schools_col…</span></span></code></pre></div></div><div class="cell"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="ot"></span><span class="fu"></span></span><span id="cb3-2"></span><span id="cb3-3"></span></code></pre></div><div class="cell-output-display"><div class="leaflet html-widget html-fill-item" id="htmlwidget-876e8d363391ce2d0f4d" style="width:100%;height:464px;"></div><script type="application/json" data-for="htmlwidget-876e8d363391ce2d0f4d"></script></div></div></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/kitchener-school-collisions/index.html" class="no-external">
-<div class="listing-date">
-Dec 18, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Tutorial,Open Data" data-listing-date-sort="1727928000000" data-listing-file-modified-sort="1728072991969" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="376">
-<div class="thumbnail">
-<p><a href="./posts/open-data-overview/open-data-overview.html" class="no-external"></a></p><a href="./posts/open-data-overview/open-data-overview.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/open-data-overview/open-data-overview.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/open-data-overview/open-data-overview.html" class="no-external">Open Data Overview</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/open-data-overview/open-data-overview.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Tutorial'); return false;">
-Tutorial
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Open Data'); return false;">
-Open Data
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/open-data-overview/open-data-overview.html" class="no-external">The Open Data Charter specifies six principles that should guide the provision of open data:</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/open-data-overview/open-data-overview.html" class="no-external">
-<div class="listing-date">
-Oct 3, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="Interactive,Visualization,Open Data" data-listing-date-sort="1727841600000" data-listing-file-modified-sort="1727964912111" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="82">
-<div class="thumbnail">
-<p><a href="./posts/tfw-program/analysis/index.html" class="no-external"></a></p><a href="./posts/tfw-program/analysis/index.html" class="no-external">
-<p class="card-img-top"><img src="posts\tfw-program\analysis\index_files\figure-html\plot-introduction-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/tfw-program/analysis/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/tfw-program/analysis/index.html" class="no-external">Canadian Temporary Foreign Worker Data</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/tfw-program/analysis/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Interactive'); return false;">
-Interactive
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Visualization'); return false;">
-Visualization
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Open Data'); return false;">
-Open Data
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/tfw-program/analysis/index.html" class="no-external">
-<div class="cell-output-display">
-<div id="ynfuthmtos" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ynfuthmtos table {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color…</style><table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><thead><tr class="header gt_col_headings"><th id="name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th><th id="value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col"></th></tr></thead><tbody class="gt_table_body"><tr class="odd"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="even"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="odd"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="even"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="odd"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="even"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="odd"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="even"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr><tr class="odd"><td class="gt_row gt_left" headers="name"></td><td class="gt_row gt_right" headers="value"></td></tr></tbody></table></div></div></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/tfw-program/analysis/index.html" class="no-external">
-<div class="listing-date">
-Oct 2, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="Tutorial,R,Excel" data-listing-date-sort="1724731200000" data-listing-file-modified-sort="1724785828740" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="124">
-<div class="thumbnail">
-<p><a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external"></a></p><a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external">
-<p class="card-img-top"><img src="posts\sort-filter-unique\thumbnail.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external">Sort-Unique-Filter</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Tutorial'); return false;">
-Tutorial
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Excel'); return false;">
-Excel
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external">This is the first post in a Quarto blog. Welcome!</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/sort-filter-unique/sort-filter-unique.html" class="no-external">
-<div class="listing-date">
-Aug 27, 2024
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="Interactive,Visualization,Stocks" data-listing-date-sort="1724731200000" data-listing-file-modified-sort="1727897393141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="75">
-<div class="thumbnail">
-<p><a href="./posts/stockVis/index.html" class="no-external"></a></p><a href="./posts/stockVis/index.html" class="no-external">
-<p class="card-img-top"><img src="posts\stockVis\thumbnail.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/stockVis/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/stockVis/index.html" class="no-external">Stock Price Visualization Tool</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/stockVis/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Interactive'); return false;">
-Interactive
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Visualization'); return false;">
-Visualization
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Stocks'); return false;">
-Stocks
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/stockVis/index.html" class="no-external">Welcome to my stock-price visualization tool!</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/stockVis/index.html" class="no-external">
-<div class="listing-date">
-Aug 27, 2024
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
