@@ -1,5 +1,6 @@
 ---
 title: "Kitchener School Collisions"
+image: "images/map_snapshot.JPG"
 date: "2024-12-18"
 categories: [Open Data, R, Policy]
 warning: false
