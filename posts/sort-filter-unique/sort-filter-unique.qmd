@@ -16,30 +16,6 @@ Since this post doesn't specify an explicit `image`, the first image in the post
 #| label: load-packages
 
 library(tidyverse)  # for data prep and visualization
-library(lubridate)  # for working with dates
-```
-
-```{r}
-#| label: load-data
-
-# read data from csv into tibble named 'sales'
-sales <- as_tibble(read.csv('data/AdventureWorks.csv')) |> 
-  # reformat date to yyyy-mm-dd and change type to date
-  mutate(order_date = mdy(order_date))
-
-glimpse(sales)
-```
-
-```{r}
-#| label: add-columns
-
-#add sales amount, total cost, and profit columns for each order item
-sales <- sales |> 
-  mutate(sales_amount = order_quantity * product_sales_price,
-         total_cost = order_quantity * product_standard_cost,
-         profit = sales_amount - total_cost)
-
-head(sales)
 ```
 
 ```{=html}
@@ -49,8 +25,8 @@ frameborder="0">
 </iframe>
 ```
 
-
-```<scala>
+``` <scala>
 =MAX(A1,A2)
 ```
+
 =MAX(A1,A2)
