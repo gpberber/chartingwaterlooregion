@@ -12,24 +12,29 @@ echo: false
 
 ```{r}
 #| label: load-packages-sources
+here::i_am("posts/kitchener-school-collisions/reports/analysis.qmd")
 
-source("collision_functions.R")
 library(gt)
+library(here)
+
+source(here("posts", "kitchener-school-collisions", "R", "helpers.R"))
 ```
 
 ```{r}
 #| label: load-data
 
-all_collisions <- read_csv("data/collisions_with_proximity_to_schools.csv")
-collisions_near_schools <- read_csv("data/schools_collision_summary.csv")
+all_collisions <- read_csv(here("posts", "kitchener-school-collisions", "data", "collisions_with_proximity_to_schools.csv"))
+collisions_near_schools <- read_csv(here("posts", "kitchener-school-collisions", "data", "schools_collision_summary.csv"))
 ```
 
 ```{r}
 #| label: collisions-by-time-window
 
 collisions_near_schools |> 
+  filter(!is.na(time_window)) |> 
   group_by(time_window) |> 
-  summarise(across(ends_with("_collisions"), sum), .groups = "drop")
+  summarise(across(ends_with("_collisions"), sum), .groups = "drop") |> 
+  gt()
 
 ```
 

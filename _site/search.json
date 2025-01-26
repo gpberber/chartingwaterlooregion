@@ -68,5 +68,19 @@
     "title": "Open Data Overview",
     "section": "",
     "text": "The ODC guidance on implementing Principle 3 focuses more on accessibility than usability, emphasizing that data should be easily discoverable, accessible, and barrier-free. To these ends, it asks providers to pledge they will release free, unrestricively licensed data in multiple open, standardized formats on a central portal that permits anonymous access and downloading. These four pledges are very specific and relatively easy to implement, but they do very little to enhance data’s usability (open, standardized formats help most with this). Only the fifth and final pledge stresses that providers should ensure data can be used effectively by the widest range of users, and goes on to suggest this can be achieved by promoting data literacy, building capacity for effective use of open data, and helping people effectively understand how public resources are used. All three suggestions are vague, difficult to implement, and, most important, place the onus on users to get better at using the data rather than on providers to get better at making the data more usable, regardless of users’ data literacy. To implement a suggestion like, “Governments may provide educational and training resources for citizens, government employees, and civil society and private sector representatives to ensure they have the skills necessary to access, read, understand, and manipulate data,” governments would have to invest significant sums of money to achieve a goal that could only ever hope to be achieved in the very long term, and even then with a very low chance of success given persistent difficulties in raising citizens’ financial literacy and ongoing problems with basic literacy and numeracy among Canada’s youth."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/reports/analysis.html",
+    "href": "posts/kitchener-school-collisions/reports/analysis.html",
+    "title": "Kitchener School Collisions",
+    "section": "",
+    "text": "time_window\npedestrian_collisions\ncyclist_collisions\nother_collisions\ntotal_collisions\n\n\n\n\nbtw_6am_6pm\n29\n14\n722\n765\n\n\nbtw_7am_5pm\n26\n11\n649\n686\n\n\nbtw_8am_4pm\n22\n9\n531\n562\n\n\n\n\n\n\n\nThe interactive map below reports the types and number of collisions that took place on a school day between 6AM and 6PM within 250m of schools in Kitchener. Hover over a bubble to see the school name and click on it to see collision details. A bubble with a number indicates multiple underlying schools. Click on it to zoom in and see bubbles for the individual schools."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/reports/analysis.html#collisions-within-250m-of-kitchener-schools-jan-2015-june-2022",
+    "href": "posts/kitchener-school-collisions/reports/analysis.html#collisions-within-250m-of-kitchener-schools-jan-2015-june-2022",
+    "title": "Kitchener School Collisions",
+    "section": "",
+    "text": "time_window\npedestrian_collisions\ncyclist_collisions\nother_collisions\ntotal_collisions\n\n\n\n\nbtw_6am_6pm\n29\n14\n722\n765\n\n\nbtw_7am_5pm\n26\n11\n649\n686\n\n\nbtw_8am_4pm\n22\n9\n531\n562\n\n\n\n\n\n\n\nThe interactive map below reports the types and number of collisions that took place on a school day between 6AM and 6PM within 250m of schools in Kitchener. Hover over a bubble to see the school name and click on it to see collision details. A bubble with a number indicates multiple underlying schools. Click on it to zoom in and see bubbles for the individual schools."
   }
 ]
