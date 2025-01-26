@@ -18,7 +18,7 @@ library(scales)
 
 ```{r load-tfw-data}
 
-tfw_data <- read_csv(here("posts", "tfw-program", "data", "tfw_data_clean.csv")) |> 
+tfw_data <- read_csv(here("posts", "tfw-program", "data", "tfw_data_clean.csv")) |>
   mutate(across(c(id, year), as.character))
 ```
 

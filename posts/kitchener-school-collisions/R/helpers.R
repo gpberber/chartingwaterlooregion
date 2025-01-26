@@ -83,7 +83,7 @@ add_latlon_to_tibble <- function(data, x_col, y_col) {
     )
 }
 
-# function to identify collisions within 250m of a school
+# function to identify collisions within specified distance of a school
 analyze_collisions_near_schools <- function(collisions, schools, radius_meters = 250) {
   # Function to get names of nearby schools for a single collision
   get_nearby_schools <- function(collision_lat, collision_lon) {
@@ -109,18 +109,14 @@ analyze_collisions_near_schools <- function(collisions, schools, radius_meters =
     rowwise() %>%
     mutate(
       nearby_schools = get_nearby_schools(latitude, longitude),
-      near_school = !is.na(nearby_schools),
-      distance_to_nearest_school = min(distHaversine(
-        p1 = matrix(c(longitude_use, latitude_use), ncol = 2),
-        p2 = matrix(c(schools$longitude, schools$latitude), ncol = 2)
-      ))
+      near_school = !is.na(nearby_schools)
     ) %>%
     ungroup()
   
   return(collisions_with_proximity)
 }
 
-# function to create inetractive map of collsion data near schools
+# function to create inetractive map of collision data near schools
 create_school_collision_map <- function(data) {
   # Create popup content for each school
   popup_content <- sprintf(

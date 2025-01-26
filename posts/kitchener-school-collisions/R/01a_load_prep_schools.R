@@ -1,11 +1,15 @@
+here::i_am("posts/kitchener-school-collisions/R/01a_load_prep_schools.R")
+
 # Required packages
 library(tidygeocoder)
 library(janitor)
-source("collision_functions.R")
+library(here)
+
+source(here("posts", "kitchener-school-collisions", "R", "helpers.R"))
 
 
 # Read the public schools HTML content
-public_schools_html_content <- read_html("https://www.wrdsb.ca/our-schools/schools/")
+public_schools_html_content <- read_html(here("posts", "kitchener-school-collisions", "data-raw", "public_schools.htm"))
 
 # Extract school names and addresses
 public_schools_data <- public_schools_html_content %>%
@@ -45,7 +49,8 @@ public_schools_geocoded <- public_schools_clean %>%
   arrange(school_name)
 
 # Create vector of school names and addresses from the PDF data (these vectors were generated
-# by having Claude AI scrape the PDF of Catholic schools
+# by having Claude AI scrape the PDF of Catholic schools as was unable to tidy it
+# up using R code)
 catholic_schools_data <- tibble(
   school_name = c(
     "Blessed Sacrament", "Canadian Martyrs", "Christ the King", "Holy Family",
@@ -151,111 +156,10 @@ schools_clean <- rbind(public_schools_geocoded, catholic_schools_geocoded) |>
   arrange(school_name)
 
 # filter for bricks-and-mortar Kitchener schools
-kitchener_schools <- schools_clean |> 
+kitchener_schools_geocoded <- schools_clean |> 
   filter(
     grepl("Kitchener", address),
-    !grepl("Remote", school_name) #remove onlone schools
+    !grepl("Remote", school_name) #remove online schools
   )
 
-# load collisions data
-all_collisions <- read_csv("data/collisions_raw.csv") |> 
-  clean_names() |> 
-  select(
-    accidentnum:accident_month, 
-    accident_hour, 
-    accident_weekday, 
-    latitude, 
-    longitude, 
-    xcoord,
-    ycoord,
-    accidentlocation,
-    classificationofaccident,
-    impactlocation,
-    initialimpacttype,
-    trafficcontrol,
-    pedestrianinvolved,
-    cyclistinvolved,
-    environmentcondition1,
-    xmlimportnotes
-  ) 
-
-# for collisions with lat-lon coords of 0, use x-y coords to obtain lat-lon
-all_collisions <- add_latlon_to_tibble(
-  data = all_collisions,
-  x_col = "xcoord",
-  y_col = "ycoord"
-) |>
-  mutate(
-    latitude_use = if_else(latitude == 0, latitude_new, latitude),
-    longitude_use = if_else(longitude == 0, longitude_new, longitude)
-  ) |> 
-  relocate(accidentnum:latitude, latitude_new, latitude_use, longitude, longitude_new, longitude_use)
-
-# add school proximity info to collisions data
-collisions_with_proximity_to_schools <- analyze_collisions_near_schools(all_collisions, kitchener_schools, radius_meters = 250) |>
-  mutate(
-    during_school_hours = if_else(
-      !(accident_month %in% c(7, 8)) &
-      !(accident_weekday %in% c("Saturday", "Sunday")) &
-      (accident_hour >= 6) & (accident_hour < 18),
-      TRUE,
-      FALSE
-    ),
-    near_school_during_school_hours = if_else((near_school + during_school_hours) == 2, TRUE, FALSE)
-  )
-
-# collisions_during_school_hours <- collisions_with_proximity_to_schools |> 
-#   filter(
-#     !(accident_month %in% c(7, 8)),
-#     !(accident_weekday %in% c("Saturday", "Sunday")),
-#     (accident_hour >= 6) & (accident_hour < 18)
-#   ) 
-
-# tibble containing only collisions during school hours within 250m of school
-collisions_near_schools_during_school_hours <- collisions_with_proximity_to_schools |> 
-  filter(near_school_during_school_hours == TRUE) |> 
-  mutate(no_ped_cyc_involved = if_else((pedestrianinvolved + cyclistinvolved) > 0, FALSE, TRUE))
-
-# Count maximum number of schools for any collision
-max_schools <- collisions_near_schools_during_school_hours %>%
-  pull(nearby_schools) %>%
-  str_count("; ") %>%
-  max() %>%
-  {. + 1}  # Add 1 since n delimiters = n+1 schools
-
-# Create column names for the separated schools
-school_cols <- paste0("nearby_school_", seq_len(max_schools))
-
-collisions_near_schools_summary <- collisions_near_schools_during_school_hours |> 
-  select(nearby_schools, pedestrianinvolved, cyclistinvolved, no_ped_cyc_involved) |> 
-  separate(
-    col = nearby_schools,
-    into = school_cols,
-    sep = "; ",
-    fill = "right"  # Fill empty values with NA
-  ) |> 
-  pivot_longer(cols = starts_with("nearby"), values_to = "school_name") |> 
-  filter(!is.na(school_name)) |> 
-  group_by(school_name) |> 
-  summarize(
-    pedestrian_collisions = sum(pedestrianinvolved),
-    cyclist_collisions = sum(cyclistinvolved),
-    other_collisions = sum(no_ped_cyc_involved)
-  ) |> 
-  ungroup() |> 
-  mutate(total_collisions = pedestrian_collisions + cyclist_collisions + other_collisions)
-
-schools_collision_summary <- kitchener_schools |>
-  left_join(collisions_near_schools_summary) |>
-  filter(!grepl(paste(c("Oak Creek", "Bakhita"), collapse = "|"), school_name)) |> # schools not open during study period
-  replace_na(list(
-    pedestrian_collisions = 0,
-    cyclist_collisions = 0,
-    other_collisions = 0,
-    total_collisions = 0
-  ))
-
-write_csv(schools_clean, "data/schools_clean.csv")
-write_csv(all_collisions, "data/collisions_clean.csv")
-write_csv(schools_collision_summary, "data/schools_collision_summary.csv")
-write_csv(collisions_with_proximity_to_schools, "data/collisions_with_proximity_to_schools.csv")
+write_csv(kitchener_schools_geocoded, here("posts", "kitchener-school-collisions", "data", "kitchener_schools_geocoded.csv"))
