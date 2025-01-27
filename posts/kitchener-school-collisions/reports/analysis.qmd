@@ -24,18 +24,37 @@ source(here("posts", "kitchener-school-collisions", "R", "helpers.R"))
 #| label: load-data
 
 all_collisions <- read_csv(here("posts", "kitchener-school-collisions", "data", "collisions_with_proximity_to_schools.csv"))
+
 collisions_near_schools <- read_csv(here("posts", "kitchener-school-collisions", "data", "schools_collision_summary.csv"))
 ```
 
 ```{r}
-#| label: collisions-by-time-window
+#| label: days-by-type
 
-collisions_near_schools |> 
-  filter(!is.na(time_window)) |> 
-  group_by(time_window) |> 
-  summarise(across(ends_with("_collisions"), sum), .groups = "drop") |> 
-  gt()
+all_days <- tibble(
+  date = seq.Date(ymd("2015-01-01"), ymd("2022-07-31"), "days"),
+  weekday = weekdays(date),
+  month = month(date),
+  on_school_day = if_else(
+      !(month %in% c(7, 8)) & !(weekday %in% c("Saturday", "Sunday")),
+      TRUE,
+      FALSE
+    ),
+  during_covid_shutdown = case_when(
+      between(date, ymd("2020-03-16"), ymd("2020-06-30")) ~ TRUE,
+      between(date, ymd("2020-12-21"), ymd("2021-02-07")) ~ TRUE,
+      between(date, ymd("2021-04-12"), ymd("2021-06-30")) ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    school_day_type = case_when(
+      on_school_day & during_covid_shutdown ~ "Lockdown School Day",
+      on_school_day & !during_covid_shutdown ~ "Regular School Day",
+      TRUE ~ "Non-School Day"
+    )
+  ) |> 
+  count(school_day_type, name = "num_days")
 
+all_days
 ```
 
 ```{r}
@@ -43,6 +62,83 @@ collisions_near_schools |>
 
 collisions_btw_6am_6pm <- collisions_near_schools |> 
   filter(grepl("6am", time_window))
+```
+
+```{r}
+#| label: collisions-6am-6pm
+
+collisions_btw_6am_6pm |> 
+  group_by(school_name) |> 
+  summarise(across(ends_with("_collisions"), sum), .groups = "drop") |> 
+  filter(total_collisions > 0) |> 
+  arrange(desc(total_collisions)) |> 
+  gt(rowname_col = "school_name") |> 
+  tab_header(
+    title = md("**Schools With at Least One Collision Within 250M**"),
+    subtitle = "Collisions Involving Pedestrians or Cyclists Broken Out"
+    ) |> 
+  cols_label(
+    pedestrian_collisions = "Pedestrians",
+    cyclist_collisions = "Cyclists",
+    other_collisions = "Other",
+    total_collisions = "Total"
+  ) |> 
+  grand_summary_rows(
+    columns = everything(),
+    fns = list(Total ~ sum(.))
+  )  # Add summary row
+
+```
+
+```{r}
+#| label: by-day-type
+
+coll_by_day_type <- all_collisions |>
+  filter(btw_6am_6pm & near_school) |> 
+  group_by(school_day_type) |> 
+  summarise(across(ends_with("involved"), sum), .groups = "drop") |>
+  mutate(
+    total_collisions = pedestrianinvolved + cyclistinvolved + no_ped_cyc_involved,
+    pedestrian_perc = pedestrianinvolved / total_collisions,
+    cyclist_perc = cyclistinvolved / total_collisions,
+    other_perc = no_ped_cyc_involved / total_collisions
+    )
+
+coll_by_day_type |> 
+  gt(rowname_col = "school_day_type") |> 
+  tab_header(
+    title = md("**Collisions by Type of Day**")) |> 
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total",
+    pedestrian_perc = "Pedestrian %",
+    cyclist_perc = "Cyclist %",
+    other_perc = "Other %"
+  ) |> 
+  fmt_percent(columns = ends_with("perc"), decimals = 1)
+
+```
+
+```{r}
+#| label: colls-per-day
+
+coll_by_day_type |> 
+  left_join(all_days) |> 
+  mutate(across(2:5, ~ .x / num_days)) |> 
+  select(-(6:9)) |> 
+  gt(rowname_col = "school_day_type") |> 
+  tab_header(
+    title = md("**Collisions per Day**")) |> 
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total"
+  ) |> 
+  fmt_number(columns = everything(), decimals = 2)
+
 ```
 
 The interactive map below reports the types and number of collisions that took place on a school day between 6AM and 6PM within 250m of schools in Kitchener. Hover over a bubble to see the school name and click on it to see collision details. A bubble with a number indicates multiple underlying schools. Click on it to zoom in and see bubbles for the individual schools.

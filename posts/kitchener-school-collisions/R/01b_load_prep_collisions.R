@@ -33,6 +33,16 @@ all_collisions <- read_csv("posts/kitchener-school-collisions/data-raw/kitchener
     location_notes = xmlimportnotes
   ) 
 
+# split date-time column
+all_collisions <- all_collisions |> 
+  mutate(
+    accidentdate = mdy_hms(accidentdate),
+    accident_date = as_date(accidentdate),
+    accident_time = format(accidentdate, "%H:%M:%S")
+  ) |> 
+  select(-accidentdate) |> 
+  relocate(accidentnum, accident_date, accident_time)
+
 # remove 178 duplicate collisions reported for 2019 
 # most have a reported time of 12am in one row and a later time in the other row
 # assumed the later time was the correct one
@@ -63,7 +73,7 @@ all_collisions <- all_collisions |>
   ))) |>
   ungroup()
 
-# add school day and school-hour window columns
+# add school day, school-hour window, pandemic closure, and non-pedestrian/cyclist columns
 all_collisions <- all_collisions |>
   mutate(
     on_school_day = if_else(
@@ -74,7 +84,18 @@ all_collisions <- all_collisions |>
     btw_6am_6pm = (accident_hour >= 6) & (accident_hour < 18),
     btw_7am_5pm = (accident_hour >= 7) & (accident_hour < 17),
     btw_8am_4pm = (accident_hour >= 8) & (accident_hour < 16),
-    no_ped_cyc_involved = if_else((pedestrianinvolved + cyclistinvolved) > 0, FALSE, TRUE)
+    no_ped_cyc_involved = if_else((pedestrianinvolved + cyclistinvolved) > 0, FALSE, TRUE),
+    during_covid_shutdown = case_when(
+      between(accident_date, ymd("2020-03-16"), ymd("2020-06-30")) ~ TRUE,
+      between(accident_date, ymd("2020-12-21"), ymd("2021-02-07")) ~ TRUE,
+      between(accident_date, ymd("2021-04-12"), ymd("2021-06-30")) ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    school_day_type = case_when(
+      on_school_day & during_covid_shutdown ~ "Lockdown School Day",
+      on_school_day & !during_covid_shutdown ~ "Regular School Day",
+      TRUE ~ "Non-School Day"
+    )
   )
 
 # add school proximity info to collisions data

@@ -1,212 +1,285 @@
-school_name,address,latitude,longitude,time_window,pedestrian_collisions,cyclist_collisions,other_collisions,total_collisions
-Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,btw_6am_6pm,0,0,13,13
-Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,btw_7am_5pm,0,0,11,11
-Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,btw_8am_4pm,0,0,10,10
-Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,btw_6am_6pm,0,0,5,5
-Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,btw_7am_5pm,0,0,4,4
-Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,btw_8am_4pm,0,0,1,1
-Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,btw_6am_6pm,0,0,4,4
-Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,btw_7am_5pm,0,0,3,3
-Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,btw_8am_4pm,0,0,3,3
-Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,btw_6am_6pm,0,0,7,7
-Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,btw_7am_5pm,0,0,7,7
-Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,btw_8am_4pm,0,0,6,6
-Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,btw_6am_6pm,0,4,32,36
-Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,btw_7am_5pm,0,3,30,33
-Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,btw_8am_4pm,0,3,24,27
-Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,btw_6am_6pm,0,0,2,2
-Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,btw_7am_5pm,0,0,2,2
-Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,btw_8am_4pm,0,0,2,2
-Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,btw_6am_6pm,0,0,2,2
-Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,btw_7am_5pm,0,0,2,2
-Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,btw_8am_4pm,0,0,1,1
-Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,btw_6am_6pm,0,0,4,4
-Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,btw_7am_5pm,0,0,4,4
-Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,btw_8am_4pm,0,0,3,3
-Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,btw_6am_6pm,0,0,7,7
-Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,btw_7am_5pm,0,0,6,6
-Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,btw_8am_4pm,0,0,5,5
-Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,btw_6am_6pm,0,0,6,6
-Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,btw_7am_5pm,0,0,5,5
-Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,btw_8am_4pm,0,0,5,5
-Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,btw_6am_6pm,0,1,7,8
-Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,btw_7am_5pm,0,1,5,6
-Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,btw_8am_4pm,0,1,3,4
-Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,btw_6am_6pm,0,0,10,10
-Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,btw_7am_5pm,0,0,10,10
-Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,btw_8am_4pm,0,0,9,9
-Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,btw_6am_6pm,0,0,5,5
-Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,btw_7am_5pm,0,0,4,4
-Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,btw_8am_4pm,0,0,4,4
-Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,btw_6am_6pm,0,0,2,2
-Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,btw_7am_5pm,0,0,2,2
-Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,btw_8am_4pm,0,0,2,2
-Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,btw_6am_6pm,0,0,10,10
-Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,btw_7am_5pm,0,0,9,9
-Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,btw_8am_4pm,0,0,7,7
-Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,btw_6am_6pm,0,0,7,7
-Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,btw_7am_5pm,0,0,6,6
-Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,btw_8am_4pm,0,0,5,5
-Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,btw_6am_6pm,0,0,11,11
-Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,btw_7am_5pm,0,0,9,9
-Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,btw_8am_4pm,0,0,6,6
-Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_6am_6pm,0,0,6,6
-Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_7am_5pm,0,0,5,5
-Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_8am_4pm,0,0,4,4
-Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,btw_6am_6pm,0,0,3,3
-Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,btw_7am_5pm,0,0,3,3
-Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,btw_8am_4pm,0,0,3,3
-Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,btw_6am_6pm,0,1,2,3
-Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,btw_7am_5pm,0,1,2,3
-Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,btw_8am_4pm,0,1,2,3
-Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,btw_6am_6pm,0,0,6,6
-Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,btw_7am_5pm,0,0,5,5
-Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,btw_8am_4pm,0,0,5,5
-Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,btw_6am_6pm,0,1,36,37
-Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,btw_7am_5pm,0,1,31,32
-Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,btw_8am_4pm,0,0,22,22
-Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,btw_6am_6pm,0,0,3,3
-Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,btw_7am_5pm,0,0,2,2
-Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,btw_8am_4pm,0,0,2,2
-J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,btw_6am_6pm,0,0,18,18
-J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,btw_7am_5pm,0,0,17,17
-J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,btw_8am_4pm,0,0,14,14
-J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,btw_6am_6pm,0,0,7,7
-J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,btw_7am_5pm,0,0,7,7
-J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,btw_8am_4pm,0,0,7,7
-Janet Metcalfe Public School,335 Seabrook Drive Kitchener ON N2R 0G3,43.38558148773738,-80.49876750926715,NA,0,0,0,0
-Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,btw_6am_6pm,0,0,18,18
-Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,btw_7am_5pm,0,0,15,15
-Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,btw_8am_4pm,0,0,13,13
-John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,btw_6am_6pm,0,0,5,5
-John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,btw_7am_5pm,0,0,5,5
-John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,btw_8am_4pm,0,0,4,4
-John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,btw_6am_6pm,4,0,13,17
-John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,btw_7am_5pm,4,0,11,15
-John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,btw_8am_4pm,2,0,10,12
-King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,btw_6am_6pm,2,0,28,30
-King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,btw_7am_5pm,2,0,24,26
-King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,btw_8am_4pm,2,0,20,22
-Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,btw_6am_6pm,4,0,52,56
-Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,btw_7am_5pm,4,0,51,55
-Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,btw_8am_4pm,3,0,39,42
-Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,btw_6am_6pm,0,0,4,4
-Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,btw_7am_5pm,0,0,4,4
-Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,btw_8am_4pm,0,0,4,4
-Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,btw_6am_6pm,0,0,2,2
-Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,btw_7am_5pm,0,0,2,2
-Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,btw_8am_4pm,0,0,2,2
-Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,btw_6am_6pm,0,1,1,2
-Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,btw_7am_5pm,0,1,1,2
-Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,btw_8am_4pm,0,0,1,1
-Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,btw_6am_6pm,3,2,25,30
-Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,btw_7am_5pm,3,1,23,27
-Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,btw_8am_4pm,2,1,18,21
-Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,btw_6am_6pm,0,0,10,10
-Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,btw_7am_5pm,0,0,9,9
-Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,btw_8am_4pm,0,0,8,8
-Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,btw_6am_6pm,0,0,2,2
-Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,btw_7am_5pm,0,0,2,2
-Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,btw_8am_4pm,0,0,2,2
-Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,btw_6am_6pm,0,0,8,8
-Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,btw_7am_5pm,0,0,8,8
-Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,btw_8am_4pm,0,0,7,7
-Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,btw_6am_6pm,2,1,33,36
-Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,btw_7am_5pm,2,0,30,32
-Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,btw_8am_4pm,2,0,24,26
-Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,btw_6am_6pm,0,0,5,5
-Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,btw_7am_5pm,0,0,5,5
-Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,btw_8am_4pm,0,0,4,4
-Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,btw_6am_6pm,0,0,22,22
-Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,btw_7am_5pm,0,0,20,20
-Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,btw_8am_4pm,0,0,18,18
-Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,btw_6am_6pm,1,0,6,7
-Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,btw_7am_5pm,1,0,6,7
-Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,btw_8am_4pm,1,0,6,7
-Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,btw_6am_6pm,0,0,6,6
-Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,btw_7am_5pm,0,0,6,6
-Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,btw_8am_4pm,0,0,5,5
-Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,btw_6am_6pm,0,0,8,8
-Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,btw_7am_5pm,0,0,7,7
-Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,btw_8am_4pm,0,0,5,5
-Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_6am_6pm,0,0,6,6
-Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_7am_5pm,0,0,5,5
-Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,btw_8am_4pm,0,0,4,4
-Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,btw_6am_6pm,1,0,5,6
-Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,btw_7am_5pm,1,0,5,6
-Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,btw_8am_4pm,1,0,4,5
-Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,btw_6am_6pm,1,0,4,5
-Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,btw_7am_5pm,1,0,2,3
-Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,btw_8am_4pm,1,0,1,2
-Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,btw_6am_6pm,1,0,6,7
-Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,btw_7am_5pm,1,0,6,7
-Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,btw_8am_4pm,1,0,5,6
-Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,btw_6am_6pm,0,1,8,9
-Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,btw_7am_5pm,0,1,6,7
-Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,btw_8am_4pm,0,1,4,5
-Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,btw_6am_6pm,0,0,10,10
-Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,btw_7am_5pm,0,0,9,9
-Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,btw_8am_4pm,0,0,8,8
-St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,btw_6am_6pm,0,0,5,5
-St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,btw_7am_5pm,0,0,4,4
-St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,btw_8am_4pm,0,0,2,2
-St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,btw_6am_6pm,2,0,3,5
-St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,btw_7am_5pm,0,0,3,3
-St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,btw_8am_4pm,0,0,3,3
-St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,btw_6am_6pm,1,0,29,30
-St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,btw_7am_5pm,1,0,28,29
-St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,btw_8am_4pm,1,0,22,23
-St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,btw_6am_6pm,0,0,7,7
-St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,btw_7am_5pm,0,0,6,6
-St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,btw_8am_4pm,0,0,5,5
-St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,btw_6am_6pm,0,0,3,3
-St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,btw_7am_5pm,0,0,3,3
-St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,btw_8am_4pm,0,0,3,3
-St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,btw_6am_6pm,0,0,21,21
-St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,btw_7am_5pm,0,0,17,17
-St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,btw_8am_4pm,0,0,12,12
-St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,btw_6am_6pm,0,0,4,4
-St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,btw_7am_5pm,0,0,4,4
-St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,btw_8am_4pm,0,0,3,3
-St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,btw_6am_6pm,0,0,14,14
-St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,btw_7am_5pm,0,0,13,13
-St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,btw_8am_4pm,0,0,13,13
-St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,btw_6am_6pm,0,0,17,17
-St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,btw_7am_5pm,0,0,15,15
-St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,btw_8am_4pm,0,0,13,13
-St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,btw_6am_6pm,0,0,5,5
-St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,btw_7am_5pm,0,0,5,5
-St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,btw_8am_4pm,0,0,5,5
-St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,btw_6am_6pm,0,0,5,5
-St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,btw_7am_5pm,0,0,5,5
-St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,btw_8am_4pm,0,0,4,4
-St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,btw_6am_6pm,1,0,13,14
-St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,btw_7am_5pm,0,0,10,10
-St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,btw_8am_4pm,0,0,5,5
-Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,btw_6am_6pm,0,0,6,6
-Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,btw_7am_5pm,0,0,6,6
-Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,btw_8am_4pm,0,0,5,5
-Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,btw_6am_6pm,0,0,16,16
-Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,btw_7am_5pm,0,0,14,14
-Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,btw_8am_4pm,0,0,12,12
-Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,btw_6am_6pm,1,0,7,8
-Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,btw_7am_5pm,1,0,7,8
-Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,btw_8am_4pm,1,0,6,7
-Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,btw_6am_6pm,0,0,5,5
-Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,btw_7am_5pm,0,0,4,4
-Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,btw_8am_4pm,0,0,4,4
-W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,btw_6am_6pm,1,0,11,12
-W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,btw_7am_5pm,1,0,9,10
-W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,btw_8am_4pm,1,0,7,8
-Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,btw_6am_6pm,0,0,4,4
-Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,btw_7am_5pm,0,0,3,3
-Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,btw_8am_4pm,0,0,2,2
-Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,btw_6am_6pm,0,1,16,17
-Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,btw_7am_5pm,0,1,12,13
-Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,btw_8am_4pm,0,1,10,11
-Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,btw_6am_6pm,3,1,19,23
-Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,btw_7am_5pm,3,1,18,22
-Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,btw_8am_4pm,3,1,17,21
-Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,btw_6am_6pm,1,0,10,11
-Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,btw_7am_5pm,1,0,10,11
-Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,btw_8am_4pm,1,0,7,8
+school_name,address,latitude,longitude,school_day_type,time_window,pedestrian_collisions,cyclist_collisions,other_collisions,total_collisions
+Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,Regular School Day,btw_6am_6pm,0,0,13,13
+Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,Regular School Day,btw_7am_5pm,0,0,11,11
+Alpine Public School,75 Lucerne Dr Kitchener ON N2E 1B4,43.4200926,-80.48073988317654,Regular School Day,btw_8am_4pm,0,0,10,10
+Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,Regular School Day,btw_6am_6pm,0,0,5,5
+Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,Regular School Day,btw_7am_5pm,0,0,4,4
+Blessed Sacrament,"367 The Country Way Kitchener, ON N2E 2S3",43.407401,-80.48360968785599,Regular School Day,btw_8am_4pm,0,0,1,1
+Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,Regular School Day,btw_6am_6pm,0,0,4,4
+Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,Regular School Day,btw_7am_5pm,0,0,3,3
+Bridgeport Public School,59 Bridge St W Kitchener ON N2K 1K6,43.48279435,-80.48666451523832,Regular School Day,btw_8am_4pm,0,0,3,3
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Regular School Day,btw_6am_6pm,0,0,6,6
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Regular School Day,btw_7am_5pm,0,0,6,6
+Brigadoon Public School,415 Caryndale Dr Kitchener ON N2R 1J7,43.38474885,-80.45538689508561,Regular School Day,btw_8am_4pm,0,0,5,5
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Lockdown School Day,btw_6am_6pm,0,0,2,2
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Lockdown School Day,btw_7am_5pm,0,0,2,2
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Regular School Day,btw_6am_6pm,0,4,30,34
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Regular School Day,btw_7am_5pm,0,3,28,31
+Cameron Heights Collegiate Institute,301 Charles St E Kitchener ON N2G 2P8,43.4444278,-80.48169635843578,Regular School Day,btw_8am_4pm,0,3,23,26
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Regular School Day,btw_6am_6pm,0,0,1,1
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Regular School Day,btw_7am_5pm,0,0,1,1
+Canadian Martyrs,"50 Confederation Drive Kitchener, ON N2B 2X5",43.4619039,-80.44667797642393,Regular School Day,btw_8am_4pm,0,0,1,1
+Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,Regular School Day,btw_6am_6pm,0,0,2,2
+Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,Regular School Day,btw_7am_5pm,0,0,2,2
+Chicopee Hills Public School,300 Chicopee Hills Drive Kitchener ON N2A 0J6,43.4451825,-80.41411500815191,Regular School Day,btw_8am_4pm,0,0,1,1
+Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,Regular School Day,btw_6am_6pm,0,0,4,4
+Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,Regular School Day,btw_7am_5pm,0,0,4,4
+Country Hills Public School,195 Country Hill Dr Kitchener ON N2E 2G7,43.41335555,-80.4707269854407,Regular School Day,btw_8am_4pm,0,0,3,3
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Regular School Day,btw_6am_6pm,0,0,6,6
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Regular School Day,btw_7am_5pm,0,0,5,5
+Courtland Senior Public School,107 Courtland Ave E Kitchener ON N2G 2T9,43.4428724,-80.48902349891235,Regular School Day,btw_8am_4pm,0,0,4,4
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Regular School Day,btw_6am_6pm,0,0,5,5
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Regular School Day,btw_7am_5pm,0,0,4,4
+Crestview Public School,153 Montcalm Dr Kitchener ON N2B 2R6,43.4540155,-80.44196626374642,Regular School Day,btw_8am_4pm,0,0,4,4
+Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,Regular School Day,btw_6am_6pm,0,1,6,7
+Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,Regular School Day,btw_7am_5pm,0,1,4,5
+Doon Public School,1401 Doon Village Rd Kitchener ON N2P 1A8,43.38714255,-80.42078687802726,Regular School Day,btw_8am_4pm,0,1,3,4
+Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,Regular School Day,btw_6am_6pm,0,0,10,10
+Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,Regular School Day,btw_7am_5pm,0,0,10,10
+Driftwood Park Public School,50 Parkland Cres Kitchener ON N2N 1S4,43.41490885,-80.53682872984814,Regular School Day,btw_8am_4pm,0,0,9,9
+Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,Regular School Day,btw_6am_6pm,0,0,5,5
+Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,Regular School Day,btw_7am_5pm,0,0,4,4
+Eastwood Collegiate Institute,760 Weber St E Kitchener ON N2H 1H6,43.43921975,-80.45894365959595,Regular School Day,btw_8am_4pm,0,0,4,4
+Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,Regular School Day,btw_6am_6pm,0,0,2,2
+Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,Regular School Day,btw_7am_5pm,0,0,2,2
+Forest Heights Collegiate Institute,255 Fischer-Hallman Rd Kitchener ON N2M 4X8,43.4252264,-80.52282822639316,Regular School Day,btw_8am_4pm,0,0,2,2
+Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,Regular School Day,btw_6am_6pm,0,0,10,10
+Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,Regular School Day,btw_7am_5pm,0,0,9,9
+Forest Hill Public School,255 Westmount Rd E Kitchener ON N2M 4Z2,43.42594295,-80.50654684887172,Regular School Day,btw_8am_4pm,0,0,7,7
+Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,Regular School Day,btw_6am_6pm,0,0,7,7
+Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,Regular School Day,btw_7am_5pm,0,0,6,6
+Franklin Public School,371 Franklin St N Kitchener ON N2A 1Y9,43.44404375,-80.44721852094926,Regular School Day,btw_8am_4pm,0,0,5,5
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Lockdown School Day,btw_6am_6pm,0,0,3,3
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Lockdown School Day,btw_7am_5pm,0,0,3,3
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Lockdown School Day,btw_8am_4pm,0,0,3,3
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Regular School Day,btw_6am_6pm,0,0,8,8
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Regular School Day,btw_7am_5pm,0,0,6,6
+Glencairn Public School,664 Erinbrook Dr Kitchener ON N2E 2R1,43.41048335,-80.49143732171149,Regular School Day,btw_8am_4pm,0,0,3,3
+Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_6am_6pm,0,0,6,6
+Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_7am_5pm,0,0,5,5
+Grand River Collegiate Institute,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_8am_4pm,0,0,4,4
+Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,Regular School Day,btw_6am_6pm,0,0,3,3
+Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,Regular School Day,btw_7am_5pm,0,0,3,3
+Groh Public School,225 Thomas Slee Drive Kitchener ON N2P 0B8,43.3718994,-80.439414460644,Regular School Day,btw_8am_4pm,0,0,3,3
+Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,Regular School Day,btw_6am_6pm,0,1,2,3
+Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,Regular School Day,btw_7am_5pm,0,1,2,3
+Hillside Public School,11 Chopin Dr Kitchener ON N2M 2G3,43.44231905,-80.52386793846287,Regular School Day,btw_8am_4pm,0,1,2,3
+Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,Regular School Day,btw_6am_6pm,0,0,6,6
+Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,Regular School Day,btw_7am_5pm,0,0,5,5
+Howard Robertson Public School,130 Morgan Ave Kitchener ON N2A 2M5,43.4300125,-80.42953964214641,Regular School Day,btw_8am_4pm,0,0,5,5
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Lockdown School Day,btw_6am_6pm,0,0,3,3
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Lockdown School Day,btw_7am_5pm,0,0,2,2
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Lockdown School Day,btw_8am_4pm,0,0,2,2
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Regular School Day,btw_6am_6pm,0,1,33,34
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Regular School Day,btw_7am_5pm,0,1,29,30
+Huron Heights Secondary School,1825 Strasburg Rd Kitchener ON N2R 1S3,43.39407745,-80.46607334573369,Regular School Day,btw_8am_4pm,0,0,20,20
+Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,Regular School Day,btw_6am_6pm,0,0,3,3
+Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,Regular School Day,btw_7am_5pm,0,0,2,2
+Huron Natural Area Outdoor Environmental Education Centre,801 Trillium Drive Kitchener ON N2J 3Z4,43.3984278,-80.48194487503022,Regular School Day,btw_8am_4pm,0,0,2,2
+J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,Regular School Day,btw_6am_6pm,0,0,18,18
+J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,Regular School Day,btw_7am_5pm,0,0,17,17
+J F Carmichael Public School,80 Patricia Ave Kitchener ON N2M 1J3,43.4393139,-80.50437457598599,Regular School Day,btw_8am_4pm,0,0,14,14
+J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,Regular School Day,btw_6am_6pm,0,0,7,7
+J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,Regular School Day,btw_7am_5pm,0,0,7,7
+J W Gerth Public School,171 Apple Ridge Dr Kitchener ON N2P 0A1,43.3840899,-80.43943399368025,Regular School Day,btw_8am_4pm,0,0,7,7
+Janet Metcalfe Public School,335 Seabrook Drive Kitchener ON N2R 0G3,43.38558148773738,-80.49876750926715,NA,NA,0,0,0,0
+Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,Regular School Day,btw_6am_6pm,0,0,18,18
+Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,Regular School Day,btw_7am_5pm,0,0,15,15
+Jean Steckle Public School,130 Woodbine Ave Kitchener ON N2R 1X7,43.38750873141032,-80.48523648777457,Regular School Day,btw_8am_4pm,0,0,13,13
+John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,Regular School Day,btw_6am_6pm,0,0,5,5
+John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,Regular School Day,btw_7am_5pm,0,0,5,5
+John Darling Public School,200 Rolling Meadows Dr Kitchener ON N2N 3G9,43.420092749999995,-80.54665349005109,Regular School Day,btw_8am_4pm,0,0,4,4
+John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,Regular School Day,btw_6am_6pm,4,0,13,17
+John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,Regular School Day,btw_7am_5pm,4,0,11,15
+John Sweeney,"185 Activa Ave., Kitchener, ON N2E 4A1",43.4084771,-80.51255170681014,Regular School Day,btw_8am_4pm,2,0,10,12
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Lockdown School Day,btw_6am_6pm,0,0,1,1
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Lockdown School Day,btw_7am_5pm,0,0,1,1
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Lockdown School Day,btw_8am_4pm,0,0,1,1
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Regular School Day,btw_6am_6pm,2,0,27,29
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Regular School Day,btw_7am_5pm,2,0,23,25
+King Edward Public School,709 King St W Kitchener ON N2G 1E3,43.45423335,-80.50702386344551,Regular School Day,btw_8am_4pm,2,0,19,21
+Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,Regular School Day,btw_6am_6pm,4,0,51,55
+Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,Regular School Day,btw_7am_5pm,4,0,50,54
+Kitchener-Waterloo Collegiate & Vocational School,787 King St W Kitchener ON N2G 1E3,43.4555829,-80.50900287030169,Regular School Day,btw_8am_4pm,3,0,39,42
+Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,Regular School Day,btw_6am_6pm,0,0,4,4
+Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,Regular School Day,btw_7am_5pm,0,0,4,4
+Lackner Woods Public School,151 Zeller Dr Kitchener ON N2A 4H4,43.4523849,-80.41847735077803,Regular School Day,btw_8am_4pm,0,0,4,4
+Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,Regular School Day,btw_6am_6pm,0,0,2,2
+Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,Regular School Day,btw_7am_5pm,0,0,2,2
+Laurentian Senior Public School,777 Westmount Rd E Kitchener ON N2E 1J2,43.4176059,-80.5027895793489,Regular School Day,btw_8am_4pm,0,0,2,2
+Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,Regular School Day,btw_6am_6pm,0,1,0,1
+Mackenzie King Public School,51 Natchez Rd Kitchener ON N2B 3A7,43.4657256,-80.44751310353621,Regular School Day,btw_7am_5pm,0,1,0,1
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Lockdown School Day,btw_6am_6pm,0,1,2,3
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Lockdown School Day,btw_7am_5pm,0,0,2,2
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Lockdown School Day,btw_8am_4pm,0,0,2,2
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Regular School Day,btw_6am_6pm,3,1,23,27
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Regular School Day,btw_7am_5pm,3,1,21,25
+Margaret Avenue Senior Public School,325 Louisa St Kitchener ON N2H 5N1,43.45960925,-80.48983037208485,Regular School Day,btw_8am_4pm,2,1,16,19
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Regular School Day,btw_6am_6pm,0,0,9,9
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Regular School Day,btw_7am_5pm,0,0,8,8
+Meadowlane Public School,236 Forestwood Dr Kitchener ON N2N 1C1,43.4187273,-80.52701806685407,Regular School Day,btw_8am_4pm,0,0,7,7
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Regular School Day,btw_6am_6pm,0,0,1,1
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Regular School Day,btw_7am_5pm,0,0,1,1
+Monsignor R.M. Haller,"118 Shea Crescent Kitchener, ON N2E 1E8",43.4184178,-80.49277094587332,Regular School Day,btw_8am_4pm,0,0,1,1
+Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,Regular School Day,btw_6am_6pm,0,0,8,8
+Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,Regular School Day,btw_7am_5pm,0,0,8,8
+Our Lady of Grace,"70 Gracefield Crescent Kitchener, ON N2E 1R9",43.41986505,-80.47863491141305,Regular School Day,btw_8am_4pm,0,0,7,7
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Lockdown School Day,btw_6am_6pm,0,0,2,2
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Lockdown School Day,btw_7am_5pm,0,0,2,2
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Lockdown School Day,btw_8am_4pm,0,0,2,2
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Regular School Day,btw_6am_6pm,2,1,31,34
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Regular School Day,btw_7am_5pm,2,0,28,30
+Pioneer Park Public School,55 Upper Canada Dr Kitchener ON N2P 1G2,43.3967845,-80.44372428192447,Regular School Day,btw_8am_4pm,2,0,22,24
+Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,Regular School Day,btw_6am_6pm,0,0,5,5
+Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,Regular School Day,btw_7am_5pm,0,0,5,5
+Prueter Public School,40 Prueter Ave Kitchener ON N2H 6G6,43.46897535,-80.4911172091114,Regular School Day,btw_8am_4pm,0,0,4,4
+Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,Regular School Day,btw_6am_6pm,0,0,21,21
+Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,Regular School Day,btw_7am_5pm,0,0,20,20
+Queen Elizabeth Public School,191 Hoffman St Kitchener ON N2M 3N2,43.4301204,-80.4855199588219,Regular School Day,btw_8am_4pm,0,0,18,18
+Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,Regular School Day,btw_6am_6pm,1,0,6,7
+Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,Regular School Day,btw_7am_5pm,1,0,6,7
+Queensmount Senior Public School,21 Westmount Rd W Kitchener ON N2M 1R6,43.433722149999994,-80.51125766489162,Regular School Day,btw_8am_4pm,1,0,6,7
+Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,Regular School Day,btw_6am_6pm,0,0,6,6
+Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,Regular School Day,btw_7am_5pm,0,0,6,6
+Resurrection Catholic Secondary School,"455 University Ave. W, Kitchener, ON N2N 3B9",43.43957025,-80.54613569108241,Regular School Day,btw_8am_4pm,0,0,5,5
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Regular School Day,btw_6am_6pm,0,0,7,7
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Regular School Day,btw_7am_5pm,0,0,6,6
+Rockway Public School,70 Vanier Dr Kitchener ON N2C 1J5,43.4287303,-80.46336958478244,Regular School Day,btw_8am_4pm,0,0,4,4
+Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_6am_6pm,0,0,6,6
+Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_7am_5pm,0,0,5,5
+Rosemount School,175 Indian Rd Kitchener ON N2B 2S7,43.45655415,-80.43678110602693,Regular School Day,btw_8am_4pm,0,0,4,4
+Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,Regular School Day,btw_6am_6pm,1,0,5,6
+Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,Regular School Day,btw_7am_5pm,1,0,5,6
+Saint John Paul II,"75 Pebblecreek Drive Kitchener, ON N2A 4K1",43.4489905,-80.41183658143837,Regular School Day,btw_8am_4pm,1,0,4,5
+Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,Regular School Day,btw_6am_6pm,1,0,4,5
+Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,Regular School Day,btw_7am_5pm,1,0,2,3
+Sandhills Public School,1250 Victoria St S Kitchener ON N2N 3J2,43.4327259,-80.54390469177656,Regular School Day,btw_8am_4pm,1,0,1,2
+Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,Regular School Day,btw_6am_6pm,1,0,6,7
+Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,Regular School Day,btw_7am_5pm,1,0,6,7
+Sheppard Public School,278 Weber St E Kitchener ON N2H 1G2,43.44701135,-80.47184812876462,Regular School Day,btw_8am_4pm,1,0,5,6
+Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,Regular School Day,btw_6am_6pm,0,1,8,9
+Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,Regular School Day,btw_7am_5pm,0,1,6,7
+Smithson Public School,150 Belleview Ave Kitchener ON N2B 1G7,43.4545164,-80.46165275367684,Regular School Day,btw_8am_4pm,0,1,4,5
+Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,Regular School Day,btw_6am_6pm,0,0,10,10
+Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,Regular School Day,btw_7am_5pm,0,0,9,9
+Southridge Public School,1425 Queen's Blvd Kitchener ON N2M 5B3,43.4291513,-80.51851283923051,Regular School Day,btw_8am_4pm,0,0,8,8
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Lockdown School Day,btw_6am_6pm,0,0,1,1
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Lockdown School Day,btw_7am_5pm,0,0,1,1
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Lockdown School Day,btw_8am_4pm,0,0,1,1
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Regular School Day,btw_6am_6pm,0,0,4,4
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Regular School Day,btw_7am_5pm,0,0,3,3
+St. Aloysius,"504 Connaught Street Kitchener, ON N2C 1C2",43.42893205,-80.44560320272623,Regular School Day,btw_8am_4pm,0,0,1,1
+St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,Regular School Day,btw_6am_6pm,2,0,3,5
+St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,Regular School Day,btw_7am_5pm,0,0,3,3
+St. Anne Kit,"250 East Avenue Kitchener, ON N2H 1Z4",43.4512039,-80.47018390136591,Regular School Day,btw_8am_4pm,0,0,3,3
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Lockdown School Day,btw_6am_6pm,0,0,1,1
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Lockdown School Day,btw_7am_5pm,0,0,1,1
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Lockdown School Day,btw_8am_4pm,0,0,1,1
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Regular School Day,btw_6am_6pm,1,0,28,29
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Regular School Day,btw_7am_5pm,1,0,27,28
+St. Bernadette,"245 Lorne Ave., Kitchener, ON N2M 3Y9",43.434059899999994,-80.49142270283606,Regular School Day,btw_8am_4pm,1,0,21,22
+St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,Regular School Day,btw_6am_6pm,0,0,7,7
+St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,Regular School Day,btw_7am_5pm,0,0,6,6
+St. Daniel,"39 Midland Drive Kitchener, ON N2A 2A9",43.4483141,-80.4478973273295,Regular School Day,btw_8am_4pm,0,0,5,5
+St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,Regular School Day,btw_6am_6pm,0,0,3,3
+St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,Regular School Day,btw_7am_5pm,0,0,3,3
+St. Dominic Savio,"3 Westforest Trail Kitchener, ON N2N 3A6",43.433836549999995,-80.54042064982094,Regular School Day,btw_8am_4pm,0,0,3,3
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Lockdown School Day,btw_6am_6pm,0,0,1,1
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Lockdown School Day,btw_7am_5pm,0,0,1,1
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Lockdown School Day,btw_8am_4pm,0,0,1,1
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Regular School Day,btw_6am_6pm,0,0,20,20
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Regular School Day,btw_7am_5pm,0,0,16,16
+St. John,"99 Strange Street Kitchener, ON N2G 1R4",43.44878215,-80.50951778476119,Regular School Day,btw_8am_4pm,0,0,11,11
+St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,Regular School Day,btw_6am_6pm,0,0,4,4
+St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,Regular School Day,btw_7am_5pm,0,0,4,4
+St. Kateri Tekakwitha,"560 Pioneer Drive Kitchener, ON N2P 1P2",43.393690250000006,-80.45054899828011,Regular School Day,btw_8am_4pm,0,0,3,3
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Lockdown School Day,btw_6am_6pm,0,0,1,1
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Lockdown School Day,btw_7am_5pm,0,0,1,1
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Lockdown School Day,btw_8am_4pm,0,0,1,1
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Regular School Day,btw_6am_6pm,0,0,13,13
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Regular School Day,btw_7am_5pm,0,0,12,12
+St. Mark,"240 Autumn Hill Cres Kitchener, ON N2N 1K8",43.4204653,-80.5316646375,Regular School Day,btw_8am_4pm,0,0,12,12
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Lockdown School Day,btw_6am_6pm,0,0,2,2
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Lockdown School Day,btw_7am_5pm,0,0,2,2
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Lockdown School Day,btw_8am_4pm,0,0,2,2
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Regular School Day,btw_6am_6pm,0,0,15,15
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Regular School Day,btw_7am_5pm,0,0,13,13
+St. Mary's High School,"1500 Block Line Road Kitchener, ON N2C 2S2",43.42064825,-80.46776869343864,Regular School Day,btw_8am_4pm,0,0,11,11
+St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,Regular School Day,btw_6am_6pm,0,0,5,5
+St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,Regular School Day,btw_7am_5pm,0,0,5,5
+St. Paul,"45 Birchcliff Avenue Kitchener, ON N2M 4V7",43.4258691,-80.51688476613764,Regular School Day,btw_8am_4pm,0,0,5,5
+St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,Regular School Day,btw_6am_6pm,0,0,5,5
+St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,Regular School Day,btw_7am_5pm,0,0,5,5
+St. Teresa Kitchener,"270 Edwin Street Kitchener, ON N2H 4P4",43.46774785,-80.4876731293018,Regular School Day,btw_8am_4pm,0,0,4,4
+St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,Regular School Day,btw_6am_6pm,1,0,13,14
+St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,Regular School Day,btw_7am_5pm,0,0,10,10
+St. Timothy,"15 Bechtel Drive Kitchener, ON N2P 1T4",43.3926099,-80.43733731001443,Regular School Day,btw_8am_4pm,0,0,5,5
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Lockdown School Day,btw_6am_6pm,0,0,1,1
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Regular School Day,btw_6am_6pm,0,0,5,5
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Regular School Day,btw_7am_5pm,0,0,5,5
+Stanley Park Senior Public School,191 Hickson Dr Kitchener ON N2B 2H8,43.45344765,-80.44823075357635,Regular School Day,btw_8am_4pm,0,0,4,4
+Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,Regular School Day,btw_6am_6pm,0,0,16,16
+Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,Regular School Day,btw_7am_5pm,0,0,14,14
+Suddaby Public School,171 Frederick St Kitchener ON N2H 2M6,43.45218635,-80.48249472429079,Regular School Day,btw_8am_4pm,0,0,12,12
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Lockdown School Day,btw_6am_6pm,0,0,2,2
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Lockdown School Day,btw_7am_5pm,0,0,2,2
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Lockdown School Day,btw_8am_4pm,0,0,2,2
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Regular School Day,btw_6am_6pm,1,0,5,6
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Regular School Day,btw_7am_5pm,1,0,5,6
+Sunnyside Senior Public School,1042 Weber St E Kitchener ON N2A 1B6,43.43648805,-80.45100592377618,Regular School Day,btw_8am_4pm,1,0,4,5
+Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,Regular School Day,btw_6am_6pm,0,0,5,5
+Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,Regular School Day,btw_7am_5pm,0,0,4,4
+Trillium Public School,79 Laurentian Dr Kitchener ON N2E 1C3,43.4174238,-80.49598627725761,Regular School Day,btw_8am_4pm,0,0,4,4
+W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,Regular School Day,btw_6am_6pm,1,0,11,12
+W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,Regular School Day,btw_7am_5pm,1,0,9,10
+W T Townshend Public School,245 Activa Ave Kitchener ON N2E 4A3,43.4065353,-80.51609874274064,Regular School Day,btw_8am_4pm,1,0,7,8
+Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,Regular School Day,btw_6am_6pm,0,0,4,4
+Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,Regular School Day,btw_7am_5pm,0,0,3,3
+Westheights Public School,429 Westheights Dr Kitchener ON N2N 1M3,43.41933385,-80.5349551616786,Regular School Day,btw_8am_4pm,0,0,2,2
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Lockdown School Day,btw_6am_6pm,0,0,2,2
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Lockdown School Day,btw_7am_5pm,0,0,1,1
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Lockdown School Day,btw_8am_4pm,0,0,1,1
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Regular School Day,btw_6am_6pm,0,1,14,15
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Regular School Day,btw_7am_5pm,0,1,11,12
+Westmount Public School,329 Glasgow St Kitchener ON N2M 2M9,43.4493292,-80.52155894197145,Regular School Day,btw_8am_4pm,0,1,9,10
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Lockdown School Day,btw_6am_6pm,0,1,0,1
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Lockdown School Day,btw_7am_5pm,0,1,0,1
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Lockdown School Day,btw_8am_4pm,0,1,0,1
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Regular School Day,btw_6am_6pm,3,0,19,22
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Regular School Day,btw_7am_5pm,3,0,18,21
+Williamsburg Public School,760 Commonwealth Cres Kitchener ON N2E 4K7,43.4027144,-80.50398061060531,Regular School Day,btw_8am_4pm,3,0,17,20
+Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,Regular School Day,btw_6am_6pm,1,0,10,11
+Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,Regular School Day,btw_7am_5pm,1,0,10,11
+Wilson Avenue Public School,221 Wilson Ave Kitchener ON N2C 1G9,43.42597615,-80.45367645796043,Regular School Day,btw_8am_4pm,1,0,7,8

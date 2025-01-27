@@ -28,7 +28,7 @@ max_schools <- collisions_near_schools_during_school_hours  |>
 school_cols <- paste0("nearby_school_", seq_len(max_schools))
 
 collisions_near_schools_summary <- collisions_near_schools_during_school_hours |> 
-  select(nearby_schools, ends_with("involved"), starts_with("btw")) |>
+  select(nearby_schools, ends_with("involved"), starts_with("btw"), school_day_type) |>
   pivot_longer(cols = starts_with("btw"), names_to = "time_window", values_to = "collision_occurred") |> 
   filter(collision_occurred) |> 
   select(-collision_occurred) |> 
@@ -40,7 +40,7 @@ collisions_near_schools_summary <- collisions_near_schools_during_school_hours |
   ) |> 
   pivot_longer(cols = starts_with("nearby"), values_to = "school_name") |> 
   filter(!is.na(school_name)) |> 
-  group_by(school_name, time_window) |> 
+  group_by(school_name, school_day_type, time_window) |> 
   summarize(
     pedestrian_collisions = sum(pedestrianinvolved),
     cyclist_collisions = sum(cyclistinvolved),
