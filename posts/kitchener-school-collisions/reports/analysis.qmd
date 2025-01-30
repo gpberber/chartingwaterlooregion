@@ -29,7 +29,23 @@ collisions_near_schools <- read_csv(here("posts", "kitchener-school-collisions",
 ```
 
 ```{r}
+#| label: add-columns-to-collisions
+
+all_collisions <- all_collisions |> 
+  mutate(
+    time_period = case_when(
+      accident_hour < 6 ~ "12AM - 6AM",
+      accident_hour < 12 ~ "6AM - 12PM",
+      accident_hour < 18 ~ "12PM - 6PM",
+      TRUE ~ "6PM - 12AM"
+    )
+  )
+
+```
+
+```{r}
 #| label: days-by-type
+#| include: false
 
 all_days <- tibble(
   date = seq.Date(ymd("2015-01-01"), ymd("2022-07-31"), "days"),
@@ -65,6 +81,69 @@ collisions_btw_6am_6pm <- collisions_near_schools |>
 ```
 
 ```{r}
+#| label: pdestrian-collisions-6am-6pm
+
+collisions_btw_6am_6pm |> 
+  group_by(school_name) |> 
+  summarise(num_collisions =  sum(pedestrian_collisions), .groups = "drop") |> 
+  filter(num_collisions > 0) |> 
+  arrange(desc(num_collisions)) |> 
+  gt(rowname_col = "school_name") |> 
+  tab_header(
+    title = md("**Schools With at Least One Pedestrian Collision Within 250M**")
+    ) |> 
+  cols_label(
+    num_collisions = "# of Collisions") |> 
+  grand_summary_rows(
+    columns = everything(),
+    fns = list(Total ~ sum(.))
+  )  # Add summary row
+```
+
+```{r}
+#| label: ped-by-year-
+
+school_collisions <- all_collisions |>
+  filter(
+    near_school,
+    btw_6am_6pm,
+    grepl("Reg", school_day_type)
+  ) 
+
+school_collisions |> 
+  filter(pedestrianinvolved) |> 
+  #group_by(accident_year) |>
+  #summarise(num_ped_collisions = sum(pedestrianinvolved)) |>
+  mutate(accident_year = as.character(accident_year)) |>
+  ggplot(aes(x = accident_year)) +
+    geom_bar(fill = "purple4") +
+    theme_bw() +
+    labs(
+      x = "",
+      y = "",
+      title = "Number of Pedestrian Collisions per Year",
+      subtitle = "Within 250m of a school on a regular school day from 6am-6pm (2022 data to June 30 only)"
+    )
+```
+
+```{r}
+#| label: traffic-control
+
+school_collisions |> 
+  filter(pedestrianinvolved) |> 
+  ggplot(aes(y = trafficcontrol)) +
+    geom_bar(fill = "purple4") +
+    scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 2)) +
+    theme_bw() +
+    labs(
+      x = "",
+      y = "",
+      title = "Number of Pedestrian Collisions by Traffic Control Type",
+      subtitle = "Within 250m of a school on a regular school day from 6am-6pm (2022 data to June 30 only)"
+    )
+```
+
+```{r}
 #| label: collisions-6am-6pm
 
 collisions_btw_6am_6pm |> 
@@ -94,8 +173,8 @@ collisions_btw_6am_6pm |>
 #| label: by-day-type
 
 coll_by_day_type <- all_collisions |>
-  filter(btw_6am_6pm & near_school) |> 
-  group_by(school_day_type) |> 
+  filter(near_school) |> 
+  group_by(school_day_type, time_period) |> 
   summarise(across(ends_with("involved"), sum), .groups = "drop") |>
   mutate(
     total_collisions = pedestrianinvolved + cyclistinvolved + no_ped_cyc_involved,
@@ -105,19 +184,35 @@ coll_by_day_type <- all_collisions |>
     )
 
 coll_by_day_type |> 
+  group_by(time_period) |>  
   gt(rowname_col = "school_day_type") |> 
   tab_header(
-    title = md("**Collisions by Type of Day**")) |> 
+    title = md("**Collisions by Time Period and Type of Day**")) |> 
   cols_label(
     pedestrianinvolved = "Pedestrians",
     cyclistinvolved = "Cyclists",
     no_ped_cyc_involved = "Other",
     total_collisions = "Total",
-    pedestrian_perc = "Pedestrian %",
-    cyclist_perc = "Cyclist %",
-    other_perc = "Other %"
+    pedestrian_perc = "Pedestrians",
+    cyclist_perc = "Cyclists",
+    other_perc = "Other"
+  )|> 
+  fmt_percent(columns = ends_with("perc"), decimals = 1) |> 
+  tab_spanner(
+    label = md("**# of collisions**"),
+    columns = 3:6
+  ) %>%
+  tab_spanner(
+    label = md("**% of collisions**"), 
+    columns = 7:9
   ) |> 
-  fmt_percent(columns = ends_with("perc"), decimals = 1)
+  row_group_order(
+    groups = c("12AM - 6AM", "6AM - 12PM", "12PM - 6PM", "6PM - 12AM")
+    ) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()  # Applies to all row groups
+  )
 
 ```
 
@@ -126,8 +221,9 @@ coll_by_day_type |>
 
 coll_by_day_type |> 
   left_join(all_days) |> 
-  mutate(across(2:5, ~ .x / num_days)) |> 
-  select(-(6:9)) |> 
+  mutate(across(3:6, ~ .x / num_days)) |> 
+  select(-(7:10)) |> 
+  group_by(time_period) |> 
   gt(rowname_col = "school_day_type") |> 
   tab_header(
     title = md("**Collisions per Day**")) |> 
@@ -137,7 +233,118 @@ coll_by_day_type |>
     no_ped_cyc_involved = "Other",
     total_collisions = "Total"
   ) |> 
-  fmt_number(columns = everything(), decimals = 2)
+  fmt_number(columns = everything(), decimals = 3) |> 
+  row_group_order(
+    groups = c("12AM - 6AM", "6AM - 12PM", "12PM - 6PM", "6PM - 12AM")
+    ) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()  # Applies to all row groups
+  )
+
+```
+
+```{r}
+#| label: by-nearness-to-school
+
+coll_by_nearness <- all_collisions |>
+  filter(school_day_type == "Regular School Day") |> 
+  mutate(
+    near_school = if_else(
+      near_school, 
+      "Within 250M of School", 
+      "Beyond 250M from School"
+      )
+    ) |> 
+  group_by(near_school, time_period) |> 
+  summarise(across(ends_with("involved"), sum), .groups = "drop") |>
+  mutate(
+    total_collisions = pedestrianinvolved + cyclistinvolved + no_ped_cyc_involved,
+    pedestrian_perc = pedestrianinvolved / total_collisions,
+    cyclist_perc = cyclistinvolved / total_collisions,
+    other_perc = no_ped_cyc_involved / total_collisions
+    )
+
+coll_by_nearness |> 
+  group_by(near_school) |> 
+  arrange(factor(time_period, levels = c("12AM - 6AM", "6AM - 12PM", "12PM - 6PM", "6PM - 12AM"))) |> 
+  gt(rowname_col = "time_period") |> 
+  tab_header(
+    title = md("**Collisions by School Proximity and Time Period**")) |> 
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total",
+    pedestrian_perc = "Pedestrians",
+    cyclist_perc = "Cyclists",
+    other_perc = "Other"
+  )|> 
+  fmt_percent(columns = ends_with("perc"), decimals = 1) |> 
+  tab_spanner(
+    label = md("**# of collisions**"),
+    columns = 3:6
+  ) %>%
+  tab_spanner(
+    label = md("**% of collisions**"), 
+    columns = 7:9
+  ) |> 
+  row_group_order(
+    groups = c("Within 250M of School", "Beyond 250M from School")
+    ) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()  # Applies to all row groups
+  )
+```
+
+```{r}
+#| label: colls-per-day-by-proximity
+
+num_reg_days <- all_days |> 
+  filter(school_day_type == "Regular School Day") |> 
+  pull(num_days)
+
+coll_by_nearness |> 
+  mutate(across(3:6, ~ .x / num_reg_days)) |> 
+  select(-(7:9)) |> 
+  group_by(near_school) |> 
+  arrange(factor(time_period, levels = c("12AM - 6AM", "6AM - 12PM", "12PM - 6PM", "6PM - 12AM"))) |>
+  gt(rowname_col = "time_period") |> 
+  tab_header(
+    title = md("**Collisions per Day**")) |> 
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total"
+  ) |> 
+  fmt_number(columns = everything(), decimals = 2) |> 
+  row_group_order(
+    groups = c("Within 250M of School", "Beyond 250M from School")
+    ) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()  # Applies to all row groups
+  )
+```
+
+```{r}
+#| label: ped-by-year-all-days
+
+all_collisions |> 
+  group_by(accident_year) |> 
+  summarise(num_ped_collisions = sum(pedestrianinvolved)) |> 
+  mutate(accident_year = as.character(accident_year)) |> 
+  ggplot(aes(x = accident_year, y = num_ped_collisions)) +
+    geom_col(fill = "purple4") +
+    theme_bw() +
+    labs(
+      x = "", 
+      y = "", 
+      title = "Number of Pedestrian Collisions per Year",
+      subtitle = "All days, locations, and time periods (2022 data to July 31 only)"
+      )
 
 ```
 
@@ -146,7 +353,9 @@ The interactive map below reports the types and number of collisions that took p
 ```{r}
 #| label: map-collisions
 
-map <- create_school_collision_map(collisions_btw_6am_6pm)
+map <- collisions_btw_6am_6pm |> 
+  filter(grepl("Reg", school_day_type)) |> 
+  create_school_collision_map()
 
 map
 ```
