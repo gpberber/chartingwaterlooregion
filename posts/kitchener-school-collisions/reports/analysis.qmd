@@ -1,7 +1,7 @@
 ---
 title: "Kitchener School Collisions"
 image: "../images/map_snapshot.JPG"
-date: "2024-12-18"
+date: "2025-01-30"
 categories: [Open Data, R, Policy]
 warning: false
 message: false
@@ -101,7 +101,7 @@ collisions_btw_6am_6pm |>
 ```
 
 ```{r}
-#| label: ped-by-year-
+#| label: ped-by-year
 
 school_collisions <- all_collisions |>
   filter(
@@ -114,9 +114,10 @@ school_collisions |>
   filter(pedestrianinvolved) |> 
   #group_by(accident_year) |>
   #summarise(num_ped_collisions = sum(pedestrianinvolved)) |>
-  mutate(accident_year = as.character(accident_year)) |>
+  mutate(accident_year = factor(accident_year, levels = c("2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"))) |>
   ggplot(aes(x = accident_year)) +
-    geom_bar(fill = "purple4") +
+  geom_bar(fill = "purple4") +
+  scale_x_discrete(drop = FALSE) +
     theme_bw() +
     labs(
       x = "",
@@ -131,7 +132,7 @@ school_collisions |>
 
 school_collisions |> 
   filter(pedestrianinvolved) |> 
-  ggplot(aes(y = trafficcontrol)) +
+  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
     geom_bar(fill = "purple4") +
     scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 2)) +
     theme_bw() +
@@ -153,7 +154,7 @@ collisions_btw_6am_6pm |>
   arrange(desc(total_collisions)) |> 
   gt(rowname_col = "school_name") |> 
   tab_header(
-    title = md("**Schools With at Least One Collision Within 250M**"),
+    title = md("**Schools With at Least One Collision of Any Kind Within 250M**"),
     subtitle = "Collisions Involving Pedestrians or Cyclists Broken Out"
     ) |> 
   cols_label(

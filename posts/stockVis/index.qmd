@@ -4,6 +4,7 @@ date: "2024-10-27"
 categories: [Interactive, Visualization, Stocks]
 warning: false
 message: false
+draft: true
 ---
 
 Welcome to my stock-price visualization tool!

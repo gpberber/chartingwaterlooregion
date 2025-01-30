@@ -1,8 +1,8 @@
 {
-  "hash": "b35ba4ad69111ab81baed340fc2acb86",
+  "hash": "a3412dcc91cfc0d2deed31151e961c2f",
   "result": {
     "engine": "knitr",
-    "markdown": "---\ntitle: \"Sort-Unique-Filter\"\ndate: \"2024-08-27\"\ncategories: [Tutorial,R,Excel]\nwarning: false\nmessage: false\n---\n\n\n\nThis is the first post in a Quarto blog. Welcome!\n\n![](thumbnail.jpg)\n\nSince this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse)  # for data prep and visualization\n```\n:::\n\n```{=html}\n<iframe id=\"example1\" src=\"https://deadicated-to-data.shinyapps.io/stockVis\"\nstyle=\"border: non; width: 1000px; height: 700px\"\nframeborder=\"0\">\n</iframe>\n```\n\n\n\n``` <scala>\n=MAX(A1,A2)\n```\n\n=MAX(A1,A2)\n",
+    "markdown": "---\ntitle: \"Sort-Unique-Filter\"\ndate: \"2024-08-27\"\ncategories: [Tutorial,R,Excel]\nwarning: false\nmessage: false\ndraft: true\n---\n\n\n\nThis is the first post in a Quarto blog. Welcome!\n\n![](thumbnail.jpg)\n\nSince this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse)  # for data prep and visualization\n```\n:::\n\n```{=html}\n<iframe id=\"example1\" src=\"https://deadicated-to-data.shinyapps.io/stockVis\"\nstyle=\"border: non; width: 1000px; height: 700px\"\nframeborder=\"0\">\n</iframe>\n```\n\n\n\n``` <scala>\n=MAX(A1,A2)\n```\n\n=MAX(A1,A2)\n",
     "supporting": [],
     "filters": [
       "rmarkdown/pagebreak.lua"
