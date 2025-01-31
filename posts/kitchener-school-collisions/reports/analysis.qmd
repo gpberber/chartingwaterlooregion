@@ -110,20 +110,42 @@ school_collisions <- all_collisions |>
     grepl("Reg", school_day_type)
   ) 
 
-school_collisions |> 
-  filter(pedestrianinvolved) |> 
-  #group_by(accident_year) |>
-  #summarise(num_ped_collisions = sum(pedestrianinvolved)) |>
-  mutate(accident_year = factor(accident_year, levels = c("2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"))) |>
-  ggplot(aes(x = accident_year)) +
-  geom_bar(fill = "purple4") +
-  scale_x_discrete(drop = FALSE) +
+all_collisions |> 
+  filter(
+    pedestrianinvolved,
+    grepl("Reg", school_day_type),
+    btw_6am_6pm
+    ) |> 
+  mutate(
+    accident_year = factor(accident_year, levels = c("2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022")),
+    school_proximity = if_else(near_school, "Within 250m of a school", "Beyond 250m from a school")
+    ) |>
+  ggplot(aes(x = accident_year, fill = school_proximity)) +
+    geom_bar(stat = "count") +
+    scale_fill_manual(values = c("Within 250m of a school" = "purple4", "Beyond 250m from a school" = "gray52")) +
+    expand_limits(y = 25) +  # This adds padding up to y=25
+    facet_wrap(vars(school_proximity), nrow = 2, drop = FALSE) +
+    geom_text(
+      stat = "count", 
+      aes(label = after_stat(count)),
+      vjust = -0.5
+    ) +
     theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.y = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.x = element_text(face = "bold"),
+      legend.position = "none"
+    ) +
     labs(
       x = "",
       y = "",
       title = "Number of Pedestrian Collisions per Year",
-      subtitle = "Within 250m of a school on a regular school day from 6am-6pm (2022 data to June 30 only)"
+      subtitle = "On a regular school day from 6am-6pm (2022 data to June 30 only)"
     )
 ```
 
@@ -135,7 +157,23 @@ school_collisions |>
   ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
     geom_bar(fill = "purple4") +
     scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 2)) +
+    geom_text(
+        stat = "count", 
+        aes(label = after_stat(count)),
+        position = position_dodge(width = 0.9),
+        hjust = 1.5,
+        colour = "white"
+    ) +
     theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.x = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.y = element_text(face = "bold")
+    ) +
     labs(
       x = "",
       y = "",
@@ -334,12 +372,27 @@ coll_by_nearness |>
 #| label: ped-by-year-all-days
 
 all_collisions |> 
-  group_by(accident_year) |> 
-  summarise(num_ped_collisions = sum(pedestrianinvolved)) |> 
+  filter(pedestrianinvolved) |> 
   mutate(accident_year = as.character(accident_year)) |> 
-  ggplot(aes(x = accident_year, y = num_ped_collisions)) +
-    geom_col(fill = "purple4") +
+  ggplot(aes(x = accident_year)) +
+    geom_bar(stat = "count", fill = "purple4") +
+    geom_text(
+      stat = "count", 
+      aes(label = after_stat(count)),
+      position = position_dodge(width = 0.9),
+      vjust = 1.5,
+      colour = "white"
+    ) +
     theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.y = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.x = element_text(face = "bold")
+    ) +
     labs(
       x = "", 
       y = "", 
@@ -347,6 +400,36 @@ all_collisions |>
       subtitle = "All days, locations, and time periods (2022 data to July 31 only)"
       )
 
+```
+
+```{r}
+#| label: traffic-control-all-ped-collisions
+
+all_collisions |> 
+  filter(pedestrianinvolved) |> 
+  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
+    geom_bar(fill = "purple4") +
+    scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 10)) +
+    geom_text(stat = "count", 
+              aes(label = after_stat(count)),
+              position = position_dodge(width = 0.9),
+              hjust = -0.5) +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.x = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.y = element_text(face = "bold")
+    ) +
+    labs(
+      x = "",
+      y = "",
+      title = "Number of Pedestrian Collisions by Traffic Control Type",
+      subtitle = "2022 data to July 31 only"
+    )
 ```
 
 The interactive map below reports the types and number of collisions that took place on a school day between 6AM and 6PM within 250m of schools in Kitchener. Hover over a bubble to see the school name and click on it to see collision details. A bubble with a number indicates multiple underlying schools. Click on it to zoom in and see bubbles for the individual schools.
