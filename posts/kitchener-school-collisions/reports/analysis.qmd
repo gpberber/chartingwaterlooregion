@@ -121,7 +121,7 @@ all_collisions |>
     school_proximity = if_else(near_school, "Within 250m of a school", "Beyond 250m from a school")
     ) |>
   ggplot(aes(x = accident_year, fill = school_proximity)) +
-    geom_bar(stat = "count") +
+    geom_bar(stat = "count", width = .5) +
     scale_fill_manual(values = c("Within 250m of a school" = "purple4", "Beyond 250m from a school" = "gray52")) +
     expand_limits(y = 25) +  # This adds padding up to y=25
     facet_wrap(vars(school_proximity), nrow = 2, drop = FALSE) +
@@ -155,7 +155,7 @@ all_collisions |>
 school_collisions |> 
   filter(pedestrianinvolved) |> 
   ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
-    geom_bar(fill = "purple4") +
+    geom_bar(fill = "purple4", width = 0.5) +
     scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 2)) +
     geom_text(
         stat = "count", 
@@ -375,7 +375,7 @@ all_collisions |>
   filter(pedestrianinvolved) |> 
   mutate(accident_year = as.character(accident_year)) |> 
   ggplot(aes(x = accident_year)) +
-    geom_bar(stat = "count", fill = "purple4") +
+    geom_bar(stat = "count", fill = "purple4", width = 0.5) +
     geom_text(
       stat = "count", 
       aes(label = after_stat(count)),
@@ -408,7 +408,7 @@ all_collisions |>
 all_collisions |> 
   filter(pedestrianinvolved) |> 
   ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
-    geom_bar(fill = "purple4") +
+    geom_bar(fill = "purple4", width = 0.7) +
     scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 10)) +
     geom_text(stat = "count", 
               aes(label = after_stat(count)),
