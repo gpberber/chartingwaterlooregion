@@ -92,7 +92,7 @@ collisions_btw_6am_6pm <- collisions_near_schools |>
 
 ## Overall Trend in Pedestrian Collisions
 
-In @fig-ped-by-year-all-days we see that the number of pedestrian collisions per year has been steadily decreasing since 2015.
+In @fig-ped-by-year-all-days we see that the number of pedestrian collisions per year has been steadily decreasing since 2015. In total, there were 231 collisions involving pedestrians during the study period.
 
 ```{r}
 #| label: fig-ped-by-year-all-days
