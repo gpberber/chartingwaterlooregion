@@ -90,9 +90,82 @@ collisions_btw_6am_6pm <- collisions_near_schools |>
   filter(grepl("6am", time_window))
 ```
 
+## Overall Trend in Pedestrian Collisions
+
+In @fig-ped-by-year-all-days we see that the number of pedestrian collisions per year has been steadily decreasing since 2015.
+
+```{r}
+#| label: fig-ped-by-year-all-days
+#| fig-cap: "Total pedestrian collisions per year"
+
+all_collisions |> 
+  filter(pedestrianinvolved) |> 
+  mutate(accident_year = as.character(accident_year)) |> 
+  ggplot(aes(x = accident_year)) +
+    geom_bar(stat = "count", fill = "purple4", width = 0.8) +
+    geom_text(
+      stat = "count", 
+      aes(label = after_stat(count)),
+      vjust = 1.5,
+      colour = "white"
+    ) +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.y = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.x = element_text(face = "bold"),
+      plot.margin = margin(10, 100, 10, 100)
+    ) +
+    labs(
+      x = "", 
+      y = "",
+      subtitle = "(2022 data to July 31 only)"
+      )
+
+```
+
+## Pedestrian Collisions by Type of Traffic Control at Collision Location
+
+In @fig-traffic-control-all-ped-collisions we see that just over half (129/231 or 56%) of all pedestrian collisions occurred at <span style="color: #551A8B; font-weight: bold;">locations with some type of traffic control in place</span>.
+
+```{r}
+#| label: fig-traffic-control-all-ped-collisions
+#| fig-cap: "Total pedestrian collisions by traffic control type"
+
+all_collisions |> 
+  filter(pedestrianinvolved) |> 
+  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)), fill = trafficcontrol %in% c("No control", "unknown"))) +
+    geom_bar(width = 0.8) +
+    scale_fill_manual(values = c("purple4", "gray52"), guide = "none") +
+    scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 10)) +
+    geom_text(stat = "count", 
+              aes(label = after_stat(count)),
+              position = position_dodge(width = 0.9),
+              hjust = -0.5) +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),         # Removes gridlines
+      axis.text.x = element_blank(),          # Removes axis values
+      axis.title = element_blank(),         # Removes axis titles
+      axis.line = element_blank(),          # Removes axis lines
+      axis.ticks = element_blank(),
+      panel.border = element_blank(),
+      axis.text.y = element_text(face = "bold")
+    ) +
+    labs(
+      x = "",
+      y = "",
+      subtitle = "(2022 data to July 31 only)"
+    )
+```
+
 ## Pedestrian Collisions Near Schools
 
-@tbl-schped reports the schools that had at least one pedestrian collision within 250m.
+@tbl-schped reports the schools that had at least one pedestrian collision within 250m. In total there were 28 pedestrian collisions within 250m of a school (one of these occurred within 250m of two schools, so the number of collisions below add to 29).
 
 ```{r}
 #| label: tbl-schped
@@ -108,9 +181,9 @@ collisions_btw_6am_6pm |>
     num_collisions = "# of collisions") 
 ```
 
-## Pedestrian Collisions by Year
+## Pedestrian Collisions per Year by School Proximity
 
-@fig-ped-by-year compares the number of pedestrian collisions inside and outside the 250m boundary of schools.
+@fig-ped-by-year compares the number of pedestrian collisions inside and outside the 250m boundary of schools on regular school days (i.e., days schools were not locked down due to the pandemic). As with total pedestrian collisions in @fig-ped-by-year-all-days above, we see steadily declining trends inside and outside the 250m boundary.
 
 ```{r}
 #| label: fig-ped-by-year
@@ -134,7 +207,7 @@ all_collisions |>
     school_proximity = if_else(near_school, "Within 250m of a school", "Beyond 250m from a school")
     ) |>
   ggplot(aes(x = accident_year, fill = school_proximity)) +
-    geom_bar(stat = "count", width = .5) +
+    geom_bar(stat = "count", width = .8) +
     scale_fill_manual(values = c("Within 250m of a school" = "purple4", "Beyond 250m from a school" = "gray52")) +
     expand_limits(y = 25) +  # This adds padding up to y=25
     facet_wrap(vars(school_proximity), nrow = 2, drop = FALSE) +
@@ -152,7 +225,8 @@ all_collisions |>
       axis.ticks = element_blank(),
       panel.border = element_blank(),
       axis.text.x = element_text(face = "bold"),
-      legend.position = "none"
+      legend.position = "none",
+      plot.margin = margin(10, 100, 10, 100)
     ) +
     labs(
       x = "",
@@ -161,18 +235,19 @@ all_collisions |>
     )
 ```
 
-## Collisions by Type of Traffic Control
+## Collisions Near Schools by Type of Traffic Control
 
-@fig-traffic-control reports the number of pedestrian collisions by the type of traffic control that was in place at the scene of the collision.
+Consistent with @fig-traffic-control-all-ped-collisions above, @fig-traffic-control shows that just over half (15/28 or 54%) of pedestrian collisions near schools occurred at <span style="color: #551A8B; font-weight: bold;">locations with some type of traffic control in place</span>.
 
 ```{r}
 #| label: fig-traffic-control
-#| fig-cap: "Traffic controls in effect at location of pedestrian collisions"
+#| fig-cap: "Traffic controls in effect at pedestrian collisions near schools"
 
 school_collisions |> 
   filter(pedestrianinvolved) |> 
-  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
-    geom_bar(fill = "purple4", width = 0.5) +
+  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)), fill = trafficcontrol %in% c("No control", "unknown"))) +
+    geom_bar(width = 0.8) +
+    scale_fill_manual(values = c("purple4", "gray52"), guide = "none") +
     scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 2)) +
     geom_text(
         stat = "count", 
@@ -189,7 +264,8 @@ school_collisions |>
       axis.line = element_blank(),          # Removes axis lines
       axis.ticks = element_blank(),
       panel.border = element_blank(),
-      axis.text.y = element_text(face = "bold")
+      axis.text.y = element_text(face = "bold"),
+      plot.margin = margin(50, 50, 50, 50)
     ) +
     labs(
       x = "",
@@ -199,7 +275,7 @@ school_collisions |>
 
 ## All Collisions Near Schools
 
-@tbl-all-coll-near-sch reports the number of collisions of any type that occurred within 250m of a school, with the number of pedestrian and cyclist collisions broken out from all other types of collisions.
+@tbl-all-coll-near-sch reports the number of collisions of any type that occurred within 250m of a school, with the number of pedestrian and cyclist collisions broken out from all other types of collisions. The vast majority (\~95%) of collisions near schools involve neither pedestrians nor cyclists.
 
 ```{r}
 #| label: tbl-all-coll-near-sch
@@ -246,8 +322,6 @@ coll_by_day_type <- all_collisions |>
 coll_by_day_type |> 
   group_by(time_period) |>  
   gt(rowname_col = "school_day_type") |> 
-  tab_header(
-    title = md("**Collisions by Time Period and Type of Day**")) |> 
   cols_label(
     pedestrianinvolved = "Pedestrians",
     cyclistinvolved = "Cyclists",
@@ -398,78 +472,6 @@ coll_by_nearness |>
     style = cell_text(weight = "bold"),
     locations = cells_row_groups()  # Applies to all row groups
   )
-```
-
-## Overall Trend in Pedestrian Collisions
-
-In @fig-ped-by-year-all-days we see that the total number of pedestrian collisions has been steadily decreasing since 2015.
-
-```{r}
-#| label: fig-ped-by-year-all-days
-#| fig-cap: "Total pedestrian collisions per year"
-
-all_collisions |> 
-  filter(pedestrianinvolved) |> 
-  mutate(accident_year = as.character(accident_year)) |> 
-  ggplot(aes(x = accident_year)) +
-    geom_bar(stat = "count", fill = "purple4", width = 0.5) +
-    geom_text(
-      stat = "count", 
-      aes(label = after_stat(count)),
-      position = position_dodge(width = 0.9),
-      vjust = 1.5,
-      colour = "white"
-    ) +
-    theme_bw() +
-    theme(
-      panel.grid = element_blank(),         # Removes gridlines
-      axis.text.y = element_blank(),          # Removes axis values
-      axis.title = element_blank(),         # Removes axis titles
-      axis.line = element_blank(),          # Removes axis lines
-      axis.ticks = element_blank(),
-      panel.border = element_blank(),
-      axis.text.x = element_text(face = "bold")
-    ) +
-    labs(
-      x = "", 
-      y = "",
-      subtitle = "(2022 data to July 31 only)"
-      )
-
-```
-
-## Total Collisions by Type of Traffic Control in Place
-
-In @fig-traffic-control-all-ped-collisions we see that about half of all pedestrian collisions occurred at locations with some type of traffic control in place.
-
-```{r}
-#| label: fig-traffic-control-all-ped-collisions
-#| fig-cap: "Total pedestrian collisions by traffic control type"
-
-all_collisions |> 
-  filter(pedestrianinvolved) |> 
-  ggplot(aes(y = fct_rev(fct_infreq(trafficcontrol)))) +
-    geom_bar(fill = "purple4", width = 0.7) +
-    scale_x_continuous(breaks = function(x) seq(0, ceiling(x[2]), by = 10)) +
-    geom_text(stat = "count", 
-              aes(label = after_stat(count)),
-              position = position_dodge(width = 0.9),
-              hjust = -0.5) +
-    theme_bw() +
-    theme(
-      panel.grid = element_blank(),         # Removes gridlines
-      axis.text.x = element_blank(),          # Removes axis values
-      axis.title = element_blank(),         # Removes axis titles
-      axis.line = element_blank(),          # Removes axis lines
-      axis.ticks = element_blank(),
-      panel.border = element_blank(),
-      axis.text.y = element_text(face = "bold")
-    ) +
-    labs(
-      x = "",
-      y = "",
-      subtitle = "(2022 data to July 31 only)"
-    )
 ```
 
 ## Map of School Collisions
