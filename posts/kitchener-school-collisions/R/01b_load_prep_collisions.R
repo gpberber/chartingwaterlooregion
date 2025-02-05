@@ -12,7 +12,7 @@ kitchener_schools_geocoded <- read_csv(here("posts", "kitchener-school-collision
 
 
 # load collisions data
-all_collisions <- read_csv("posts/kitchener-school-collisions/data-raw/kitchener_collisions.csv") |> 
+all_collisions <- read_csv(here("posts", "kitchener-school-collisions", "data-raw", "kitchener_collisions.csv")) |> 
   clean_names() |> 
   select(
     accidentnum:accident_month, 
