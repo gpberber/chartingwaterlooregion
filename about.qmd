@@ -1,6 +1,5 @@
 ---
 title: "About Charting Waterloo Region"
-image: 
 about:
   template: solana
   links:

@@ -130,7 +130,7 @@ all_collisions |>
 
 ## Pedestrian Collisions by Type of Traffic Control at Collision Location
 
-In @fig-traffic-control-all-ped-collisions we see that just over half (129/231 or 56%) of all pedestrian collisions occurred at <span style="color: #551A8B; font-weight: bold;">locations with some type of traffic control in place</span>.
+In @fig-traffic-control-all-ped-collisions we see that just over half (129/231 or 56%) of all pedestrian collisions occurred at [locations with some type of traffic control in place]{style="color: #551A8B; font-weight: bold;"}.
 
 ```{r}
 #| label: fig-traffic-control-all-ped-collisions
@@ -237,7 +237,7 @@ all_collisions |>
 
 ## Collisions Near Schools by Type of Traffic Control
 
-Consistent with @fig-traffic-control-all-ped-collisions above, @fig-traffic-control shows that just over half (15/28 or 54%) of pedestrian collisions near schools occurred at <span style="color: #551A8B; font-weight: bold;">locations with some type of traffic control in place</span>.
+Consistent with @fig-traffic-control-all-ped-collisions above, @fig-traffic-control shows that just over half (15/28 or 54%) of pedestrian collisions near schools occurred at [locations with some type of traffic control in place]{style="color: #551A8B; font-weight: bold;"}.
 
 ```{r}
 #| label: fig-traffic-control
