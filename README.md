@@ -1,1 +1,1 @@
-A blog deadicated to data analytics.
+A blog dedicated to charts about Waterloo Region.

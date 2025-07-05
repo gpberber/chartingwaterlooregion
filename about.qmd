@@ -1,5 +1,5 @@
 ---
-title: "About Deadicated to Data"
+title: "About Charting Waterloo Region"
 image: grateful-data.JPG
 about:
   template: solana
@@ -7,9 +7,7 @@ about:
     - icon: linkedin
       href: https://www.linkedin.com/in/greg-berberich/
     - icon: github
-      href: https://github.com/gpberber/deadicated-to-data
+      href: https://github.com/gpberber/chartingwaterlooregion
 ---
 
-I'm Greg and after almost 30 years of being on the internet, I've decided to start my first blog! I have no grand plan for it right now, but as its name suggests, it will feature posts focused on data analytics, likely a mix of tutorials and analysis of things I find interesting. Mainly, I suppose it's an outlet for me to indulge my analytics habit. And no, deadicated isn't spelled wrong, at least to people who've spent way too much time listening to [this band](https://en.wikipedia.org/wiki/Grateful_Dead) over the years!
-
-~Thanks to [Grateful Data](https://www.grateful-data.com/) for the profile image.~
+This blog is dedicated to keeping Waterloo Region residents informed about their community using charts full of interesting data about the Region.

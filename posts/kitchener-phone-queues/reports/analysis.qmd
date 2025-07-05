@@ -1,0 +1,36 @@
+---
+title: "Kitchener Phone Queues"
+image: "../images/map_snapshot.JPG"
+date: "2025-02-05"
+categories: [Open Data, R, Policy]
+warning: false
+message: false
+echo: false
+draft: true
+format:
+  html:
+    number-sections: false  # Numbers main sections
+    number-depth: 3       # How deep to number subsections
+    tbl-cap-location: bottom
+    fig-align: center
+    css: styles.css
+    crossref:             # Optional custom settings
+      fig-prefix: Figure  # Default is "Figure"
+      tbl-prefix: Table  # Default is "Table"
+---
+
+```{r}
+#| label: load-packages-sources
+
+here::i_am("posts/kitchener-phone-queues/reports/analysis.qmd")
+
+library(tidyverse)
+library(gt)
+library(here)
+```
+
+```{r}
+#| label: load-data
+
+
+```

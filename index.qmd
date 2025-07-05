@@ -1,5 +1,5 @@
 ---
-title: "Deadicated to Data"
+title: "Charting Waterloo Region"
 listing:
   contents: posts
   sort: "date desc"

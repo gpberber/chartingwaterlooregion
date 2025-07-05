@@ -1,0 +1,1658 @@
+---
+title: "Phone Queue Data Exploration"
+author: "gpb"
+date: "2025-02-06"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+here::i_am("posts/kitchener-phone-queues/R/02_explore.Rmd")
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(scales)
+library(here)
+library(changepoint)
+library(segmented)
+library(ggtext)
+library(tidyverse)
+library(prophet)
+library(janitor)
+
+queue_data <- read_csv(here("posts", "kitchener-phone-queues", "data", "queue_data_clean.csv"))
+
+my_purple <- "#604A7B"
+my_grey <- "#7F898A"
+```
+
+```{r set-ggplot-theme, include=FALSE}
+theme_set(
+  theme_classic() +  # or whatever base theme you want
+  theme(
+    axis.text.x = element_text(face = "bold"),
+    axis.text.y = element_text(face = "bold"),
+    panel.border = element_blank()
+  )
+)
+```
+
+```{r metrics-per-date}
+queue_data |> 
+  group_by(date) |> 
+  summarise(num_metrics = n()) |> 
+  group_by(num_metrics) |> 
+  count()
+```
+
+All but 14 (\< 1%) of the approximately 1,600 dates have 17 metrics. The two dates with more than 17 metrics have two different values reported for some of the metrics and it's not possible to tell which ones are correct, so we'll drop them all. We could impute missing values for the 12 dates that have an incomplete set of 17, but since they represent such a small proportion of the data, we'll just drop them.
+
+```{r remove-dates-with-odd-metric-sets}
+queue_data <- queue_data |> 
+  add_count(date, name = "metric_count") |> 
+  filter(metric_count == 17) |> 
+  select(-metric_count)
+
+unique(queue_data$metric)
+```
+
+All remaining dates have the same set of 17 metrics.
+
+#### Metric Definitions
+
+Here are the definitions of the metrics (as provided by Claude.ai):
+
+**Avg Handle Time**: Average duration of calls from answer to disconnect, including hold time.
+
+**Avg Queue Time**: Average wait time in queue for all calls (both answered and abandoned).
+
+**Avg Speed of Answer**: Average wait time for answered calls only.
+
+**Calls Abandoned**: Total number of calls where the caller hung up while in queue.
+
+**Calls Abandoned \< Service Level**: Number of calls abandoned before the service level threshold (e.g., 30 seconds).
+
+**Calls Handled**: Total number of calls answered by agents.
+
+**Calls Handled \< Service Level**: Number of calls answered before the service level threshold.
+
+**Calls Presented**: Total number of calls entering the queue.
+
+**Max Handle Time**: Longest duration of any single call from answer to disconnect.
+
+**Max Queue Time**: Longest wait time of any single call in queue.
+
+**Percentage of Calls Abandoned**: (Calls Abandoned / Calls Presented) × 100
+
+**Percentage of Calls Handled**: (Calls Handled / Calls Presented) × 100
+
+**Percentage of Service Level Met (Handled)**: (Calls Handled \< Service Level / Calls Handled) × 100
+
+**Percentage of Service Level Met (With Abandoned Calls Counted Negatively)**: (Calls Handled \< Service Level / (Calls Presented)) × 100
+
+**Percentage of Service Level Met (With Abandoned Calls Counted Positively)**: ((Calls Handled \< Service Level + Calls Abandoned \< Service Level) / Calls Presented) × 100
+
+**Percentage of Service Level Met (Without Abandoned Calls)**: (Calls Handled \< Service Level / (Calls Presented - Calls Abandoned)) × 100
+
+**Service Level (sec):** The targeted time limit for answering a call once it's in the queue.
+
+Also from Claude:
+
+The most common service level target for municipal customer service centers is typically 80/30 - meaning 80% of calls should be answered within 30 seconds. However, actual targets can vary based on:
+
+-   Size of municipality
+
+-   Available resources
+
+-   Type of services provided
+
+-   Call complexity
+
+-   Hours of operation
+
+-   Local government priorities and budget
+
+Some municipalities use:
+
+-   70/30 (70% in 30 seconds) - For smaller centers or those with budget constraints
+
+-   80/20 (80% in 20 seconds) - For centers focusing on quick response
+
+-   90/30 (90% in 30 seconds) - For well-resourced centers prioritizing accessibility
+
+When you see service levels significantly below these targets (like 60% or lower), it often indicates:
+
+-   Resource constraints
+
+-   Peak period challenges
+
+-   Staffing issues
+
+-   Higher than expected call volumes
+
+```{r pivot-metrics}
+queue_data <- queue_data |> 
+  pivot_wider(names_from = "metric", values_from = "value") |> 
+  clean_names() |> 
+  mutate(
+    total_handle_time_hrs = calls_handled * avg_handle_time / 3600,
+    total_queue_time_secs = calls_presented * avg_queue_time
+    )
+
+summary(queue_data)
+```
+
+The "service_level_sec" column (the targeted time within which a call is expected to be handled) is the same for every date, so we can drop it. Also, the data begins on February 26, 2019, so only the final three days of that month are included. We will drop those as well. The period ends on July 30, 2023, so all but the final day of that month are included, so we will retain the July 2023 data.
+
+```{r drop-service-level-column}
+queue_data <- queue_data |> 
+  select(-service_level_sec) |> 
+  filter(date >= "2019-03-01")
+```
+
+We deleted the data for 14 dates that didn't have the common set of 17 metrics. Let's see how many other dates are missing from the period covered by the data.
+
+```{r check-missing-dates}
+all_dates_in_period <- seq.Date(
+  min(queue_data$date), 
+  max(queue_data$date), 
+  "days"
+)
+
+as.Date(setdiff(all_dates_in_period, queue_data$date))
+```
+
+There are 27 missing days during the 1,613-day period, so 13 are truly missing from the original dataset in addition to the 14 we dropped above due to odd metric sets. There is no apparent pattern to the missing days and they represent only 1.7% of the total days, so their absence will not hinder the analysis.
+
+```{r boxplots, fig.height=12}
+queue_data |> 
+  select(where(is.numeric)) |> 
+  pivot_longer(everything(), 
+              names_to = "variable", 
+              values_to = "value") |> 
+  ggplot() +
+  geom_boxplot(aes(x = 0, y = value)) +
+  facet_wrap(~variable, scales = "free_x", ncol = 2) +
+  coord_flip() +  # This makes them horizontal
+  theme(axis.text.y = element_blank()) +
+  xlab("") +
+  ylab("")  # Remove y-axis label since it's now horizontal
+```
+
+```{r hist-presented}
+medians <- queue_data |>  
+   group_by(type_of_day) |>  
+   summarize(
+     median = median(calls_presented),
+     # Position annotation slightly right of median
+     x_pos = median + 10,  # Adjust the +10 as needed
+     # Position vertically - adjust y as needed
+     y_pos = n()/5.7  # Adjust as needed based on your histogram height
+     
+     )
+
+queue_data |> 
+  filter(
+    (type_of_day == "Weekend" & calls_presented < 300) |
+    (type_of_day == "Weekday" & calls_presented < 750)
+  ) |> 
+  ggplot(aes(x = calls_presented)) +
+  geom_histogram(bins = 25, fill = my_grey, alpha = 0.7) +
+  geom_vline(data = medians,
+             aes(xintercept = median),
+             color = my_purple,
+             linetype = "dashed") +
+  geom_text(data = medians,
+            aes(x = x_pos, y = y_pos, 
+                label = paste("Median:", median)
+                ),
+            hjust = 0,
+            size = 3.5,
+            color = my_purple
+            ) +
+  facet_wrap(~type_of_day, scales = "free") +
+  labs(
+    x = "",
+    y = "",
+    title = "Distribution of Number of Calls Presented in A Day"
+    )
+```
+
+```{r hist-perc-service-level}
+median_perc <- median(queue_data$percentage_of_service_level_met_with_abandoned_calls_counted_negatively)
+
+queue_data |> 
+  ggplot(aes(x = percentage_of_service_level_met_with_abandoned_calls_counted_negatively)) +
+  geom_histogram(bins = 25, fill = my_grey, alpha = 0.7) +
+  geom_vline(
+    aes(xintercept = median_perc),
+    color = my_purple,
+    linetype = "dashed") +
+  geom_vline(xintercept = 80, color = "black") +
+  geom_text(aes(x = median_perc + 1, y = 265, 
+                label = paste0("Median: ", median_perc, "%")
+                ),
+            hjust = 0,
+            size = 3.5,
+            color = my_purple
+            ) +
+  annotate(
+      "text", 
+      x = 79, 
+      color = "black",
+      y = 265, 
+      label = "Target: 80%", 
+      hjust = 1,
+      size = 3.5
+    ) +
+  scale_y_continuous(breaks = seq(0, 250, 50)) +
+  scale_x_continuous(labels = label_percent(scale = 1)) +
+  labs(
+    x = "",
+    y = "",
+    title = "Distribution of Percentage of a Day's Calls Answered Within 30 Seconds"
+    )
+```
+
+```{r hist-avg-handle-time}
+median_time <- median(queue_data$avg_handle_time)
+
+queue_data |> 
+  ggplot(aes(x = avg_handle_time)) +
+  geom_histogram(bins = 25, fill = my_grey, alpha = 0.7) +
+  geom_vline(
+    aes(xintercept = median_time),
+    color = my_purple,
+    linetype = "dashed") +
+  annotate(
+      "text", 
+      x = median_time, 
+      color = my_purple,
+      y = 270, 
+      label = paste0("Median: ", median_time),
+      hjust = -0.1,
+      size = 3.5
+    ) +
+  scale_y_continuous(breaks = seq(0, 250, 50)) +
+  scale_x_continuous(breaks = seq(50, 250, 25)) +
+  labs(
+    x = "",
+    y = "",
+    title = "Distribution of Average Daily Handle Times (seconds)"
+    )
+```
+
+```{r hist-avg-queue-time}
+median_q_time <- median(queue_data$avg_queue_time)
+
+queue_data |> 
+  ggplot(aes(x = avg_queue_time)) +
+  geom_histogram(bins = 25, fill = my_grey, alpha = 0.7) +
+  geom_vline(
+    aes(xintercept = median_q_time),
+    color = my_purple,
+    linetype = "dashed") +
+  annotate(
+      "text", 
+      x = median_q_time, 
+      color = my_purple,
+      y = 850, 
+      label = paste0("Median: ", median_q_time),
+      hjust = -0.05,
+      size = 3.5
+    ) +
+  scale_y_continuous(breaks = seq(0, 800, 100)) +
+  scale_x_continuous(breaks = seq(0, 800, 50)) +
+  labs(
+    x = "",
+    y = "",
+    title = "Distribution of Average Daily Queue Times (seconds)"
+    )
+```
+
+```{r avg-times-comparison}
+queue_data |> 
+   group_by(year_month) |> 
+    summarize(med_handle_time = median(avg_handle_time),
+              med_queue_time = median(avg_queue_time),
+              .groups = "drop"
+    ) |>
+    ggplot(aes(x = year_month)) +
+      geom_line(aes(y = med_handle_time, color = "Median Handle Time")) +
+      geom_line(aes(y = med_queue_time, color = "Median Queue Time")) +
+      scale_color_manual(values = c("Median Handle Time" = my_grey, "Median Queue Time" = my_purple)) +
+      scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+      scale_y_continuous(breaks = seq(0, 150, by = 25)) +
+      theme(
+        legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 1)
+      ) +
+      labs(
+        x = "",
+        y = ""
+      )
+```
+
+```{r calls-presented-day}
+queue_data |>
+  filter(calls_presented < 750) |> 
+  ggplot(aes(x = date, y = calls_presented, color = type_of_day)) +
+  geom_point(size = 0.9) +
+  geom_smooth(method = "loess", se = FALSE, color = "black") +
+  scale_color_manual(values = c(my_purple, my_grey), guide = "none") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Total Calls Presented",
+    x = "",
+    y = ""
+  ) 
+```
+
+```{r calls-abandoned-day}
+queue_data |>
+  filter(calls_abandoned < 200) |> 
+  ggplot(aes(x = date, y = calls_abandoned)) +
+  geom_point(size = 0.9, color = my_grey) +
+  geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Total Calls Abandoned",
+    x = "",
+    y = ""
+  ) 
+```
+
+```{r perc_abandoned-day}
+queue_data |>
+  #filter(calls_presented < 750) |> 
+  ggplot(aes(x = date, y = percentage_of_calls_abandoned)) +
+  geom_point(size = 0.9, color = my_grey) +
+  geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Percentage of Calls Abandoned",
+    x = "",
+    y = ""
+  ) 
+```
+
+```{r scatter-queuetime-calls-pres}
+queue_data |> 
+  filter(
+    calls_presented < 750,
+    avg_queue_time < 400
+    ) |> 
+  ggplot(aes(x = calls_presented, y = avg_queue_time)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess") +
+    xlab("Number of Calls Presented") +
+    ylab("Average Queue Time (seconds)")
+```
+
+```{r scatter-handletime-calls-pres}
+queue_data |> 
+  filter(calls_presented < 600,
+    avg_handle_time < 200
+    ) |>
+  ggplot(aes(x = calls_presented, y = avg_handle_time)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess") +
+    xlab("Number of Calls Presented") +
+    ylab("Average Handle Time (seconds)")
+```
+
+```{r scatter-queuetime-calls-aband}
+queue_data |> 
+  filter(
+    avg_queue_time < 400,
+    percentage_of_calls_abandoned < 40
+    ) |>
+  ggplot(aes(x = avg_queue_time, y = percentage_of_calls_abandoned)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "loess") +
+    xlab("Average Time in Queue (seconds)") +
+    ylab("% of Calls Abandoned") +
+    scale_y_continuous(labels = label_percent(scale = 1))
+```
+
+```{r service-level-met}
+queue_data |>
+  # filter(calls_presented < 600,
+  #   avg_handle_time < 200
+  #   ) |>
+  ggplot(aes(
+    x = date,
+    y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively
+  )) +
+    geom_col(fill = my_grey, alpha = 0.5) +
+    geom_line(y = 80, color = my_purple) +
+    annotate(
+      "text", 
+      x = max(queue_data$date), 
+      color = my_purple,
+      y = 77, 
+      label = "Target: 80%  ", 
+      hjust = 1
+    ) +
+    labs(
+      title = "Percentage of Calls Answered Within 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    scale_y_continuous(labels = label_percent(scale = 1))
+```
+
+```{r service-level-met-by-month}
+changedate <- "2021-05-01"
+
+queue_data |>
+  group_by(year_month) |> 
+  summarize(perc_service_level_met = 
+              sum(calls_handled_service_level) /
+              sum(calls_presented)
+            ) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = perc_service_level_met)) +
+  geom_line(color = my_grey) +
+  geom_point(size = 0.9, color = my_grey) +
+  geom_line(y = 0.80) +
+  annotate(
+      "text", 
+      x = max(queue_data$date), 
+      y = 0.81, 
+      label = "Target: 80%  ", 
+      hjust = 1
+    ) +
+  geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+  geom_vline(xintercept = as.Date(changedate), 
+               color = "black", 
+               linetype = "dashed") +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Percentage of Calls Answered Within 30 Seconds",
+    x = "",
+    y = ""
+  ) +
+  scale_y_continuous(labels = label_percent(scale = 100))
+
+```
+
+```{r mw-test-before-after-may21}
+# Split data into before/after periods
+before_change <- queue_data |> 
+  filter(year_month < as.Date(changedate)) |> 
+  pull(percentage_of_service_level_met_with_abandoned_calls_counted_negatively)
+
+after_change <- queue_data |> 
+  filter(year_month >= as.Date(changedate)) |> 
+  pull(percentage_of_service_level_met_with_abandoned_calls_counted_negatively)
+
+# Test if the two periods are significantly different
+wilcox.test(before_change, after_change)
+
+# Get summary statistics for each period
+queue_data |> 
+  mutate(period = if_else(year_month < as.Date(changedate), 
+                         "Before", "After")) |> 
+  group_by(period) |> 
+  summarize(
+    mean_calls = mean(percentage_of_service_level_met_with_abandoned_calls_counted_negatively),
+    median_calls = median(percentage_of_service_level_met_with_abandoned_calls_counted_negatively),
+    sd_calls = sd(percentage_of_service_level_met_with_abandoned_calls_counted_negatively),
+    n_days = n()
+  )
+```
+
+```{r calls-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(total_calls_presented = sum(calls_presented)) |> 
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = total_calls_presented)) +
+  geom_line(color = my_grey) +
+  geom_point(size = 0.9, color = my_grey) +
+  geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Total Calls Presented",
+    x = "",
+    y = ""
+  ) 
+```
+
+```{r service-level-met-jul20}
+jul_20 <- queue_data |>
+  filter(year == 2020 & month == "Jul")
+
+ggplot(jul_20, aes(
+  x = date,
+  y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively
+)) +
+  geom_col(fill = my_grey) +
+  geom_line(y = 80) +
+  annotate(
+    "text", 
+    x = min(jul_20$date), 
+    y = 83, 
+    label = "Target: 80%",
+    hjust = 0
+  ) +
+  labs(
+    title = "Percentage of Calls Answered Within 30 Seconds (July 2020)",
+    x = "",
+    y = ""
+  ) +
+  scale_y_continuous(labels = label_percent(scale = 1))
+```
+
+```{r service-level-met-may22}
+may_22 <- queue_data |>
+  filter(year == 2022 & month == "May")
+
+ggplot(may_22, aes(
+  x = date,
+  y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively
+)) +
+  geom_col(fill = my_grey) +
+  geom_line(y = 80) +
+  annotate(
+    "text", 
+    x = max(may_22$date), 
+    y = 83, 
+    label = "Target: 80%", 
+    hjust = 1.5
+  ) +
+  labs(
+    title = "Percentage of Calls Answered Within 30 Seconds (May 2022)",
+    x = "",
+    y = ""
+  ) +
+  scale_y_continuous(labels = label_percent(scale = 1))
+
+```
+
+```{r scatter-service-level-calls-pres}
+queue_data |> 
+  filter(calls_presented < 750) |> 
+  ggplot(aes(x = calls_presented, y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively, color = type_of_day)) +
+    geom_point(alpha = 0.5) +
+    scale_color_manual(values = c(my_purple, my_grey), guide = "none") +
+    geom_smooth(method = "loess") +
+    xlab("Number of Calls Presented") +
+    ylab("% of Calls Answered Within 30 Seconds") +
+    scale_y_continuous(labels = label_percent(scale = 1))
+```
+
+```{r corrs-pres-serv-level-met}
+queue_data |> 
+  filter(
+    (type_of_day == "Weekday" & calls_presented > 199 & calls_presented < 750) |
+    (type_of_day == "Weekend" & calls_presented < 300)
+  )|> 
+  group_by(type_of_day) |> 
+  summarize(corr = cor(calls_presented, percentage_of_service_level_met_with_abandoned_calls_counted_negatively))
+```
+
+```{r perc-calls-aband-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(perc_abandoned = 
+              sum(calls_abandoned) /
+              sum(calls_presented)
+            ) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = perc_abandoned)) +
+  geom_line(color = my_grey) +
+  geom_point(size = 0.9, color = my_grey) +
+  geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+  scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Percentage of Calls Abandoned",
+    x = "",
+    y = ""
+  ) +
+  scale_y_continuous(labels = label_percent(scale = 100))
+```
+
+```{r presented-abandrate-base100}
+
+queue_data |> 
+  # Create monthly totals
+  group_by(year_month) |> 
+  summarize(
+    total_calls = sum(calls_presented),
+    abandon_rate = sum(calls_abandoned) / sum(calls_presented) * 100,
+    .groups = "drop"
+  ) |> 
+  # Calculate index values (March 2019 as base)
+  mutate(
+    calls_index = total_calls / first(total_calls) * 100,
+    abandon_rate_index = abandon_rate / first(abandon_rate) * 100
+  ) |> 
+  # Create the plot
+  ggplot(aes(x = year_month)) +
+    geom_line(aes(y = calls_index, color = "Total Calls")) +
+    geom_line(aes(y = abandon_rate_index, color = "Abandon Rate")) +
+    geom_point(aes(y = calls_index, color = "Total Calls"), size = 0.9) +
+    geom_point(aes(y = abandon_rate_index, color = "Abandon Rate"), size = 0.9) +
+    scale_color_manual(values = c("Total Calls" = my_grey, "Abandon Rate" = my_purple)) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(
+      legend.position = "none",
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    labs(
+      x = "",
+      y = "Index (March 2019 = 100)"
+    )
+```
+
+```{r presented-aband-base100}
+
+pres_aband_base100 <- queue_data |> 
+  # Create monthly totals
+  group_by(year_month) |> 
+  summarize(
+    total_calls = sum(calls_presented),
+    abandon_calls = sum(calls_abandoned),
+    .groups = "drop"
+  ) |> 
+  # Calculate index values (March 2019 as base)
+  mutate(
+    calls_index = total_calls / first(total_calls) * 100,
+    abandon_calls_index = abandon_calls / first(abandon_calls) * 100,
+    abandon_vs_pres = abandon_calls_index - calls_index
+  )
+  # Create the plot
+pres_aband_base100 |> 
+  ggplot(aes(x = year_month)) +
+    geom_line(aes(y = calls_index, color = "Total Calls")) +
+    geom_line(aes(y = abandon_calls_index, color = "Abandoned Calls")) +
+    geom_point(aes(y = calls_index, color = "Total Calls"), size = 0.9) +
+    geom_point(aes(y = abandon_calls_index, color = "Abandoned Calls"), size = 0.9) +
+    scale_color_manual(values = c("Total Calls" = my_grey, "Abandoned Calls" = my_purple)) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(
+      legend.position = "none",
+      panel.grid.minor = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
+    labs(
+      x = "",
+      y = "Index (March 2019 = 100)"
+    )
+```
+
+```{r aband-pres-bar}
+pres_aband_base100 |> 
+  ggplot(aes(
+    x = year_month, 
+    y = abandon_vs_pres,
+    fill = abandon_vs_pres > 0  
+  )) + 
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    scale_x_date(
+      limits = as.Date(c("2019-03-01", "2023-07-31")),
+      date_breaks = "3 months", 
+      date_labels = "%Y-%m",
+      expand = c(0,0)
+    ) +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    scale_y_continuous(breaks = seq(-25, 150, by = 25)) +
+    theme(legend.position = "none") +
+    annotate("text", x = as.Date("2022-06-01"), y = -2, 
+             label = "Abandoned LOWER\nthan Pesented", hjust = 1,
+             size = 2.6, color = my_grey, fontface = "bold"
+             ) +
+    annotate("text", x = as.Date("2022-11-01"), y = 60, 
+             label = "Abandoned HIGHER\nthan Presented", hjust = 0,
+             size = 2.6, color = my_purple, fontface = "bold"
+             ) +
+    labs(
+      x = "",
+      y = "Difference (percentage points)",
+      title = "Change in Calls Abandoned vs Change in Calls Presented"
+    )
+```
+
+```{r perc-handled-calls-handled-in-30secs}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(perc_handled_within_30_secs = 
+              sum(calls_handled_service_level) /
+              sum(calls_handled)
+            ) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = perc_handled_within_30_secs)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Percentage of Handled Calls Answered Within 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    scale_y_continuous(labels = label_percent(scale = 100))
+```
+
+```{r perc-aband-calls-aband-30secs}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(perc_abandoned_after_30_secs = 
+              (sum(calls_abandoned) - sum(calls_abandoned_service_level)) /
+              sum(calls_abandoned)
+            ) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = perc_abandoned_after_30_secs)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Percentage of Abandoned Calls Abandoned After Waiting 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    scale_y_continuous(labels = label_percent(scale = 100))
+```
+
+```{r perc-calls-aband-svclevel-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(perc_abandoned = 
+              (sum(calls_abandoned) - sum(calls_abandoned_service_level)) /
+              (sum(calls_presented) - sum(calls_abandoned_service_level))
+            ) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = perc_abandoned)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Percentage of Calls Abandoned (excl. calls < 30 secs)",
+      x = "",
+      y = ""
+    ) +
+    scale_y_continuous(labels = label_percent(scale = 100))
+```
+
+```{r avg-queue-time-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(avg_queue_time = sum(total_queue_time_secs) / sum(calls_presented)) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = avg_queue_time)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Average Queue Time (seconds)",
+      x = "",
+      y = ""
+    )
+```
+
+```{r avg-handle-time-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(avg_handle_time = sum(total_handle_time_hrs) / sum(calls_handled) * 3600) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = avg_handle_time)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Average Handle Time (seconds)",
+      x = "",
+      y = ""
+    )
+```
+
+```{r max-handle-time-by-month}
+queue_data |>
+  group_by(year_month) |> 
+  summarize(max_handle_time_month = max(max_handle_time)) |>
+  ungroup() |> 
+  # Create the plot
+  ggplot(aes(x = year_month, y = max_handle_time_month)) +
+    geom_line(color = my_grey) +
+    geom_point(size = 0.9, color = my_grey) +
+    geom_smooth(method = "loess", se = FALSE, color = my_purple) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Maximum Handle Time (seconds)",
+      x = "",
+      y = ""
+    )
+```
+
+```{r num-days-week}
+queue_data |> 
+  count(day_of_week)
+```
+
+```{r total-calls-day-of-week}
+queue_data |> 
+  ggplot(aes(x = day_of_week, y = calls_presented, fill = type_of_day)) +
+    geom_bar(stat = "summary", fun = "sum") +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "summary", 
+        fun = "sum",
+        aes(label = comma(after_stat(y))),
+        position = position_dodge(width = 0.9),
+        size = 2.9,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Total Number of Calls Presented by Day of Week",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r median-calls-day-of-week}
+queue_data |> 
+  filter(!holiday) |> 
+  ggplot(aes(x = day_of_week, y = calls_presented, fill = type_of_day)) +
+    geom_bar(stat = "summary", fun = "median") +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "summary", 
+        fun = "median",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Median Number of Calls Presented by Day of Week",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r aband-day-of-week}
+overall_perc_aband <- round(sum(queue_data$calls_abandoned) / sum(queue_data$calls_presented), 3)
+
+queue_data |> 
+  filter(!holiday) |> 
+  group_by(day_of_week, type_of_day) |> 
+  summarize(perc_abandoned = 
+              sum(calls_abandoned) /
+              sum(calls_presented)
+  ) |> 
+  ungroup() |> 
+  ggplot(aes(x = day_of_week, y = perc_abandoned, fill = type_of_day)) +
+    geom_hline(yintercept = overall_perc_aband) +
+    annotate("text", x = "Wed", y = 0.08, 
+               label = paste("Overall:", percent(overall_perc_aband, accuracy = 0.1)),
+               size = 3, color = "black", hjust = 0.8
+               ) +
+    geom_col() +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Percentage of Calls Abandoned by Day of Week",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r handle-time-day-of-week}
+queue_data |> 
+  filter(!holiday) |>
+  group_by(day_of_week, type_of_day) |> 
+  summarize(avg_handle_time = sum(total_handle_time_hrs) / sum(calls_handled) * 3600) |> 
+  ggplot(aes(x = day_of_week, y = avg_handle_time, fill = type_of_day)) +
+    geom_col() +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        aes(label = round(after_stat(y), 0)),
+        #position = position_dodge(width = 0.9),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Average Handle Time (seconds)",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r queue-time-day-of-week}
+queue_data |> 
+  filter(!holiday) |>
+  filter(total_queue_time_secs < 200000) |> 
+  group_by(day_of_week, type_of_day) |> 
+  summarise(avg_queue_time = sum(total_queue_time_secs) / sum(calls_presented)) |> 
+  ggplot(aes(x = day_of_week, y = avg_queue_time, fill = type_of_day)) +
+    geom_col() +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "identity",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Average Queue Time (seconds)",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r perc-handled-within-30secs-day-of-week}
+queue_data |> 
+  filter(!holiday) |>
+  group_by(day_of_week, type_of_day) |> 
+  summarize(perc_handled_within_30 = 
+              sum(calls_handled_service_level) /
+              sum(calls_presented)
+  ) |> 
+  ungroup() |> 
+  ggplot(aes(x = day_of_week, y = perc_handled_within_30, fill = type_of_day)) +
+    geom_col() +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Percentage of Calls Answered Within 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r aband-after-30secs-day-of-week}
+queue_data |> 
+  group_by(day_of_week, type_of_day) |> 
+  summarize(perc_aband_after_30 = 
+              (sum(calls_abandoned) - sum(calls_abandoned_service_level)) /
+              sum(calls_abandoned)
+  ) |> 
+  ungroup() |> 
+  ggplot(aes(x = day_of_week, y = perc_aband_after_30, fill = type_of_day)) +
+    geom_col() +
+    scale_fill_manual(values = c(
+      "Weekday" = my_purple, 
+      "Weekend" = my_grey
+      )
+    ) +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Percentage of Abandoned Calls Abandoned After 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 100, 10, 100),
+      legend.position = "none"
+    )
+```
+
+```{r calls-month}
+queue_data |> 
+  ggplot(aes(
+    x = month, 
+    y = calls_presented, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_bar(stat = "summary", fun = "median") +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        stat = "summary", 
+        fun = "median",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Median Number of Calls Presented",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 50, 10, 50),
+      legend.position = "none"
+    )
+```
+
+```{r calls-month-apr20-excluded}
+queue_data |> 
+  filter(year_month != "2020-04-01") |> 
+  ggplot(aes(
+    x = month, 
+    y = calls_presented, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_bar(stat = "summary", fun = "median") +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        stat = "summary", 
+        fun = "median",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Median Number of Calls Presented (Apr 2020 excluded)",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 50, 10, 50),
+      legend.position = "none"
+    )
+```
+
+```{r aband-month}
+queue_data |> 
+  group_by(month) |> 
+  summarize(perc_abandoned = 
+              sum(calls_abandoned) /
+              sum(calls_presented)
+  ) |> 
+  ungroup() |> 
+  ggplot(aes(
+    x = month, 
+    y = perc_abandoned, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_col() +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Percentage of Calls Abandoned",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 50, 10, 50),
+      legend.position = "none"
+    )
+```
+
+```{r handle-time-month}
+queue_data |> 
+  group_by(month) |> 
+  summarize(avg_handle_time = sum(total_handle_time_hrs) / sum(calls_handled) * 3600) |> 
+  ggplot(aes(
+    x = month, 
+    y = avg_handle_time, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_col() +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        aes(label = round(after_stat(y), 0)),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Average Handle Time (seconds)",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 50, 10, 50),
+      legend.position = "none"
+    )
+```
+
+```{r queue-time-month}
+queue_data |> 
+  filter(total_queue_time_secs < 200000) |> 
+  group_by(month) |> 
+  summarize(avg_queue_time = sum(total_queue_time_secs) / sum(calls_presented)) |>
+  ggplot(aes(
+    x = month, 
+    y = avg_queue_time, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_col() +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        aes(label = round(after_stat(y), 0)),
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Average Queue Time (seconds)",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 50, 10, 50),
+      legend.position = "none"
+    )
+```
+
+```{r perc-handled-within-30secs-month}
+queue_data |> 
+  group_by(month) |> 
+  summarize(perc_handled_within_30 = 
+              sum(calls_handled_service_level) /
+              sum(calls_presented)
+  ) |> 
+  ungroup() |> 
+  ggplot(aes(
+    x = month, 
+    y = perc_handled_within_30, 
+    fill = month %in% c("Jan", "Jun", "Jul", "Dec")
+  )) +
+    geom_col() +
+    scale_fill_manual(values = c(my_grey, my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = "Percentage of Calls Answered Within 30 Seconds",
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      legend.position = "none"
+    )
+```
+
+```{r segmented-model-answered-below-30secs}
+# First create a linear model
+init_model_serv <- lm(percentage_of_service_level_met_with_abandoned_calls_counted_negatively ~ date, data = queue_data)
+
+# Then fit the segmented model
+seg_model_serv <- segmented(init_model_serv, seg.Z = ~date)
+
+# Get the estimated breakpoint
+breakpoint_numeric <- seg_model_serv$psi["psi1.date", "Est."]
+breakpoint <- as.Date(breakpoint_numeric, origin = "1970-01-01")
+
+# Visualize
+queue_data |> 
+  ggplot(aes(x = date, y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively)) +
+    geom_point(alpha = 0.3, color = my_grey) +
+    geom_line(aes(y = fitted(seg_model_serv)), color = my_purple) +
+    geom_vline(xintercept = breakpoint, linetype = "dashed") +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    scale_y_continuous(labels = label_percent(scale = 1)) +
+    annotate("text", x = breakpoint, y = 25, 
+             label = breakpoint, hjust = 1.1,
+             size = 3, color = my_purple
+             ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      x = "",
+      y = "",
+      title = "Percentage of Calls Answered Within 30 Seconds"
+    )
+```
+
+```{r davies-test-serv-model}
+davies.test(init_model_serv, seg.Z = ~date, k = 10)
+```
+
+```{r segmented-model-pres}
+calls_pres <- queue_data |> 
+  filter(calls_presented < 600)
+
+# First create a linear model
+init_model_pres <- lm(calls_presented ~ date, data = calls_pres)
+
+# Then fit the segmented model
+seg_model_pres <- segmented(init_model_pres, seg.Z = ~date)
+
+# Get the estimated breakpoint
+breakpoint_numeric <- seg_model_pres$psi["psi1.date", "Est."]
+breakpoint <- as.Date(breakpoint_numeric, origin = "1970-01-01")
+
+# Visualize
+calls_pres |> 
+  ggplot(aes(x = date, y = calls_presented)) +
+    geom_point(alpha = 0.3, color = my_grey) +
+    geom_line(aes(y = fitted(seg_model_pres)), color = my_purple) +
+    geom_vline(xintercept = breakpoint, linetype = "dashed") +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    x = "",
+    y = ""
+  )
+```
+
+```{r davies-test-results-pres-model}
+# View the results
+davies.test(init_model_pres, seg.Z = ~date, k = 10)
+```
+
+```{r segmented-model-avg-queue-time}
+qtime_df <- queue_data |> 
+  filter(avg_queue_time < 250)
+
+# First create a linear model
+init_model_qtime <- lm(avg_queue_time ~ date, data = qtime_df)
+
+# Then fit the segmented model
+seg_model_qtime <- segmented(init_model_qtime, seg.Z = ~date)
+
+# Get the estimated breakpoint
+breakpoint_numeric <- seg_model_qtime$psi["psi1.date", "Est."]
+breakpoint <- as.Date(breakpoint_numeric, origin = "1970-01-01")
+
+# Visualize
+qtime_df |> 
+  ggplot(aes(x = date, y = avg_queue_time)) +
+    geom_point(alpha = 0.3, color = my_grey) +
+    geom_line(aes(y = fitted(seg_model_qtime)), color = my_purple) +
+    geom_vline(xintercept = breakpoint, linetype = "dashed") +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    annotate("text", x = breakpoint, y = 175, 
+             label = breakpoint, hjust = 1.1,
+             size = 3, color = my_purple
+             ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      x = "",
+      y = "",
+      title = "Daily Average Queue Time (seconds)"
+    )
+```
+
+```{r davies-test-qtime}
+davies.test(init_model_qtime, seg.Z = ~date, k = 10)
+```
+
+```{r segmented-model-aband}
+aband_df <- queue_data #|> 
+  #filter(percentage_of_calls_abandoned <= 40)
+
+# First create a linear model
+init_model_aband <- lm(percentage_of_calls_abandoned ~ date, data = aband_df)
+
+# Then fit the segmented model
+seg_model_aband <- segmented(init_model_aband, seg.Z = ~date)
+
+# Get the estimated breakpoint
+breakpoint_numeric <- seg_model_aband$psi["psi1.date", "Est."]
+breakpoint <- as.Date(breakpoint_numeric, origin = "1970-01-01")
+
+# Visualize
+aband_df |> 
+  ggplot(aes(x = date, y = percentage_of_calls_abandoned)) +
+    geom_point(alpha = 0.3, color = my_grey) +
+    geom_line(aes(y = fitted(seg_model_aband)), color = my_purple) +
+    geom_vline(xintercept = breakpoint, linetype = "dashed") +
+    scale_x_date(date_breaks = "3 months", date_labels = "%Y-%m") +
+    scale_y_continuous(labels = label_percent(scale = 1)) +
+    annotate("text", x = breakpoint, y = 35, 
+             label = breakpoint, hjust = 1.1,
+             size = 3, color = my_purple
+             ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      x = "",
+      y = "",
+      title = "Percentage of Calls Abandoned"
+    )
+```
+
+```{r davies-test-aband}
+davies.test(init_model_aband, seg.Z = ~date, k = 10)
+```
+
+```{r prep-2019-v-2023}
+queue_19_23 <- queue_data |> 
+  filter(
+    year %in% c(2019, 2023),
+    between(month_num, 3, 7)
+  ) |> 
+  select(
+    year,
+    month,
+    year_month,
+    day_of_week,
+    type_of_day,
+    calls_presented,
+    calls_abandoned,
+    calls_handled,
+    calls_abandoned_service_level,
+    calls_handled_service_level,
+    total_handle_time_hrs,
+    total_queue_time_secs
+  )
+  
+queue_19_23_month <- queue_19_23 |> 
+  group_by(year, month, year_month) |> 
+  summarize(
+    num_days = n(),
+    median_calls_presented = median(calls_presented),
+    avg_calls_presented = mean(calls_presented),
+    across(c(3:9), sum)
+  ) |> 
+  mutate(
+    perc_abandoned = calls_abandoned / calls_presented,
+    perc_handled_30 = calls_handled_service_level / calls_presented,
+    perc_abandoned_30 = calls_abandoned_service_level / calls_presented,
+    avg_handle_time = total_handle_time_hrs / calls_handled * 3600,
+    avg_queue_time = total_queue_time_secs / calls_presented
+  )
+```
+
+```{r pres-19-23}
+queue_19_23_month |> 
+  ggplot(aes(
+    x = month, 
+    y = median_calls_presented, 
+    fill = factor(year)
+  )) +
+    geom_col(width = 0.9, position = position_dodge(width = 0.9)) +
+    scale_fill_manual(values = c("2019" = my_grey, "2023" = my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = after_stat(y)),
+        position = position_dodge(width = 0.9),
+        size = 4,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = paste0("Median Calls Presented ", "<strong><span style='color:", my_grey, "'>2019</span></strong> vs <strong><span style='color:", my_purple, "'>2023</span></strong>"),
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      plot.title = element_markdown()
+    )
+```
+
+```{r perc-aband-19-23}
+queue_19_23_month |> 
+  ggplot(aes(
+    x = month, 
+    y = perc_abandoned, 
+    fill = factor(year)
+  )) +
+    geom_col(width = 0.9, position = position_dodge(width = 0.9)) +
+    scale_fill_manual(values = c("2019" = my_grey, "2023" = my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3.5,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = paste0("Percentage of Calls Abandoned ", "<strong><span style='color:", my_grey, "'>2019</span></strong> vs <strong><span style='color:", my_purple, "'>2023</span></strong>"),
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      plot.title = element_markdown()
+    )
+```
+
+```{r avg-handle-19-23}
+queue_19_23_month |> 
+  ggplot(aes(
+    x = month, 
+    y = avg_handle_time, 
+    fill = factor(year)
+  )) +
+    geom_col(width = 0.9, position = position_dodge(width = 0.9)) +
+    scale_fill_manual(values = c("2019" = my_grey, "2023" = my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        size = 3.5,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = paste0("Average Handle Time (seconds) ", "<strong><span style='color:", my_grey, "'>2019</span></strong> vs <strong><span style='color:", my_purple, "'>2023</span></strong>"),
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      plot.title = element_markdown()
+    )
+```
+
+```{r avg-queue-19-23}
+queue_19_23_month |> 
+  ggplot(aes(
+    x = month, 
+    y = avg_queue_time, 
+    fill = factor(year)
+  )) +
+    geom_hline(yintercept = 30) +
+    annotate(
+      "text", 
+      x = "Mar", 
+      y = 34, 
+      label = "Target: 30",
+      hjust = 1.02,
+      size = 3.5
+    ) +
+    geom_col(width = 0.9, position = position_dodge(width = 0.9)) +
+    scale_fill_manual(values = c("2019" = my_grey, "2023" = my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = round(after_stat(y), 0)),
+        position = position_dodge(width = 0.9),
+        size = 3.4,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = paste0("Average Queue Time (seconds) ", "<strong><span style='color:", my_grey, "'>2019</span></strong> vs <strong><span style='color:", my_purple, "'>2023</span></strong>"),
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      plot.title = element_markdown()
+    )
+```
+
+```{r perc-handled-30secs-19-23}
+queue_19_23_month |> 
+  ggplot(aes(
+    x = month, 
+    y = perc_handled_30, 
+    fill = factor(year)
+  )) +
+    geom_hline(yintercept = 0.80) +
+    annotate(
+      "text", 
+      x = "Jul", 
+      y = 0.84, 
+      label = "Target: 80%",
+      hjust = 0.2
+    ) +
+    geom_col(width = 0.9, position = position_dodge(width = 0.9)) +
+    scale_fill_manual(values = c("2019" = my_grey, "2023" = my_purple), guide = "none") +
+    geom_text(
+        stat = "identity",
+        aes(label = percent(after_stat(y), accuracy = 0.1)),
+        position = position_dodge(width = 0.9),
+        size = 3.5,
+        vjust = 1.5,
+        colour = "white"
+    ) +
+    labs(
+      title = paste0("Percentage of Calls Answered Within 30 Seconds ", "<strong><span style='color:", my_grey, "'>2019</span></strong> vs <strong><span style='color:", my_purple, "'>2023</span></strong>"),
+      x = "",
+      y = ""
+    ) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      plot.margin = margin(10, 20, 10, 20),
+      plot.title = element_markdown()
+    )
+```

@@ -1,0 +1,428 @@
+---
+title: "Call Center Volume Analysis with Prophet"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+
+here::i_am("posts/kitchener-phone-queues/R/03_time_series_analysis.Rmd")
+```
+
+# Introduction
+
+This analysis examines call center volume data using Facebook's Prophet forecasting tool. The analysis accounts for:
+
+-   Weekly and monthly seasonality patterns
+
+-   Statutory and school holiday effects
+
+-   COVID-19 lockdown periods
+
+# Data Preparation
+
+## Load Required Libraries
+
+```{r libraries}
+library(prophet)
+library(tidyverse)
+library(janitor)
+library(here)
+library(scales)
+library(naniar)
+```
+
+## Create Supporting Datasets
+
+Load and prepare the data for analysis. The data includes indicators for holidays and COVID lockdown periods.
+
+```{r data_prep}
+# load and prep queue dataset
+queue_data <- read_csv(here("posts", "kitchener-phone-queues", "data", "queue_data_clean.csv")) |> 
+  add_count(date, name = "metric_count") |> 
+  filter(metric_count <= 17) |> 
+  filter(date >= "2019-03-01") |> 
+  pivot_wider(names_from = "metric", values_from = "value") |> 
+  clean_names() 
+
+# Find missing dates in data period
+all_dates_in_period <- seq.Date(
+  ymd("2019-03-01"), 
+  ymd("2023-07-31"), 
+  "days"
+)
+
+# create missing dates df for binding to prepped Prophet df
+missing_dates <- tibble(
+  ds = as.Date(setdiff(all_dates_in_period, queue_data$date)),
+  y = NA
+  )
+
+# load and prep holidays dataset
+stat_holidays <- read_csv(here("posts", "kitchener-phone-queues", "data", "holidays.csv")) |> 
+  filter(
+    date >= ymd("2019-03-01"),
+    holiday != "Additional Day"
+  ) |> 
+  rename(ds = date) |> 
+  mutate(
+    lower_window = 0,
+    upper_window = 0
+  )
+
+# create covid lockdown dates tibble to include as one-off holidays
+lockdowns <- tribble(
+  ~holiday, ~ds, ~ds_upper,
+  "lockdown_1", ymd("2020-03-17"), ymd("2020-07-16"),
+  "lockdown_2", ymd("2020-12-26"), ymd("2021-02-09"),
+  "lockdown_3", ymd("2021-04-08"), ymd("2021-07-15"),
+  "lockdown_4", ymd("2022-01-05"), ymd("2022-03-20")
+) |> 
+  mutate(
+    lower_window = 0,
+    upper_window = as.integer(ds_upper - ds)
+  ) |> 
+  select(-ds_upper)
+
+# create March break dates tibble to include as holidays
+school_breaks <- tribble(
+  ~holiday, ~ds, ~lower_window, ~upper_window,
+  "March Break", ymd("2019-03-11"), -30, 6,
+  "March Break", ymd("2020-03-16"), -30, 6,
+  "March Break", ymd("2021-03-15"), -30, 6,  # original (COVID delay to April)
+  "April Break", ymd("2021-04-12"), -30, 6,  # actual
+  "March Break", ymd("2022-03-14"), -30, 6,
+  "March Break", ymd("2023-03-13"), -30, 6,
+  "March Break", ymd("2024-03-11"), -30, 6,
+  "Summer Break", ymd("2019-07-01"), -45, 61,
+  "Summer Break", ymd("2020-07-01"), -45, 61,
+  "Summer Break", ymd("2021-07-01"), -45, 61,
+  "Summer Break", ymd("2022-07-01"), -45, 61,
+  "Summer Break", ymd("2023-07-01"), -45, 61,
+  "Summer Break", ymd("2024-07-01"), -45, 61,
+  "Christmas Break", ymd("2019-12-23"), -20, 13,
+  "Christmas Break", ymd("2020-12-21"), -20, 13,
+  "Christmas Break", ymd("2021-12-20"), -20, 13,
+  "Christmas Break", ymd("2022-12-26"), -20, 13,
+  "Christmas Break", ymd("2023-12-25"), -20, 13,
+)
+
+# consolidate holidays tibble
+holidays <- bind_rows(stat_holidays, lockdowns, school_breaks)
+```
+
+# Analysis of Calls Presented
+
+## Model Configuration
+
+```{r create-calls-pres-df}
+# Prepare calls presented data for Prophet
+df_pres <- queue_data |> 
+  select(ds = date, y = calls_presented, type_of_day) |> 
+  group_by(type_of_day) |> 
+  mutate(
+    z_score = abs(scale(y)),
+    y = if_else(z_score < 3, y, NA) # replace outliers with NA
+  ) |> 
+  ungroup() |> 
+  select(ds, y) |> 
+  rbind(missing_dates) |> 
+  arrange(ds)
+```
+
+Configure the Prophet model with appropriate seasonality settings and external regressors.
+
+```{r model-setup}
+# Create prophet model
+m_pres <- prophet(df_pres, holidays = holidays, seasonality.mode = "multiplicative")
+```
+
+## Model Forecasting
+
+Fit the model and generate forecasts.
+
+```{r fit_and_forecast}
+# Create future dataframe for predictions
+future <- make_future_dataframe(m_pres, periods = 366)
+
+# Generate forecasts
+forecast <- predict(m_pres, future) |> 
+  clean_names()
+```
+
+## Visualization
+
+### Forecast Plot
+
+```{r forecast_plot}
+plot(m_pres, forecast) + add_changepoints_to_plot(m_pres)
+```
+
+### Component Plots
+
+```{r component_plots}
+# Create component plots
+prophet_plot_components(m_pres, forecast)
+```
+
+```{r school-breaks-impact}
+# First add year to both dataframes
+df_with_year <- df_pres |> 
+  mutate(year = year(ds))
+
+holidays_with_year <- school_breaks |> 
+  mutate(year = year(ds)) |> 
+  rename(break_start = ds)
+
+# Then join by year and calculate days until break
+df_with_breaks <- df_with_year |> 
+  left_join(holidays_with_year, by = "year") |> 
+  mutate(days_until_break = as.integer(break_start - ds)) |>
+  filter(days_until_break >= -7, days_until_break <= 75)
+
+df_with_breaks |> 
+  ggplot(aes(x = days_until_break, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~holiday, scales = "free_y") +
+  scale_x_reverse() +  # This reverses the x-axis
+  labs(x = "Days Until Break Starts", 
+       y = "Calls Presented",
+       title = "Call Volumes Leading Up to School Breaks",
+       subtitle = "Day 0 = First day of break") +
+  theme_minimal()
+```
+
+# Analysis of % of Calls Answered Within 30 Seconds
+
+## Model Configuration
+
+```{r create-calls-handled-30-df}
+# Prepare  data for Prophet
+df_hand30 <- queue_data |> 
+  select(ds = date, y = percentage_of_service_level_met_with_abandoned_calls_counted_negatively) |> 
+  mutate(
+    median_abs_dev = mad(y, na.rm = TRUE),
+    median_val = median(y, na.rm = TRUE),
+    modified_z = abs(0.6745 * (y - median_val) / median_abs_dev),
+    y = if_else(modified_z < 3.5, y, NA) # replace outliers with NA
+  ) |> 
+  ungroup() |> 
+  select(ds, y) |> 
+  rbind(missing_dates) |> 
+  arrange(ds)
+
+holidays_hand30 <- holidays |> 
+  filter(!holiday %in% c("Christmas Break", "March Break", "April Break"))
+```
+
+Configure the Prophet model with appropriate seasonality settings and external regressors.
+
+```{r model-setup-hand30}
+# Create prophet model
+m_hand30 <- prophet(df_hand30, holidays = holidays_hand30, seasonality.mode = "additive")
+```
+
+## Model Forecasting
+
+Fit the model and generate forecasts.
+
+```{r forecast-hand30}
+# Create future dataframe for predictions
+future <- make_future_dataframe(m_hand30, periods = 366)
+
+# Generate forecasts
+forecast_hand30 <- predict(m_hand30, future) |> 
+  clean_names()
+```
+
+## Visualization
+
+### Forecast Plot
+
+```{r forecast_plot-hand30}
+plot(m_hand30, forecast_hand30) + add_changepoints_to_plot(m_hand30)
+```
+
+### Component Plots
+
+```{r component_plots-hand30}
+# Create component plots
+prophet_plot_components(m_hand30, forecast_hand30)
+```
+
+```{r component_plots-hand30-subset}
+m_hand30_sub <- m_hand30
+
+m_hand30_sub$history <- m_hand30_sub$history |> 
+  filter(ds >= ymd("2023-08-01"))
+
+forecast_hand30_sub <- forecast_hand30 |> 
+  filter(ds >= ymd("2023-08-01"))
+
+# Create component plots
+prophet_plot_components(m_hand30_sub, forecast_hand30_sub)
+
+```
+
+```{r break-impact-hand30}
+# First add year to both dataframes
+df_with_year <- df_hand30 |> 
+  mutate(year = year(ds))
+
+# Then join by year and calculate days until break
+df_with_breaks <- df_with_year |> 
+  left_join(holidays_with_year, by = "year") |> 
+  mutate(days_until_break = as.integer(break_start - ds)) |>
+  filter(days_until_break >= -7, days_until_break <= 75)
+
+df_with_breaks |> 
+  ggplot(aes(x = days_until_break, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~holiday, scales = "free_y") +
+  scale_x_reverse() +  # This reverses the x-axis
+  labs(x = "Days Until Break Starts", 
+       y = "% Answered Within 30 Seconds",
+       title = "Service Levels Leading Up to School Breaks",
+       subtitle = "Day 0 = First day of break") +
+  theme_minimal()
+```
+
+# Analysis of % of Calls Abandoned
+
+## Model Configuration
+
+```{r create-calls-aband-df}
+# Prepare  data for Prophet
+df_aband <- queue_data |> 
+  select(ds = date, y = percentage_of_calls_abandoned) |> 
+  mutate(
+    median_abs_dev = mad(y, na.rm = TRUE),
+    median_val = median(y, na.rm = TRUE),
+    modified_z = abs(0.6745 * (y - median_val) / median_abs_dev),
+    y = if_else(modified_z < 3.5, y, NA) # replace outliers with NA
+  ) |> 
+  ungroup() |> 
+  select(ds, y) |> 
+  rbind(missing_dates) |> 
+  arrange(ds)
+
+holidays_aband <- holidays |> 
+  filter(!holiday %in% c("Christmas Break", "March Break", "April Break"))
+```
+
+Configure the Prophet model with appropriate seasonality settings and external regressors.
+
+```{r model-setup-aband}
+# Create prophet model
+m_aband <- prophet(df_aband, holidays = holidays_aband, seasonality.mode = "additive")
+```
+
+## Model Forecasting
+
+Fit the model and generate forecasts.
+
+```{r forecast-aband}
+# Create future dataframe for predictions
+future <- make_future_dataframe(m_aband, periods = 366)
+
+# Generate forecasts
+forecast_aband <- predict(m_aband, future) |> 
+  clean_names()
+```
+
+## Visualization
+
+### Forecast Plot
+
+```{r forecast_plot-aband}
+plot(m_aband, forecast_aband) + add_changepoints_to_plot(m_aband)
+```
+
+### Component Plots
+
+```{r component_plots}
+# Create component plots
+prophet_plot_components(m_aband, forecast_aband)
+```
+
+```{r component_plots-subset-aband}
+m_hand30_sub <- m_hand30
+
+m_hand30_sub$history <- m_hand30_sub$history |> 
+  filter(ds >= ymd("2023-08-01"))
+
+forecast_hand30_sub <- forecast_hand30 |> 
+  filter(ds >= ymd("2023-08-01"))
+
+# Create component plots
+prophet_plot_components(m_hand30_sub, forecast_hand30_sub)
+
+```
+
+```{r create-lockdown-function}
+lockdown_1_dates <- seq.Date(ymd("2020-03-17"), ymd("2020-07-16"), "days")
+lockdown_2_dates <- seq.Date(ymd("2020-12-26"), ymd("2021-02-09"), "days")
+lockdown_3_dates <- seq.Date(ymd("2021-04-08"), ymd("2021-07-15"), "days")
+lockdown_4_dates <- seq.Date(ymd("2022-01-05"), ymd("2022-03-20"), "days")
+
+is_lockdown_date <- function(ds, lockdown_dates) {
+  ds <- as.Date(ds)
+  return(as.numeric(ds %in% lockdown_dates))
+}
+```
+
+```{r create-dfs-with-lockdown-columns}
+df_pres_lockdowns <- df_pres |> 
+  mutate(
+    lockdown_1 = is_lockdown_date(ds, lockdown_1_dates),
+    lockdown_2 = is_lockdown_date(ds, lockdown_2_dates),
+    lockdown_3 = is_lockdown_date(ds, lockdown_3_dates),
+    lockdown_4 = is_lockdown_date(ds, lockdown_4_dates)
+  )
+
+holidays_no_lockdowns <- holidays |> 
+  filter(!grepl("lock", holiday))
+
+future_lockdowns <- future |> 
+  mutate(
+    lockdown_1 = is_lockdown_date(ds, lockdown_1_dates),
+    lockdown_2 = is_lockdown_date(ds, lockdown_2_dates),
+    lockdown_3 = is_lockdown_date(ds, lockdown_3_dates),
+    lockdown_4 = is_lockdown_date(ds, lockdown_4_dates)
+  )
+```
+
+```{r model-with-lockdown-regressors}
+m_lockdown <- prophet(
+  holidays = holidays_no_lockdowns, 
+  seasonality.mode = "multiplicative",
+  mcmc.samples = 1000
+  )
+m_lockdown <- add_regressor(m_lockdown, "lockdown_1")
+m_lockdown <- add_regressor(m_lockdown, "lockdown_2")
+m_lockdown <- add_regressor(m_lockdown, "lockdown_3")
+m_lockdown <- add_regressor(m_lockdown, "lockdown_4")
+m_lockdown <- fit.prophet(m_lockdown, df_pres_lockdowns)
+
+forecast_lockdown <- predict(m_lockdown, future_lockdowns)
+prophet_plot_components(m_lockdown, forecast_lockdown)
+```
+
+```{r}
+regressor_coefficients(m_lockdown)
+```
