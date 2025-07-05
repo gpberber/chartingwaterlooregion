@@ -1,6 +1,6 @@
 ---
 title: "About Charting Waterloo Region"
-image: grateful-data.JPG
+image: 
 about:
   template: solana
   links:
