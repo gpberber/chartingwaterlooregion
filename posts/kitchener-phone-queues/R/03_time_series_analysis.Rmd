@@ -2,6 +2,7 @@
 title: "Call Center Volume Analysis with Prophet"
 author: "Your Name"
 date: "`r Sys.Date()`"
+draft: true
 output: 
   html_document:
     toc: true
@@ -355,7 +356,7 @@ plot(m_aband, forecast_aband) + add_changepoints_to_plot(m_aband)
 
 ### Component Plots
 
-```{r component_plots}
+```{r component_plots_v2}
 # Create component plots
 prophet_plot_components(m_aband, forecast_aband)
 ```

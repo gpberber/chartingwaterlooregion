@@ -1,0 +1,15 @@
+{
+  "hash": "770852423b5042c4068739f826875b93",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Kitchener Phone Queues\"\nimage: \"../images/map_snapshot.JPG\"\ndate: \"2025-02-05\"\ncategories: [Open Data, R, Policy]\nwarning: false\nmessage: false\necho: false\ndraft: true\nformat:\n  html:\n    number-sections: false  # Numbers main sections\n    number-depth: 3       # How deep to number subsections\n    tbl-cap-location: bottom\n    fig-align: center\n    css: styles.css\n    crossref:             # Optional custom settings\n      fig-prefix: Figure  # Default is \"Figure\"\n      tbl-prefix: Table  # Default is \"Table\"\n---\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
