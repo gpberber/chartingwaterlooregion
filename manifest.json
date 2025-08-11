@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "metadata": {
+    "appmode": "quarto-static",
+    "entrypoint": "_quarto.yml"
+  },
+  "files": {}
+}

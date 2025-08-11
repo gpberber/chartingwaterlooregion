@@ -1,2 +1,3360 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"></html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-07-09">
+
+<title>Exploring TFW Data – Charting Waterloo Region</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-afa5a15123fc473ab5b8a0f0fad9c898.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="quarto:status" content="draft">
+
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner"><div id="quarto-draft-alert" class="alert alert-warning"><i class="bi bi-pencil-square"></i>Draft</div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Charting Waterloo Region</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About Charting Waterloo Region</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/greg-berberich/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/gpberber/chartingwaterlooregion"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Exploring TFW Data</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Interactive</div>
+                <div class="quarto-category">Visualization</div>
+                <div class="quarto-category">Open Data</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 9, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<div class="cell">
+<div class="cell-output-display">
+<div id="gpnvhoiyxu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#gpnvhoiyxu table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#gpnvhoiyxu thead, #gpnvhoiyxu tbody, #gpnvhoiyxu tfoot, #gpnvhoiyxu tr, #gpnvhoiyxu td, #gpnvhoiyxu th {
+  border-style: none;
+}
+
+#gpnvhoiyxu p {
+  margin: 0;
+  padding: 0;
+}
+
+#gpnvhoiyxu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#gpnvhoiyxu .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#gpnvhoiyxu .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#gpnvhoiyxu .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#gpnvhoiyxu .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#gpnvhoiyxu .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#gpnvhoiyxu .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#gpnvhoiyxu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#gpnvhoiyxu .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#gpnvhoiyxu .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#gpnvhoiyxu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gpnvhoiyxu .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#gpnvhoiyxu .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#gpnvhoiyxu .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#gpnvhoiyxu .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gpnvhoiyxu .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#gpnvhoiyxu .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#gpnvhoiyxu .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#gpnvhoiyxu .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gpnvhoiyxu .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#gpnvhoiyxu .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gpnvhoiyxu .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#gpnvhoiyxu .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gpnvhoiyxu .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gpnvhoiyxu .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gpnvhoiyxu .gt_left {
+  text-align: left;
+}
+
+#gpnvhoiyxu .gt_center {
+  text-align: center;
+}
+
+#gpnvhoiyxu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#gpnvhoiyxu .gt_font_normal {
+  font-weight: normal;
+}
+
+#gpnvhoiyxu .gt_font_bold {
+  font-weight: bold;
+}
+
+#gpnvhoiyxu .gt_font_italic {
+  font-style: italic;
+}
+
+#gpnvhoiyxu .gt_super {
+  font-size: 65%;
+}
+
+#gpnvhoiyxu .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#gpnvhoiyxu .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#gpnvhoiyxu .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#gpnvhoiyxu .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#gpnvhoiyxu .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#gpnvhoiyxu .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#gpnvhoiyxu .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#gpnvhoiyxu .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#gpnvhoiyxu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">name</th>
+<th id="value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="name">rows</td>
+<td class="gt_row gt_right" headers="value">528565</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="name">columns</td>
+<td class="gt_row gt_right" headers="value">25</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="name">discrete_columns</td>
+<td class="gt_row gt_right" headers="value">21</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="name">continuous_columns</td>
+<td class="gt_row gt_right" headers="value">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="name">all_missing_columns</td>
+<td class="gt_row gt_right" headers="value">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="name">total_missing_values</td>
+<td class="gt_row gt_right" headers="value">243937</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="name">complete_rows</td>
+<td class="gt_row gt_right" headers="value">312750</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="name">total_observations</td>
+<td class="gt_row gt_right" headers="value">13214125</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="name">memory_usage</td>
+<td class="gt_row gt_right" headers="value">136112464</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-introduction-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-missing-data-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="eqcldeevhs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#eqcldeevhs table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#eqcldeevhs thead, #eqcldeevhs tbody, #eqcldeevhs tfoot, #eqcldeevhs tr, #eqcldeevhs td, #eqcldeevhs th {
+  border-style: none;
+}
+
+#eqcldeevhs p {
+  margin: 0;
+  padding: 0;
+}
+
+#eqcldeevhs .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#eqcldeevhs .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#eqcldeevhs .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#eqcldeevhs .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#eqcldeevhs .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#eqcldeevhs .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#eqcldeevhs .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#eqcldeevhs .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#eqcldeevhs .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#eqcldeevhs .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#eqcldeevhs .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eqcldeevhs .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#eqcldeevhs .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#eqcldeevhs .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#eqcldeevhs .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eqcldeevhs .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#eqcldeevhs .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#eqcldeevhs .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#eqcldeevhs .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eqcldeevhs .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#eqcldeevhs .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eqcldeevhs .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#eqcldeevhs .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eqcldeevhs .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eqcldeevhs .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eqcldeevhs .gt_left {
+  text-align: left;
+}
+
+#eqcldeevhs .gt_center {
+  text-align: center;
+}
+
+#eqcldeevhs .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#eqcldeevhs .gt_font_normal {
+  font-weight: normal;
+}
+
+#eqcldeevhs .gt_font_bold {
+  font-weight: bold;
+}
+
+#eqcldeevhs .gt_font_italic {
+  font-style: italic;
+}
+
+#eqcldeevhs .gt_super {
+  font-size: 65%;
+}
+
+#eqcldeevhs .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#eqcldeevhs .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#eqcldeevhs .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#eqcldeevhs .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#eqcldeevhs .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#eqcldeevhs .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#eqcldeevhs .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#eqcldeevhs .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#eqcldeevhs div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">year</th>
+<th id="quarter" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">quarter</th>
+<th id="region" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">region</th>
+<th id="employer" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">employer</th>
+<th id="city" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">city</th>
+<th id="postal_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">postal_code</th>
+<th id="noc_code_original" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_code_original</th>
+<th id="noc_unit_group_original" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_unit_group_original</th>
+<th id="noc_broad_category_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_broad_category_code</th>
+<th id="noc_major_group_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_major_group_code</th>
+<th id="noc_sub_major_group_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_sub_major_group_code</th>
+<th id="noc_minor_group_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_minor_group_code</th>
+<th id="noc_unit_group_code" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_unit_group_code</th>
+<th id="noc_broad_category" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_broad_category</th>
+<th id="noc_major_group" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_major_group</th>
+<th id="noc_sub_major_group" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_sub_major_group</th>
+<th id="noc_minor_group" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_minor_group</th>
+<th id="noc_unit_group" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">noc_unit_group</th>
+<th id="teer_category" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">teer_category</th>
+<th id="program_stream" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">program_stream</th>
+<th id="num_lmias_approved" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">num_lmias_approved</th>
+<th id="num_positions_approved" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">num_positions_approved</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right" headers="year">2016</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">5.5%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">100.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">100.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="year">2017</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">3.4%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">100.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="year">2018</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">2.3%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">100.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="year">2019</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">1.6%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">100.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="year">2020</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.7%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">100.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="year">2021</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.6%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">72.2%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="year">2022</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.4%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">0.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="year">2023</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.4%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">0.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right" headers="year">2024</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.5%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">0.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" headers="year">2025</td>
+<td class="gt_row gt_right" headers="quarter">0.0%</td>
+<td class="gt_row gt_right" headers="region">0.0%</td>
+<td class="gt_row gt_right" headers="employer">0.0%</td>
+<td class="gt_row gt_right" headers="city">0.0%</td>
+<td class="gt_row gt_right" headers="postal_code">0.6%</td>
+<td class="gt_row gt_right" headers="noc_code_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_original">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group_code">0.0%</td>
+<td class="gt_row gt_right" headers="noc_broad_category">0.0%</td>
+<td class="gt_row gt_right" headers="noc_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_sub_major_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_minor_group">0.0%</td>
+<td class="gt_row gt_right" headers="noc_unit_group">0.0%</td>
+<td class="gt_row gt_right" headers="teer_category">0.0%</td>
+<td class="gt_row gt_right" headers="program_stream">0.0%</td>
+<td class="gt_row gt_right" headers="num_lmias_approved">0.0%</td>
+<td class="gt_row gt_right" headers="num_positions_approved">0.0%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-overall-by-year-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-overall-by-year-per-1000-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-overall-Q1-by-year-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-overall-Q1-by-year-per-1000-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-by-region-year-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-by-region-year-per-1000-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-by-year-region-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-by-year-region-per-1000-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="kccgixrcwj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kccgixrcwj table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#kccgixrcwj thead, #kccgixrcwj tbody, #kccgixrcwj tfoot, #kccgixrcwj tr, #kccgixrcwj td, #kccgixrcwj th {
+  border-style: none;
+}
+
+#kccgixrcwj p {
+  margin: 0;
+  padding: 0;
+}
+
+#kccgixrcwj .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#kccgixrcwj .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kccgixrcwj .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kccgixrcwj .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kccgixrcwj .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kccgixrcwj .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kccgixrcwj .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kccgixrcwj .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kccgixrcwj .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#kccgixrcwj .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#kccgixrcwj .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kccgixrcwj .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kccgixrcwj .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kccgixrcwj .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kccgixrcwj .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kccgixrcwj .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#kccgixrcwj .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#kccgixrcwj .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#kccgixrcwj .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kccgixrcwj .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#kccgixrcwj .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kccgixrcwj .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kccgixrcwj .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kccgixrcwj .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kccgixrcwj .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kccgixrcwj .gt_left {
+  text-align: left;
+}
+
+#kccgixrcwj .gt_center {
+  text-align: center;
+}
+
+#kccgixrcwj .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kccgixrcwj .gt_font_normal {
+  font-weight: normal;
+}
+
+#kccgixrcwj .gt_font_bold {
+  font-weight: bold;
+}
+
+#kccgixrcwj .gt_font_italic {
+  font-style: italic;
+}
+
+#kccgixrcwj .gt_super {
+  font-size: 65%;
+}
+
+#kccgixrcwj .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#kccgixrcwj .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#kccgixrcwj .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#kccgixrcwj .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#kccgixrcwj .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#kccgixrcwj .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#kccgixrcwj .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#kccgixrcwj .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#kccgixrcwj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="noc_unit_group" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">noc_unit_group</th>
+<th id="positions" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">positions</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Fish and seafood plant workers</td>
+<td class="gt_row gt_right" headers="positions">5943</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Specialized livestock workers and farm machinery operators</td>
+<td class="gt_row gt_right" headers="positions">1799</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Livestock labourers</td>
+<td class="gt_row gt_right" headers="positions">1326</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Harvesting labourers</td>
+<td class="gt_row gt_right" headers="positions">806</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Transport truck drivers</td>
+<td class="gt_row gt_right" headers="positions">556</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Labourers in fish and seafood processing</td>
+<td class="gt_row gt_right" headers="positions">190</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Nursery and greenhouse labourers</td>
+<td class="gt_row gt_right" headers="positions">153</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Construction trades helpers and labourers</td>
+<td class="gt_row gt_right" headers="positions">121</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Cooks</td>
+<td class="gt_row gt_right" headers="positions">109</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Food service supervisors</td>
+<td class="gt_row gt_right" headers="positions">93</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Aquaculture and marine harvest labourers</td>
+<td class="gt_row gt_right" headers="positions">84</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Industrial butchers and meat cutters, poultry preparers and related workers</td>
+<td class="gt_row gt_right" headers="positions">69</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Agricultural service contractors and farm supervisors</td>
+<td class="gt_row gt_right" headers="positions">53</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Other labourers in processing, manufacturing and utilities</td>
+<td class="gt_row gt_right" headers="positions">41</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Carpenters</td>
+<td class="gt_row gt_right" headers="positions">23</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Labourers in food and beverage processing</td>
+<td class="gt_row gt_right" headers="positions">23</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Food counter attendants, kitchen helpers and related support occupations</td>
+<td class="gt_row gt_right" headers="positions">22</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Material handlers</td>
+<td class="gt_row gt_right" headers="positions">22</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Welders and related machine operators</td>
+<td class="gt_row gt_right" headers="positions">22</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Light duty cleaners</td>
+<td class="gt_row gt_right" headers="positions">20</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Cleaning supervisors</td>
+<td class="gt_row gt_right" headers="positions">16</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Roofers and shinglers</td>
+<td class="gt_row gt_right" headers="positions">16</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Automotive service technicians, truck and bus mechanics and mechanical repairers</td>
+<td class="gt_row gt_right" headers="positions">14</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Specialists in clinical and laboratory medicine</td>
+<td class="gt_row gt_right" headers="positions">13</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Restaurant and food service managers</td>
+<td class="gt_row gt_right" headers="positions">11</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Butchers - retail and wholesale</td>
+<td class="gt_row gt_right" headers="positions">10</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Bakers</td>
+<td class="gt_row gt_right" headers="positions">9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Managers in horticulture</td>
+<td class="gt_row gt_right" headers="positions">9</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Nurse aides, orderlies and patient service associates</td>
+<td class="gt_row gt_right" headers="positions">9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Fishing vessel deckhands</td>
+<td class="gt_row gt_right" headers="positions">8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Landscaping and grounds maintenance labourers</td>
+<td class="gt_row gt_right" headers="positions">8</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Retail sales supervisors</td>
+<td class="gt_row gt_right" headers="positions">8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Meat cutters and fishmongers - retail and wholesale</td>
+<td class="gt_row gt_right" headers="positions">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Chefs</td>
+<td class="gt_row gt_right" headers="positions">6</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Administrative assistants</td>
+<td class="gt_row gt_right" headers="positions">5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Artisans and craftspersons</td>
+<td class="gt_row gt_right" headers="positions">5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Contractors and supervisors, other construction trades, installers, repairers and servicers</td>
+<td class="gt_row gt_right" headers="positions">5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Estheticians, electrologists and related occupations</td>
+<td class="gt_row gt_right" headers="positions">5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">General practitioners and family physicians</td>
+<td class="gt_row gt_right" headers="positions">5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Cashiers</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Contractors and supervisors, landscaping, grounds maintenance and horticulture services</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Food and beverage servers</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Other trades helpers and labourers</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Painters and decorators (except interior decorators)</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Professional occupations in advertising, marketing and public relations</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Software engineers and designers</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Tour and travel guides</td>
+<td class="gt_row gt_right" headers="positions">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Accounting technicians and bookkeepers</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Air pilots, flight engineers and flying instructors</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Hotel front desk clerks</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Managers in agriculture</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Retail and wholesale trade managers</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Retail salespersons and visual merchandisers</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Specialists in surgery</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Supervisors, supply chain, tracking and scheduling coordination occupations</td>
+<td class="gt_row gt_right" headers="positions">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Advertising, marketing and public relations managers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Architecture and science managers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Biologists and related scientists</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Computer and information systems managers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">General building maintenance workers and building superintendents</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Home support workers, caregivers and related occupations</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Human resources and recruitment officers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Janitors, caretakers and heavy-duty cleaners</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Manufacturing managers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Massage therapists</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Producers, directors, choreographers and related occupations</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Production and transportation logistics coordinators</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Software developers and programmers</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Telecommunications equipment installation and cable television service technicians</td>
+<td class="gt_row gt_right" headers="positions">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Accommodation service managers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Accounting and related clerks</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Actors, comedians and circus performers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Business development officers and market researchers and analysts</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Civil engineering technologists and technicians</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Computer systems developers and programmers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Construction millwrights and industrial mechanics</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Database analysts and data administrators</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Drafting technologists and technicians</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Hairstylists and barbers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Heavy-duty equipment mechanics</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Information systems testing technicians</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Machinists and machining and tooling inspectors</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Managers in social, community and correctional services</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Opticians</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Other business services managers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Other practitioners of natural healing</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Other services supervisors</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Other small engine and small equipment repairers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Other technical trades and related occupations</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Senior managers - construction, transportation, production and utilities</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Supervisors, petroleum, gas and chemical processing and utilities</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">University professors and lecturers</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">User support technicians</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Weavers, knitters and other fabric making occupations</td>
+<td class="gt_row gt_right" headers="positions">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Air transport ramp attendants</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Data scientists</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Motorcycle, all-terrain vehicle and other related mechanics</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Other customer and information services representatives</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Police investigators and other investigative occupations</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Production logistics workers</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="noc_unit_group">Traditional Chinese medicine practitioners and acupuncturists</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="noc_unit_group">Web developers and programmers</td>
+<td class="gt_row gt_right" headers="positions">0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overall-by-category-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overall-top10-major-groups-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overall-top10-minor-groups-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overall-top10-unit-groups-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="qytdrvzasn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qytdrvzasn table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#qytdrvzasn thead, #qytdrvzasn tbody, #qytdrvzasn tfoot, #qytdrvzasn tr, #qytdrvzasn td, #qytdrvzasn th {
+  border-style: none;
+}
+
+#qytdrvzasn p {
+  margin: 0;
+  padding: 0;
+}
+
+#qytdrvzasn .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#qytdrvzasn .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#qytdrvzasn .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#qytdrvzasn .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#qytdrvzasn .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#qytdrvzasn .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#qytdrvzasn .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#qytdrvzasn .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#qytdrvzasn .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#qytdrvzasn .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#qytdrvzasn .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qytdrvzasn .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#qytdrvzasn .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#qytdrvzasn .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#qytdrvzasn .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qytdrvzasn .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#qytdrvzasn .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#qytdrvzasn .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#qytdrvzasn .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qytdrvzasn .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#qytdrvzasn .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qytdrvzasn .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#qytdrvzasn .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qytdrvzasn .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qytdrvzasn .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qytdrvzasn .gt_left {
+  text-align: left;
+}
+
+#qytdrvzasn .gt_center {
+  text-align: center;
+}
+
+#qytdrvzasn .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#qytdrvzasn .gt_font_normal {
+  font-weight: normal;
+}
+
+#qytdrvzasn .gt_font_bold {
+  font-weight: bold;
+}
+
+#qytdrvzasn .gt_font_italic {
+  font-style: italic;
+}
+
+#qytdrvzasn .gt_super {
+  font-size: 65%;
+}
+
+#qytdrvzasn .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#qytdrvzasn .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#qytdrvzasn .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#qytdrvzasn .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#qytdrvzasn .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#qytdrvzasn .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#qytdrvzasn .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#qytdrvzasn .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#qytdrvzasn div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="noc_unit_group" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">noc_unit_group</th>
+<th id="num_positions" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">num_positions</th>
+<th id="class_definition" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">class_definition</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center" headers="noc_unit_group">Specialized livestock workers and farm machinery operators</td>
+<td class="gt_row gt_right" headers="num_positions">212116.61</td>
+<td class="gt_row gt_left" headers="class_definition">Specialized livestock workers carry out feeding, health and breeding programs on dairy, beef, sheep, poultry, swine and other livestock farms. Farm machinery operators operate and maintain farm machinery and equipment. They are employed on crop, livestock, fruit, vegetable and specialty farms.</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="noc_unit_group">Livestock labourers</td>
+<td class="gt_row gt_right" headers="num_positions">161733.10</td>
+<td class="gt_row gt_left" headers="class_definition">Livestock labourers assist other farm workers to raise cattle, poultry and other animals, to help carry out feeding, health and breeding programs, to process animal products and to assist in the maintenance and repair of farm equipment and buildings. They are employed on livestock farms.</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="noc_unit_group">Nursery and greenhouse labourers</td>
+<td class="gt_row gt_right" headers="num_positions">133578.00</td>
+<td class="gt_row gt_left" headers="class_definition">Nursery and greenhouse labourers plant, cultivate and harvest trees, shrubs, flowers and plants, and serve nursery and greenhouse customers. They are employed in indoor and outdoor nurseries and greenhouses.</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="noc_unit_group">Harvesting labourers</td>
+<td class="gt_row gt_right" headers="num_positions">107351.13</td>
+<td class="gt_row gt_left" headers="class_definition">Harvesting labourers and related workers assist other farm workers to plant, harvest, sort and pack crops. They participate in soil preparation, irrigation and crop planting, spraying and thinning. They are employed on fruit, vegetable and specialty crop farms.</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="noc_unit_group">Cooks</td>
+<td class="gt_row gt_right" headers="num_positions">57590.00</td>
+<td class="gt_row gt_left" headers="class_definition">Cooks prepare and cook a wide variety of foods. They are employed in restaurants, hotels, hospitals and other health care institutions, central food commissaries, educational institutions and other establishments. Cooks are also employed aboard ships and at construction and logging campsites. Apprentices are also included in this unit group.</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="noc_unit_group">Food service supervisors</td>
+<td class="gt_row gt_right" headers="num_positions">46922.00</td>
+<td class="gt_row gt_left" headers="class_definition">Food service supervisors supervise, direct and coordinate the activities of workers who prepare, portion and serve food. They are employed by hospitals and other health care establishments and by cafeterias, catering companies and other food service establishments.</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="noc_unit_group">Transport truck drivers</td>
+<td class="gt_row gt_right" headers="num_positions">39313.00</td>
+<td class="gt_row gt_left" headers="class_definition">Transport truck drivers drive straight trucks or tractor-trailers to transport freight. Long-haul truck drivers operate heavy trucks over urban, interurban, provincial and international routes, while short-haul and local transport truck drivers operate over urban and short interurban routes. They are employed by transportation, manufacturing, distribution and moving companies, and trucking employment service agencies, or they may be self-employed.</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="noc_unit_group">Fish and seafood plant workers</td>
+<td class="gt_row gt_right" headers="num_positions">30118.97</td>
+<td class="gt_row gt_left" headers="class_definition">Labourers in fish and seafood processing perform clean-up, packaging, material handling and other elemental activities related to fish and seafood processing. They are employed in fish and seafood processing and packaging plants.</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="noc_unit_group">Food counter attendants, kitchen helpers and related support occupations</td>
+<td class="gt_row gt_right" headers="num_positions">23634.00</td>
+<td class="gt_row gt_left" headers="class_definition">Food counter attendants and food preparers prepare, heat and finish cooking simple food items and serve customers at food counters. Kitchen helpers, food service helpers and dishwashers clear tables, clean kitchen areas, wash dishes, and perform various other activities to assist workers who prepare or serve food and beverages. They are employed by restaurants, cafés, hotels, fast food outlets, cafeterias, hospitals and other establishments.</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="noc_unit_group">Labourers in food and beverage processing</td>
+<td class="gt_row gt_right" headers="num_positions">19060.00</td>
+<td class="gt_row gt_left" headers="class_definition">Labourers in food and beverage processing perform material handling, clean-up, packaging and other elemental activities related to food and beverage processing. They are employed in fruit and vegetable processing plants, dairies, flour mills, bakeries, sugar refineries, meat plants, breweries and other food and beverage processing and packaging plants.</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/overall-by-teer-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-teer-props-and-positions-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/plot-teer-props-and-positions-wat-region-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="3600"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
