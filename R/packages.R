@@ -29,7 +29,10 @@ cwr_packages <- c(
   "changepoint", "segmented", "prophet", "broom", "slider", "tidytext",
 
   # Shiny posts
-  "shiny", "rsconnect"
+  "shiny", "rsconnect",
+
+  # Used by the crime dataset setup script
+  "pacman"
 )
 
 # Install any package in the list that is not already installed.

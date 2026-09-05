@@ -42,6 +42,13 @@ source("posts/<post-slug>/R/01_get_data.R")
 
 Replace `<post-slug>` with the folder name shown in the URL of the post, for example `kitchener-school-collisions`. The README in each post folder lists the original sources and their licences.
 
+Some posts draw on a shared dataset in `datasets/<name>/` instead of their own data folder. The post README says which. Each dataset has the same two scripts plus a README with its sources:
+
+```r
+source("datasets/<name>/R/01_get_data.R")
+source("datasets/<name>/R/02_clean_data.R")
+```
+
 ## 5. Render the post
 
 From a terminal in the project folder:

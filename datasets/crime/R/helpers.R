@@ -1,6 +1,6 @@
-here::i_am("posts/crime/R/03a_prep_functions.R")
+here::i_am("datasets/crime/R/helpers.R")
 
-source(here::here("posts", "crime", "R", "01_setup.R"))
+source(here::here("datasets", "crime", "R", "00_setup.R"))
 
 # Function to convert date columns in occurrences data
 convert_dates <- function(date_col) {

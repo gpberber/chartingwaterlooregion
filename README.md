@@ -9,6 +9,7 @@ Charts and plain-language analysis about life in Waterloo Region, built from ope
 | Path | Contents |
 |---|---|
 | `posts/<slug>/` | One folder per post: `index.qmd` (the post), `R/` (data scripts), `data/` (small tidy data), `README.md` (sources and licences) |
+| `datasets/<slug>/` | Shared data used by several posts: download and cleaning scripts, `load.R` for posts, tidy `data/`, `README.md` (sources, licences, versions) |
 | `R/theme_cwr.R` | House chart style: colours and the ggplot2 theme used on every chart |
 | `R/data_helpers.R` | Download and upload large data files via GitHub Releases |
 | `R/packages.R` | Every R package used on the site, with an installer |

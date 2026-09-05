@@ -10,6 +10,11 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   gitignored) then `R/02_clean_data.R` (fills `data/`, committed when each file is under 25 MB).
   `images/thumbnail.png` is the listing image. `README.md` lists sources and licences.
   Optional `app/` holds a Shiny app (deployed to shinyapps.io, never rendered by Quarto).
+- `datasets/<slug>/` is the shared data layer for data that feeds several posts: `R/01_get_data.R`,
+  `R/02_clean_data.R`, `R/helpers.R`, `R/load.R` (posts source this one line), `data-raw/`, `data/`,
+  `README.md`. Two-layer rule: a dataset is tidy, complete, and general (every year, every region);
+  a post filters and summarises for its story. A derived table two posts need moves into the dataset.
+  `datasets/crime/` is the worked example.
 - `R/theme_cwr.R` is the house chart style (colours, `theme_cwr()`, helpers). Every post sources it.
   `R/data_helpers.R` moves big files to and from GitHub Releases. `R/packages.R` lists every package.
 - `_templates/post/` is the scaffold `/new-post` copies. `_dev/` holds tooling (safety script,
@@ -30,7 +35,7 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 
 ## Skills
 
-`/new-post`, `/preview`, `/review-post`, `/publish`, `/share-data`, `/shiny-post`, `/save`, and
+`/new-post`, `/new-dataset`, `/preview`, `/review-post`, `/publish`, `/share-data`, `/shiny-post`, `/save`, and
 `cwr-charts` (loaded automatically when writing charts). Use them rather than improvising the workflow.
 
 ## Rules

@@ -1,15 +1,15 @@
 # Build a lookup of Canadian UCR violation codes from the two CCJCSS reference
-# PDFs in posts/crime/data/ucr_codes/:
+# PDFs in datasets/crime/data-raw/ucr_codes/:
 #   Current_UCR_Codes.pdf  -> Violation Reference Chart (category, subcategory,
 #                             violation, maximum penalty)
 #   Expired_UCR_Codes.pdf  -> Expired Violation Codes (violation, expiry date)
 # The two are combined into a single tibble, `ucr_categories`.
 
-here::i_am("posts/crime/R/03b_scrape_ucr_codes.R")
+here::i_am("datasets/crime/R/01b_get_ucr_codes.R")
 
-source(here::here("posts", "crime", "R", "01_setup.R"))
+source(here::here("datasets", "crime", "R", "00_setup.R"))
 
-ucr_dir <- here("posts", "crime", "data", "ucr_codes")
+ucr_dir <- here("datasets", "crime", "data-raw", "ucr_codes")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -282,4 +282,4 @@ ucr_categories <- bind_rows(current_ucr_codes, expired_ucr_codes) |>
   relocate(expiry_date, .after = maximum_penalty_in_years) |> 
   arrange(ucr_code)
 
-write_csv(ucr_categories, here("posts", "crime", "data", "ucr_categories.csv"))
+write_csv(ucr_categories, here("datasets", "crime", "data-raw", "ucr_categories.csv"))

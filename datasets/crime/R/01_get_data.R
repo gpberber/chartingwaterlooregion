@@ -1,4 +1,4 @@
-source(here::here("posts", "crime", "R", "01_setup.R"))
+source(here::here("datasets", "crime", "R", "00_setup.R"))
 
 # Get data (Run this code once a year after latest annual data added to StasCan and WRPS, usually in summer)
 
@@ -17,15 +17,15 @@ incidents_ont <- incidents_ont_connection |>
 
 # Manual download from Statistics Canada if above times out or hits issues
 # url <- "https://www150.statcan.gc.ca/n1/tbl/csv/35100180-eng.zip"
-# zip_filename <- here("posts", "crime", "data", "35100180-eng.zip")
+# zip_filename <- here("datasets", "crime", "data-raw", "35100180-eng.zip")
 # 
 # download.file(url, destfile = zip_filename, mode = "wb")
-# unzip(zip_filename, exdir = here("posts", "crime", "data"))
+# unzip(zip_filename, exdir = here("datasets", "crime", "data-raw"))
 # file.remove(zip_filename)
 
 # Read the CSV
-# incidents_ont <- read_csv(here("posts", "crime", "data", "35100180.csv"))
-# file.remove(here("posts", "crime", "data", "35100180.csv"))
+# incidents_ont <- read_csv(here("datasets", "crime", "data-raw", "35100180.csv"))
+# file.remove(here("datasets", "crime", "data-raw", "35100180.csv"))
 
 # Create list of top 50 forces based on population + Ontario overall
 top_100_forces <- incidents_ont |> 
@@ -47,8 +47,8 @@ incidents_ont_top_100 <- incidents_ont |>
   inner_join(top_100_forces, join_by(GEO == geo))
   
 # save to file
-write_csv(incidents_can, here("posts", "crime", "data", "criminal_incidents_canada.csv"))
-write_parquet(incidents_ont_top_100, here("posts", "crime", "data", "criminal_incidents_ontario.parquet"))
+write_csv(incidents_can, here("datasets", "crime", "data-raw", "criminal_incidents_canada.csv"))
+write_parquet(incidents_ont_top_100, here("datasets", "crime", "data-raw", "criminal_incidents_ontario.parquet"))
 
 # Stats Canada CSI data for CMAs and above
 csi_all_cma_higher <- get_cansim("35-10-0026-01")
@@ -64,18 +64,18 @@ csi_can_prov_ont_cma <- csi_all_cma_higher |>
 csi_ont <- get_cansim("35-10-0188-01")
 
 # save to file
-write_csv(csi_can_prov_ont_cma, here("posts", "crime", "data", "csi_canada_provs_ont_cmas.csv"))
-write_csv(csi_ont, here("posts", "crime", "data", "csi_ontario_forces.csv"))
+write_csv(csi_can_prov_ont_cma, here("datasets", "crime", "data-raw", "csi_canada_provs_ont_cmas.csv"))
+write_csv(csi_ont, here("datasets", "crime", "data-raw", "csi_ontario_forces.csv"))
 
 # get Stats Can hate crimes data
 hate_crimes <- get_cansim("35-10-0191-01")
 
-write_csv(hate_crimes, here("posts", "crime", "data", "hate_crimes.csv"))
+write_csv(hate_crimes, here("datasets", "crime", "data-raw", "hate_crimes.csv"))
 
 # get Stats Can cybercrime data
 cyber_crimes <- get_cansim("35-10-0002-01")
 
-write_csv(cyber_crimes, here("posts", "crime", "data", "cyber_crimes.csv"))
+write_csv(cyber_crimes, here("datasets", "crime", "data-raw", "cyber_crimes.csv"))
 
 # get crime victim data
 
@@ -86,7 +86,7 @@ homicide_victims_provinces <- get_cansim("35-10-0068-01")
 
 homicide_victims <- bind_rows(homicide_victims_cmas, homicide_victims_provinces)
 
-write_csv(homicide_victims, here("posts", "crime", "data", "homicide_victims.csv"))
+write_csv(homicide_victims, here("datasets", "crime", "data-raw", "homicide_victims.csv"))
 
 # age of victims of violent crimes
 violent_crime_victims_age <- get_cansim("35-10-0049-01")
@@ -97,7 +97,7 @@ violent_crime_victims_gender <- get_cansim("35-10-0050-01")
 # combine and save
 violent_crime_victims <- bind_rows(violent_crime_victims_age, violent_crime_victims_gender)
 
-write_csv(violent_crime_victims, here("posts", "crime", "data", "violent_crime_victims.csv"))
+write_csv(violent_crime_victims, here("datasets", "crime", "data-raw", "violent_crime_victims.csv"))
 
 # family and IPV victims
 family_victims <- get_cansim("35-10-0200-01")
@@ -106,7 +106,7 @@ ipv_victims <- get_cansim("35-10-0202-01")
 # combine and save
 family_ipv_victims <- bind_rows(family_victims, ipv_victims)
 
-write_csv(family_ipv_victims, here("posts", "crime", "data", "family_ipv_victims.csv"))
+write_csv(family_ipv_victims, here("datasets", "crime", "data-raw", "family_ipv_victims.csv"))
 
 
 # get Stats Can police personnel data for Ontario municipalities
@@ -119,8 +119,8 @@ police_personnel_munic <- get_cansim("35-10-0077-01") |>
 police_personnel_ont_can <- get_cansim("35-10-0076-01") |> 
   filter(str_detect(GEO, "Ontario|Canada"))
 
-write_csv(police_personnel_munic, here("posts", "crime", "data", "police_personnel_munic.csv"))
-write_csv(police_personnel_ont_can, here("posts", "crime", "data", "police_personnel_ont_can.csv"))
+write_csv(police_personnel_munic, here("datasets", "crime", "data-raw", "police_personnel_munic.csv"))
+write_csv(police_personnel_ont_can, here("datasets", "crime", "data-raw", "police_personnel_ont_can.csv"))
 
 # WRPS occurrence data
 # Define new column names based on existing names that vary in format across files
@@ -139,7 +139,7 @@ new_col_names <- c("occurrence_number", "geographic_location",
 
 # Get a list of all Excel files in the raw_occurrence_data folder
 excel_files <- list.files(
-  path = here("posts", "crime", "data", "raw_occurrence_data_files"),
+  path = here("datasets", "crime", "data-raw", "raw_occurrence_data_files"),
   full.names = TRUE
 )
 
@@ -156,7 +156,7 @@ raw_occurrence_data <- excel_files %>%
   })
 
 # Save to local file
-saveRDS(raw_occurrence_data, here("posts", "crime", "data", "occurrence_data.rds"))
+saveRDS(raw_occurrence_data, here("datasets", "crime", "data-raw", "occurrence_data.rds"))
 
 # download and combine municipal financial returns
 
@@ -179,7 +179,7 @@ download_and_process_fir_data <- function() {
     
     # Construct URL and file paths
     zip_url <- paste0(base_url, year, ".zip")
-    zip_file <- here("posts", "crime", "data", "municipal_fir_raw", paste0("fir_data_", year, ".zip"))
+    zip_file <- here("datasets", "crime", "data-raw", "municipal_fir_raw", paste0("fir_data_", year, ".zip"))
     
     tryCatch({
       # Download zip file
@@ -209,11 +209,11 @@ download_and_process_fir_data <- function() {
       
       # Extract CSV file(s)
       cat("  Extracting CSV file(s)...")
-      unzip(zip_file, files = csv_files, exdir = here("posts", "crime", "data", "municipal_fir_raw"))
+      unzip(zip_file, files = csv_files, exdir = here("datasets", "crime", "data-raw", "municipal_fir_raw"))
       cat(" ✓\n")
       
       # Read the CSV file (use the first CSV if multiple)
-      csv_file_path <- here("posts", "crime", "data", "municipal_fir_raw", csv_files[1])
+      csv_file_path <- here("datasets", "crime", "data-raw", "municipal_fir_raw", csv_files[1])
       cat("  Reading CSV data...")
       
       year_data <- read_csv(csv_file_path, 
@@ -294,7 +294,7 @@ combine_and_save_fir_data <- function(data_list) {
   cat("Combined data dimensions:", nrow(combined_data), "rows x", ncol(combined_data), "columns\n")
   
   # Save to CSV
-  output_file <- here("posts", "crime", "data", "municipal_fir.csv")
+  output_file <- here("datasets", "crime", "data-raw", "municipal_fir.csv")
   write_csv(combined_data, output_file)
   
   cat("Data saved to:", output_file, "\n")
@@ -315,7 +315,7 @@ if (length(fir_data_list) > 0) {
   
   cat("\n=== Process Complete ===\n")
   cat("You can now access the combined FIR data using:\n")
-  cat('fir_data <- read_csv(here("posts", "crime", "data", "municipal_fir.csv"))\n')
+  cat('fir_data <- read_csv(here("datasets", "crime", "data-raw", "municipal_fir.csv"))\n')
   
   # Show a preview of the combined data
   if (!is.null(combined_fir_data)) {

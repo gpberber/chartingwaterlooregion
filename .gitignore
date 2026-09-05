@@ -12,7 +12,7 @@
 /.quarto/
 /cache/
 *_cache/
-posts/**/*_files/
+**/*_files/
 **/*.quarto_ipynb
 
 # ---- Data ----
@@ -21,9 +21,8 @@ posts/**/*_files/
 **/data-raw/
 # Large clean files (> 25 MB) are listed here explicitly by /share-data
 # and live in GitHub Releases instead.
-# The crime post has not been migrated to the data-raw/ + data/ convention yet;
-# its whole data folder (5 GB of raw downloads) stays local until it is.
-posts/crime/data/
+# Derived from WRPS occurrence data obtained by request; terms not yet confirmed, stays local
+datasets/crime/data/wat_region_occurrences.rds
 
 # ---- Background reading (copyrighted PDFs etc.) ----
 # Lives outside the repo at ../chartingwaterlooregion-background/<slug>/

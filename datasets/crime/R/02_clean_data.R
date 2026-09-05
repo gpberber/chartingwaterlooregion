@@ -1,52 +1,52 @@
-# Run this once a year after raw data has been updated via 02_update_data.R
+# Run this once a year after raw data has been updated via 01_get_data.R
 
 # Load crime data from local files
-source(here::here("posts", "crime", "R", "01_setup.R"))
-source(here::here("posts", "crime", "R", "03a_prep_functions.R"))
+source(here::here("datasets", "crime", "R", "00_setup.R"))
+source(here::here("datasets", "crime", "R", "helpers.R"))
 
-# Run this once a year after raw data has been updated via 02_update_data.R
+# Run this once a year after raw data has been updated via 01_get_data.R
 
 # ---------------------------------------------------------------------------
 # Load crime data from local files
 # ---------------------------------------------------------------------------
 
-incidents_can_raw <- read_csv(here("posts", "crime", "data", "criminal_incidents_canada.csv")) |> 
+incidents_can_raw <- read_csv(here("datasets", "crime", "data-raw", "criminal_incidents_canada.csv")) |> 
   clean_names()
 
 # NOTE: the Ontario parquet is read further below, after the needed columns are
 # identified. Reading all 24 columns produced a 1.9 GB object.
 
-csi_can_provs_ont_raw <- read_csv(here("posts", "crime", "data", "csi_canada_provs_ont_cmas.csv")) |> 
+csi_can_provs_ont_raw <- read_csv(here("datasets", "crime", "data-raw", "csi_canada_provs_ont_cmas.csv")) |> 
   clean_names()
 
-csi_ont_forces_raw <- read_csv(here("posts", "crime", "data", "csi_ontario_forces.csv")) |> 
+csi_ont_forces_raw <- read_csv(here("datasets", "crime", "data-raw", "csi_ontario_forces.csv")) |> 
   clean_names()
 
-homicide_victims_raw <- read_csv(here("posts", "crime", "data", "homicide_victims.csv")) |> 
+homicide_victims_raw <- read_csv(here("datasets", "crime", "data-raw", "homicide_victims.csv")) |> 
   clean_names()
 
-hate_crimes_raw <- read_csv(here("posts", "crime", "data", "hate_crimes.csv")) |> 
+hate_crimes_raw <- read_csv(here("datasets", "crime", "data-raw", "hate_crimes.csv")) |> 
   clean_names()
 
-cyber_crimes_raw <- read_csv(here("posts", "crime", "data", "cyber_crimes.csv")) |> 
+cyber_crimes_raw <- read_csv(here("datasets", "crime", "data-raw", "cyber_crimes.csv")) |> 
   clean_names()
 
-violent_crime_victims_raw <- read_csv(here("posts", "crime", "data", "violent_crime_victims.csv")) |> 
+violent_crime_victims_raw <- read_csv(here("datasets", "crime", "data-raw", "violent_crime_victims.csv")) |> 
   clean_names()
 
-family_ipv_victims_raw <- read_csv(here("posts", "crime", "data", "family_ipv_victims.csv")) |> 
+family_ipv_victims_raw <- read_csv(here("datasets", "crime", "data-raw", "family_ipv_victims.csv")) |> 
   clean_names()
 
-personnel_munic_raw <- read_csv(here("posts", "crime", "data", "police_personnel_munic.csv")) |> 
+personnel_munic_raw <- read_csv(here("datasets", "crime", "data-raw", "police_personnel_munic.csv")) |> 
   clean_names()
 
-personnel_ont_can_raw <- read_csv(here("posts", "crime", "data", "police_personnel_ont_can.csv")) |> 
+personnel_ont_can_raw <- read_csv(here("datasets", "crime", "data-raw", "police_personnel_ont_can.csv")) |> 
   clean_names()
 
-ucr_categories_raw <- read_csv(here("posts", "crime", "data", "ucr_categories.csv")) |> 
+ucr_categories_raw <- read_csv(here("datasets", "crime", "data-raw", "ucr_categories.csv")) |> 
   mutate(ucr_code = as.character(ucr_code))
 
-fir_raw <- read_csv(here("posts", "crime", "data", "municipal_fir.csv")) |> 
+fir_raw <- read_csv(here("datasets", "crime", "data-raw", "municipal_fir.csv")) |> 
   clean_names()
 
 # --- Occurrence data ---------------------------------------------------------
@@ -54,8 +54,8 @@ fir_raw <- read_csv(here("posts", "crime", "data", "municipal_fir.csv")) |>
 # among the largest objects in the session. Leave commented out unless you are
 # actually re-running that section.
 
-# occurrence_raw <- read_rds(here("posts", "crime", "data", "occurrence_data.rds"))
-# occurrence_old <- read_rds(here("posts", "crime", "data", "clean", "wat_region_occurrences.rds"))
+# occurrence_raw <- read_rds(here("datasets", "crime", "data-raw", "occurrence_data.rds"))
+# occurrence_old <- read_rds(here("datasets", "crime", "data", "wat_region_occurrences.rds"))
 # occurrence_new <- anti_join(occurrence_raw, occurrence_old, join_by(occurrence_number))
 
 
@@ -132,7 +132,7 @@ ucr_categories <- ucr_categories_raw |>
 # SYMBOL, TERMINATED, DECIMALS, Hierarchy for GEO, and the two Statistics
 # classification columns) were read, type-converted, and then discarded.
 
-ont_parquet <- here("posts", "crime", "data", "criminal_incidents_ontario.parquet")
+ont_parquet <- here("datasets", "crime", "data-raw", "criminal_incidents_ontario.parquet")
 
 # clean_names() versions of the columns actually needed
 ont_cols_needed <- c(
@@ -253,7 +253,7 @@ incident_totals <- incidents_prepped |>
   mutate(violation = str_remove(violation, "Total,* ")) |> 
   arrange(region, year)
 
-write_rds(incident_totals, here("posts", "crime", "data", "clean", "criminal_incident_totals.rds"))
+write_parquet(incident_totals, here("datasets", "crime", "data", "criminal_incident_totals.parquet"))
 
 # create tibble of violation categories for joining below
 violation_categories <- incident_totals |> 
@@ -283,7 +283,7 @@ incidents <- incidents_prepped |>
   relocate(class, .after = "subcategory") |> 
   mutate(across(category:violation_master, as.factor))
   
-write_rds(incidents, here("posts", "crime", "data", "clean", "criminal_incidents.rds"))
+write_parquet(incidents, here("datasets", "crime", "data", "criminal_incidents.parquet"))
 
 # add nonviolent category to summary stats and create other relevant columns
 summary_totals <- incident_totals |> 
@@ -315,7 +315,7 @@ summary_totals <- incident_totals |>
   ) |> 
   ungroup()
 
-write_rds(summary_totals, here("posts", "crime", "data", "clean", "criminal_incident_summary.rds"))
+write_rds(summary_totals, here("datasets", "crime", "data", "criminal_incident_summary.rds"))
 
 # clean csi data 
 # reduce Ontario forces to top 50
@@ -390,7 +390,7 @@ csi <- csi_can_provs_ont_raw |>
   ) |> 
   ungroup()
 
-write_rds(csi, here("posts", "crime", "data", "clean", "crime_severity_index.rds"))
+write_rds(csi, here("datasets", "crime", "data", "crime_severity_index.rds"))
 
 # prep financial data for big 12 police force regions/cities
 
@@ -461,7 +461,7 @@ police_fir_clean <- fir_raw |>
     .groups = "drop"
     )
 
-write_rds(police_fir_clean, here("posts", "crime", "data", "clean", "police_fir.rds"))
+write_rds(police_fir_clean, here("datasets", "crime", "data", "police_fir.rds"))
 
 # create tibble of select data for joining to personnel tibble
 police_fir_subset <- police_fir_clean |> 
@@ -648,7 +648,7 @@ personnel_clean <- personnel_munic_prepped |>
   ungroup() |> 
   relocate(population, .after = geo_uid)
 
-write_rds(personnel_clean, here("posts", "crime", "data", "clean", "personnel.rds"))
+write_rds(personnel_clean, here("datasets", "crime", "data", "personnel.rds"))
 
 # create summary financial dataset for big 12
 big_12_financial_summary <- police_fir_subset |> 
@@ -658,7 +658,7 @@ big_12_financial_summary <- police_fir_subset |>
     total_exp_per_capita = round(total_expenses_infl_adj / population, 0)
   )
 
-write_rds(big_12_financial_summary, here("posts", "crime", "data", "clean", "big_12_financial_summary.rds"))
+write_rds(big_12_financial_summary, here("datasets", "crime", "data", "big_12_financial_summary.rds"))
 
 # clean homicide victims data
 homicide_victims_transform <- homicide_victims_raw |> 
@@ -772,7 +772,7 @@ homicide_victims_clean <- homicide_victims_transform |>
     incidents_per_100k = victims_per_100k
   )
 
-write_rds(homicide_victims_clean, here("posts", "crime", "data", "clean", "homicide_victims.rds"))
+write_rds(homicide_victims_clean, here("datasets", "crime", "data", "homicide_victims.rds"))
   
 
 # clean hate crimes data
@@ -869,7 +869,7 @@ hate_crimes_clean <- hate_crimes_transform |>
     incidents_per_100k = crimes_per_100k
   )
 
-write_rds(hate_crimes_clean, here("posts", "crime", "data", "clean", "hate_crimes.rds"))
+write_rds(hate_crimes_clean, here("datasets", "crime", "data", "hate_crimes.rds"))
 
 # clean cyber crimes data
 cyber_crimes_transform <- cyber_crimes_raw |> 
@@ -965,7 +965,7 @@ cyber_crimes_clean <- cyber_crimes_transform |>
     incidents_per_100k = crimes_per_100k
   )
 
-write_rds(cyber_crimes_clean, here("posts", "crime", "data", "clean", "cyber_crimes.rds"))
+write_rds(cyber_crimes_clean, here("datasets", "crime", "data", "cyber_crimes.rds"))
 
 # clean victims data
 
@@ -1054,7 +1054,7 @@ violent_victims_clean <- violent_crime_victims_raw |>
   ) |> 
   ungroup()
 
-write_rds(violent_victims_clean, here("posts", "crime", "data", "clean", "violent_victims.rds"))
+write_rds(violent_victims_clean, here("datasets", "crime", "data", "violent_victims.rds"))
 
 # family and ipv victims
 family_ipv_victims_clean <- family_ipv_victims_raw |> 
@@ -1095,7 +1095,7 @@ family_ipv_victims_clean <- family_ipv_victims_raw |>
   mutate(perc_of_victims_rel_category = round(num_victims / sum(num_victims) * 100, 2)) |> 
   ungroup() 
 
-write_rds(family_ipv_victims_clean, here("posts", "crime", "data", "clean", "family_ipv_victims.rds"))
+write_rds(family_ipv_victims_clean, here("datasets", "crime", "data", "family_ipv_victims.rds"))
   
   
 # Clean latest occurrence data
@@ -1264,7 +1264,7 @@ wat_region_occurrences <- wat_region_occurrences |>
   across(all_of(cols_to_factor), as_factor)
 
 # Save clean file
-saveRDS(wat_region_occurrences, here("posts", "crime", "data", "clean", "wat_region_occurrences.rds"))
+saveRDS(wat_region_occurrences, here("datasets", "crime", "data", "wat_region_occurrences.rds"))
 
 
 

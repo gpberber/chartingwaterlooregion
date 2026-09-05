@@ -21,9 +21,12 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
 5. Fill the placeholders in the copied files: `{{slug}}`, `{{title}}`, `{{date}}` (today, ISO),
    the `here::i_am()` path.
 6. Leave `draft: true` in the YAML. It stays true until `/publish` flips it.
-7. Ask the user for 2 to 4 categories (existing ones are listed on the home page; reuse where possible)
+7. Ask whether the post draws on a shared dataset (list the folders in `datasets/`). If yes, add
+   `source(here::here("datasets", "<dataset>", "R", "load.R"))` to the setup chunk, note the dataset
+   version in the README, and keep the post's own `R/` scripts for story-specific summaries only.
+8. Ask the user for 2 to 4 categories (existing ones are listed on the home page; reuse where possible)
    and a one-sentence `description` for the listing card; fill them in.
-8. Report what was created and the three next steps: put raw data in `data-raw/` (or write
+9. Report what was created and the three next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it), write `R/02_clean_data.R` to produce small tidy files in `data/`,
    then write the post using the `cwr-charts` skill. Preview with `/preview <slug>`.
 

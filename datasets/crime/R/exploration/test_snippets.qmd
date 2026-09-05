@@ -20,9 +20,10 @@ execute:
 ---
 
 ```{r load-libraries, include=FALSE}
-here::i_am("posts/crime/R/exploration/test_snippets.qmd")
+here::i_am("datasets/crime/R/exploration/test_snippets.qmd")
 
 library(tidyverse)
+library(arrow)
 library(scales)
 library(here)
 library(gt)
@@ -44,25 +45,25 @@ number_options(big.mark = "")
 ```
 
 ```{r load-data}
-incidents <- read_rds(here("posts", "crime", "data", "clean", "criminal_incidents.rds"))
+incidents <- read_parquet(here("datasets", "crime", "data", "criminal_incidents.parquet"))
 
-incident_totals <- read_rds(here("posts", "crime", "data", "clean", "criminal_incident_totals.rds"))
+incident_totals <- read_parquet(here("datasets", "crime", "data", "criminal_incident_totals.parquet"))
 
-incident_summary <-  read_rds(here("posts", "crime", "data", "clean", "criminal_incident_summary.rds"))
+incident_summary <-  read_rds(here("datasets", "crime", "data", "criminal_incident_summary.rds"))
 
-csi <- read_rds(here("posts", "crime", "data", "clean", "crime_severity_index.rds"))
+csi <- read_rds(here("datasets", "crime", "data", "crime_severity_index.rds"))
 
-homicide_victims <- read_rds(here("posts", "crime", "data", "clean", "homicide_victims.rds"))
+homicide_victims <- read_rds(here("datasets", "crime", "data", "homicide_victims.rds"))
 
-hate_crimes <- read_rds(here("posts", "crime", "data", "clean", "hate_crimes.rds"))
+hate_crimes <- read_rds(here("datasets", "crime", "data", "hate_crimes.rds"))
 
-cyber_crimes <- read_rds(here("posts", "crime", "data", "clean", "cyber_crimes.rds"))
+cyber_crimes <- read_rds(here("datasets", "crime", "data", "cyber_crimes.rds"))
 
-ipv_victims <- read_rds(here("posts", "crime", "data", "clean", "family_ipv_victims.rds"))
+ipv_victims <- read_rds(here("datasets", "crime", "data", "family_ipv_victims.rds"))
 
-personnel<- read_rds(here("posts", "crime", "data", "clean", "personnel.rds"))
+personnel<- read_rds(here("datasets", "crime", "data", "personnel.rds"))
 
-big_12_financials <- read_rds(here("posts", "crime", "data", "clean", "big_12_financial_summary.rds"))
+big_12_financials <- read_rds(here("datasets", "crime", "data", "big_12_financial_summary.rds"))
 ```
 
 ```{r create-ggplot-themes, include=FALSE}

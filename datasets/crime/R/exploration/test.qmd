@@ -1,11 +1,16 @@
 ---
-title: "Explore WR Crime"
-author: "GPB"
-date: '`r Sys.Date()`'
+title: "Untitled"
 draft: true
-output: html_document
+format: 
+  html:
+    css: |
+      "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body { 
+        font-family: 'Inter', sans-serif; 
+      }"
+editor: visual
 execute:
-  fig-dpi: 300
+  fig-dpi: 400
   fig-width: 10
   fig-height: 6
   out-width: "100%"
@@ -14,57 +19,52 @@ execute:
   message: false
 ---
 
-```{r load-libraries, include=FALSE, cache=TRUE}
-here::i_am("posts/crime/R/exploration/explore.Rmd")
+```{r load-libraries, include=FALSE}
+here::i_am("datasets/crime/R/exploration/test.qmd")
 
 library(tidyverse)
-library(DataExplorer)
+library(arrow)
 library(scales)
 library(here)
 library(gt)
 library(tidytext)
 library(janitor)
 library(cansim)
-library(ggrepel)
 library(broom)
 library(gtExtras)
-library(sandwich)
-library(lmtest)
-library(mediation)
 library(conflicted)
 library(ggtext)
-library(corrr)
-library(showtext)
 
-# font_add_google("Roboto", "Roboto")  # Downloads if needed
-# showtext_opts(dpi = 225)  # Add this line
-# showtext_auto()
 conflicts_prefer(dplyr::filter, dplyr::select, dplyr::mutate, dplyr::lag)
+
+knitr::opts_chunk$set(dev = "ragg_png", dpi = 400)
 
 number_options(big.mark = "")
 ```
 
 ```{r load-data}
-incidents <- read_rds(here("posts", "crime", "data", "clean", "criminal_incidents.rds"))
+incidents <- read_parquet(here("datasets", "crime", "data", "criminal_incidents.parquet"))
 
-incident_totals <- read_rds(here("posts", "crime", "data", "clean", "criminal_incident_totals.rds"))
+incident_totals <- read_parquet(here("datasets", "crime", "data", "criminal_incident_totals.parquet"))
 
-incident_summary <-  read_rds(here("posts", "crime", "data", "clean", "criminal_incident_summary.rds"))
+incident_summary <-  read_rds(here("datasets", "crime", "data", "criminal_incident_summary.rds"))
 
-csi <- read_rds(here("posts", "crime", "data", "clean", "crime_severity_index.rds"))
+csi <- read_rds(here("datasets", "crime", "data", "crime_severity_index.rds"))
 
-homicide_victims <- read_rds(here("posts", "crime", "data", "clean", "homicide_victims.rds"))
+homicide_victims <- read_rds(here("datasets", "crime", "data", "homicide_victims.rds"))
 
-hate_crimes <- read_rds(here("posts", "crime", "data", "clean", "hate_crimes.rds"))
+hate_crimes <- read_rds(here("datasets", "crime", "data", "hate_crimes.rds"))
 
-cyber_crimes <- read_rds(here("posts", "crime", "data", "clean", "cyber_crimes.rds"))
+cyber_crimes <- read_rds(here("datasets", "crime", "data", "cyber_crimes.rds"))
 
-personnel <- read_rds(here("posts", "crime", "data", "clean", "personnel.rds"))
+ipv_victims <- read_rds(here("datasets", "crime", "data", "family_ipv_victims.rds"))
 
-big_12_financials <- read_rds(here("posts", "crime", "data", "clean", "big_12_financial_summary.rds"))
+personnel<- read_rds(here("datasets", "crime", "data", "personnel.rds"))
+
+big_12_financials <- read_rds(here("datasets", "crime", "data", "big_12_financial_summary.rds"))
 ```
 
-```{r create-ggplot-themes, include=FALSE, cache=TRUE}
+```{r create-ggplot-themes, include=FALSE}
 # Create the Tufte-inspired theme
 theme_tufte <- function(base_size = 13, base_family = "") {
   theme_minimal(base_size = base_size, base_family = base_family) +
@@ -75,6 +75,7 @@ theme_tufte <- function(base_size = 13, base_family = "") {
         hjust = 0,
         vjust = 1,
         margin = margin(0, 0, 5, 0),
+        color = "black",
         face = "bold"
       ),
       plot.subtitle = element_markdown(
@@ -97,11 +98,11 @@ theme_tufte <- function(base_size = 13, base_family = "") {
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_text(
-        size = base_size * 0.85,
+        size = base_size * 1.0,
         margin = margin(t = base_size * 0.25)
       ),
       axis.text.y = element_markdown(
-        size = base_size * 0.85,
+        size = base_size * 1.0,
         margin = margin(r = base_size * 0.25),
         hjust = 0
       ),
@@ -137,7 +138,7 @@ theme_tufte <- function(base_size = 13, base_family = "") {
       legend.direction = "horizontal",
       legend.title = element_blank(),
       legend.text = element_text(
-        size = base_size * 0.75,
+        size = base_size * 0.85,
         margin = margin(r = 10)
       ),
       #legend.key = element_blank(),
@@ -161,8 +162,8 @@ theme_tufte <- function(base_size = 13, base_family = "") {
         b = base_size,
         l = base_size
       ),
-      # plot.title.position = "plot",
-      # plot.caption.position = "plot",
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
 
       # Remove panel border
       panel.border = element_blank(),
@@ -174,164 +175,160 @@ theme_tufte <- function(base_size = 13, base_family = "") {
 }
 
 # Set as the default theme for all plots
-theme_set(theme_tufte(base_size = 13, base_family = "")
+theme_set(theme_tufte(base_size = 13, base_family = "Inter")
   )
 
 #base_size <- 13
 
+# set custom colours and colour groups
+ontgreen <- "darkgreen"
+habsred <- "#AF1E2D"
+habsred50 <- prismatic::clr_mix(habsred, "white", ratio = 0.5)
+cowboysilver <- "#869397"
+cowboysilver50 <- prismatic::clr_mix(cowboysilver, "white", ratio = 0.5)
+cowboysilver_alpha30 <- adjustcolor(cowboysilver, alpha.f = 0.3)
+dodgerblue <- "dodgerblue4"
+dodgerblue50 <- prismatic::clr_mix(dodgerblue, "white", ratio = 0.5)
+manual_5_colours <- c(habsred, habsred50, cowboysilver, dodgerblue50, dodgerblue)
+manual_4_colours <- c(habsred, habsred50, dodgerblue50, dodgerblue)
+manual_3_colours <- c(habsred, cowboysilver, dodgerblue)
+manual_2_colours <- c(cowboysilver, dodgerblue)
+
+# consistent colours for the regions compared throughout
+comp_colours <- c(
+  "WRPS" = dodgerblue,
+  "Canada" = habsred,
+  "Ontario" = ontgreen,
+  "Other Big 12" = cowboysilver50
+)
+
+# colours for the WRPS vs nearby cities comparisons
+local_colours <- c(
+  "WRPS" = dodgerblue,
+  "Guelph" = dodgerblue50,
+  "London" = cowboysilver,
+  "Hamilton" = habsred
+)
 ```
+
+```{r create-big-12-tibble}
+big_12 <- personnel |>
+  filter(region %in% c("Canada", "Ontario") | in_big_12) |>
+  mutate(comparison_group = if_else(region %in% c("Canada", "Ontario", "WRPS"), region, "Other Big 12"))
+
+big_12_join <- big_12 |>
+  select(geo_uid, in_big_12, comparison_group) |>
+  distinct()
+
+csi <- csi |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incident_summary <- incident_summary |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incident_totals <- incident_totals |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incidents <- incidents |>
+  left_join(big_12_join, join_by(geo_uid))
+
+big_12_financials <- big_12_financials |>
+  left_join(big_12_join |> select(-in_big_12), join_by(geo_uid))
+
+# cities used for the local comparisons
+local_cities <- names(local_colours)
+```
+
+```{r set-reference-years}
+# First and latest year in each table - every year reference in the titles, subtitles
+# and axes below flows from these, so the file updates itself as new data arrives
+first_year_incidents <- min(incidents$year)
+latest_year_incidents <- max(incidents$year)
+
+first_year_incident_summary <- min(incident_summary$year)
+latest_year_incident_summary <- max(incident_summary$year)
+
+first_year_csi <- min(csi$year)
+latest_year_csi <- max(csi$year)
+
+first_year_personnel <- min(personnel$year)
+latest_year_personnel <- max(personnel$year)
+
+first_year_financials <- min(big_12_financials$year)
+latest_year_financials <- max(big_12_financials$year)
+
+first_year_homicides <- min(homicide_victims$year)
+latest_year_homicides <- max(homicide_victims$year)
+
+# baselines for the rolling ten-year comparisons
+decade_ago_incidents <- latest_year_incidents - 10
+decade_ago_personnel <- latest_year_personnel - 10
+
+# the personnel survey skips years - name the gaps in the captions rather than hard-coding them
+personnel_missing_years <- setdiff(first_year_personnel:latest_year_personnel, personnel$year) |>
+  as.character() |>
+  str_flatten_comma(last = " and ")
+
+# financial reporting lags for some services, so use the most recent year in which
+# all but at most one of the Big 12 reported, and name the non-reporters in the subtitle
+latest_year_financials_reported <- big_12_financials |>
+  filter(!is.na(total_exp_per_capita)) |>
+  count(year) |>
+  filter(n >= max(n) - 1) |>
+  slice_max(year, n = 1) |>
+  pull(year)
+
+financials_not_reporting <- setdiff(
+  unique(big_12_financials$region),
+  big_12_financials |>
+    filter(year == latest_year_financials_reported, !is.na(total_exp_per_capita)) |>
+    pull(region)
+) |>
+  str_flatten_comma(last = " and ")
+```
+
+This is a test, this is only a test. What font is this? I don't know, let's check. Supposed to be Inter.
+
+## Criminal Incidents
+
+### Waterloo Region, Ontario, and Canada
 
 ```{r plot-incidents-vs-Can-Ont}
 incident_summary |>
-  filter(str_detect(region, "WRPS|Canada|Ontario")) |> 
+  filter(str_detect(region, "WRPS|Canada|Ontario")) |>
   ggplot(aes(x = year, y = incidents_per_100k_all, colour = region)) +
   geom_line(linewidth = 1.1) +
   scale_color_manual(
-    values = c("Canada" = "deepskyblue", "Ontario" = "grey50", "WRPS" = "dodgerblue3")
+    values = comp_colours
   ) +
   scale_x_continuous(
-    breaks = c(seq(2000, 2020, 5), 2024),
-    minor_breaks = seq(2000, 2024, 1),
+    breaks = c(seq(first_year_incident_summary, latest_year_incident_summary - 4, 5), latest_year_incident_summary),
+    minor_breaks = seq(first_year_incident_summary, latest_year_incident_summary, 1),
     expand = expansion(mult = c(0.02, 0.08))
   ) +
   guides(x = guide_axis(minor.ticks = TRUE)) +
-  
+
   theme(
     legend.position.inside = c(0, 1.02)
   ) +
   labs(
-    title = "Number of Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population<br>",
     caption = "Source: Data source | *Charting Waterloo Region*"
-  )  
+  )
 ```
 
-```{r intro-incidents}
-incidents |> 
-  introduce() |> 
-  pivot_longer(everything()) |> 
-  gt()
-```
+[Police-Reported Crime Statistics in Canada, `r latest_year_incident_summary` - Stats Can Analysis](https://www150.statcan.gc.ca/n1/daily-quotidien/250722/dq250722a-eng.htm)
 
-```{r plot-intro-incidents}
-plot_intro(incidents)
-```
-
-```{r plot-missing-incidents}
-plot_missing(incidents)
-```
-
-```{r prop-na-diverted-charged}
-incidents |> 
-  filter(incidents > 0) |> 
-  select(year, contains("charged_"), contains("diverted_"), contains("unfounded"), clearance_rate, perc_contribution_to_csi) |> 
-  group_by(year) |> 
-  summarise(across(everything(), ~ mean(is.na(.x))), .groups = "drop") |> 
-  pivot_longer(2:last_col(), 
-               names_to = "column", 
-               values_to = "na_proportion") |> 
-  filter(na_proportion > 0) |> 
-  arrange(column, year) |> 
-  ggplot(aes(x = year, y = na_proportion)) +
-  geom_col() +
-  scale_x_continuous(breaks = seq(1998, 2024, 1)) +
-  coord_flip() +
-  facet_wrap(~ column, ncol = 3, scales = "free_y")
-```
-
-```{r na-perc-cont-csi}
-incidents |> 
-  filter(incidents > 0) |> 
-  select(year, incidents, perc_contribution_to_csi) |>
-  mutate(na_value = is.na(perc_contribution_to_csi)) |> 
-  group_by(year, na_value) |> 
-  summarise(min_incidents = min(incidents), max_incidents = max(incidents), mean_incidents = mean(incidents), .groups = "drop")
-```
-
-```{r yoy-change-inc-per-100k-by-region}
-incidents |> 
-  filter(year > 1998) |> 
-  select(region, incidents_per_100k, yoy_change_incidents_per_100k) |> 
-  group_by(region) |> 
-  summarize(
-    mean_inc = mean(incidents_per_100k, na.rm = TRUE),
-    prop_na_yoy = mean(is.na(yoy_change_incidents_per_100k))        
-    )
-```
-
-```{r na-yoy-change-inc-per-100k}
-incidents |> 
-  select(year, violation_master, incidents_per_100k, yoy_change_incidents_per_100k) |>
-  group_by(violation_master) |> 
-  mutate(py_incidents_per_100k = lag(incidents_per_100k)) |> 
-  ungroup() |> 
-  filter(
-    py_incidents_per_100k > 0, 
-    #is.na(yoy_change_incidents_per_100k), 
-    !is.na(incidents_per_100k)
-  ) |> 
-  mutate(yoy_isna = is.na(yoy_change_incidents_per_100k)) |> 
-  group_by(year, yoy_isna) |> 
-  summarise(min_incidents = min(incidents_per_100k), min_py_incidents = min(py_incidents_per_100k)) #|> 
-  # filter(yoy_isna == 0) |> 
-  #arrange(min_incidents)
-```
-
-```{r intro-incidents-total}
-incident_totals |> 
-  introduce() |> 
-  pivot_longer(everything()) |> 
-  gt()
-```
-
-```{r plot-missing-incidents-totals}
-plot_missing(incident_totals)
-```
-
-```{r intro-csi}
-csi |> 
-  introduce() |> 
-  pivot_longer(everything()) |> 
-  gt()
-```
-
-```{r plot-missing-csi}
-plot_missing(csi)
-```
-
-```{r intro-homicides}
-homicide_victims |> 
-  introduce() |> 
-  pivot_longer(everything()) |> 
-  gt()
-```
-
-```{r plot-intro-homicides}
-plot_intro(homicide_victims)
-```
-
-```{r plot-missing-homicides}
-plot_missing(homicide_victims)
-```
-
-```{r intro-hate-crimes}
-hate_crimes |> 
-  introduce() |> 
-  pivot_longer(everything()) |> 
-  gt()
-```
-
-```{r plot-intro-hate-crimes}
-plot_intro(hate_crimes)
-```
-
-```{r plot-missing-hate-crimes}
-plot_missing(hate_crimes)
-```
-
-[Police-Reported Crime Statistics in Canada, 2024 - Stats Can Analysis](https://www150.statcan.gc.ca/n1/daily-quotidien/250722/dq250722a-eng.htm)
+## Homicide Victims
 
 ```{r plot_hom-victims-cma}
+# first year the CMA / non-CMA split is reported
+first_year_cma <- homicide_victims |>
+  filter(city == "Total CMA", !is.na(incidents_per_100k)) |>
+  pull(year) |>
+  min()
+
 homicide_victims |>
   filter(province == "Canada") |>
   ggplot(aes(x = year, y = incidents_per_100k, colour = city)) +
@@ -355,71 +352,50 @@ homicide_victims |>
   annotate("text", x = 2010.5, y = 3.1, label = "Conservative", size = 3, colour = "black") +
   annotate("text", x = 2019.5, y = 3.1, label = "Liberal", size = 3, colour = "black") +
   scale_x_continuous(
-    breaks = c(seq(1960, 2024, 5), 2024),
+    breaks = c(seq(1960, latest_year_homicides - 4, 5), latest_year_homicides),
     labels = label_number(),
-    minor_breaks = seq(1960, 2024, 1),
+    minor_breaks = seq(1960, latest_year_homicides, 1),
     expand = expansion(mult = c(0.02, 0.05))
   ) +
   guides(x = guide_axis(minor.ticks = TRUE)) +
-  
+
+  scale_colour_manual(
+    values = c(
+      "Total All Regions" = habsred,
+      "Total CMA" = dodgerblue,
+      "Total Non-CMA" = cowboysilver
+    )
+  ) +
+
   labs(
-    title = "Number of Homicide Victims in Canada, per 100,000 people: 1961-2024",
-    subtitle = "Including breakdown between Census Metropolitan Areas and Non-CMAs for 1981-2024<br>",
+    title = str_glue("Number of Homicide Victims in Canada, per 100,000 people: {first_year_homicides}-{latest_year_homicides}"),
+    subtitle = str_glue("Including breakdown between Census Metropolitan Areas and Non-CMAs for {first_year_cma}-{latest_year_homicides}<br>"),
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
-```{r create-big-12-tibble}
-big_12 <- personnel |> 
-  filter(region %in% c("Canada", "Ontario") | in_big_12) |> 
-  mutate(comparison_group = if_else(region %in% c("Canada", "Ontario", "WRPS"), region, "Other Big 12")) 
+## Crime Severity Index
 
-big_12_join <- big_12 |> 
-  select(geo_uid, in_big_12, comparison_group) |> 
-  distinct()
-
-csi <- csi |> 
-  left_join(big_12_join, join_by(geo_uid))
-
-incident_summary <- incident_summary |> 
-  left_join(big_12_join, join_by(geo_uid))
-
-incident_totals <- incident_totals |> 
-  left_join(big_12_join, join_by(geo_uid))
-
-incidents <- incidents |> 
-  left_join(big_12_join, join_by(geo_uid))
-
-big_12_financials <- big_12_financials |> 
-  left_join(big_12_join |> select(-in_big_12), join_by(geo_uid))
-
-comp_colours <- c(
-  "WRPS" = "dodgerblue3",
-  "Canada" = "darkred",
-  "Ontario" = "darkgreen",
-  "Other Big 12" = "lightgrey"
-)
-
-latest_year_csi <- max(csi$year)
-latest_year_incidents <- max(incidents$year)
-latest_year_personnel <- max(personnel$year)
-latest_year_financials <- max(big_12_financials$year)
-```
+### Waterloo Region, Ontario, and Canada
 
 ```{r plot-csi-vs-Can-Ont}
 csi |>
-  filter(str_detect(region, "WRPS|Canada|Ontario")) |> 
+  filter(str_detect(region, "WRPS|Canada|Ontario")) |>
   ggplot(aes(x = year, y = csi, colour = region)) +
   geom_line(linewidth = 1.1) +
-  
+
+  scale_colour_manual(
+    values = comp_colours
+  ) +
+
   scale_x_continuous(
-    breaks = c(seq(2000, 2024, 5), 2024),
+    breaks = c(seq(first_year_csi, latest_year_csi - 4, 5), latest_year_csi),
     labels = label_number(big.mark = ""),
-    minor_breaks = seq(2000, 2024, 1),
+    minor_breaks = seq(first_year_csi, latest_year_csi, 1),
     expand = expansion(mult = c(0.02, 0.05)),
     position = "bottom"
   ) +
-  
+
   scale_y_continuous(
       position = "right",
       breaks = pretty_breaks(),
@@ -430,27 +406,27 @@ csi |>
   
   theme(
       axis.text.y.right = element_text(
-        size = rel(0.85),
+        size = rel(1),
         hjust = 1.0,
-        vjust = -0.5,  # Shifts labels up above gridlines
-        margin = margin(l = -18)  # Move labels left to sit on gridline ends
+        vjust = -0.0,  # Shifts labels up above gridlines
+        margin = margin(l = -22)  # Move labels left to sit on gridline ends
       ),
       legend.position.inside = c(-0.0, 1.02)
     ) +
   
   labs(
       title = "Crime Severity Index",
-      subtitle = "2000-2024<br>",
+      subtitle = str_glue("{first_year_csi}-{latest_year_csi}<br>"),
       caption = "Source: Source | *Charting Waterloo Region*"
   )
 
 ```
 
-```{r plot-incidents-local}
-local_cities <- c("WRPS", "Guelph", "Hamilton", "London")
+### Waterloo Region and Nearby Cities
 
+```{r plot-incidents-local}
 incident_summary |>
-  filter(region %in% local_cities) |> 
+  filter(region %in% local_cities) |>
   ggplot(aes(x = year, y = incidents_per_100k_all, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -458,35 +434,46 @@ incident_summary |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = local_colours
+  ) +
   labs(
-    title = "Number of Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population<br><br>",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
 ```{r plot-csi-local}
 csi |>
-  filter(region %in% local_cities) |> 
+  filter(region %in% local_cities) |>
   ggplot(aes(x = year, y = csi, colour = region)) +
   geom_line(linewidth = 1.1) +
-  
+
+  scale_colour_manual(
+    values = local_colours
+  ) +
+
   scale_x_continuous(
-    breaks = c(seq(2000, 2020, 5), 2024),
-    minor_breaks = seq(2000, 2024, 1),
+    breaks = c(seq(first_year_csi, latest_year_csi - 4, 5), latest_year_csi),
+    minor_breaks = seq(first_year_csi, latest_year_csi, 1),
     expand = expansion(mult = c(0.02, 0.05))
   ) +
   guides(x = guide_axis(minor.ticks = TRUE)) +
   labs(
-    title = "Crime Severity Index: 2000-2024",
+    title = str_glue("Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "<br>",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
+
+## Violent Crime
+
+### Waterloo Region, Ontario, and Canada
 
 ```{r plot-violent-incidents-vs-Can-Ont}
 incident_summary |>
-  filter(str_detect(region, "WRPS|Canada|Ontario")) |> 
+  filter(str_detect(region, "WRPS|Canada|Ontario")) |>
   ggplot(aes(x = year, y = incidents_per_100k_violent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -494,66 +481,71 @@ incident_summary |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = comp_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Number of Violent Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
-```{r violent-incidents--top10-increases-2014-2024}
-incidents_2024_v_2014 <- incidents |>
+## Largest Increases Over the Past Decade
+
+```{r violent-incidents-top10-increases-decade}
+incidents_decade_change <- incidents |>
   group_by(region, type, violation_master) |>
   summarise(
-    incidents_per_100k_2014 = sum(incidents_per_100k[year == 2014], na.rm = TRUE),
-    incidents_per_100k_2024 = sum(incidents_per_100k[year == 2024], na.rm = TRUE),
+    incidents_per_100k_start = sum(incidents_per_100k[year == decade_ago_incidents], na.rm = TRUE),
+    incidents_per_100k_latest = sum(incidents_per_100k[year == latest_year_incidents], na.rm = TRUE),
     .groups = "drop"
   ) |>
   mutate(
-    change_vs_2014 = incidents_per_100k_2024 - incidents_per_100k_2014,
-    perc_change_vs_2014 = case_when(
-      incidents_per_100k_2014 == 0 ~ "Zero in 2014",  # Avoid division by zero
-      TRUE ~ as.character(round(change_vs_2014 / incidents_per_100k_2014 * 100, 1))
+    change_vs_start = incidents_per_100k_latest - incidents_per_100k_start,
+    perc_change_vs_start = case_when(
+      incidents_per_100k_start == 0 ~ str_glue("Zero in {decade_ago_incidents}"),  # Avoid division by zero
+      TRUE ~ as.character(round(change_vs_start / incidents_per_100k_start * 100, 1))
     )
   ) |>
-  arrange(region, type, desc(change_vs_2014))
+  arrange(region, type, desc(change_vs_start))
 
-incidents_2024_v_2014 |> 
+incidents_decade_change |>
   filter(
     region == "WRPS",
     type == "Violent"
-  ) |> 
-  slice_max(n = 10, order_by = change_vs_2014) |> 
-  mutate(violation_master = reorder(violation_master, change_vs_2014)) |>
-  ggplot(aes(x = change_vs_2014, y = violation_master)) +
+  ) |>
+  slice_max(n = 10, order_by = change_vs_start) |>
+  mutate(violation_master = reorder(violation_master, change_vs_start)) |>
+  ggplot(aes(x = change_vs_start, y = violation_master)) +
     geom_segment(aes(
-      x = 0, xend = change_vs_2014,
+      x = 0, xend = change_vs_start,
       y = violation_master,
       yend = violation_master),
       color = "black", linewidth = 0.7) +
 
-  # Add the dots - 
+  # Add the dots -
     geom_point(
       aes(
-        x = change_vs_2014,
+        x = change_vs_start,
         y = violation_master
       ),
       shape = 19, size = 4,
-      color = "dodgerblue3"
+      color = dodgerblue
     ) +
     scale_x_continuous(position = "top", breaks = seq(0, 250, 25)) +
     geom_vline(xintercept = 0, color = "black", linewidth = 0.5) +
     labs(
       title = "Top 10 Increases in Violent Crime",
-      subtitle = "Increase in incidents per 100,000 residents, Waterloo Region, 2024 vs 2014",
+      subtitle = str_glue("Increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
       caption = "Source: Source | *Charting Waterloo Region*"
     ) +
   theme(
@@ -564,35 +556,35 @@ incidents_2024_v_2014 |>
   )
 ```
 
-```{r plot-nonviolent-crimes-wrps-top10-increases-2024-vs-2014}
-incidents_2024_v_2014 |> 
+```{r plot-nonviolent-crimes-wrps-top10-increases-decade}
+incidents_decade_change |>
   filter(
     region == "WRPS",
     type == "Non-Violent"
-  ) |> 
-  slice_max(n = 10, order_by = change_vs_2014) |> 
-  mutate(violation_master = reorder(violation_master, change_vs_2014)) |>
-  ggplot(aes(x = change_vs_2014, y = violation_master)) +
+  ) |>
+  slice_max(n = 10, order_by = change_vs_start) |>
+  mutate(violation_master = reorder(violation_master, change_vs_start)) |>
+  ggplot(aes(x = change_vs_start, y = violation_master)) +
     geom_segment(aes(
-      x = 0, xend = change_vs_2014,
+      x = 0, xend = change_vs_start,
       y = violation_master,
       yend = violation_master),
       color = "black", linewidth = 0.7) +
 
-  # Add the dots - 
+  # Add the dots -
     geom_point(
       aes(
-        x = change_vs_2014,
+        x = change_vs_start,
         y = violation_master
       ),
       shape = 19, size = 4,
-      color = "dodgerblue3"
+      color = dodgerblue
     ) +
     scale_x_continuous(position = "top", breaks = seq(0, 250, 25)) +
     geom_vline(xintercept = 0, color = "black", linewidth = 0.5) +
     labs(
       title = "Top 10 Increases in Non-Violent Crime",
-      subtitle = "Increase in incidents per 100,000 residents, Waterloo Region, 2024 vs 2014",
+      subtitle = str_glue("Increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
       caption = "Source: Source | *Charting Waterloo Region*"
     ) +
     theme(
@@ -607,34 +599,39 @@ incidents_2024_v_2014 |>
 
 ```
 
+## Selected Offences
+
 ```{r vehicle-theft-base-wrps}
-incidents |> 
+incidents |>
   filter(
     region %in% c("Canada", "Ontario", "WRPS"),
     violation_master == "Motor Vehicle Theft"
-  ) |> 
-  group_by(region) |> 
-  mutate(base_incidents = incidents_per_100k / first(incidents_per_100k, order_by = year) * 100) |> 
-  ungroup() |> 
+  ) |>
+  group_by(region) |>
+  mutate(base_incidents = incidents_per_100k / first(incidents_per_100k, order_by = year) * 100) |>
+  ungroup() |>
   ggplot(aes(x = year, y = base_incidents, color = region)) +
     geom_line(linewidth = 1.1) +
+    scale_color_manual(
+      values = comp_colours
+    ) +
     labs(
       title = "Motor Vehicle Theft",
-      subtitle = "Change in incidents per 100,000 residents, 2000 = 100<br>",
+      subtitle = str_glue("Change in incidents per 100,000 residents, {first_year_incidents} = 100<br>"),
       caption = "Source: Data source | Analysis: Your Name"
     ) +
   theme(
     legend.position.inside = c(-0.05, 1.05)
   ) +
-  
+
   scale_x_continuous(
-    breaks = c(seq(2000, 2024, 5), 2024),
+    breaks = c(seq(first_year_incidents, latest_year_incidents - 4, 5), latest_year_incidents),
     labels = label_number(),
-    minor_breaks = seq(2000, 2024, 1),
+    minor_breaks = seq(first_year_incidents, latest_year_incidents, 1),
     expand = expansion(mult = c(0.02, 0.05)),
     position = "bottom"
   ) +
-  guides(x = guide_axis(minor.ticks = TRUE)) 
+  guides(x = guide_axis(minor.ticks = TRUE))
 ```
 
 ```{r vehicle-theft-wrps}
@@ -646,13 +643,16 @@ incidents |>
   ggplot(aes(x = year, y = incidents_per_100k, color = region)) +
     geom_line(linewidth = 0.8) +
     scale_y_continuous(breaks = pretty_breaks()) +
+    scale_color_manual(
+      values = comp_colours
+    ) +
     labs(
       title = "Motor Vehicle Theft",
       subtitle = "Incidents per 100,000 residents",
       x = "",
       y = "",
-      caption = "Source: Data source | Analysis: Your Name | no data for 2020"
-    ) 
+      caption = "Source: Data source | Analysis: Your Name"
+    )
 ```
 
 ```{r abduction-under-14-wrps}
@@ -668,7 +668,7 @@ incidents |>
       "Not" = "Not by")
     )) |> 
   ggplot(aes(x = year, y = incidents_per_100k)) +
-    geom_col(fill = 'dodgerblue3') +
+    geom_col(fill = dodgerblue) +
     facet_wrap(
       ~ violation_master,
       ncol = 1
@@ -679,7 +679,7 @@ incidents |>
       sec.axis = dup_axis(labels = NULL)  # This creates labels on the right edge
     ) +
     scale_x_continuous(
-      breaks = c(2000, 2005, 2010, 2015, 2020, 2024),
+      breaks = c(seq(first_year_incidents, latest_year_incidents - 4, 5), latest_year_incidents),
       expand = expansion(mult = c(0, 0.05), add = c(0, 0))
     ) +
     labs(
@@ -692,15 +692,17 @@ incidents |>
   theme(
       axis.text.y.right = element_text(
       hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(l = -15)  # Move labels left to sit on gridline ends
+      vjust = -0.0,
+      margin = margin(l = -23)  # Move labels left to sit on gridline ends
     )
   )
 ```
 
+## Violent Crime Severity Index
+
 ```{r plot-csi-violent-incidents-vs-Can-Ont}
 csi |>
-  filter(str_detect(region, "WRPS|Canada|Ontario")) |> 
+  filter(str_detect(region, "WRPS|Canada|Ontario")) |>
   ggplot(aes(x = year, y = csi_violent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -708,19 +710,22 @@ csi |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = comp_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Violent Crime Severity Index: 2000-2024",
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
 ```{r plot-csi-violent-incidents-vs-Can-Ont-yoy}
@@ -733,14 +738,17 @@ csi |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = comp_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Violent Crime Severity Index: 2000-2024",
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "Year-over-year change, %",
     x = "",
     y = "",
@@ -748,11 +756,13 @@ csi |>
   ) 
 ```
 
+### Violent Crime in Waterloo Region and Nearby Cities
+
 ```{r plot-violent-incidents-local}
 incident_summary |>
   filter(
      region %in% local_cities
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = incidents_per_100k_violent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -760,26 +770,29 @@ incident_summary |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = local_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Number of Violent Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
 ```{r plot-csi-violent-incidents-local}
 csi |>
   filter(
    region %in% local_cities
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = csi_violent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -787,26 +800,33 @@ csi |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = local_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Violent Crime Severity Index: 2000-2024",
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
+
+## Non-Violent Crime
+
+### Waterloo Region, Ontario, and Canada
 
 ```{r plot-nonviolent-incidents-vs-Can-Ont}
 incident_summary |>
   filter(
     str_detect(region, "WRPS|Canada|Ontario")
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = incidents_per_100k_nonviolent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -814,26 +834,29 @@ incident_summary |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = comp_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Number of Non-Violent Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Non-Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
 ```{r plot-csi-nonviolent-vs-Can-Ont}
 csi |>
   filter(
     str_detect(region, "WRPS|Canada|Ontario")
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = csi_nonviolent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -841,26 +864,31 @@ csi |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = comp_colours
+  ) +
   theme(
     panel.grid.major.y = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Non-Violent Crime Severity Index: 2000-2024",
+    title = str_glue("Non-Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
+
+### Non-Violent Crime in Waterloo Region and Nearby Cities
 
 ```{r plot-nonviolent-incidents-local}
 incident_summary |>
   filter(
     region %in% local_cities
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = incidents_per_100k_nonviolent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -868,26 +896,29 @@ incident_summary |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = local_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Number of Non-Violent Criminal Incidents: 2000-2024",
+    title = str_glue("Number of Non-Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 ```
 
 ```{r plot-csi-nonviolent-local}
 csi |>
   filter(
     region %in% local_cities
-  ) |> 
+  ) |>
   ggplot(aes(x = year, y = csi_nonviolent, colour = region)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1) +
@@ -895,27 +926,34 @@ csi |>
     breaks = pretty_breaks(),
     labels = label_comma()
   ) +
+  scale_colour_manual(
+    values = local_colours
+  ) +
   theme(
     panel.grid.major = element_line(
-      color = "grey90", 
+      color = "grey90",
       linewidth = 0.3
     )
   ) +
   labs(
-    title = "Non-Violent Crime Severity Index: 2000-2024",
+    title = str_glue("Non-Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
-  ) 
+  )
 
 ```
+
+## The Big 12 Police Services
+
+### Criminal Incidents and Crime Severity
 
 ```{r plot-big12-ranked-incidents}
 incident_summary |>
   filter(
     in_big_12,
-    year == latest_year_incidents
+    year == latest_year_incident_summary
   ) |>
   select(region, comparison_group, incidents_per_100k_all, incidents_per_100k_violent, incidents_per_100k_nonviolent) |>
   # Reshape to long format for easier plotting
@@ -954,7 +992,7 @@ incident_summary |>
     fontface = "bold"
   ) +
   labs(
-    title = "Criminal Incidents: 2024",
+    title = str_glue("Criminal Incidents: {latest_year_incident_summary}"),
     subtitle = "per 100,000 residents",
     x = "",
     y = "",
@@ -968,7 +1006,7 @@ incident_summary |>
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey60")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
 
@@ -1015,7 +1053,7 @@ csi |>
     fontface = "bold"
   ) +
   labs(
-    title = "Crime Severity Index: 2024",
+    title = str_glue("Crime Severity Index: {latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
@@ -1029,7 +1067,7 @@ csi |>
     axis.text.y = element_markdown(hjust = 1)
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey60")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
 
@@ -1076,7 +1114,7 @@ big_12 |>
     fontface = "bold"
   ) +
   labs(
-    title = "Incidents per Officer: 2023",
+    title = str_glue("Incidents per Officer: {latest_year_personnel}"),
     subtitle = "",
     x = "",
     y = "",
@@ -1090,7 +1128,7 @@ big_12 |>
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey60")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
 
@@ -1098,7 +1136,9 @@ From 2024 WRPS Budget Information Package (Windsor is missing; year not noted, b
 
 ![](images/clipboard-60580425.png)
 
-```{r plot-csi-clearance-wrps, fig.height=10, fig.width=8}
+## Crime Severity and Clearance Rates in Waterloo Region
+
+```{r plot-csi-clearance-wrps, fig.height=10, fig.width=10}
 csi |> 
   filter(region == "WRPS") |> 
   # Select the base columns and pivot them longer
@@ -1142,19 +1182,19 @@ csi |>
   ) +
   labs(
     title = "Trends in Crime Severity Index and CSI-Weighted Clearance Rate",
-    subtitle = "Waterloo Region, 2000-2024, 2000 = 100",
+    subtitle = str_glue("Waterloo Region, {first_year_csi}-{latest_year_csi}, {first_year_csi} = 100"),
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
   ) +
   scale_colour_manual(
-    values = c("CSI" = "dodgerblue3", "Clearance Rate" = "grey60"),
+    values = c("CSI" = dodgerblue, "Clearance Rate" = cowboysilver),
     guide = "none"
   ) +
   scale_x_continuous(
-    breaks = seq(2000, 2024, 5),  # Major labeled ticks - updated for 2000-2024
+    breaks = c(seq(first_year_csi, latest_year_csi - 4, 5), latest_year_csi),
     expand = expansion(mult = c(0.02, 0.05)),
-    minor_breaks = seq(2000, 2024, 1)  # Updated for 2000-2024
+    minor_breaks = seq(first_year_csi, latest_year_csi, 1)
   ) +
   scale_y_continuous(
     position = "right",
@@ -1168,8 +1208,8 @@ csi |>
     axis.line.y = element_blank(),
     axis.text.y.right = element_text(
       hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(l = -18)  # Move labels left to sit on gridline ends
+      vjust = -0.0,
+      margin = margin(r = 12, l = -26)  # Move labels left to sit on gridline ends
     ),
     panel.border = element_blank(),
     axis.line.x = element_line(color = "black", linewidth = 0.5),
@@ -1229,19 +1269,19 @@ csi |>
   ) +
   labs(
     title = "Trends in Violent CSI and Incidents per 100,000",
-    subtitle = "Waterloo Region, 2000-2024, 2000 = 100",
+    subtitle = str_glue("Waterloo Region, {first_year_csi}-{latest_year_csi}, {first_year_csi} = 100"),
     x = "",
     y = "",
     caption = "Source: Data source | Analysis: Your Name"
   ) +
   scale_colour_manual(
-    values = c("CSI" = "dodgerblue3", "Clearance Rate" = "grey60"),
+    values = c("CSI" = dodgerblue, "Incidents/100k" = cowboysilver),
     guide = "none"
   ) +
   scale_x_continuous(
-    breaks = seq(2000, 2024, 5),  # Major labeled ticks - updated for 2000-2024
+    breaks = seq(first_year_csi, latest_year_csi, 5),
     expand = expansion(mult = c(0.02, 0.05)),
-    minor_breaks = seq(2000, 2024, 1)  # Updated for 2000-2024
+    minor_breaks = seq(first_year_csi, latest_year_csi, 1)
   ) +
   scale_y_continuous(
     position = "right",
@@ -1267,8 +1307,10 @@ csi |>
   )
 ```
 
+## Police Staffing and Spending in Waterloo Region
+
 ```{r plot-cop-civ-staffing-wr}
-personnel |> 
+personnel |>
   filter(region == "WRPS") |> 
   select(year, Officers = officers_per_100k, Civilians = civilians_per_100k) |> 
   pivot_longer(-year, names_to = "dept", values_to = "staffing_per_100k") |> 
@@ -1279,10 +1321,10 @@ personnel |>
     subtitle = "Positions per 100,000 residents",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
-    values = c("Officers" = "dodgerblue3", "Civilians" = "grey60"),
+    values = c("Officers" = dodgerblue, "Civilians" = cowboysilver),
     name = ""
   )
 ```
@@ -1313,9 +1355,9 @@ ggplot(plot_data, aes(x = year, y = base_rate, colour = category)) +
 geom_line(linewidth = 1.1) +
 
 scale_x_continuous(
-  breaks = c(seq(2000, latest_year_personnel, 5), latest_year_personnel),
+  breaks = c(seq(first_year_personnel, latest_year_personnel - 4, 5), latest_year_personnel),
   labels = label_number(big.mark = ""),
-  minor_breaks = seq(2000, latest_year_personnel, 1),
+  minor_breaks = seq(first_year_personnel, latest_year_personnel, 1),
   expand = expansion(mult = c(0.02, 0.06)),
   position = "bottom"
 ) +
@@ -1335,10 +1377,10 @@ geom_text(
 
 scale_colour_manual(
   values = c(
-    "Salaries" = "dodgerblue3", 
-    "Expenses" = "deepskyblue", 
-    "Civilians" = "darkred",
-    "Officers" = "grey50"
+    "Salaries" = dodgerblue, 
+    "Expenses" = dodgerblue50, 
+    "Civilians" = habsred,
+    "Officers" = cowboysilver
   ),
   guide = "none"  # Remove legend
 ) +
@@ -1356,7 +1398,7 @@ theme(
 
 labs(
     title = "WRPS Salaries, Total Expenses,<br>Officers, and Civilians per Capita",
-    subtitle = "No data for 2020, 2000 = 100",
+    subtitle = str_glue("No data for 2020, {first_year_personnel} = 100"),
     caption = "Source: Data source | *Charting Waterloo Region*"
 )
 
@@ -1371,13 +1413,13 @@ personnel |>
   geom_line(linewidth = 0.7) +
   labs(
     title = "WRPS Salaries, Total Expenses, and Criminal Incidents per Capita",
-    subtitle = "2000 = 100",
+    subtitle = str_glue("{first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
-    values = c("Salaries" = "dodgerblue3", "Expenses" = "grey60", "Violent" = "black", "Nonviolent" = "darkred"),
+    values = c("Salaries" = dodgerblue, "Expenses" = dodgerblue50, "Violent" = habsred, "Nonviolent" = habsred50),
     name = ""
   )
 ```
@@ -1390,37 +1432,40 @@ personnel |>
   ggplot(aes(x = year, y = base_rate, colour = category)) +
   geom_line(linewidth = 0.7) +
   labs(
-    title = "WRPS Salaries, Total Expenses, and Criminal Incidents per Officer",
-    subtitle = "2000 = 100",
+    title = "Halton Salaries, Total Expenses, and Criminal Incidents per Officer",
+    subtitle = str_glue("{first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
-    values = c("Salaries" = "dodgerblue3", "Expenses" = "grey60", "Violent" = "black", "Nonviolent" = "darkred"),
+    values = c("Salaries" = dodgerblue, "Expenses" = dodgerblue50, "Violent" = habsred, "Nonviolent" = habsred50),
     name = ""
   )
 ```
 
+### Police Expenditures Across the Big 12
+
 ```{r plot-big12-exp-per-capita-rank}
-big_12_financials |> 
+big_12_financials |>
   filter(
-    year == 2023,   # missing 2024 data for four regions
-    region != "Hamilton" # no Hamilton data for 2023
+    year == latest_year_financials_reported,
+    !is.na(total_exp_per_capita)
   ) |>
   mutate(
     region = reorder(region, total_exp_per_capita)
-  ) |> 
-  
+  ) |>
+
+
   ggplot(aes(x = total_exp_per_capita, y = region, fill = comparison_group)) +
   
     geom_col(
-      #fill = "dodgerblue3", 
+      #fill = dodgerblue, 
       width = 0.7
      ) +
   
     scale_x_continuous(
-      breaks = seq(0, 460, 50),
+      breaks = breaks_width(50),
       labels = label_dollar(),
       position = "top"
     ) +
@@ -1431,8 +1476,8 @@ big_12_financials |>
     
     scale_fill_manual(
       values = c(
-      "WRPS" = "dodgerblue3", 
-      "Other Big 12" = "grey50"
+      "WRPS" = dodgerblue, 
+      "Other Big 12" = cowboysilver
       ),
       guide = "none"  # Remove legend
     ) +
@@ -1447,8 +1492,8 @@ big_12_financials |>
     ) +
   
     labs(
-      title = "Total Police Expenditures per Capita: 2023",
-      subtitle = "no Hamilton data, 2024 $",
+      title = str_glue("Total Police Expenditures per Capita: {latest_year_financials_reported}"),
+      subtitle = str_glue("no {financials_not_reporting} data, {latest_year_financials} $"),
       caption = "Source: Source | *Charting Waterloo Region*"
     )
     
@@ -1456,20 +1501,20 @@ big_12_financials |>
 
 ```{r temp-test}
 temp_data <- big_12_financials |> filter(
-    year == 2023,   # missing 2024 data for four regions
-    region != "Hamilton" # no Hamilton data for 2023
+    year == latest_year_financials_reported,
+    !is.na(total_exp_per_capita)
   ) |>
   mutate(
     region = reorder(region, total_exp_per_capita),
     region_label = if_else(region == "WRPS", "**WRPS**", as.character(region))
   )
 
-ggplot(temp_data, aes(x = total_exp_per_capita, y = region)) +
+ggplot(temp_data, aes(x = total_exp_per_capita, y = region, fill = comparison_group)) +
 
-  geom_col(fill = "dodgerblue3", width = 0.8) +
+  geom_col(width = 0.7) +
 
   scale_x_continuous(
-    breaks = seq(0, 450, 50),
+    breaks = breaks_width(50),
     labels = label_number(big.mark = ""),
     position = "top"
   ) +
@@ -1478,21 +1523,43 @@ ggplot(temp_data, aes(x = total_exp_per_capita, y = region)) +
     position = "left",
     labels = temp_data |> select(region, region_label) |> deframe()
   ) +
-
+  
+  scale_fill_manual(
+      values = c(
+      "WRPS" = dodgerblue, 
+      "Other Big 12" = cowboysilver
+      ),
+      guide = "none"  # Remove legend
+    ) +
+  
   theme(
     panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
     panel.grid.major.y = element_blank(),
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
-    axis.text.x = element_text(margin = margin(t = 0, b = -20)),
+    axis.text.x = element_text(margin = margin(t = 0, b = -1)),
     axis.text.y = element_markdown(hjust = 0),
   ) +
 
   labs(
     title = "Total Expenditures per Capita",
-    subtitle = "Big 12 (no Hamilton data), 2023, $ 2024",
+    subtitle = str_glue("Big 12 (no {financials_not_reporting} data), {latest_year_financials_reported}, $ {latest_year_financials}"),
     caption = "Source: Source | *Charting Waterloo Region*"
-  ) 
+  )
+```
+
+```{r test-margin}
+ggplot(temp_data, aes(x = total_exp_per_capita, y = region)) +
+  geom_col(fill = dodgerblue) +
+  scale_x_continuous(
+    breaks = breaks_width(50),
+    position = "bottom"  # Change to bottom
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(margin = margin(t = 50, b = 0))  # Large positive margin
+  ) +
+  labs(title = "Test: bottom axis with large TOP margin")
 ```
 
 ```{r plot-cop-civ-staffing-area}
@@ -1508,16 +1575,16 @@ personnel |>
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank()
   ) +
-  # Officer proportion labels for 2000 and max year
+  # Officer proportion labels for the first and latest year
   geom_text(
-    data = personnel |> 
-      filter(region == "WRPS", year %in% c(2000, max(year, na.rm = TRUE))) |>
+    data = personnel |>
+      filter(region == "WRPS", year %in% c(first_year_personnel, latest_year_personnel)) |>
       select(year, prop_officers),
-    aes(x = ifelse(year == 2000, year - 1, year + 1.1), 
+    aes(x = if_else(year == first_year_personnel, year - 1, year + 1.1),
         y = prop_officers,  # Position at the top edge of the Officers area (bottom blue area)
         label = paste0(round(prop_officers, 1), "%")),
     inherit.aes = FALSE,
-    color = "dodgerblue3",
+    color = dodgerblue,
     fontface = "bold"
   ) +
   # Officers label in the blue area (bottom)
@@ -1539,18 +1606,18 @@ personnel |>
            size = 4) +
   labs(
     title = "WRPS Officer and Civilian Staffing Levels",
-    subtitle = "Proportion of total staffing, 2000-2023",
+    subtitle = str_glue("Proportion of total staffing, {first_year_personnel}-{latest_year_personnel}"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_fill_manual(
-    values = c("Officers" = "dodgerblue3", "Civilians" = "grey60"),
+    values = c("Officers" = dodgerblue, "Civilians" = cowboysilver),
     name = ""
   ) +
   guides(fill = "none") +
   scale_x_continuous(
-    breaks = seq(2000, 2020, 5)
+    breaks = seq(first_year_personnel, latest_year_personnel - 4, 5)
   )
 ```
 
@@ -1558,12 +1625,12 @@ personnel |>
 personnel |> 
  filter(region == "WRPS") |> 
  ggplot(aes(x = year, y = prop_officers)) +
- geom_col(fill = "dodgerblue3") +
+ geom_col(fill = dodgerblue) +
 
   scale_x_continuous(
     breaks = pretty_breaks(),
     labels = label_number(big.mark = ""),
-    #minor_breaks = seq(2000, 2024, 1),
+    #minor_breaks = seq(first_year_personnel, latest_year_personnel, 1),
     expand = expansion(mult = c(0.02, 0.05)),
     position = "bottom"
   ) +
@@ -1589,7 +1656,7 @@ personnel |>
  labs(
    title = "WRPS Officer Staffing Levels",
    subtitle = "Officers as proportion of total staffing, %",
-   caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+   caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
  )
 ```
 
@@ -1598,21 +1665,21 @@ plot_data <- personnel |>
   filter(
     region == "WRPS"
   ) |> 
-  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, CSI = base_csi) |> 
-  pivot_longer(-year, names_to = "stat", values_to = "base_rate") 
+  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, CSI = base_csi) |>
+  pivot_longer(-year, names_to = "stat", values_to = "base_rate")
 
 # Create the enhanced plot
-# Calculate 2014 values and percentage changes for horizontal lines and labels
-baseline_2014 <- plot_data |> 
-  filter(year == 2014) |> 
+# Calculate decade-ago values and percentage changes for horizontal lines and labels
+baseline_decade_ago <- plot_data |>
+  filter(year == decade_ago_personnel) |>
   select(stat, baseline_value = base_rate)
 
-final_year_data <- plot_data |> 
-  filter(year == max(year)) |> 
+final_year_data <- plot_data |>
+  filter(year == max(year)) |>
   select(stat, final_value = base_rate, final_year = year)
 
-pct_changes <- baseline_2014 |> 
-  left_join(final_year_data, by = "stat") |> 
+pct_changes <- baseline_decade_ago |>
+  left_join(final_year_data, by = "stat") |>
   mutate(
     pct_change = round(((final_value - baseline_value) / baseline_value) * 100, 1),
     pct_label = case_when(
@@ -1624,11 +1691,11 @@ pct_changes <- baseline_2014 |>
 # Create the enhanced plot
 plot_data |> 
   ggplot(aes(x = year, y = base_rate, colour = stat)) +
-  # Add horizontal reference lines from 2014 values
+  # Add horizontal reference lines from decade-ago values
   geom_segment(
     data = pct_changes,
-    aes(x = 2014, xend = max(plot_data$year), 
-        y = baseline_value, yend = baseline_value, 
+    aes(x = decade_ago_personnel, xend = max(plot_data$year),
+        y = baseline_value, yend = baseline_value,
         colour = stat),
     linetype = "dashed",
     alpha = 0.6,
@@ -1636,17 +1703,17 @@ plot_data |>
   ) +
   # Main trend lines
   geom_line(linewidth = 0.7) +
-  # Points at 2014 and final year
+  # Points at the decade-ago and final year
   geom_point(
-    data = plot_data |> 
-      filter(year %in% c(2014, max(year))),
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
     aes(colour = stat),
     size = 1.5
   ) +
-  # Labels for 2014 values
+  # Labels for decade-ago values
   geom_text(
-    data = plot_data |> 
-      filter(year == 2014),
+    data = plot_data |>
+      filter(year == decade_ago_personnel),
     aes(label = round(base_rate, 0)),
     show.legend = FALSE,
     size = 3,
@@ -1654,7 +1721,7 @@ plot_data |>
   ) +
   # Labels for final year values
   geom_text(
-    data = plot_data |> 
+    data = plot_data |>
       filter(year == max(year)),
     aes(label = round(base_rate, 0)),
     hjust = -0.4,
@@ -1664,7 +1731,7 @@ plot_data |>
   # Percentage change labels between horizontal lines and trend lines
   geom_text(
     data = pct_changes,
-    aes(x = final_year - 1, 
+    aes(x = final_year - 1,
         y = (baseline_value + final_value) / 2,
         label = pct_label,
         colour = stat),
@@ -1675,10 +1742,10 @@ plot_data |>
   ) +
   labs(
     title = "Trends in WRPS Staffing Levels vs Crime Severity Index",
-    subtitle = "Staffing based on positions per 100,000 population,<br>percentage change 2023 vs 2014 also reported, 2000 = 100",
+    subtitle = str_glue("Staffing based on positions per 100,000 population,<br>percentage change {latest_year_personnel} vs {decade_ago_personnel} also reported, {first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Statistics Canada. Table 35-10-0077-01  Police personnel and selected crime statistics,<br>municipal police services | Charting Waterloo Region | no data for 2020"
+    caption = str_glue("Source: Statistics Canada. Table 35-10-0077-01  Police personnel and selected crime statistics,<br>municipal police services | Charting Waterloo Region | no data for {personnel_missing_years}")
   ) +
   # Direct line labels instead of legend
   geom_text(
@@ -1695,13 +1762,13 @@ plot_data |>
     size = 3.0
   ) +
   scale_colour_manual(
-    values = c("Officers" = "dodgerblue3", "Civilians" = "grey60", "CSI" = "black"),
+    values = c("Officers" = dodgerblue, "Civilians" = cowboysilver, "CSI" = habsred),
     guide = "none"  # Remove legend
   ) +
   scale_x_continuous(
     expand = expansion(mult = c(0.02, 0.05)),
-    breaks = c(2000, 2005, 2010, 2015, 2020, 2023),
-    limits = c(2000, 2023.5)
+    breaks = c(seq(first_year_personnel, latest_year_personnel - 4, 5), latest_year_personnel),
+    limits = c(first_year_personnel, latest_year_personnel + 0.5)
   )
 ```
 
@@ -1710,22 +1777,22 @@ plot_data <- personnel |>
   filter(
     region == "WRPS"
   ) |> 
-  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, Clearance = base_clearance_rate) |> 
-  pivot_longer(-year, names_to = "stat", values_to = "base_rate") 
+  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, Clearance = base_clearance_rate) |>
+  pivot_longer(-year, names_to = "stat", values_to = "base_rate")
 
 
 # Create the enhanced plot
-# Calculate 2014 values and percentage changes for horizontal lines and labels
-baseline_2014 <- plot_data |> 
-  filter(year == 2014) |> 
+# Calculate decade-ago values and percentage changes for horizontal lines and labels
+baseline_decade_ago <- plot_data |>
+  filter(year == decade_ago_personnel) |>
   select(stat, baseline_value = base_rate)
 
-final_year_data <- plot_data |> 
-  filter(year == max(year)) |> 
+final_year_data <- plot_data |>
+  filter(year == max(year)) |>
   select(stat, final_value = base_rate, final_year = year)
 
-pct_changes <- baseline_2014 |> 
-  left_join(final_year_data, by = "stat") |> 
+pct_changes <- baseline_decade_ago |>
+  left_join(final_year_data, by = "stat") |>
   mutate(
     pct_change = round(((final_value - baseline_value) / baseline_value) * 100, 1),
     pct_label = case_when(
@@ -1737,11 +1804,11 @@ pct_changes <- baseline_2014 |>
 # Create the enhanced plot
 plot_data |> 
   ggplot(aes(x = year, y = base_rate, colour = stat)) +
-  # Add horizontal reference lines from 2014 values
+  # Add horizontal reference lines from decade-ago values
   geom_segment(
     data = pct_changes,
-    aes(x = 2014, xend = max(plot_data$year), 
-        y = baseline_value, yend = baseline_value, 
+    aes(x = decade_ago_personnel, xend = max(plot_data$year),
+        y = baseline_value, yend = baseline_value,
         colour = stat),
     linetype = "dashed",
     alpha = 0.6,
@@ -1749,17 +1816,17 @@ plot_data |>
   ) +
   # Main trend lines
   geom_line(linewidth = 0.7) +
-  # Points at 2014 and final year
+  # Points at the decade-ago and final year
   geom_point(
-    data = plot_data |> 
-      filter(year %in% c(2014, max(year))),
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
     aes(colour = stat),
     size = 1.5
   ) +
-  # Labels for 2014 values
+  # Labels for decade-ago values
   geom_text(
-    data = plot_data |> 
-      filter(year == 2014),
+    data = plot_data |>
+      filter(year == decade_ago_personnel),
     aes(label = round(base_rate, 0)),
     show.legend = FALSE,
     size = 3,
@@ -1767,7 +1834,7 @@ plot_data |>
   ) +
   # Labels for final year values
   geom_text(
-    data = plot_data |> 
+    data = plot_data |>
       filter(year == max(year)),
     aes(label = round(base_rate, 0)),
     hjust = -0.4,
@@ -1777,7 +1844,7 @@ plot_data |>
   # Percentage change labels between horizontal lines and trend lines
   geom_text(
     data = pct_changes,
-    aes(x = final_year - 1, 
+    aes(x = final_year - 1,
         y = (baseline_value + final_value) / 2,
         label = pct_label,
         colour = stat),
@@ -1788,10 +1855,10 @@ plot_data |>
   ) +
   labs(
     title = "Trends in WRPS Staffing Levels vs Clearance Rate",
-    subtitle = "Staffing based on positions per 100,000 population,<br>percentage change 2022 vs 2014 also reported, 2000 = 100",
+    subtitle = str_glue("Staffing based on positions per 100,000 population,<br>percentage change {latest_year_personnel} vs {decade_ago_personnel} also reported, {first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Statistics Canada. Table 35-10-0077-01  Police personnel and selected crime statistics,<br>municipal police services | Charting Waterloo Region | no data for 2020"
+    caption = str_glue("Source: Statistics Canada. Table 35-10-0077-01  Police personnel and selected crime statistics,<br>municipal police services | Charting Waterloo Region | no data for {personnel_missing_years}")
   ) +
   # Direct line labels instead of legend
   geom_text(
@@ -1808,13 +1875,13 @@ plot_data |>
     size = 3.0
   ) +
   scale_colour_manual(
-    values = c("Officers" = "dodgerblue3", "Civilians" = "grey60", "Clearance" = "black"),
+    values = c("Officers" = dodgerblue, "Civilians" = cowboysilver, "Clearance" = habsred),
     guide = "none"  # Remove legend
   ) +
   scale_x_continuous(
     expand = expansion(mult = c(0.02, 0.05)),
-    breaks = c(2000, 2005, 2010, 2015, 2020, 2023),
-    limits = c(2000, 2023.5)
+    breaks = c(seq(first_year_personnel, latest_year_personnel - 4, 5), latest_year_personnel),
+    limits = c(first_year_personnel, latest_year_personnel + 0.5)
   )
 ```
 
@@ -1822,32 +1889,34 @@ plot_data |>
 personnel |>
   filter(region == "WRPS") |> 
   ggplot(aes(x = year, y = officer_civilian_ratio)) +
-  geom_line(linewidth = 0.8, colour = "dodgerblue3") +
+  geom_line(linewidth = 0.8, colour = dodgerblue) +
   geom_ribbon(aes(ymin = 1.5, ymax = officer_civilian_ratio), 
-              fill = "dodgerblue3", alpha = 0.3) +
+              fill = dodgerblue, alpha = 0.3) +
   scale_y_continuous(breaks = seq(1.5, 3.0, 0.3)) +
   labs(
     title = "Ratio of WRPS Officer to Civilian Staffing Levels",
     subtitle = "Number of Officers per Civilian Staff Person",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) 
 ```
 
+### Spending, Staffing, and Outcomes
+
 ```{r plot-officer-civilian-ratio-vs-csi-wrps}
 personnel |>
-  filter(region == "Ontario") |> 
+  filter(region == "Ontario") |>
   ggplot(aes(x = officer_civilian_ratio, y = weighted_clearance_rate)) +
-  geom_point(size = 2, colour = "dodgerblue3") +
-  geom_smooth() +
+  geom_point(size = 2, colour = dodgerblue) +
+  geom_smooth(colour = habsred) +
   scale_y_continuous(breaks = pretty_breaks()) +
   labs(
-    title = "Office-Civilian Ratio vs CSI",
-    subtitle = "WRPS, 2000-2023",
+    title = "Office-Civilian Ratio vs Clearance Rate",
+    subtitle = str_glue("WRPS, {first_year_personnel}-{latest_year_personnel}"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) 
 ```
 
@@ -1855,8 +1924,8 @@ personnel |>
 personnel |>
   filter(region == "WRPS") |> 
   ggplot(aes(x = salaries_per_capita, y = weighted_clearance_rate)) +
-  geom_point(size = 2, colour = "dodgerblue3") +
-  geom_smooth() +
+  geom_point(size = 2, colour = dodgerblue) +
+  geom_smooth(colour = habsred) +
   scale_y_continuous(breaks = pretty_breaks(), labels = label_percent(scale = 1)) +
   scale_x_continuous(
     breaks = pretty_breaks(),
@@ -1864,10 +1933,10 @@ personnel |>
   ) +
   labs(
     title = "Total Salaries per Capita vs Clearance Rate",
-    subtitle = "Big 12, 2000-2023",
+    subtitle = str_glue("Big 12, {first_year_personnel}-{latest_year_personnel}"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) 
 ```
 
@@ -1876,12 +1945,12 @@ personnel |>
   filter(region == "WRPS") |> 
   ggplot(aes(x = salaries_per_capita, y = weighted_clearance_rate)) +
 
-  geom_point(size = 2, colour = "dodgerblue3") +
+  geom_point(size = 2, colour = dodgerblue) +
 
-  geom_smooth(linewidth = 1.1, colour = "dodgerblue3") +
+  geom_smooth(linewidth = 1.1, colour = dodgerblue) +
 
   scale_x_continuous(
-    breaks = seq(200, 350, 25),
+    breaks = breaks_width(25),
     labels = label_dollar(),
     #minor_breaks = seq(0, 200, 5),
     expand = expansion(mult = c(0.02, 0.08)),
@@ -1917,8 +1986,8 @@ personnel |>
 personnel |>
   filter(region == "WRPS") |> 
   ggplot(aes(x = salaries_per_capita, y = csi)) +
-  geom_point(size = 2, colour = "dodgerblue3") +
-  geom_smooth() +
+  geom_point(size = 2, colour = dodgerblue) +
+  geom_smooth(colour = habsred) +
   scale_y_continuous(breaks = pretty_breaks()) +
    scale_x_continuous(
     breaks = pretty_breaks(),
@@ -1926,10 +1995,10 @@ personnel |>
   ) +
   labs(
     title = "Total Salaries per Capita vs CSI",
-    subtitle = "Big 12, 2000-2023",
+    subtitle = str_glue("Big 12, {first_year_personnel}-{latest_year_personnel}"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) 
 ```
 
@@ -1937,8 +2006,8 @@ personnel |>
 personnel |>
   filter(region == "WRPS") |> 
   ggplot(aes(x = salaries_per_capita, y = incidents_per_100k)) +
-  geom_point(size = 2, colour = "dodgerblue3") +
-  geom_smooth() +
+  geom_point(size = 2, colour = dodgerblue) +
+  geom_smooth(colour = habsred) +
   scale_y_continuous(breaks = pretty_breaks(), labels = label_comma()) +
    scale_x_continuous(
     breaks = pretty_breaks(),
@@ -1946,15 +2015,17 @@ personnel |>
   ) +
   labs(
     title = "Total Salaries per Capita vs Criminal Incidents per 100,000",
-    subtitle = "Big 12, 2000-2023",
+    subtitle = str_glue("Big 12, {first_year_personnel}-{latest_year_personnel}"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) 
 ```
 
+## Clearance Rates
+
 ```{r plot-clearance-rates-big12}
-big_12 |> 
+big_12 |>
   ggplot(aes(x = year, y = weighted_clearance_rate, group = region)) +
   # Background layer - Other Big 12
   geom_line(
@@ -1974,7 +2045,7 @@ big_12 |>
     subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -2005,7 +2076,7 @@ csi |>
     ),
     shape = 19, size = 8
   ) +
-  scale_color_manual(values = c("grey60", "dodgerblue3")) +
+  scale_color_manual(values = comp_colours) +
   scale_y_reordered() +
   scale_x_continuous(expand = expansion(mult = c(0, 0.05))) + 
   geom_text(
@@ -2016,7 +2087,7 @@ csi |>
     fontface = "bold"
   ) +
   labs(
-    title = paste("Weighted Clearance Rate of Big 12, %:", latest_year_csi),
+    title = str_glue("Weighted Clearance Rate of Big 12, %: {latest_year_csi}"),
     subtitle = "",
     x = "",
     y = "",
@@ -2030,7 +2101,7 @@ csi |>
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("grey50", "dodgerblue3")
+    values = comp_colours
   )
 ```
 
@@ -2077,17 +2148,17 @@ big_12_ranked |>
     vjust_position = if_else(line_from_above, 1.5, -0.8)  # Shifted down labels further
   ) |> 
   ggplot(aes(x = year, y = clearance_rank)) +
-  geom_step(linewidth = 1.2, color = "dodgerblue3") +
-  geom_point(size = 2, color = "dodgerblue3") +
+  geom_step(linewidth = 1.2, color = dodgerblue) +
+  geom_point(size = 2, color = dodgerblue) +
   geom_text(aes(label = round(weighted_clearance_rate, 0), vjust = vjust_position), 
             size = 3.0, 
-            color = "dodgerblue3") +
+            color = dodgerblue) +
   scale_y_reverse(
                   breaks = 1:12, 
                   labels = ordinal_labels(1:12),
                   limits = c(12.0, 0.5)
                 ) +
-  scale_x_continuous(breaks = seq(2000, 2024, 2)) +
+  scale_x_continuous(breaks = seq(first_year_csi, latest_year_csi, 2)) +
   labs(
     title = "WRPS Clearance Rate Ranking Among Big 12 Police Services",
     subtitle = "Point labels report weighted clearance rates",
@@ -2121,7 +2192,7 @@ ggplot(ranked_data, aes(x = year, y = region, fill = clearance_rank)) +
   geom_tile(color = "white", linewidth = 0.5) +
   
   scale_fill_stepsn(
-    colors = alpha("dodgerblue4", c(1, 0.7, 0.4, 0.1)),
+    colors = alpha(dodgerblue, c(1, 0.7, 0.4, 0.1)),
     breaks = c(1, 3, 6, 9, 12),
     labels = c("1st", "3rd", "6th", "9th", "12th"),
     na.value = "black",
@@ -2137,7 +2208,7 @@ ggplot(ranked_data, aes(x = year, y = region, fill = clearance_rank)) +
   ) +
   
   scale_x_continuous(
-    breaks = c(seq(2000, 2025, 5), 2024),
+    breaks = c(seq(first_year_csi, latest_year_csi - 4, 5), latest_year_csi),
     labels = label_number(),
     expand = expansion(mult = c(0.0, 0.0)),
     position = "bottom"
@@ -2180,9 +2251,9 @@ plot_data <- big_12_ranked |>
   )
 
 # Define fill scale parameters
-fill_colors <- alpha("dodgerblue4", c(0.2, 0.4, 0.6, 0.8, 1.0))  # Adjust colors as needed
-fill_breaks <- c(43.8, 48, 56, 64, 72, 80)   # Adjust breaks
-fill_labels <- c(43.8, 48, 56, 64, 72, 80)  # Adjust labels
+fill_colors <- alpha(dodgerblue, c(0.2, 0.4, 0.6, 0.8, 1.0))  # Adjust colors as needed
+fill_breaks <- pretty(big_12_ranked$weighted_clearance_rate_violent, n = 5)  # follows the data
+fill_labels <- fill_breaks
 
 
 ggplot(plot_data, aes(x = year, y = row_factor, fill = weighted_clearance_rate_violent)) +
@@ -2206,7 +2277,7 @@ ggplot(plot_data, aes(x = year, y = row_factor, fill = weighted_clearance_rate_v
   ) +
   
   scale_x_continuous(
-    breaks = c(seq(2000, 2025, 5), 2024),
+    breaks = c(seq(first_year_csi, latest_year_csi - 4, 5), latest_year_csi),
     labels = label_number(),
     expand = expansion(mult = c(0.0, 0.0)),
     position = "bottom"
@@ -2220,7 +2291,7 @@ ggplot(plot_data, aes(x = year, y = row_factor, fill = weighted_clearance_rate_v
   
   theme(
     panel.grid.major.y = element_blank(),
-    legend.position.inside = c(0.379, 1.08)
+    legend.position.inside = c(0.379, 1.05)
   ) +
   
   labs(
@@ -2247,14 +2318,14 @@ big_12_ranked |>
   mutate(region = factor(region, levels = region_order)) |> 
   ggplot(aes(x = year, y = region, fill = weighted_clearance_rate_violent)) +
   geom_tile(color = "white", linewidth = 0.5) +
-  scale_fill_gradient2(low = "deepskyblue", mid = "yellow", high = "darkred",
+  scale_fill_gradient2(low = dodgerblue, mid = cowboysilver50, high = habsred,
                        midpoint = clearance_midpoint,
                        name = "Clearance<br>Rate (%)",
-                       breaks = c(44, 50, 60, 70, 79),
-                       labels = c("44%", "50%", "60%", "70%", "79%"),
+                       breaks = pretty(clearance_range, n = 5),
+                       labels = label_percent(scale = 1, accuracy = 1),
                        guide = guide_colorbar(label.position = "top"),
                        na.value = "white") +
-  scale_x_continuous(breaks = seq(2000, 2024, 2), expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(first_year_csi, latest_year_csi, 2), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   labs(
     title = "Weighted Clearance Rates for Violent Crimes - Big 12",
@@ -2272,339 +2343,7 @@ big_12_ranked |>
   )
 ```
 
-```{r reg-model}
-reg_data <- big_12 |> 
-  filter(in_big_12) |> 
-  mutate(region = relevel(factor(region), ref = "WRPS")) |> 
-  group_by(region) |> 
-  arrange(year) |> 
-  mutate(
-    log_csi = log(csi),
-    log_officers_per_100k = log(officers_per_100k),
-    log_civilians_per_100k = log(civilians_per_100k),
-    log_clearance_rate = log(weighted_clearance_rate),
-    log_prop_male = log(prop_male),
-    log_prop_civilian = log(prop_civilians),
-    log_total_personnel_per_100k = log(total_personnel_per_100k),
-    log_lagged_total_personnel_per_100k = log(lagged_total_personnel_per_100k),
-    log_lagged_prop_civilians = log(lagged_prop_civilians),
-    log_lagged_prop_male = log(lagged_prop_male),
-    log_lagged_clearance_rate = log(lagged_clearance_rate),
-    diff_log_csi = log_csi - lag(log_csi),
-    diff_log_officers_per_100k = log_officers_per_100k - lag(log_officers_per_100k),
-    diff_log_civilians_per_100k = log_civilians_per_100k - lag(log_civilians_per_100k),
-    diff_log_clearance_rate = log_clearance_rate - lag(log_clearance_rate)
-  )
-
-csi_model <- lm(csi ~ region + year_factor + officers_per_100k + civilians_per_100k + weighted_clearance_rate, data = reg_data)
-
-tidy_results <- tidy(csi_model, conf.int = TRUE)
-
-tidy_results |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Regression Results"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r reg-model-overall-stats}
-glance_results <- glance(csi_model)
-
-# For the model summary statistics
-glance_results |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r reg-model-cluster-std-err-region}
-# Get the clustered results
-clustered_results <- coeftest(csi_model, vcov = vcovCL, cluster = ~region)
-
-# Convert to a tidy format
-clustered_tidy <- clustered_results |>
-  broom::tidy(conf.int = TRUE)
-
-# Create the gt table
-clustered_tidy |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = c(estimate, std.error, statistic, p.value, conf.low, conf.high),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate", 
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Regression Results",
-    subtitle = "With Region-Clustered Standard Errors"
-  ) |>
-  tab_footnote(
-    footnote = "Standard errors clustered by region",
-    locations = cells_column_labels(columns = std.error)
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r log-model}
-log_model <- lm(log_csi ~ region + year_factor + log_clearance_rate, data = reg_data)
-
-tidy_results_log <- tidy(log_model, conf.int = TRUE)
-
-tidy_results_log |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Regression Results: Logged variables"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r log-model-overall-stats}
-glance_results_log <- glance(log_model)
-
-# For the model summary statistics
-glance_results_log |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r log-model-cluster-std-err-region}
-# Get the clustered results
-clustered_results_log <- coeftest(log_model, vcov = vcovCL, cluster = ~region)
-
-# Convert to a tidy format
-clustered_tidy_log <- clustered_results_log |>
-  broom::tidy(conf.int = TRUE)
-
-# Create the gt table
-clustered_tidy_log |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = c(estimate, std.error, statistic, p.value, conf.low, conf.high),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate", 
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Regression Results",
-    subtitle = "With Region-Clustered Standard Errors"
-  ) |>
-  tab_footnote(
-    footnote = "Standard errors clustered by region",
-    locations = cells_column_labels(columns = std.error)
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r diff-log-model}
-diff_reg_data <- reg_data |> 
-  filter(year != 2000) |> 
-  mutate(year_factor = relevel(year_factor, ref = "2001"))
-  
-diff_log_model <- lm(diff_log_csi ~ region + year_factor +  diff_log_officers_per_100k + diff_log_civilians_per_100k + diff_log_clearance_rate, data = diff_reg_data)
-
-tidy_results_diff_log <- tidy(diff_log_model, conf.int = TRUE)
-
-tidy_results_diff_log |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Regression Results: Logged Difference variables"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r difflog-model-overall-stats}
-glance_results_diff_log <- glance(diff_log_model)
-
-# For the model summary statistics
-glance_results_diff_log |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r reg-model-clearance}
-clearance_model <- lm(weighted_clearance_rate ~ region + year_factor + officers_per_100k + civilians_per_100k + prop_male, data = reg_data)
-
-tidy_results_clearance <- tidy(clearance_model, conf.int = TRUE)
-
-tidy_results_clearance |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "Clearance Rate Regression Results"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r reg-model-clearance-overall-stats}
-glance_results <- glance(clearance_model)
-
-# For the model summary statistics
-glance_results |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r reg-model-clearance-cluster-std-err-region}
-# Get the clustered results
-clustered_results_clearance <- coeftest(clearance_model, vcov = vcovCL, cluster = ~region)
-
-# Convert to a tidy format
-clustered_tidy_clearance <- clustered_results_clearance |>
-  broom::tidy(conf.int = TRUE)
-
-# Create the gt table
-clustered_tidy_clearance |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = c(estimate, std.error, statistic, p.value, conf.low, conf.high),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate", 
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "Clearance Rate Regression Results",
-    subtitle = "With Region-Clustered Standard Errors"
-  ) |>
-  tab_footnote(
-    footnote = "Standard errors clustered by region",
-    locations = cells_column_labels(columns = std.error)
-  ) |>
-  opt_table_font(font = "system-ui")
-```
+## Officer Staffing Across the Big 12
 
 ```{r plot-officers-per-100k-big12}
 big_12 |>
@@ -2627,7 +2366,7 @@ big_12 |>
     subtitle = "Officers per 100,000 people<br><br>",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -2695,18 +2434,18 @@ slope_data |>
   # Add manual y-axis labels positioned close to the right side
   annotate(
     "text",
-    x = 2.05,  # Close to the 2023 data points
+    x = 2.05,  # Close to the latest year's data points
     y = seq(120, 200, 10),
     label = seq(120, 200, 10),
     size = 3,
     color = "grey40"
   ) +
   labs(
-    title = "Officer Staffing 2000 vs 2023",
+    title = str_glue("Officer Staffing {first_year_personnel} vs {latest_year_personnel}"),
     subtitle = "Officers per 100,000 people",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -2792,12 +2531,7 @@ scale_y_continuous(
 ) +
 
 scale_colour_manual(
-  values = c(
-    "WRPS" = "dodgerblue3", 
-    "Ontario" = "deepskyblue", 
-    "Other Big 12" = "lightgrey",
-    "Canada" = "darkred"
-  ),
+  values = comp_colours,
   guide = "none"  # Remove legend
 ) +
 
@@ -2941,10 +2675,10 @@ p +
   ) +
   scale_colour_manual(
     values = c(
-      "WRPS" = "dodgerblue3", 
-      "London" = "deepskyblue", 
-      "Guelph" = "grey50",
-      "Toronto" = "darkred"
+      "WRPS" = dodgerblue,
+      "London" = dodgerblue50,
+      "Guelph" = cowboysilver,
+      "Toronto" = habsred
     ),
     guide = "none"
   ) +
@@ -2958,7 +2692,7 @@ p +
     )
   ) +
   labs(
-    title = "Change in Officer Staffing: 2000 vs 2023",
+    title = str_glue("Change in Officer Staffing: {first_year_personnel} vs {latest_year_personnel}"),
     subtitle = "Officers per 100,000 residents",
     caption = "Source: Source | *Charting Waterloo Region*"
   )
@@ -3045,12 +2779,7 @@ ggplot(plot_data, aes(x = year, y = incidents_per_100k_all, colour = grouping)) 
   # ) +
   
   scale_colour_manual(
-    values = c(
-      "WRPS" = "dodgerblue3", 
-      "Guelph" = "deepskyblue", 
-      "London" = "grey50",
-      "Hamilton" = "darkred"
-    ),
+    values = local_colours,
     guide = "none"
   ) +
   
@@ -3072,8 +2801,8 @@ ggplot(plot_data, aes(x = year, y = incidents_per_100k_all, colour = grouping)) 
   )
 ```
 
-```{r plot-off-civ-per-100k-change-since-2000}
-# Create dot plot with percent changes for latest year vs 2000
+```{r plot-off-civ-per-100k-change-since-base-year}
+# Create dot plot with percent changes for the latest year vs the first year
 dot_data <- big_12 |>
   filter(year == latest_year_personnel) |>
   mutate(
@@ -3137,15 +2866,15 @@ ggplot(dot_data_plot) +
   # Control legend colors - Officers first
   scale_color_manual(
     values = c(
-      "Officers per 100k" = "dodgerblue3",
-      "Civilians per 100k" = "deepskyblue"
+      "Officers per 100k" = dodgerblue,
+      "Civilians per 100k" = dodgerblue50
     ),
     name = NULL,
     breaks = c("Officers per 100k", "Civilians per 100k")
   ) +
 
   # Customize the plot
-  scale_x_continuous(position = "top", breaks = seq(-20, 100, 10)) +
+  scale_x_continuous(position = "top", breaks = breaks_width(10)) +
   scale_y_discrete(
     position = "left",
     labels = dot_data_plot |> select(region, region_label) |> deframe()
@@ -3153,7 +2882,7 @@ ggplot(dot_data_plot) +
   labs(
     x = NULL, y = NULL,
     title = "Change in Officer and Civilian Staffing Levels",
-    subtitle = "Big 12, Canada, and Ontario, 2023 vs 2000, % change<br>",
+    subtitle = str_glue("Big 12, Canada, and Ontario, {latest_year_personnel} vs {first_year_personnel}, % change<br>"),
     caption = "Source: Tables 35-10-0076-01, 35-10-0077-01 | *Charting Waterloo Region*"
   ) +
   theme(
@@ -3214,15 +2943,15 @@ ggplot(dot_data_plot) +
 
     scale_color_manual(
       values = c(
-        "Officers per 100k" = "dodgerblue3",
-        "Civilians per 100k" = "deepskyblue"
+        "Officers per 100k" = dodgerblue,
+        "Civilians per 100k" = dodgerblue50
       ),
       name = NULL,
       breaks = c("Officers per 100k", "Civilians per 100k")
     ) +
 
     scale_x_continuous(
-      breaks = c(seq(-20, 80, 10)),
+      breaks = breaks_width(10),
       labels = label_number(big.mark = ""),
       expand = expansion(mult = c(0.02, 0.05)),
       position = "top"
@@ -3267,10 +2996,10 @@ big_12 |>
   ) +
   labs(
     title = "Changes in WRPS Staffing Relative to Canada, Ontario, and Other Big 12 Forces",
-    subtitle = "Officers per 100,000 people, 2000 = 100",
+    subtitle = str_glue("Officers per 100,000 people, {first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -3299,7 +3028,7 @@ big_12 |>
     subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -3325,10 +3054,10 @@ big_12 |>
   ) +
   labs(
     title = "Changes in Ratio of Officer to Civilian Staffing Levels",
-    subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces; 2000 = 100",
+    subtitle = str_glue("WRPS vs Canada, Ontario, and Other Big 12 Forces; {first_year_personnel} = 100"),
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -3383,7 +3112,7 @@ big_12_latest |>
     fontface = "bold"
   ) +
   labs(
-    title = "Staffing Levels of Big 12 Police Services: 2023",
+    title = str_glue("Staffing Levels of Big 12 Police Services: {latest_year_personnel}"),
     subtitle = "",
     x = "",
     y = "",
@@ -3397,7 +3126,7 @@ big_12_latest |>
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey50")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
 
@@ -3405,7 +3134,7 @@ big_12_latest |>
 # Prepare the data for all three metrics
 big_12_strength <- big_12 |>
   filter(
-    year == 2023,
+    year == latest_year_personnel,
     !region %in% c("Canada", "Ontario")
   ) |>
   select(region, comparison_group, officers_per_100k, auth_strength_per_100k, actual_vs_auth) |>
@@ -3448,7 +3177,7 @@ big_12_strength |>
     fontface = "bold"
   ) +
   labs(
-    title = "Actual vs Authorized Officer Staffing of Big 12 Police Services: 2023",
+    title = str_glue("Actual vs Authorized Officer Staffing of Big 12 Police Services: {latest_year_personnel}"),
     subtitle = "",
     x = "",
     y = "",
@@ -3462,9 +3191,11 @@ big_12_strength |>
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey60")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
+
+## Gender Composition of Police Services
 
 ```{r plot-big12-prop-female}
 big_12 |>
@@ -3487,7 +3218,7 @@ big_12 |>
     subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces",
     x = "",
     y = "",
-    caption = "Source: Data source | Analysis: Your Name | no data for 2020"
+    caption = str_glue("Source: Data source | Analysis: Your Name | no data for {personnel_missing_years}")
   ) +
   scale_colour_manual(
     values = comp_colours,
@@ -3497,7 +3228,7 @@ big_12 |>
 
 ```{r plot-big12-female-rank}
 big_12 |> filter(
-    year == max(year),
+    year == latest_year_personnel,
     !region %in% c("Canada", "Ontario")
   ) |>
   mutate(region = reorder(region, prop_female)) |> 
@@ -3513,7 +3244,7 @@ big_12 |> filter(
     fontface = "bold"
   ) +
   labs(
-    title = "Proportion of Officers Who are Female: 2023",
+    title = str_glue("Proportion of Officers Who are Female: {latest_year_personnel}"),
     subtitle = "",
     x = "",
     y = "",
@@ -3527,859 +3258,6 @@ big_12 |> filter(
     legend.title = element_blank()
   ) +
   scale_fill_manual(
-    values = c("WRPS" = "dodgerblue3", "Other Big 12" = "grey60")
+    values = c("WRPS" = dodgerblue, "Other Big 12" = cowboysilver)
   )
 ```
-
-```{r data-prep}
-# Filter for complete cases across all variables
-reg_data_complete <- reg_data |>
-  filter(!is.na(csi), !is.na(prop_civilians), !is.na(region), 
-         !is.na(year_factor), !is.na(weighted_clearance_rate), !is.na(prop_male))
-```
-
-```{r outlier-detection}
-# Fit full model for outlier identification
-full_model <- lm(csi ~ prop_civilians + region + year_factor + 
-                 weighted_clearance_rate + prop_male, data = reg_data_complete)
-
-# Calculate diagnostic statistics
-cooks_d <- cooks.distance(full_model)
-std_resids <- rstandard(full_model)
-
-# Define outlier thresholds
-n <- nrow(reg_data_complete)
-threshold_cooks <- 4/n
-threshold_resid <- 2.5
-
-# Identify outliers using either criterion
-outliers_cooks <- which(cooks_d > threshold_cooks)
-outliers_resid <- which(abs(std_resids) > threshold_resid)
-outliers_combined <- unique(c(outliers_cooks, outliers_resid))
-
-# Remove outliers
-reg_data_no_outliers <- reg_data_complete[-outliers_combined, ]
-```
-
-```{r generate-residuals}
-# Regress CSI on control variables
-csi_controls_model <- lm(csi ~ region + year_factor + weighted_clearance_rate + prop_male, 
-                         data = reg_data_no_outliers)
-
-# Regress officer-civilian ratio on control variables
-ratio_controls_model <- lm(prop_civilians ~ region + year_factor + 
-                          weighted_clearance_rate + prop_male, data = reg_data_no_outliers)
-
-# Extract residuals
-reg_data_residuals <- reg_data_no_outliers |>
-  ungroup() |> 
-  mutate(
-    csi_residual = residuals(csi_controls_model),
-    ratio_residual = residuals(ratio_controls_model)
-  )
-```
-
-```{r main-regression}
-# Full regression model with all controls
-main_model <- lm(csi ~ prop_civilians + region + year_factor + 
-                 weighted_clearance_rate + prop_male, data = reg_data_no_outliers)
-
-# Extract key coefficients
-main_results <- tidy(main_model) |>
-  filter(term %in% c("prop_civilians", "prop_male", "weighted_clearance_rate"))
-
-# Model fit statistics
-model_stats <- glance(main_model)
-```
-
-```{r display-results}
-main_results
-
-model_stats |>
-  select(r.squared, adj.r.squared, p.value, nobs)
-```
-
-```{r partial-plot, fig.width=10, fig.height=6}
-# Calculate correlation for residuals
-correlation_coef <- cor(reg_data_residuals$ratio_residual, reg_data_residuals$csi_residual)
-
-# Extract specific coefficients for plot labels
-prop_civilians_coef <- main_results |> filter(term == "prop_civilians")
-prop_male_coef <- main_results |> filter(term == "prop_male")
-
-# Create partial regression plot
-reg_data_residuals |>
-  ggplot(aes(x = ratio_residual, y = csi_residual)) +
-  geom_point(alpha = 0.7, size = 1.8, color = "darkblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red", linewidth = 1.2) +
-  labs(
-    x = "Proportion of Staff Who Are Civilians<br>(after controlling for region, year, clearance rate & gender composition)",
-    y = "Crime Severity Index<br>(after controlling for region, year, clearance rate & gender composition)",
-    title = "Partial Regression: Civilian Proportion vs Crime Severity Index",
-    subtitle = paste0("β = ", round(prop_civilians_coef$estimate, 2), 
-                     " (SE = ", round(prop_civilians_coef$std.error, 2), 
-                     "), t = ", round(prop_civilians_coef$statistic, 2),
-                     ", p = ", format(prop_civilians_coef$p.value, digits = 3, scientific = FALSE),
-                     "<br>Correlation = ", round(correlation_coef, 3),
-                     ", R² = ", round(model_stats$r.squared, 3),
-                     " | Gender β = ", round(prop_male_coef$estimate, 2))
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.subtitle = element_text(size = 11),
-    axis.title = element_text(size = 12),
-    panel.grid.minor = element_blank()
-  ) +
-  annotate("text", x = 0.25, y = 8, 
-           label = paste0("CSI = ", round(prop_civilians_coef$estimate, 2), 
-                         " × Civilian Proportion + controls"),
-           size = 4, hjust = 0, color = "darkred", fontface = "italic")
-```
-
-## Key Findings
-
-- **Officer-Civilian Ratio Effect**: β = `r round(prop_civilians_coef$estimate, 2)` (p = `r format(prop_civilians_coef$p.value, digits = 3, scientific = FALSE)`)
-  - Each 1-unit increase in officer-civilian ratio associated with `r round(abs(prop_civilians_coef$estimate), 2)` point decrease in CSI
-- **Gender Composition Effect**: β = `r round(prop_male_coef$estimate, 2)` (p \< 0.001)
-  - Each 1% increase in male officers associated with `r round(prop_male_coef$estimate, 2)` point increase in CSI
-- **Model Performance**: Explains `r round(model_stats$r.squared * 100, 1)`% of CSI variation across `r model_stats$nobs` observations after removing `r length(outliers_combined)` outliers
-
-```{r mediation-analysis-clearance}
-# Model 1: How does staffing affect clearance rates?
-log_clearance_model <- lm(log_clearance_rate ~ log_officers_per_100k + log_civilians_per_100k + log_prop_male + region + year_factor, data = reg_data)
-
-tidy_results_log_clearance <- tidy(log_clearance_model, conf.int = TRUE)
-
-tidy_results_log_clearance |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "Clearance Rate Logged Regression Results"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r mediation-analysis-clearance-cluster-std-err-region}
-# Get the clustered results
-clustered_results_log_clearance <- coeftest(log_clearance_model, vcov = vcovCL, cluster = ~region)
-
-# Convert to a tidy format
-clustered_tidy_log_clearance <- clustered_results_log_clearance |>
-  broom::tidy(conf.int = TRUE)
-
-# Create the gt table
-clustered_tidy_log_clearance |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = c(estimate, std.error, statistic, p.value, conf.low, conf.high),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate", 
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "Clearance Rate Logged Regression Results",
-    subtitle = "With Region-Clustered Standard Errors"
-  ) |>
-  tab_footnote(
-    footnote = "Standard errors clustered by region",
-    locations = cells_column_labels(columns = std.error)
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r mediation-analysis-clearance-model-summary}
-log_clearance_glance_results <- glance(log_clearance_model)
-
-# For the model summary statistics
-log_clearance_glance_results |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r mediation-analysis-csi-model}
-# Model 2: How does staffing affect csi?
-log_csi_model <- lm(log_csi ~ log_officers_per_100k + log_civilians_per_100k + log_prop_male + log_clearance_rate + region + year_factor, data = reg_data)
-
-tidy_results_log_csi <- tidy(log_csi_model, conf.int = TRUE)
-
-tidy_results_log_csi |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = where(is.numeric),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate",
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Logged Regression Results"
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r mediation-analysis-csi-cluster-std-err-region}
-# Get the clustered results
-clustered_results_log_csi <- coeftest(log_csi_model, vcov = vcovCL, cluster = ~region)
-
-# Convert to a tidy format
-clustered_tidy_log_csi <- clustered_results_log_csi |>
-  broom::tidy(conf.int = TRUE)
-
-# Create the gt table
-clustered_tidy_log_csi |>
-  mutate(term = str_remove(term, "region")) |> 
-  gt() |>
-  fmt_number(
-    columns = c(estimate, std.error, statistic, p.value, conf.low, conf.high),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    term = "Term",
-    estimate = "Estimate", 
-    std.error = "Std. Error",
-    statistic = "t-statistic",
-    p.value = "p-value",
-    conf.low = "CI Lower",
-    conf.high = "CI Upper"
-  ) |>
-  tab_header(
-    title = "CSI Logged Regression Results",
-    subtitle = "With Region-Clustered Standard Errors"
-  ) |>
-  tab_footnote(
-    footnote = "Standard errors clustered by region",
-    locations = cells_column_labels(columns = std.error)
-  ) |>
-  opt_table_font(font = "system-ui")
-```
-
-```{r mediation-analysis-csi-model-summary}
-log_csi_glance_results <- glance(log_csi_model)
-
-# For the model summary statistics
-log_csi_glance_results |>
-  pivot_longer(everything(), names_to = "statistic", values_to = "value") |>
-  gt() |>
-  fmt_number(
-    columns = value,
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    statistic = "Model Statistic",
-    value = "Value"
-  ) |>
-  tab_header(
-    title = "Model Summary Statistics"
-  )
-```
-
-```{r mediation-decompose-effects-officers}
-# Decompose effects
-med_officers <- mediate(log_clearance_model, log_csi_model, 
-                       treat = "log_officers_per_100k", 
-                       mediator = "log_clearance_rate")
-
-# Extract the results manually for a table
-mediation_officer_summary <- data.frame(
-  Effect = c("ACME (Indirect)", "ADE (Direct)", "Total Effect", "Proportion Mediated"),
-  Estimate = c(med_officers$d0, med_officers$z0, med_officers$tau.coef, med_officers$n0),
-  CI_Lower = c(med_officers$d0.ci[1], med_officers$z0.ci[1], 
-               med_officers$tau.ci[1], med_officers$n0.ci[1]),
-  CI_Upper = c(med_officers$d0.ci[2], med_officers$z0.ci[2], 
-               med_officers$tau.ci[2], med_officers$n0.ci[2]),
-  P_Value = c(med_officers$d0.p, med_officers$z0.p, 
-              med_officers$tau.p, med_officers$n0.p)
-)
-
-# Create the table
-mediation_officer_summary |>
-  gt() |>
-  fmt_number(
-    columns = c(Estimate, CI_Lower, CI_Upper),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  fmt_number(
-    columns = P_Value,
-    decimals = 4,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    Effect = "Effect Type",
-    Estimate = "Estimate",
-    CI_Lower = "CI Lower",
-    CI_Upper = "CI Upper",
-    P_Value = "p-value"
-  ) |>
-  tab_header(
-    title = "Mediation Analysis: Officers per 100k → Clearance Rate → CSI"
-  )
-```
-
-```{r mediation-decompose-effects-civilians}
-# Decompose effects
-med_civilians <- mediate(log_clearance_model, log_csi_model, 
-                       treat = "log_civilians_per_100k", 
-                       mediator = "log_clearance_rate")
-
-# Extract the results manually for a table
-mediation_civilian_summary <- data.frame(
-  Effect = c("ACME (Indirect)", "ADE (Direct)", "Total Effect", "Proportion Mediated"),
-  Estimate = c(med_civilians$d0, med_civilians$z0, med_civilians$tau.coef, med_civilians$n0),
-  CI_Lower = c(med_civilians$d0.ci[1], med_civilians$z0.ci[1], 
-               med_civilians$tau.ci[1], med_civilians$n0.ci[1]),
-  CI_Upper = c(med_civilians$d0.ci[2], med_civilians$z0.ci[2], 
-               med_civilians$tau.ci[2], med_civilians$n0.ci[2]),
-  P_Value = c(med_civilians$d0.p, med_civilians$z0.p, 
-              med_civilians$tau.p, med_civilians$n0.p)
-)
-
-# Create the table
-mediation_civilian_summary |>
-  gt() |>
-  fmt_number(
-    columns = c(Estimate, CI_Lower, CI_Upper),
-    decimals = 3,
-    use_seps = FALSE
-  ) |>
-  fmt_number(
-    columns = P_Value,
-    decimals = 4,
-    use_seps = FALSE
-  ) |>
-  cols_label(
-    Effect = "Effect Type",
-    Estimate = "Estimate",
-    CI_Lower = "CI Lower",
-    CI_Upper = "CI Upper",
-    P_Value = "p-value"
-  ) |>
-  tab_header(
-    title = "Mediation Analysis: Civilians per 100k → Clearance Rate → CSI"
-  )
-```
-
-# Mediation Analysis: Direct and Indirect Effects
-
-Simple mediation analysis examining direct and indirect effects of total personnel per 100k, proportion civilian, and proportion male on CSI, with weighted clearance rate as the mediator.
-
-# Remove Outliers
-
-```{r remove-outliers}
-# Identify outliers using Cook's distance for the full models
-# Mediator model with all three predictors
-temp_med_model <- lm(weighted_clearance_rate ~ total_personnel_per_100k + prop_civilians + prop_male + region + year_factor, 
-                     data = reg_data)
-
-# Outcome model with all three predictors  
-temp_out_model <- lm(csi ~ total_personnel_per_100k + prop_civilians + prop_male + weighted_clearance_rate + region + year_factor, 
-                     data = reg_data)
-
-# Calculate Cook's distance
-cooks_med <- cooks.distance(temp_med_model)
-cooks_out <- cooks.distance(temp_out_model)
-
-# Identify outliers (Cook's distance > 4/n)
-n <- nrow(reg_data)
-outliers <- which(cooks_med > 4/n | cooks_out > 4/n)
-
-# Remove outliers
-reg_data_clean <- reg_data[-outliers, ]
-
-cat("Original data:", nrow(reg_data), "observations<br>")
-cat("Outliers removed:", length(outliers), "<br>")
-cat("Clean data:", nrow(reg_data_clean), "observations<br>")
-```
-
-## Linear Models
-
-```{r linear-models}
-# Single mediator model with all three predictors
-linear_med_model <- lm(weighted_clearance_rate ~ total_personnel_per_100k + prop_civilians + prop_male + region + year_factor, 
-                       data = reg_data_clean)
-
-# Single outcome model with all three predictors
-linear_out_model <- lm(csi ~ total_personnel_per_100k + prop_civilians + prop_male + weighted_clearance_rate + region + year_factor, 
-                       data = reg_data_clean)
-
-cat("Linear Models Summary:<br>")
-cat("Mediator model R²:", round(summary(linear_med_model)$r.squared, 4), "<br>")
-cat("Outcome model R²:", round(summary(linear_out_model)$r.squared, 4), "<br>")
-```
-
-## Linear Mediation Analysis - Total Personnel per 100k
-
-```{r linear-mediation-total-personnel}
-# Mediation analysis for total_personnel_per_100k
-mediation_tp_linear <- mediate(linear_med_model, linear_out_model, 
-                              treat = "total_personnel_per_100k", 
-                              mediator = "weighted_clearance_rate",
-                              boot = FALSE)
-
-summary(mediation_tp_linear)
-```
-
-## Linear Mediation Analysis - Proportion Civilian
-
-```{r linear-mediation-prop-civilian}
-# Mediation analysis for prop_civilians
-mediation_pc_linear <- mediate(linear_med_model, linear_out_model, 
-                              treat = "prop_civilians", 
-                              mediator = "weighted_clearance_rate",
-                              boot = FALSE)
-
-summary(mediation_pc_linear)
-```
-
-## Linear Mediation Analysis - Proportion Male
-
-```{r linear-mediation-prop-male}
-# Mediation analysis for prop_male
-mediation_pm_linear <- mediate(linear_med_model, linear_out_model, 
-                              treat = "prop_male", 
-                              mediator = "weighted_clearance_rate",
-                              boot = FALSE)
-
-summary(mediation_pm_linear)
-```
-
-## Log-Log Models
-
-```{r log-models}
-# Single log mediator model with all three predictors
-log_med_model <- lm(log_clearance_rate ~ log_total_personnel_per_100k + log_prop_civilian + log_prop_male + region + year_factor, 
-                    data = reg_data_clean)
-
-# Single log outcome model with all three predictors
-log_out_model <- lm(log_csi ~ log_total_personnel_per_100k + log_prop_civilian + log_prop_male + log_clearance_rate + region + year_factor, 
-                    data = reg_data_clean)
-
-cat("Log-Log Models Summary:<br>")
-cat("Mediator model R²:", round(summary(log_med_model)$r.squared, 4), "<br>")
-cat("Outcome model R²:", round(summary(log_out_model)$r.squared, 4), "<br>")
-```
-
-## Log-Log Mediation Analysis - Total Personnel per 100k
-
-```{r log-mediation-total-personnel}
-# Mediation analysis for log_total_personnel_per_100k
-mediation_tp_log <- mediate(log_med_model, log_out_model, 
-                           treat = "log_total_personnel_per_100k", 
-                           mediator = "log_clearance_rate",
-                           boot = FALSE)
-
-summary(mediation_tp_log)
-```
-
-## Log-Log Mediation Analysis - Proportion Civilian
-
-```{r log-mediation-prop-civilian}
-# Mediation analysis for log_prop_civilian
-mediation_pc_log <- mediate(log_med_model, log_out_model, 
-                           treat = "log_prop_civilian", 
-                           mediator = "log_clearance_rate",
-                           boot = FALSE)
-
-summary(mediation_pc_log)
-```
-
-## Log-Log Mediation Analysis - Proportion Male
-
-```{r log-mediation-prop-male}
-# Mediation analysis for log_prop_male
-mediation_pm_log <- mediate(log_med_model, log_out_model, 
-                           treat = "log_prop_male", 
-                           mediator = "log_clearance_rate",
-                           boot = FALSE)
-
-summary(mediation_pm_log)
-```
-
-## Extract Results
-
-```{r extract-results}
-# Create results table
-results <- tibble(
-  Model = c(rep("Linear", 3), rep("Log-Log", 3)),
-  Predictor = rep(c("Total Personnel per 100k", "Proportion Civilian", "Proportion Male"), 2),
-  
-  # Indirect Effects (ACME)
-  Indirect_Effect = c(mediation_tp_linear$d0, mediation_pc_linear$d0, mediation_pm_linear$d0,
-                     mediation_tp_log$d0, mediation_pc_log$d0, mediation_pm_log$d0),
-  Indirect_pvalue = c(mediation_tp_linear$d0.p, mediation_pc_linear$d0.p, mediation_pm_linear$d0.p,
-                     mediation_tp_log$d0.p, mediation_pc_log$d0.p, mediation_pm_log$d0.p),
-  
-  # Direct Effects (ADE)  
-  Direct_Effect = c(mediation_tp_linear$z0, mediation_pc_linear$z0, mediation_pm_linear$z0,
-                   mediation_tp_log$z0, mediation_pc_log$z0, mediation_pm_log$z0),
-  Direct_pvalue = c(mediation_tp_linear$z0.p, mediation_pc_linear$z0.p, mediation_pm_linear$z0.p,
-                   mediation_tp_log$z0.p, mediation_pc_log$z0.p, mediation_pm_log$z0.p),
-  
-  # Total Effects
-  Total_Effect = c(mediation_tp_linear$tau.coef, mediation_pc_linear$tau.coef, mediation_pm_linear$tau.coef,
-                  mediation_tp_log$tau.coef, mediation_pc_log$tau.coef, mediation_pm_log$tau.coef),
-  Total_pvalue = c(mediation_tp_linear$tau.p, mediation_pc_linear$tau.p, mediation_pm_linear$tau.p,
-                  mediation_tp_log$tau.p, mediation_pc_log$tau.p, mediation_pm_log$tau.p),
-  
-  # Proportion Mediated
-  Prop_Mediated = c(mediation_tp_linear$n0, mediation_pc_linear$n0, mediation_pm_linear$n0,
-                   mediation_tp_log$n0, mediation_pc_log$n0, mediation_pm_log$n0)
-)
-
-results
-```
-
-## Results Table
-
-```{r results-table}
-results |>
-  mutate(
-    # Add significance indicators
-    Indirect_Sig = case_when(
-      Indirect_pvalue < 0.001 ~ "***",
-      Indirect_pvalue < 0.01 ~ "**", 
-      Indirect_pvalue < 0.05 ~ "*",
-      TRUE ~ ""
-    ),
-    Direct_Sig = case_when(
-      Direct_pvalue < 0.001 ~ "***",
-      Direct_pvalue < 0.01 ~ "**",
-      Direct_pvalue < 0.05 ~ "*", 
-      TRUE ~ ""
-    ),
-    Total_Sig = case_when(
-      Total_pvalue < 0.001 ~ "***",
-      Total_pvalue < 0.01 ~ "**",
-      Total_pvalue < 0.05 ~ "*",
-      TRUE ~ ""
-    )
-  ) |>
-  select(Model, Predictor, 
-         Indirect_Effect, Indirect_Sig, Indirect_pvalue,
-         Direct_Effect, Direct_Sig, Direct_pvalue, 
-         Total_Effect, Total_Sig, Total_pvalue,
-         Prop_Mediated) |>
-  gt() |>
-  tab_header(
-    title = "Mediation Analysis Results",
-    subtitle = "Direct and Indirect Effects through Weighted Clearance Rate (All Predictors in Same Models)"
-  ) |>
-  fmt_number(
-    columns = c(Indirect_Effect, Direct_Effect, Total_Effect, Prop_Mediated),
-    decimals = 4
-  ) |>
-  fmt_number(
-    columns = c(Indirect_pvalue, Direct_pvalue, Total_pvalue),
-    decimals = 4
-  ) |>
-  cols_label(
-    Indirect_Effect = "Indirect Effect",
-    Indirect_Sig = "",
-    Indirect_pvalue = "p-value",
-    Direct_Effect = "Direct Effect", 
-    Direct_Sig = "",
-    Direct_pvalue = "p-value",
-    Total_Effect = "Total Effect",
-    Total_Sig = "",
-    Total_pvalue = "p-value",
-    Prop_Mediated = "Prop. Mediated"
-  ) |>
-  tab_spanner(
-    label = "Indirect Effects",
-    columns = c(Indirect_Effect, Indirect_Sig, Indirect_pvalue)
-  ) |>
-  tab_spanner(
-    label = "Direct Effects", 
-    columns = c(Direct_Effect, Direct_Sig, Direct_pvalue)
-  ) |>
-  tab_spanner(
-    label = "Total Effects",
-    columns = c(Total_Effect, Total_Sig, Total_pvalue)
-  )
-```
-
-## Model Comparison
-
-```{r model-comparison}
-# Compare model fit between linear and log-log
-model_comparison <- tibble(
-  Model_Type = c("Linear", "Log-Log"),
-  Mediator_R2 = c(summary(linear_med_model)$r.squared, summary(log_med_model)$r.squared),
-  Outcome_R2 = c(summary(linear_out_model)$r.squared, summary(log_out_model)$r.squared),
-  Mediator_Adj_R2 = c(summary(linear_med_model)$adj.r.squared, summary(log_med_model)$adj.r.squared),
-  Outcome_Adj_R2 = c(summary(linear_out_model)$adj.r.squared, summary(log_out_model)$adj.r.squared)
-)
-
-model_comparison |>
-  gt() |>
-  tab_header(
-    title = "Model Fit Comparison",
-    subtitle = "Linear vs Log-Log Model Performance"
-  ) |>
-  fmt_number(
-    columns = c(Mediator_R2, Outcome_R2, Mediator_Adj_R2, Outcome_Adj_R2),
-    decimals = 4
-  ) |>
-  cols_label(
-    Model_Type = "Model Type",
-    Mediator_R2 = "Mediator R²",
-    Outcome_R2 = "Outcome R²",
-    Mediator_Adj_R2 = "Mediator Adj. R²",
-    Outcome_Adj_R2 = "Outcome Adj. R²"
-  )
-```
-
-## Key Findings
-
-```{r key-findings}
-cat("=== MEDIATION ANALYSIS SUMMARY ===<br><br>")
-
-cat("SIGNIFICANT INDIRECT EFFECTS (p < 0.05):<br>")
-sig_indirect <- results |> filter(Indirect_pvalue < 0.05)
-if(nrow(sig_indirect) > 0) {
-  for(i in 1:nrow(sig_indirect)) {
-    cat(sprintf("- %s (%s): %.4f (p = %.4f)<br>", 
-                sig_indirect$Predictor[i], sig_indirect$Model[i], 
-                sig_indirect$Indirect_Effect[i], sig_indirect$Indirect_pvalue[i]))
-  }
-} else {
-  cat("- None<br>")
-}
-
-cat("<br>SIGNIFICANT DIRECT EFFECTS (p < 0.05):<br>")
-sig_direct <- results |> filter(Direct_pvalue < 0.05)
-if(nrow(sig_direct) > 0) {
-  for(i in 1:nrow(sig_direct)) {
-    cat(sprintf("- %s (%s): %.4f (p = %.4f)<br>", 
-                sig_direct$Predictor[i], sig_direct$Model[i], 
-                sig_direct$Direct_Effect[i], sig_direct$Direct_pvalue[i]))
-  }
-} else {
-  cat("- None<br>")
-}
-
-cat("<br>MODEL FIT COMPARISON:<br>")
-cat(sprintf("- Linear mediator model R²: %.4f<br>", model_comparison$Mediator_R2[1]))
-cat(sprintf("- Log-Log mediator model R²: %.4f<br>", model_comparison$Mediator_R2[2]))
-cat(sprintf("- Linear outcome model R²: %.4f<br>", model_comparison$Outcome_R2[1]))
-cat(sprintf("- Log-Log outcome model R²: %.4f<br>", model_comparison$Outcome_R2[2]))
-
-if(model_comparison$Outcome_R2[2] > model_comparison$Outcome_R2[1]) {
-  cat("- Log-Log models show better fit overall<br>")
-} else {
-  cat("- Linear models show better fit overall<br>")
-}
-
-cat("<br>MEDIATION INTERPRETATION:<br>")
-for(i in 1:nrow(results)) {
-  if(!is.na(results$Prop_Mediated[i]) && is.finite(results$Prop_Mediated[i])) {
-    pct <- round(results$Prop_Mediated[i] * 100, 1)
-    cat(sprintf("- %s (%s): %.1f%% of total effect is mediated through clearance rate<br>",
-                results$Predictor[i], results$Model[i], pct))
-  }
-}
-```
-
-```{r quadratic-model}
-# linear model
-main_model <- lm(weighted_clearance_rate ~ total_personnel + officer_civilian_ratio + region + year_factor + prop_male, data = reg_data)
-# Add quadratic term to test for u-shaped relationship
-quadratic_model <- lm(weighted_clearance_rate ~ total_personnel + I(total_personnel^2) + officer_civilian_ratio + I(officer_civilian_ratio^2) + region + year_factor + prop_male + I(prop_male^2), data = reg_data)
-
-# Extract key coefficients
-quadratic_results <- tidy(quadratic_model) |>
-  filter(term %in% c("total_personnel", "I(total_personnel^2)", "officer_civilian_ratio", "I(officer_civilian_ratio^2)", "prop_male", "I(prop_male^2)"))
-
-quadratic_results
-```
-
-## Model Comparison
-
-```{r model-comparison-2}
-# Compare linear vs quadratic model fit
-linear_stats <- glance(main_model)
-quadratic_stats <- glance(quadratic_model)
-
-# F-test for significance of quadratic term
-anova_test <- anova(main_model, quadratic_model)
-
-# Display comparison
-tibble(
-  Model = c("Linear", "Quadratic"),
-  R_squared = c(linear_stats$r.squared, quadratic_stats$r.squared),
-  Adj_R_squared = c(linear_stats$adj.r.squared, quadratic_stats$adj.r.squared),
-  AIC = c(linear_stats$AIC, quadratic_stats$AIC)
-)
-
-anova_test
-```
-
-## Optimal Point Calculation
-
-```{r optimal-point}
-# Calculate turning point if quadratic relationship exists
-linear_coef <- quadratic_results |> filter(term == "officer_civilian_ratio") |> pull(estimate)
-quadratic_coef <- quadratic_results |> filter(term == "I(officer_civilian_ratio^2)") |> pull(estimate)
-
-if(abs(quadratic_coef) > 0.001) {
-  optimal_point <- -linear_coef / (2 * quadratic_coef)
-  
-  if(quadratic_coef > 0) {
-    relationship_type <- "U-shaped (minimum CSI)"
-  } else {
-    relationship_type <- "Inverted-U (maximum CSI)"
-  }
-  
-  cat("Turning point:", round(optimal_point, 2), "% civilian staff<br>")
-  cat("Relationship type:", relationship_type, "<br>")
-} else {
-  cat("No significant curvature detected<br>")
-}
-```
-
-## Visualization: Linear vs Quadratic Fits
-
-```{r comparison-plot, fig.width=10, fig.height=6}
-# Plot comparing linear and quadratic relationships
-ggplot(reg_data_no_outliers, aes(x = prop_civilians, y = csi)) +
-  geom_point(alpha = 0.6, size = 2, color = "darkblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red", linewidth = 1, 
-              aes(linetype = "Linear")) +
-  geom_smooth(method = "lm", formula = y ~ x + I(x^2), se = TRUE, 
-              color = "green", linewidth = 1, aes(linetype = "Quadratic")) +
-  scale_linetype_manual(values = c("Linear" = "dashed", "Quadratic" = "solid")) +
-  labs(
-    x = "Proportion of Civilians (%)",
-    y = "Crime Severity Index",
-    title = "Linear vs Quadratic Relationship: Civilian Proportion and CSI",
-    subtitle = paste0("Quadratic R² = ", round(quadratic_stats$r.squared, 3),
-                     " vs Linear R² = ", round(linear_stats$r.squared, 3)),
-    linetype = "Model"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.subtitle = element_text(size = 12),
-    legend.position = "bottom"
-  )
-```
-
-## Partial Regression Plot with Quadratic Fit
-
-```{r quadratic-partial-plot, fig.width=10, fig.height=6}
-# Generate residuals controlling for all other variables
-csi_controls_quad <- lm(csi ~ region + year_factor + weighted_clearance_rate + prop_male, 
-                        data = reg_data_no_outliers)
-
-reg_data_quad_residuals <- reg_data_no_outliers |>
-  ungroup() |>
-  mutate(csi_residual = residuals(csi_controls_quad))
-
-# Plot residuals vs civilian proportion with quadratic fit
-ggplot(reg_data_quad_residuals, aes(x = prop_civilians, y = csi_residual)) +
-  geom_point(alpha = 0.7, size = 1.8, color = "darkblue") +
-  geom_smooth(method = "lm", formula = y ~ x + I(x^2), se = TRUE, 
-              color = "red", linewidth = 1.2) +
-  labs(
-    x = "Proportion of Civilians (%)",
-    y = "CSI Residuals (after controlling for region, year, clearance rate & gender)",
-    title = "Quadratic Relationship: Civilian Proportion vs CSI Residuals",
-    subtitle = "Testing for U-shaped relationship after controlling for confounders"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.subtitle = element_text(size = 11)
-  )
-```
-
-## Results Summary
-
-```{r results-summary}
-# Extract specific coefficients for interpretation
-civilian_linear <- quadratic_results |> filter(term == "officer_civilian_ratio")
-civilian_quad <- quadratic_results |> filter(term == "I(officer_civilian_ratio^2)")
-
-# Create results summary
-results_summary <- tibble(
-  Term = c("Linear (prop_civilians)", "Quadratic (prop_civilians²)"),
-  Coefficient = c(civilian_linear$estimate, civilian_quad$estimate),
-  SE = c(civilian_linear$std.error, civilian_quad$std.error),
-  t_value = c(civilian_linear$statistic, civilian_quad$statistic),
-  p_value = c(civilian_linear$p.value, civilian_quad$p.value),
-  Significant = c(civilian_linear$p.value < 0.05, civilian_quad$p.value < 0.05)
-)
-
-results_summary
-```
-
-## Interpretation
-
-- **Linear Term**: β = `r round(civilian_linear$estimate, 3)` (p = `r format(civilian_linear$p.value, digits = 3, scientific = FALSE)`)
-- **Quadratic Term**: β = `r round(civilian_quad$estimate, 3)` (p = `r format(civilian_quad$p.value, digits = 3, scientific = FALSE)`)
-- **Model Improvement**: R² increases from `r round(linear_stats$r.squared, 4)` to `r round(quadratic_stats$r.squared, 4)`
-
-```{r interpretation-logic, echo=FALSE}
-if(civilian_quad$p.value < 0.05) {
-  if(civilian_quad$estimate > 0) {
-    conclusion <- "**FINDING**: Significant U-shaped relationship detected! CSI decreases then increases with civilian proportion, suggesting an optimal staffing balance."
-  } else {
-    conclusion <- "**FINDING**: Significant inverted-U relationship detected! CSI increases then decreases with civilian proportion."
-  }
-} else {
-  conclusion <- "**FINDING**: No significant curvature detected - the linear relationship appears adequate for this data."
-}
-```
-
-`r conclusion`
-
-### Policy Implications
-
-If a u-shaped relationship exists, it suggests: - **Too few civilians**: Officers overwhelmed with administrative tasks - **Optimal balance**: Efficient division of labor between enforcement and support\
-- **Too many civilians**: Insufficient officers for enforcement activities

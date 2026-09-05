@@ -11,6 +11,7 @@ project:
     - "!posts/*/app/"    # Shiny apps are deployed separately, never rendered here
     - "!_dev/"
     - "!_templates/"
+    - "!datasets/"      # shared data pipelines and exploration notebooks
   resources:
     - images/           # favicon, logo, placeholder thumbnail, social card
 

@@ -7,7 +7,9 @@ argument-hint: <slug> [data-raw|data]
 # Share data through a GitHub Release
 
 Arguments: `$ARGUMENTS` = post slug and optionally the kind (`data-raw` for raw inputs, `data` for
-big cleaned files). Default kind is `data-raw`.
+big cleaned files). Default kind is `data-raw`. Add `--dataset` when the folder is a shared dataset
+under `datasets/<slug>/` rather than a post; then pass `root = "datasets"` to every helper call
+below and the tag becomes `data-raw-dataset-<slug>-v<n>` / `data-dataset-<slug>-v<n>`.
 
 Uses `R/data_helpers.R` (`cwr_data_upload()`, `cwr_data_download()`, `cwr_data_list()`), which
 call the GitHub REST API through the `gh` and `httr2` packages. Tags follow `data-raw-<slug>-v<n>` / `data-<slug>-v<n>`.
