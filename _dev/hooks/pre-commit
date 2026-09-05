@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 # Git pre-commit hook: runs the repo safety check before every commit.
 # Installed by copying this file to .git/hooks/pre-commit (see README.md here).
+# Skips silently in worktrees that do not carry the script (e.g. the temporary
+# worktree quarto publish uses for the gh-pages branch).
 repo_root=$(git rev-parse --show-toplevel)
-bash "$repo_root/_dev/check_repo_safety.sh"
+script="$repo_root/_dev/check_repo_safety.sh"
+[ -f "$script" ] || exit 0
+bash "$script"
