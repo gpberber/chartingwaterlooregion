@@ -521,6 +521,6 @@ Code and data for this post: [`posts/kitchener-school-collisions/`](https://gith
 ```{r}
 #| label: session-info
 
-sessioninfo::session_info(pkgs = "attached")
+cwr_session_info()
 ```
 :::

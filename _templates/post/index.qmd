@@ -66,6 +66,6 @@ Code and data for this post: [`posts/{{slug}}/`](https://github.com/gpberber/cha
 #| label: session-info
 #| echo: false
 
-sessioninfo::session_info(pkgs = "attached")
+cwr_session_info()
 ```
 :::

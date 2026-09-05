@@ -202,3 +202,24 @@ cwr_caption <- function(source) {
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.
 # 3.2 mm is roughly 9 pt, the standard label size used across the templates.
 label_size <- 3.2
+
+# Session information for the Reproducibility box at the end of each post.
+# sessioninfo::session_info() would also print the pandoc and quarto install
+# paths, which expose the local user name and folder layout, so this prints
+# only what a reader needs: R version, OS, date, and attached package versions.
+cwr_session_info <- function() {
+  platform <- sessioninfo::platform_info()
+  cat(
+    "R version: ", platform$version, "\n",
+    "OS:        ", platform$os, "\n",
+    "Rendered:  ", platform$date, "\n",
+    "Quarto:    ", as.character(quarto::quarto_version()), "\n\n",
+    sep = ""
+  )
+  # as.data.frame() drops sessioninfo's print method, which would add the
+  # library path column back; keep only the informative columns
+  pkgs <- as.data.frame(sessioninfo::package_info(pkgs = "attached"))
+  pkgs <- pkgs[, c("package", "loadedversion", "date", "source")]
+  names(pkgs) <- c("package", "version", "date", "source")
+  print(pkgs, row.names = FALSE)
+}
