@@ -32,7 +32,7 @@
     "href": "reproduce.html#get-the-data-for-a-post",
     "title": "Reproduce a post",
     "section": "4. Get the data for a post",
-    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-school-collisions. The README in each post folder lists the original sources and their licences."
+    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-school-collisions. The README in each post folder lists the original sources and their licences.\nSome posts draw on a shared dataset in datasets/&lt;name&gt;/ instead of their own data folder. The post README says which. Each dataset has the same two scripts plus a README with its sources:\nsource(\"datasets/&lt;name&gt;/R/01_get_data.R\")\nsource(\"datasets/&lt;name&gt;/R/02_clean_data.R\")"
   },
   {
     "objectID": "reproduce.html#render-the-post",
