@@ -74,23 +74,23 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-schped-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="raphxdikza" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#raphxdikza table {
+<div id="lnmeqnqiri" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lnmeqnqiri table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#raphxdikza thead, #raphxdikza tbody, #raphxdikza tfoot, #raphxdikza tr, #raphxdikza td, #raphxdikza th {
+#lnmeqnqiri thead, #lnmeqnqiri tbody, #lnmeqnqiri tfoot, #lnmeqnqiri tr, #lnmeqnqiri td, #lnmeqnqiri th {
   border-style: none;
 }
 
-#raphxdikza p {
+#lnmeqnqiri p {
   margin: 0;
   padding: 0;
 }
 
-#raphxdikza .gt_table {
+#lnmeqnqiri .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -116,12 +116,12 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-left-color: #D3D3D3;
 }
 
-#raphxdikza .gt_caption {
+#lnmeqnqiri .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#raphxdikza .gt_title {
+#lnmeqnqiri .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -133,7 +133,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-bottom-width: 0;
 }
 
-#raphxdikza .gt_subtitle {
+#lnmeqnqiri .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -145,7 +145,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-top-width: 0;
 }
 
-#raphxdikza .gt_heading {
+#lnmeqnqiri .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -157,13 +157,13 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-right-color: #D3D3D3;
 }
 
-#raphxdikza .gt_bottom_border {
+#lnmeqnqiri .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#raphxdikza .gt_col_headings {
+#lnmeqnqiri .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -178,7 +178,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-right-color: #D3D3D3;
 }
 
-#raphxdikza .gt_col_heading {
+#lnmeqnqiri .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -198,7 +198,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   overflow-x: hidden;
 }
 
-#raphxdikza .gt_column_spanner_outer {
+#lnmeqnqiri .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -210,15 +210,15 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 4px;
 }
 
-#raphxdikza .gt_column_spanner_outer:first-child {
+#lnmeqnqiri .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#raphxdikza .gt_column_spanner_outer:last-child {
+#lnmeqnqiri .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#raphxdikza .gt_column_spanner {
+#lnmeqnqiri .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -230,11 +230,11 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   width: 100%;
 }
 
-#raphxdikza .gt_spanner_row {
+#lnmeqnqiri .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#raphxdikza .gt_group_heading {
+#lnmeqnqiri .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -260,7 +260,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   text-align: left;
 }
 
-#raphxdikza .gt_empty_group_heading {
+#lnmeqnqiri .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -275,15 +275,15 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   vertical-align: middle;
 }
 
-#raphxdikza .gt_from_md > :first-child {
+#lnmeqnqiri .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#raphxdikza .gt_from_md > :last-child {
+#lnmeqnqiri .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#raphxdikza .gt_row {
+#lnmeqnqiri .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -302,7 +302,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   overflow-x: hidden;
 }
 
-#raphxdikza .gt_stub {
+#lnmeqnqiri .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -315,7 +315,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 5px;
 }
 
-#raphxdikza .gt_stub_row_group {
+#lnmeqnqiri .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -329,15 +329,15 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   vertical-align: top;
 }
 
-#raphxdikza .gt_row_group_first td {
+#lnmeqnqiri .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#raphxdikza .gt_row_group_first th {
+#lnmeqnqiri .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#raphxdikza .gt_summary_row {
+#lnmeqnqiri .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -347,16 +347,16 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 5px;
 }
 
-#raphxdikza .gt_first_summary_row {
+#lnmeqnqiri .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#raphxdikza .gt_first_summary_row.thick {
+#lnmeqnqiri .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#raphxdikza .gt_last_summary_row {
+#lnmeqnqiri .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -366,7 +366,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-bottom-color: #D3D3D3;
 }
 
-#raphxdikza .gt_grand_summary_row {
+#lnmeqnqiri .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -376,7 +376,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 5px;
 }
 
-#raphxdikza .gt_first_grand_summary_row {
+#lnmeqnqiri .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -386,7 +386,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-top-color: #D3D3D3;
 }
 
-#raphxdikza .gt_last_grand_summary_row_top {
+#lnmeqnqiri .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -396,11 +396,11 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-bottom-color: #D3D3D3;
 }
 
-#raphxdikza .gt_striped {
+#lnmeqnqiri .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#raphxdikza .gt_table_body {
+#lnmeqnqiri .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -409,7 +409,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-bottom-color: #D3D3D3;
 }
 
-#raphxdikza .gt_footnotes {
+#lnmeqnqiri .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -423,7 +423,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-right-color: #D3D3D3;
 }
 
-#raphxdikza .gt_footnote {
+#lnmeqnqiri .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -432,7 +432,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 5px;
 }
 
-#raphxdikza .gt_sourcenotes {
+#lnmeqnqiri .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -446,7 +446,7 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   border-right-color: #D3D3D3;
 }
 
-#raphxdikza .gt_sourcenote {
+#lnmeqnqiri .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -454,72 +454,72 @@ Figure&nbsp;2: Pedestrian collisions by the type of traffic control at the locat
   padding-right: 5px;
 }
 
-#raphxdikza .gt_left {
+#lnmeqnqiri .gt_left {
   text-align: left;
 }
 
-#raphxdikza .gt_center {
+#lnmeqnqiri .gt_center {
   text-align: center;
 }
 
-#raphxdikza .gt_right {
+#lnmeqnqiri .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#raphxdikza .gt_font_normal {
+#lnmeqnqiri .gt_font_normal {
   font-weight: normal;
 }
 
-#raphxdikza .gt_font_bold {
+#lnmeqnqiri .gt_font_bold {
   font-weight: bold;
 }
 
-#raphxdikza .gt_font_italic {
+#lnmeqnqiri .gt_font_italic {
   font-style: italic;
 }
 
-#raphxdikza .gt_super {
+#lnmeqnqiri .gt_super {
   font-size: 65%;
 }
 
-#raphxdikza .gt_footnote_marks {
+#lnmeqnqiri .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#raphxdikza .gt_asterisk {
+#lnmeqnqiri .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#raphxdikza .gt_indent_1 {
+#lnmeqnqiri .gt_indent_1 {
   text-indent: 5px;
 }
 
-#raphxdikza .gt_indent_2 {
+#lnmeqnqiri .gt_indent_2 {
   text-indent: 10px;
 }
 
-#raphxdikza .gt_indent_3 {
+#lnmeqnqiri .gt_indent_3 {
   text-indent: 15px;
 }
 
-#raphxdikza .gt_indent_4 {
+#lnmeqnqiri .gt_indent_4 {
   text-indent: 20px;
 }
 
-#raphxdikza .gt_indent_5 {
+#lnmeqnqiri .gt_indent_5 {
   text-indent: 25px;
 }
 
-#raphxdikza .katex-display {
+#lnmeqnqiri .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#raphxdikza div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lnmeqnqiri div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -652,23 +652,23 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-all-coll-near-sch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="bjqzdnktqr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bjqzdnktqr table {
+<div id="hcdvltcday" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hcdvltcday table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bjqzdnktqr thead, #bjqzdnktqr tbody, #bjqzdnktqr tfoot, #bjqzdnktqr tr, #bjqzdnktqr td, #bjqzdnktqr th {
+#hcdvltcday thead, #hcdvltcday tbody, #hcdvltcday tfoot, #hcdvltcday tr, #hcdvltcday td, #hcdvltcday th {
   border-style: none;
 }
 
-#bjqzdnktqr p {
+#hcdvltcday p {
   margin: 0;
   padding: 0;
 }
 
-#bjqzdnktqr .gt_table {
+#hcdvltcday .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -694,12 +694,12 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-left-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_caption {
+#hcdvltcday .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bjqzdnktqr .gt_title {
+#hcdvltcday .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -711,7 +711,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-bottom-width: 0;
 }
 
-#bjqzdnktqr .gt_subtitle {
+#hcdvltcday .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -723,7 +723,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-top-width: 0;
 }
 
-#bjqzdnktqr .gt_heading {
+#hcdvltcday .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -735,13 +735,13 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-right-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_bottom_border {
+#hcdvltcday .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_col_headings {
+#hcdvltcday .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -756,7 +756,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-right-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_col_heading {
+#hcdvltcday .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -776,7 +776,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   overflow-x: hidden;
 }
 
-#bjqzdnktqr .gt_column_spanner_outer {
+#hcdvltcday .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -788,15 +788,15 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 4px;
 }
 
-#bjqzdnktqr .gt_column_spanner_outer:first-child {
+#hcdvltcday .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bjqzdnktqr .gt_column_spanner_outer:last-child {
+#hcdvltcday .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bjqzdnktqr .gt_column_spanner {
+#hcdvltcday .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -808,11 +808,11 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   width: 100%;
 }
 
-#bjqzdnktqr .gt_spanner_row {
+#hcdvltcday .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bjqzdnktqr .gt_group_heading {
+#hcdvltcday .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -838,7 +838,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   text-align: left;
 }
 
-#bjqzdnktqr .gt_empty_group_heading {
+#hcdvltcday .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -853,15 +853,15 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   vertical-align: middle;
 }
 
-#bjqzdnktqr .gt_from_md > :first-child {
+#hcdvltcday .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bjqzdnktqr .gt_from_md > :last-child {
+#hcdvltcday .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bjqzdnktqr .gt_row {
+#hcdvltcday .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -880,7 +880,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   overflow-x: hidden;
 }
 
-#bjqzdnktqr .gt_stub {
+#hcdvltcday .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -893,7 +893,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 5px;
 }
 
-#bjqzdnktqr .gt_stub_row_group {
+#hcdvltcday .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -907,15 +907,15 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   vertical-align: top;
 }
 
-#bjqzdnktqr .gt_row_group_first td {
+#hcdvltcday .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bjqzdnktqr .gt_row_group_first th {
+#hcdvltcday .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bjqzdnktqr .gt_summary_row {
+#hcdvltcday .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -925,16 +925,16 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 5px;
 }
 
-#bjqzdnktqr .gt_first_summary_row {
+#hcdvltcday .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_first_summary_row.thick {
+#hcdvltcday .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bjqzdnktqr .gt_last_summary_row {
+#hcdvltcday .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -944,7 +944,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-bottom-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_grand_summary_row {
+#hcdvltcday .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -954,7 +954,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 5px;
 }
 
-#bjqzdnktqr .gt_first_grand_summary_row {
+#hcdvltcday .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -964,7 +964,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-top-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_last_grand_summary_row_top {
+#hcdvltcday .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -974,11 +974,11 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-bottom-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_striped {
+#hcdvltcday .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bjqzdnktqr .gt_table_body {
+#hcdvltcday .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -987,7 +987,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-bottom-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_footnotes {
+#hcdvltcday .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1001,7 +1001,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-right-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_footnote {
+#hcdvltcday .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1010,7 +1010,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 5px;
 }
 
-#bjqzdnktqr .gt_sourcenotes {
+#hcdvltcday .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1024,7 +1024,7 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   border-right-color: #D3D3D3;
 }
 
-#bjqzdnktqr .gt_sourcenote {
+#hcdvltcday .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1032,72 +1032,72 @@ Figure&nbsp;4: Pedestrian collisions within 250 m of a school, by traffic contro
   padding-right: 5px;
 }
 
-#bjqzdnktqr .gt_left {
+#hcdvltcday .gt_left {
   text-align: left;
 }
 
-#bjqzdnktqr .gt_center {
+#hcdvltcday .gt_center {
   text-align: center;
 }
 
-#bjqzdnktqr .gt_right {
+#hcdvltcday .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bjqzdnktqr .gt_font_normal {
+#hcdvltcday .gt_font_normal {
   font-weight: normal;
 }
 
-#bjqzdnktqr .gt_font_bold {
+#hcdvltcday .gt_font_bold {
   font-weight: bold;
 }
 
-#bjqzdnktqr .gt_font_italic {
+#hcdvltcday .gt_font_italic {
   font-style: italic;
 }
 
-#bjqzdnktqr .gt_super {
+#hcdvltcday .gt_super {
   font-size: 65%;
 }
 
-#bjqzdnktqr .gt_footnote_marks {
+#hcdvltcday .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bjqzdnktqr .gt_asterisk {
+#hcdvltcday .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bjqzdnktqr .gt_indent_1 {
+#hcdvltcday .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bjqzdnktqr .gt_indent_2 {
+#hcdvltcday .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bjqzdnktqr .gt_indent_3 {
+#hcdvltcday .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bjqzdnktqr .gt_indent_4 {
+#hcdvltcday .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bjqzdnktqr .gt_indent_5 {
+#hcdvltcday .gt_indent_5 {
   text-indent: 25px;
 }
 
-#bjqzdnktqr .katex-display {
+#hcdvltcday .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#bjqzdnktqr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#hcdvltcday div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1636,23 +1636,23 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-by-day-type-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="pealhkndfk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#pealhkndfk table {
+<div id="pcmapjkggw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#pcmapjkggw table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#pealhkndfk thead, #pealhkndfk tbody, #pealhkndfk tfoot, #pealhkndfk tr, #pealhkndfk td, #pealhkndfk th {
+#pcmapjkggw thead, #pcmapjkggw tbody, #pcmapjkggw tfoot, #pcmapjkggw tr, #pcmapjkggw td, #pcmapjkggw th {
   border-style: none;
 }
 
-#pealhkndfk p {
+#pcmapjkggw p {
   margin: 0;
   padding: 0;
 }
 
-#pealhkndfk .gt_table {
+#pcmapjkggw .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1678,12 +1678,12 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-left-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_caption {
+#pcmapjkggw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#pealhkndfk .gt_title {
+#pcmapjkggw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1695,7 +1695,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-bottom-width: 0;
 }
 
-#pealhkndfk .gt_subtitle {
+#pcmapjkggw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1707,7 +1707,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-top-width: 0;
 }
 
-#pealhkndfk .gt_heading {
+#pcmapjkggw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1719,13 +1719,13 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-right-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_bottom_border {
+#pcmapjkggw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_col_headings {
+#pcmapjkggw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1740,7 +1740,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-right-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_col_heading {
+#pcmapjkggw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1760,7 +1760,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   overflow-x: hidden;
 }
 
-#pealhkndfk .gt_column_spanner_outer {
+#pcmapjkggw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1772,15 +1772,15 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 4px;
 }
 
-#pealhkndfk .gt_column_spanner_outer:first-child {
+#pcmapjkggw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pealhkndfk .gt_column_spanner_outer:last-child {
+#pcmapjkggw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pealhkndfk .gt_column_spanner {
+#pcmapjkggw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1792,11 +1792,11 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   width: 100%;
 }
 
-#pealhkndfk .gt_spanner_row {
+#pcmapjkggw .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#pealhkndfk .gt_group_heading {
+#pcmapjkggw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1822,7 +1822,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   text-align: left;
 }
 
-#pealhkndfk .gt_empty_group_heading {
+#pcmapjkggw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1837,15 +1837,15 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   vertical-align: middle;
 }
 
-#pealhkndfk .gt_from_md > :first-child {
+#pcmapjkggw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pealhkndfk .gt_from_md > :last-child {
+#pcmapjkggw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pealhkndfk .gt_row {
+#pcmapjkggw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1864,7 +1864,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   overflow-x: hidden;
 }
 
-#pealhkndfk .gt_stub {
+#pcmapjkggw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1877,7 +1877,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 5px;
 }
 
-#pealhkndfk .gt_stub_row_group {
+#pcmapjkggw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1891,15 +1891,15 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   vertical-align: top;
 }
 
-#pealhkndfk .gt_row_group_first td {
+#pcmapjkggw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#pealhkndfk .gt_row_group_first th {
+#pcmapjkggw .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#pealhkndfk .gt_summary_row {
+#pcmapjkggw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1909,16 +1909,16 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 5px;
 }
 
-#pealhkndfk .gt_first_summary_row {
+#pcmapjkggw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_first_summary_row.thick {
+#pcmapjkggw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#pealhkndfk .gt_last_summary_row {
+#pcmapjkggw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1928,7 +1928,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-bottom-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_grand_summary_row {
+#pcmapjkggw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1938,7 +1938,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 5px;
 }
 
-#pealhkndfk .gt_first_grand_summary_row {
+#pcmapjkggw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1948,7 +1948,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-top-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_last_grand_summary_row_top {
+#pcmapjkggw .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1958,11 +1958,11 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-bottom-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_striped {
+#pcmapjkggw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pealhkndfk .gt_table_body {
+#pcmapjkggw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1971,7 +1971,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-bottom-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_footnotes {
+#pcmapjkggw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1985,7 +1985,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-right-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_footnote {
+#pcmapjkggw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1994,7 +1994,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 5px;
 }
 
-#pealhkndfk .gt_sourcenotes {
+#pcmapjkggw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2008,7 +2008,7 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   border-right-color: #D3D3D3;
 }
 
-#pealhkndfk .gt_sourcenote {
+#pcmapjkggw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2016,72 +2016,72 @@ Table&nbsp;2: Collisions of any kind within 250 m of a school on school days, 6 
   padding-right: 5px;
 }
 
-#pealhkndfk .gt_left {
+#pcmapjkggw .gt_left {
   text-align: left;
 }
 
-#pealhkndfk .gt_center {
+#pcmapjkggw .gt_center {
   text-align: center;
 }
 
-#pealhkndfk .gt_right {
+#pcmapjkggw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pealhkndfk .gt_font_normal {
+#pcmapjkggw .gt_font_normal {
   font-weight: normal;
 }
 
-#pealhkndfk .gt_font_bold {
+#pcmapjkggw .gt_font_bold {
   font-weight: bold;
 }
 
-#pealhkndfk .gt_font_italic {
+#pcmapjkggw .gt_font_italic {
   font-style: italic;
 }
 
-#pealhkndfk .gt_super {
+#pcmapjkggw .gt_super {
   font-size: 65%;
 }
 
-#pealhkndfk .gt_footnote_marks {
+#pcmapjkggw .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#pealhkndfk .gt_asterisk {
+#pcmapjkggw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#pealhkndfk .gt_indent_1 {
+#pcmapjkggw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#pealhkndfk .gt_indent_2 {
+#pcmapjkggw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#pealhkndfk .gt_indent_3 {
+#pcmapjkggw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#pealhkndfk .gt_indent_4 {
+#pcmapjkggw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#pealhkndfk .gt_indent_5 {
+#pcmapjkggw .gt_indent_5 {
   text-indent: 25px;
 }
 
-#pealhkndfk .katex-display {
+#pcmapjkggw .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#pealhkndfk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#pcmapjkggw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2273,23 +2273,23 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-colls-per-day-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="zngzlcyrvi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#zngzlcyrvi table {
+<div id="kzwkzvgyhj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kzwkzvgyhj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#zngzlcyrvi thead, #zngzlcyrvi tbody, #zngzlcyrvi tfoot, #zngzlcyrvi tr, #zngzlcyrvi td, #zngzlcyrvi th {
+#kzwkzvgyhj thead, #kzwkzvgyhj tbody, #kzwkzvgyhj tfoot, #kzwkzvgyhj tr, #kzwkzvgyhj td, #kzwkzvgyhj th {
   border-style: none;
 }
 
-#zngzlcyrvi p {
+#kzwkzvgyhj p {
   margin: 0;
   padding: 0;
 }
 
-#zngzlcyrvi .gt_table {
+#kzwkzvgyhj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2315,12 +2315,12 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-left-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_caption {
+#kzwkzvgyhj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#zngzlcyrvi .gt_title {
+#kzwkzvgyhj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2332,7 +2332,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-bottom-width: 0;
 }
 
-#zngzlcyrvi .gt_subtitle {
+#kzwkzvgyhj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2344,7 +2344,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-top-width: 0;
 }
 
-#zngzlcyrvi .gt_heading {
+#kzwkzvgyhj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2356,13 +2356,13 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-right-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_bottom_border {
+#kzwkzvgyhj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_col_headings {
+#kzwkzvgyhj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2377,7 +2377,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-right-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_col_heading {
+#kzwkzvgyhj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2397,7 +2397,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   overflow-x: hidden;
 }
 
-#zngzlcyrvi .gt_column_spanner_outer {
+#kzwkzvgyhj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2409,15 +2409,15 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 4px;
 }
 
-#zngzlcyrvi .gt_column_spanner_outer:first-child {
+#kzwkzvgyhj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zngzlcyrvi .gt_column_spanner_outer:last-child {
+#kzwkzvgyhj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zngzlcyrvi .gt_column_spanner {
+#kzwkzvgyhj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2429,11 +2429,11 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   width: 100%;
 }
 
-#zngzlcyrvi .gt_spanner_row {
+#kzwkzvgyhj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#zngzlcyrvi .gt_group_heading {
+#kzwkzvgyhj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2459,7 +2459,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   text-align: left;
 }
 
-#zngzlcyrvi .gt_empty_group_heading {
+#kzwkzvgyhj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2474,15 +2474,15 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   vertical-align: middle;
 }
 
-#zngzlcyrvi .gt_from_md > :first-child {
+#kzwkzvgyhj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zngzlcyrvi .gt_from_md > :last-child {
+#kzwkzvgyhj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zngzlcyrvi .gt_row {
+#kzwkzvgyhj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2501,7 +2501,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   overflow-x: hidden;
 }
 
-#zngzlcyrvi .gt_stub {
+#kzwkzvgyhj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2514,7 +2514,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 5px;
 }
 
-#zngzlcyrvi .gt_stub_row_group {
+#kzwkzvgyhj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2528,15 +2528,15 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   vertical-align: top;
 }
 
-#zngzlcyrvi .gt_row_group_first td {
+#kzwkzvgyhj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#zngzlcyrvi .gt_row_group_first th {
+#kzwkzvgyhj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#zngzlcyrvi .gt_summary_row {
+#kzwkzvgyhj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2546,16 +2546,16 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 5px;
 }
 
-#zngzlcyrvi .gt_first_summary_row {
+#kzwkzvgyhj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_first_summary_row.thick {
+#kzwkzvgyhj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#zngzlcyrvi .gt_last_summary_row {
+#kzwkzvgyhj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2565,7 +2565,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-bottom-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_grand_summary_row {
+#kzwkzvgyhj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2575,7 +2575,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 5px;
 }
 
-#zngzlcyrvi .gt_first_grand_summary_row {
+#kzwkzvgyhj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2585,7 +2585,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-top-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_last_grand_summary_row_top {
+#kzwkzvgyhj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2595,11 +2595,11 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-bottom-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_striped {
+#kzwkzvgyhj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zngzlcyrvi .gt_table_body {
+#kzwkzvgyhj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2608,7 +2608,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-bottom-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_footnotes {
+#kzwkzvgyhj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2622,7 +2622,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-right-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_footnote {
+#kzwkzvgyhj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2631,7 +2631,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 5px;
 }
 
-#zngzlcyrvi .gt_sourcenotes {
+#kzwkzvgyhj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2645,7 +2645,7 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   border-right-color: #D3D3D3;
 }
 
-#zngzlcyrvi .gt_sourcenote {
+#kzwkzvgyhj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2653,72 +2653,72 @@ Table&nbsp;3: Collisions within 250 m of a school by type of day and time of day
   padding-right: 5px;
 }
 
-#zngzlcyrvi .gt_left {
+#kzwkzvgyhj .gt_left {
   text-align: left;
 }
 
-#zngzlcyrvi .gt_center {
+#kzwkzvgyhj .gt_center {
   text-align: center;
 }
 
-#zngzlcyrvi .gt_right {
+#kzwkzvgyhj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zngzlcyrvi .gt_font_normal {
+#kzwkzvgyhj .gt_font_normal {
   font-weight: normal;
 }
 
-#zngzlcyrvi .gt_font_bold {
+#kzwkzvgyhj .gt_font_bold {
   font-weight: bold;
 }
 
-#zngzlcyrvi .gt_font_italic {
+#kzwkzvgyhj .gt_font_italic {
   font-style: italic;
 }
 
-#zngzlcyrvi .gt_super {
+#kzwkzvgyhj .gt_super {
   font-size: 65%;
 }
 
-#zngzlcyrvi .gt_footnote_marks {
+#kzwkzvgyhj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#zngzlcyrvi .gt_asterisk {
+#kzwkzvgyhj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#zngzlcyrvi .gt_indent_1 {
+#kzwkzvgyhj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#zngzlcyrvi .gt_indent_2 {
+#kzwkzvgyhj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#zngzlcyrvi .gt_indent_3 {
+#kzwkzvgyhj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#zngzlcyrvi .gt_indent_4 {
+#kzwkzvgyhj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#zngzlcyrvi .gt_indent_5 {
+#kzwkzvgyhj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#zngzlcyrvi .katex-display {
+#kzwkzvgyhj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#zngzlcyrvi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#kzwkzvgyhj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2856,23 +2856,23 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-by-nearness-to-school-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="suwjilqlog" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#suwjilqlog table {
+<div id="lxptzupsol" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lxptzupsol table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#suwjilqlog thead, #suwjilqlog tbody, #suwjilqlog tfoot, #suwjilqlog tr, #suwjilqlog td, #suwjilqlog th {
+#lxptzupsol thead, #lxptzupsol tbody, #lxptzupsol tfoot, #lxptzupsol tr, #lxptzupsol td, #lxptzupsol th {
   border-style: none;
 }
 
-#suwjilqlog p {
+#lxptzupsol p {
   margin: 0;
   padding: 0;
 }
 
-#suwjilqlog .gt_table {
+#lxptzupsol .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2898,12 +2898,12 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-left-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_caption {
+#lxptzupsol .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#suwjilqlog .gt_title {
+#lxptzupsol .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2915,7 +2915,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-bottom-width: 0;
 }
 
-#suwjilqlog .gt_subtitle {
+#lxptzupsol .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2927,7 +2927,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-top-width: 0;
 }
 
-#suwjilqlog .gt_heading {
+#lxptzupsol .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2939,13 +2939,13 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-right-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_bottom_border {
+#lxptzupsol .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_col_headings {
+#lxptzupsol .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2960,7 +2960,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-right-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_col_heading {
+#lxptzupsol .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2980,7 +2980,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   overflow-x: hidden;
 }
 
-#suwjilqlog .gt_column_spanner_outer {
+#lxptzupsol .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2992,15 +2992,15 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 4px;
 }
 
-#suwjilqlog .gt_column_spanner_outer:first-child {
+#lxptzupsol .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#suwjilqlog .gt_column_spanner_outer:last-child {
+#lxptzupsol .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#suwjilqlog .gt_column_spanner {
+#lxptzupsol .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3012,11 +3012,11 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   width: 100%;
 }
 
-#suwjilqlog .gt_spanner_row {
+#lxptzupsol .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#suwjilqlog .gt_group_heading {
+#lxptzupsol .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3042,7 +3042,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   text-align: left;
 }
 
-#suwjilqlog .gt_empty_group_heading {
+#lxptzupsol .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3057,15 +3057,15 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   vertical-align: middle;
 }
 
-#suwjilqlog .gt_from_md > :first-child {
+#lxptzupsol .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#suwjilqlog .gt_from_md > :last-child {
+#lxptzupsol .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#suwjilqlog .gt_row {
+#lxptzupsol .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3084,7 +3084,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   overflow-x: hidden;
 }
 
-#suwjilqlog .gt_stub {
+#lxptzupsol .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3097,7 +3097,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 5px;
 }
 
-#suwjilqlog .gt_stub_row_group {
+#lxptzupsol .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3111,15 +3111,15 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   vertical-align: top;
 }
 
-#suwjilqlog .gt_row_group_first td {
+#lxptzupsol .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#suwjilqlog .gt_row_group_first th {
+#lxptzupsol .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#suwjilqlog .gt_summary_row {
+#lxptzupsol .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3129,16 +3129,16 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 5px;
 }
 
-#suwjilqlog .gt_first_summary_row {
+#lxptzupsol .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_first_summary_row.thick {
+#lxptzupsol .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#suwjilqlog .gt_last_summary_row {
+#lxptzupsol .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3148,7 +3148,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-bottom-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_grand_summary_row {
+#lxptzupsol .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3158,7 +3158,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 5px;
 }
 
-#suwjilqlog .gt_first_grand_summary_row {
+#lxptzupsol .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3168,7 +3168,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-top-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_last_grand_summary_row_top {
+#lxptzupsol .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3178,11 +3178,11 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-bottom-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_striped {
+#lxptzupsol .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#suwjilqlog .gt_table_body {
+#lxptzupsol .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3191,7 +3191,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-bottom-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_footnotes {
+#lxptzupsol .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3205,7 +3205,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-right-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_footnote {
+#lxptzupsol .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3214,7 +3214,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 5px;
 }
 
-#suwjilqlog .gt_sourcenotes {
+#lxptzupsol .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3228,7 +3228,7 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   border-right-color: #D3D3D3;
 }
 
-#suwjilqlog .gt_sourcenote {
+#lxptzupsol .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3236,72 +3236,72 @@ Table&nbsp;4: Collisions per day within 250 m of a school, by type of day and ti
   padding-right: 5px;
 }
 
-#suwjilqlog .gt_left {
+#lxptzupsol .gt_left {
   text-align: left;
 }
 
-#suwjilqlog .gt_center {
+#lxptzupsol .gt_center {
   text-align: center;
 }
 
-#suwjilqlog .gt_right {
+#lxptzupsol .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#suwjilqlog .gt_font_normal {
+#lxptzupsol .gt_font_normal {
   font-weight: normal;
 }
 
-#suwjilqlog .gt_font_bold {
+#lxptzupsol .gt_font_bold {
   font-weight: bold;
 }
 
-#suwjilqlog .gt_font_italic {
+#lxptzupsol .gt_font_italic {
   font-style: italic;
 }
 
-#suwjilqlog .gt_super {
+#lxptzupsol .gt_super {
   font-size: 65%;
 }
 
-#suwjilqlog .gt_footnote_marks {
+#lxptzupsol .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#suwjilqlog .gt_asterisk {
+#lxptzupsol .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#suwjilqlog .gt_indent_1 {
+#lxptzupsol .gt_indent_1 {
   text-indent: 5px;
 }
 
-#suwjilqlog .gt_indent_2 {
+#lxptzupsol .gt_indent_2 {
   text-indent: 10px;
 }
 
-#suwjilqlog .gt_indent_3 {
+#lxptzupsol .gt_indent_3 {
   text-indent: 15px;
 }
 
-#suwjilqlog .gt_indent_4 {
+#lxptzupsol .gt_indent_4 {
   text-indent: 20px;
 }
 
-#suwjilqlog .gt_indent_5 {
+#lxptzupsol .gt_indent_5 {
   text-indent: 25px;
 }
 
-#suwjilqlog .katex-display {
+#lxptzupsol .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#suwjilqlog div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lxptzupsol div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3446,23 +3446,23 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-colls-per-day-by-proximity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="dfkiegjqyt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#dfkiegjqyt table {
+<div id="lypxljptjf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lypxljptjf table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#dfkiegjqyt thead, #dfkiegjqyt tbody, #dfkiegjqyt tfoot, #dfkiegjqyt tr, #dfkiegjqyt td, #dfkiegjqyt th {
+#lypxljptjf thead, #lypxljptjf tbody, #lypxljptjf tfoot, #lypxljptjf tr, #lypxljptjf td, #lypxljptjf th {
   border-style: none;
 }
 
-#dfkiegjqyt p {
+#lypxljptjf p {
   margin: 0;
   padding: 0;
 }
 
-#dfkiegjqyt .gt_table {
+#lypxljptjf .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3488,12 +3488,12 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-left-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_caption {
+#lypxljptjf .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#dfkiegjqyt .gt_title {
+#lypxljptjf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3505,7 +3505,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-bottom-width: 0;
 }
 
-#dfkiegjqyt .gt_subtitle {
+#lypxljptjf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3517,7 +3517,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-top-width: 0;
 }
 
-#dfkiegjqyt .gt_heading {
+#lypxljptjf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3529,13 +3529,13 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-right-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_bottom_border {
+#lypxljptjf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_col_headings {
+#lypxljptjf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3550,7 +3550,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-right-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_col_heading {
+#lypxljptjf .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3570,7 +3570,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   overflow-x: hidden;
 }
 
-#dfkiegjqyt .gt_column_spanner_outer {
+#lypxljptjf .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3582,15 +3582,15 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 4px;
 }
 
-#dfkiegjqyt .gt_column_spanner_outer:first-child {
+#lypxljptjf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dfkiegjqyt .gt_column_spanner_outer:last-child {
+#lypxljptjf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dfkiegjqyt .gt_column_spanner {
+#lypxljptjf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3602,11 +3602,11 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   width: 100%;
 }
 
-#dfkiegjqyt .gt_spanner_row {
+#lypxljptjf .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#dfkiegjqyt .gt_group_heading {
+#lypxljptjf .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3632,7 +3632,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   text-align: left;
 }
 
-#dfkiegjqyt .gt_empty_group_heading {
+#lypxljptjf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3647,15 +3647,15 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   vertical-align: middle;
 }
 
-#dfkiegjqyt .gt_from_md > :first-child {
+#lypxljptjf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dfkiegjqyt .gt_from_md > :last-child {
+#lypxljptjf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dfkiegjqyt .gt_row {
+#lypxljptjf .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3674,7 +3674,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   overflow-x: hidden;
 }
 
-#dfkiegjqyt .gt_stub {
+#lypxljptjf .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3687,7 +3687,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 5px;
 }
 
-#dfkiegjqyt .gt_stub_row_group {
+#lypxljptjf .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3701,15 +3701,15 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   vertical-align: top;
 }
 
-#dfkiegjqyt .gt_row_group_first td {
+#lypxljptjf .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dfkiegjqyt .gt_row_group_first th {
+#lypxljptjf .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#dfkiegjqyt .gt_summary_row {
+#lypxljptjf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3719,16 +3719,16 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 5px;
 }
 
-#dfkiegjqyt .gt_first_summary_row {
+#lypxljptjf .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_first_summary_row.thick {
+#lypxljptjf .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dfkiegjqyt .gt_last_summary_row {
+#lypxljptjf .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3738,7 +3738,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-bottom-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_grand_summary_row {
+#lypxljptjf .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3748,7 +3748,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 5px;
 }
 
-#dfkiegjqyt .gt_first_grand_summary_row {
+#lypxljptjf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3758,7 +3758,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-top-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_last_grand_summary_row_top {
+#lypxljptjf .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3768,11 +3768,11 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-bottom-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_striped {
+#lypxljptjf .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dfkiegjqyt .gt_table_body {
+#lypxljptjf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3781,7 +3781,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-bottom-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_footnotes {
+#lypxljptjf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3795,7 +3795,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-right-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_footnote {
+#lypxljptjf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3804,7 +3804,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 5px;
 }
 
-#dfkiegjqyt .gt_sourcenotes {
+#lypxljptjf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3818,7 +3818,7 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   border-right-color: #D3D3D3;
 }
 
-#dfkiegjqyt .gt_sourcenote {
+#lypxljptjf .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3826,72 +3826,72 @@ Table&nbsp;5: Collisions on regular school days by school proximity and time of 
   padding-right: 5px;
 }
 
-#dfkiegjqyt .gt_left {
+#lypxljptjf .gt_left {
   text-align: left;
 }
 
-#dfkiegjqyt .gt_center {
+#lypxljptjf .gt_center {
   text-align: center;
 }
 
-#dfkiegjqyt .gt_right {
+#lypxljptjf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dfkiegjqyt .gt_font_normal {
+#lypxljptjf .gt_font_normal {
   font-weight: normal;
 }
 
-#dfkiegjqyt .gt_font_bold {
+#lypxljptjf .gt_font_bold {
   font-weight: bold;
 }
 
-#dfkiegjqyt .gt_font_italic {
+#lypxljptjf .gt_font_italic {
   font-style: italic;
 }
 
-#dfkiegjqyt .gt_super {
+#lypxljptjf .gt_super {
   font-size: 65%;
 }
 
-#dfkiegjqyt .gt_footnote_marks {
+#lypxljptjf .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#dfkiegjqyt .gt_asterisk {
+#lypxljptjf .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dfkiegjqyt .gt_indent_1 {
+#lypxljptjf .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dfkiegjqyt .gt_indent_2 {
+#lypxljptjf .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dfkiegjqyt .gt_indent_3 {
+#lypxljptjf .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dfkiegjqyt .gt_indent_4 {
+#lypxljptjf .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dfkiegjqyt .gt_indent_5 {
+#lypxljptjf .gt_indent_5 {
   text-indent: 25px;
 }
 
-#dfkiegjqyt .katex-display {
+#lypxljptjf .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#dfkiegjqyt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lypxljptjf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3994,8 +3994,8 @@ Table&nbsp;6: Collisions per regular school day by school proximity and time of 
 <div id="fig-map-collisions" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-map-collisions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="leaflet html-widget html-fill-item" id="htmlwidget-c2e7a131aa20dcbbd2c1" style="width:100%;height:406px;"></div>
-<script type="application/json" data-for="htmlwidget-c2e7a131aa20dcbbd2c1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addCircleMarkers","args":[[43.4200926,43.407401,43.48279435,43.38474885,43.4444278,43.4619039,43.4451825,43.41335555,43.4428724,43.4540155,43.38714255,43.41490885,43.43921975,43.4252264,43.42594295,43.44404375,43.41048335,43.45655415,43.3718994,43.44231905,43.4300125,43.39407745,43.3984278,43.4393139,43.3840899,43.38750873141032,43.42009274999999,43.4084771,43.45423335,43.4555829,43.4523849,43.4176059,43.4657256,43.45960925,43.4187273,43.4184178,43.41986505,43.3967845,43.46897535,43.4301204,43.43372214999999,43.43957025,43.4287303,43.45655415,43.4489905,43.4327259,43.44701135,43.4545164,43.4291513,43.42893205,43.4512039,43.43405989999999,43.4483141,43.43383655,43.44878215,43.39369025000001,43.4204653,43.42064825,43.4258691,43.46774785,43.3926099,43.45344765,43.45218635,43.43648805,43.4174238,43.4065353,43.41933385,43.4493292,43.4027144,43.42597615],[-80.48073988317654,-80.48360968785599,-80.48666451523832,-80.45538689508561,-80.48169635843578,-80.44667797642393,-80.41411500815191,-80.47072698544071,-80.48902349891235,-80.44196626374642,-80.42078687802726,-80.53682872984814,-80.45894365959595,-80.52282822639316,-80.50654684887172,-80.44721852094926,-80.49143732171149,-80.43678110602693,-80.439414460644,-80.52386793846287,-80.42953964214641,-80.46607334573369,-80.48194487503022,-80.50437457598599,-80.43943399368025,-80.48523648777457,-80.54665349005109,-80.51255170681014,-80.50702386344551,-80.50900287030169,-80.41847735077803,-80.5027895793489,-80.44751310353621,-80.48983037208485,-80.52701806685407,-80.49277094587332,-80.47863491141305,-80.44372428192447,-80.49111720911139,-80.4855199588219,-80.51125766489162,-80.54613569108241,-80.46336958478244,-80.43678110602693,-80.41183658143837,-80.54390469177656,-80.47184812876462,-80.46165275367684,-80.51851283923051,-80.44560320272623,-80.47018390136591,-80.49142270283606,-80.4478973273295,-80.54042064982094,-80.50951778476119,-80.45054899828011,-80.5316646375,-80.46776869343864,-80.51688476613764,-80.4876731293018,-80.43733731001443,-80.44823075357635,-80.48249472429079,-80.45100592377618,-80.49598627725761,-80.51609874274064,-80.5349551616786,-80.52155894197145,-80.50398061060531,-80.45367645796043],[10.66666666666667,8.888888888888889,8.666666666666666,9.111111111111111,15.33333333333333,8,8.222222222222221,8.666666666666666,9.111111111111111,8.888888888888889,9.333333333333334,10,8.888888888888889,8.222222222222221,10,9.333333333333334,9.555555555555555,9.111111111111111,8.444444444444445,8.444444444444445,9.111111111111111,15.33333333333333,8.444444444444445,11.77777777777778,9.333333333333334,11.77777777777778,8.888888888888889,11.55555555555556,14.22222222222222,20,8.666666666666666,8.222222222222221,8,13.77777777777778,9.777777777777779,8,9.555555555555555,15.33333333333333,8.888888888888889,12.44444444444444,9.333333333333334,9.111111111111111,9.333333333333334,9.111111111111111,9.111111111111111,8.888888888888889,9.333333333333334,9.777777777777779,10,8.666666666666666,8.888888888888889,14.22222222222222,9.333333333333334,8.444444444444445,12.22222222222222,8.666666666666666,10.66666666666667,11.11111111111111,8.888888888888889,8.888888888888889,10.88888888888889,8.888888888888889,11.33333333333333,9.111111111111111,8.888888888888889,10.44444444444444,8.666666666666666,11.11111111111111,12.66666666666667,10.22222222222222],null,null,{"interactive":true,"className":"","stroke":true,"color":"#2B83BA","weight":2,"opacity":0.5,"fill":true,"fillColor":"#2B83BA","fillOpacity":0.6},{"showCoverageOnHover":true,"zoomToBoundsOnClick":true,"spiderfyOnMaxZoom":true,"removeOutsideVisibleBounds":true,"spiderLegPolylineOptions":{"weight":1.5,"color":"#222","opacity":0.5},"freezeAtZoom":false,"maxClusterRadius":25,"iconCreateFunction":"\n          function(cluster) {\n            var count = cluster.getChildCount();\n            var size = Math.min(count * 5 + 20, 50);  // Scale size with count\n            return L.divIcon({\n              html: '<div style=\"background-color: #2B83BA; color: white; border-radius: 50%; width: ' + size + 'px; height: ' + size + 'px; line-height: ' + size + 'px; text-align: center; font-weight: bold;\">' + count + '<\/div>',\n              className: 'marker-cluster',\n              iconSize: L.point(size, size)\n            });\n          }\n        "},null,["<strong>Alpine Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>Blessed Sacrament<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Bridgeport Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Brigadoon Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Cameron Heights Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 4<br/>\n     Other collisions: 30","<strong>Canadian Martyrs<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 1","<strong>Chicopee Hills Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Country Hills Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Courtland Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Crestview Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Doon Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 6","<strong>Driftwood Park Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>Eastwood Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Forest Heights Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Forest Hill Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>Franklin Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Glencairn Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 8","<strong>Grand River Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Groh Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>Hillside Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 2","<strong>Howard Robertson Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Huron Heights Secondary School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 33","<strong>Huron Natural Area Outdoor Environmental Education Centre<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>J F Carmichael Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 18","<strong>J W Gerth Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Jean Steckle Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 18","<strong>John Darling Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>John Sweeney<\/strong><br/>\n     Pedestrian collisions: 4<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>King Edward Public School<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 27","<strong>Kitchener-Waterloo Collegiate & Vocational School<\/strong><br/>\n     Pedestrian collisions: 4<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 51","<strong>Lackner Woods Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Laurentian Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Mackenzie King Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 0","<strong>Margaret Avenue Senior Public School<\/strong><br/>\n     Pedestrian collisions: 3<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 23","<strong>Meadowlane Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 9","<strong>Monsignor R.M. Haller<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 1","<strong>Our Lady of Grace<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 8","<strong>Pioneer Park Public School<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 31","<strong>Prueter Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Queen Elizabeth Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 21","<strong>Queensmount Senior Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Resurrection Catholic Secondary School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Rockway Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Rosemount School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Saint John Paul II<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Sandhills Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Sheppard Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Smithson Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 8","<strong>Southridge Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>St. Aloysius<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>St. Anne Kit<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>St. Bernadette<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 28","<strong>St. Daniel<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>St. Dominic Savio<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>St. John<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 20","<strong>St. Kateri Tekakwitha<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>St. Mark<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>St. Mary's High School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 15","<strong>St. Paul<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>St. Teresa Kitchener<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>St. Timothy<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>Stanley Park Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Suddaby Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 16","<strong>Sunnyside Senior Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Trillium Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>W T Townshend Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 11","<strong>Westheights Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Westmount Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 14","<strong>Williamsburg Public School<\/strong><br/>\n     Pedestrian collisions: 3<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 19","<strong>Wilson Avenue Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10"],null,["Alpine Public School","Blessed Sacrament","Bridgeport Public School","Brigadoon Public School","Cameron Heights Collegiate Institute","Canadian Martyrs","Chicopee Hills Public School","Country Hills Public School","Courtland Senior Public School","Crestview Public School","Doon Public School","Driftwood Park Public School","Eastwood Collegiate Institute","Forest Heights Collegiate Institute","Forest Hill Public School","Franklin Public School","Glencairn Public School","Grand River Collegiate Institute","Groh Public School","Hillside Public School","Howard Robertson Public School","Huron Heights Secondary School","Huron Natural Area Outdoor Environmental Education Centre","J F Carmichael Public School","J W Gerth Public School","Jean Steckle Public School","John Darling Public School","John Sweeney","King Edward Public School","Kitchener-Waterloo Collegiate &amp; Vocational School","Lackner Woods Public School","Laurentian Senior Public School","Mackenzie King Public School","Margaret Avenue Senior Public School","Meadowlane Public School","Monsignor R.M. Haller","Our Lady of Grace","Pioneer Park Public School","Prueter Public School","Queen Elizabeth Public School","Queensmount Senior Public School","Resurrection Catholic Secondary School","Rockway Public School","Rosemount School","Saint John Paul II","Sandhills Public School","Sheppard Public School","Smithson Public School","Southridge Public School","St. Aloysius","St. Anne Kit","St. Bernadette","St. Daniel","St. Dominic Savio","St. John","St. Kateri Tekakwitha","St. Mark","St. Mary's High School","St. Paul","St. Teresa Kitchener","St. Timothy","Stanley Park Senior Public School","Suddaby Public School","Sunnyside Senior Public School","Trillium Public School","W T Townshend Public School","Westheights Public School","Westmount Public School","Williamsburg Public School","Wilson Avenue Public School"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"15px","textOnly":false,"style":{"font-weight":"normal","padding":"3px 8px"},"className":"","sticky":true},null]}],"limits":{"lat":[43.3718994,43.48279435],"lng":[-80.54665349005109,-80.41183658143837]}},"evals":["calls.1.args.6.iconCreateFunction"],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-309de86332e06a6749b7" style="width:100%;height:406px;"></div>
+<script type="application/json" data-for="htmlwidget-309de86332e06a6749b7">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addCircleMarkers","args":[[43.4200926,43.407401,43.48279435,43.38474885,43.4444278,43.4619039,43.4451825,43.41335555,43.4428724,43.4540155,43.38714255,43.41490885,43.43921975,43.4252264,43.42594295,43.44404375,43.41048335,43.45655415,43.3718994,43.44231905,43.4300125,43.39407745,43.3984278,43.4393139,43.3840899,43.38750873141032,43.42009274999999,43.4084771,43.45423335,43.4555829,43.4523849,43.4176059,43.4657256,43.45960925,43.4187273,43.4184178,43.41986505,43.3967845,43.46897535,43.4301204,43.43372214999999,43.43957025,43.4287303,43.45655415,43.4489905,43.4327259,43.44701135,43.4545164,43.4291513,43.42893205,43.4512039,43.43405989999999,43.4483141,43.43383655,43.44878215,43.39369025000001,43.4204653,43.42064825,43.4258691,43.46774785,43.3926099,43.45344765,43.45218635,43.43648805,43.4174238,43.4065353,43.41933385,43.4493292,43.4027144,43.42597615],[-80.48073988317654,-80.48360968785599,-80.48666451523832,-80.45538689508561,-80.48169635843578,-80.44667797642393,-80.41411500815191,-80.47072698544071,-80.48902349891235,-80.44196626374642,-80.42078687802726,-80.53682872984814,-80.45894365959595,-80.52282822639316,-80.50654684887172,-80.44721852094926,-80.49143732171149,-80.43678110602693,-80.439414460644,-80.52386793846287,-80.42953964214641,-80.46607334573369,-80.48194487503022,-80.50437457598599,-80.43943399368025,-80.48523648777457,-80.54665349005109,-80.51255170681014,-80.50702386344551,-80.50900287030169,-80.41847735077803,-80.5027895793489,-80.44751310353621,-80.48983037208485,-80.52701806685407,-80.49277094587332,-80.47863491141305,-80.44372428192447,-80.49111720911139,-80.4855199588219,-80.51125766489162,-80.54613569108241,-80.46336958478244,-80.43678110602693,-80.41183658143837,-80.54390469177656,-80.47184812876462,-80.46165275367684,-80.51851283923051,-80.44560320272623,-80.47018390136591,-80.49142270283606,-80.4478973273295,-80.54042064982094,-80.50951778476119,-80.45054899828011,-80.5316646375,-80.46776869343864,-80.51688476613764,-80.4876731293018,-80.43733731001443,-80.44823075357635,-80.48249472429079,-80.45100592377618,-80.49598627725761,-80.51609874274064,-80.5349551616786,-80.52155894197145,-80.50398061060531,-80.45367645796043],[10.66666666666667,8.888888888888889,8.666666666666666,9.111111111111111,15.33333333333333,8,8.222222222222221,8.666666666666666,9.111111111111111,8.888888888888889,9.333333333333334,10,8.888888888888889,8.222222222222221,10,9.333333333333334,9.555555555555555,9.111111111111111,8.444444444444445,8.444444444444445,9.111111111111111,15.33333333333333,8.444444444444445,11.77777777777778,9.333333333333334,11.77777777777778,8.888888888888889,11.55555555555556,14.22222222222222,20,8.666666666666666,8.222222222222221,8,13.77777777777778,9.777777777777779,8,9.555555555555555,15.33333333333333,8.888888888888889,12.44444444444444,9.333333333333334,9.111111111111111,9.333333333333334,9.111111111111111,9.111111111111111,8.888888888888889,9.333333333333334,9.777777777777779,10,8.666666666666666,8.888888888888889,14.22222222222222,9.333333333333334,8.444444444444445,12.22222222222222,8.666666666666666,10.66666666666667,11.11111111111111,8.888888888888889,8.888888888888889,10.88888888888889,8.888888888888889,11.33333333333333,9.111111111111111,8.888888888888889,10.44444444444444,8.666666666666666,11.11111111111111,12.66666666666667,10.22222222222222],null,null,{"interactive":true,"className":"","stroke":true,"color":"#2B83BA","weight":2,"opacity":0.5,"fill":true,"fillColor":"#2B83BA","fillOpacity":0.6},{"showCoverageOnHover":true,"zoomToBoundsOnClick":true,"spiderfyOnMaxZoom":true,"removeOutsideVisibleBounds":true,"spiderLegPolylineOptions":{"weight":1.5,"color":"#222","opacity":0.5},"freezeAtZoom":false,"maxClusterRadius":25,"iconCreateFunction":"\n          function(cluster) {\n            var count = cluster.getChildCount();\n            var size = Math.min(count * 5 + 20, 50);  // Scale size with count\n            return L.divIcon({\n              html: '<div style=\"background-color: #2B83BA; color: white; border-radius: 50%; width: ' + size + 'px; height: ' + size + 'px; line-height: ' + size + 'px; text-align: center; font-weight: bold;\">' + count + '<\/div>',\n              className: 'marker-cluster',\n              iconSize: L.point(size, size)\n            });\n          }\n        "},null,["<strong>Alpine Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>Blessed Sacrament<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Bridgeport Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Brigadoon Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Cameron Heights Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 4<br/>\n     Other collisions: 30","<strong>Canadian Martyrs<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 1","<strong>Chicopee Hills Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Country Hills Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Courtland Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Crestview Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Doon Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 6","<strong>Driftwood Park Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>Eastwood Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Forest Heights Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Forest Hill Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>Franklin Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Glencairn Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 8","<strong>Grand River Collegiate Institute<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Groh Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>Hillside Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 2","<strong>Howard Robertson Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Huron Heights Secondary School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 33","<strong>Huron Natural Area Outdoor Environmental Education Centre<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>J F Carmichael Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 18","<strong>J W Gerth Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Jean Steckle Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 18","<strong>John Darling Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>John Sweeney<\/strong><br/>\n     Pedestrian collisions: 4<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>King Edward Public School<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 27","<strong>Kitchener-Waterloo Collegiate & Vocational School<\/strong><br/>\n     Pedestrian collisions: 4<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 51","<strong>Lackner Woods Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Laurentian Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 2","<strong>Mackenzie King Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 0","<strong>Margaret Avenue Senior Public School<\/strong><br/>\n     Pedestrian collisions: 3<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 23","<strong>Meadowlane Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 9","<strong>Monsignor R.M. Haller<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 1","<strong>Our Lady of Grace<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 8","<strong>Pioneer Park Public School<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 31","<strong>Prueter Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Queen Elizabeth Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 21","<strong>Queensmount Senior Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Resurrection Catholic Secondary School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Rockway Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>Rosemount School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Saint John Paul II<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Sandhills Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Sheppard Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 6","<strong>Smithson Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 8","<strong>Southridge Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10","<strong>St. Aloysius<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>St. Anne Kit<\/strong><br/>\n     Pedestrian collisions: 2<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>St. Bernadette<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 28","<strong>St. Daniel<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 7","<strong>St. Dominic Savio<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 3","<strong>St. John<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 20","<strong>St. Kateri Tekakwitha<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>St. Mark<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>St. Mary's High School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 15","<strong>St. Paul<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>St. Teresa Kitchener<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>St. Timothy<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 13","<strong>Stanley Park Senior Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Suddaby Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 16","<strong>Sunnyside Senior Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>Trillium Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 5","<strong>W T Townshend Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 11","<strong>Westheights Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 4","<strong>Westmount Public School<\/strong><br/>\n     Pedestrian collisions: 0<br/>\n     Cyclist collisions: 1<br/>\n     Other collisions: 14","<strong>Williamsburg Public School<\/strong><br/>\n     Pedestrian collisions: 3<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 19","<strong>Wilson Avenue Public School<\/strong><br/>\n     Pedestrian collisions: 1<br/>\n     Cyclist collisions: 0<br/>\n     Other collisions: 10"],null,["Alpine Public School","Blessed Sacrament","Bridgeport Public School","Brigadoon Public School","Cameron Heights Collegiate Institute","Canadian Martyrs","Chicopee Hills Public School","Country Hills Public School","Courtland Senior Public School","Crestview Public School","Doon Public School","Driftwood Park Public School","Eastwood Collegiate Institute","Forest Heights Collegiate Institute","Forest Hill Public School","Franklin Public School","Glencairn Public School","Grand River Collegiate Institute","Groh Public School","Hillside Public School","Howard Robertson Public School","Huron Heights Secondary School","Huron Natural Area Outdoor Environmental Education Centre","J F Carmichael Public School","J W Gerth Public School","Jean Steckle Public School","John Darling Public School","John Sweeney","King Edward Public School","Kitchener-Waterloo Collegiate &amp; Vocational School","Lackner Woods Public School","Laurentian Senior Public School","Mackenzie King Public School","Margaret Avenue Senior Public School","Meadowlane Public School","Monsignor R.M. Haller","Our Lady of Grace","Pioneer Park Public School","Prueter Public School","Queen Elizabeth Public School","Queensmount Senior Public School","Resurrection Catholic Secondary School","Rockway Public School","Rosemount School","Saint John Paul II","Sandhills Public School","Sheppard Public School","Smithson Public School","Southridge Public School","St. Aloysius","St. Anne Kit","St. Bernadette","St. Daniel","St. Dominic Savio","St. John","St. Kateri Tekakwitha","St. Mark","St. Mary's High School","St. Paul","St. Teresa Kitchener","St. Timothy","Stanley Park Senior Public School","Suddaby Public School","Sunnyside Senior Public School","Trillium Public School","W T Townshend Public School","Westheights Public School","Westmount Public School","Williamsburg Public School","Wilson Avenue Public School"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"15px","textOnly":false,"style":{"font-weight":"normal","padding":"3px 8px"},"className":"","sticky":true},null]}],"limits":{"lat":[43.3718994,43.48279435],"lng":[-80.54665349005109,-80.41183658143837]}},"evals":["calls.1.args.6.iconCreateFunction"],"jsHooks":[]}</script>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-map-collisions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;5: Collisions within 250 m of a school on regular school days, 6 AM to 6 PM.
@@ -4028,49 +4028,34 @@ Figure&nbsp;5: Collisions within 250 m of a school on regular school days, 6 AM 
 <p>Code and data for this post: <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-school-collisions"><code>posts/kitchener-school-collisions/</code></a> on GitHub. See <a href="../../reproduce.html">Reproduce a post</a> for the steps.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>─ Session info ───────────────────────────────────────────────────────────────
- setting  value
- version  R version 4.5.3 (2026-03-11 ucrt)
- os       Windows 11 x64 (build 26200)
- system   x86_64, mingw32
- ui       RTerm
- language (EN)
- collate  English_Canada.utf8
- ctype    English_Canada.utf8
- tz       America/Toronto
- date     2026-09-05
- pandoc   3.7.0.2 @ C:/Users/gregb/AppData/Local/Pandoc/ (via rmarkdown)
- quarto   1.9.38 @ C:\\PROGRA~1\\Quarto\\bin\\quarto.exe
+<pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
+OS:        Windows 11 x64 (build 26200)
+Rendered:  2026-09-05
+Quarto:    1.9.38
 
-─ Packages ───────────────────────────────────────────────────────────────────
- package    * version date (UTC) lib source
- conflicted * 1.2.0   2023-02-01 [1] CRAN (R 4.2.3)
- dplyr      * 1.2.1   2026-04-03 [1] CRAN (R 4.5.2)
- forcats    * 1.0.1   2025-09-25 [1] CRAN (R 4.5.3)
- geosphere  * 1.6-8   2026-04-05 [1] CRAN (R 4.5.3)
- ggplot2    * 4.0.3   2026-04-22 [1] CRAN (R 4.5.3)
- ggtext     * 0.1.2   2022-09-16 [1] CRAN (R 4.4.3)
- gt         * 1.3.0   2026-01-22 [1] CRAN (R 4.5.3)
- gtExtras   * 0.6.2   2026-01-17 [1] CRAN (R 4.5.3)
- here       * 1.0.2   2025-09-15 [1] CRAN (R 4.5.3)
- janitor    * 2.2.1   2024-12-22 [1] CRAN (R 4.5.3)
- leaflet    * 2.2.3   2025-09-04 [1] CRAN (R 4.5.1)
- lubridate  * 1.9.5   2026-02-04 [1] CRAN (R 4.5.3)
- patchwork  * 1.3.2   2025-08-25 [1] CRAN (R 4.4.3)
- purrr      * 1.2.2   2026-04-10 [1] CRAN (R 4.5.2)
- readr      * 2.2.0   2026-02-19 [1] CRAN (R 4.5.3)
- rvest      * 1.0.5   2025-08-29 [1] CRAN (R 4.5.1)
- scales     * 1.4.0   2025-04-24 [1] CRAN (R 4.5.3)
- sf         * 1.1-2   2026-07-23 [1] CRAN (R 4.5.3)
- stringr    * 1.6.0   2025-11-04 [1] CRAN (R 4.5.3)
- tibble     * 3.3.1   2026-01-11 [1] CRAN (R 4.5.2)
- tidyr      * 1.3.2   2025-12-19 [1] CRAN (R 4.5.3)
- tidyverse  * 2.0.0   2023-02-22 [1] CRAN (R 4.5.2)
-
- [1] C:/R/R-4.5.3/library
- * ── Packages attached to the search path.
-
-──────────────────────────────────────────────────────────────────────────────</code></pre>
+    package version       date         source
+ conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)
+      dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)
+    forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)
+  geosphere   1.6-8 2026-04-05 CRAN (R 4.5.3)
+    ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)
+     ggtext   0.1.2 2022-09-16 CRAN (R 4.4.3)
+         gt   1.3.0 2026-01-22 CRAN (R 4.5.3)
+   gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)
+       here   1.0.2 2025-09-15 CRAN (R 4.5.3)
+    janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)
+    leaflet   2.2.3 2025-09-04 CRAN (R 4.5.1)
+  lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)
+  patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)
+      purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)
+      readr   2.2.0 2026-02-19 CRAN (R 4.5.3)
+      rvest   1.0.5 2025-08-29 CRAN (R 4.5.1)
+     scales   1.4.0 2025-04-24 CRAN (R 4.5.3)
+         sf   1.1-2 2026-07-23 CRAN (R 4.5.3)
+    stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)
+     tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)
+      tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)
+  tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)</code></pre>
 </div>
 </div>
 </div>
