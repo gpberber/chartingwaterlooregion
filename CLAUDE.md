@@ -42,6 +42,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Secrets: none in the repo. Read keys with `Sys.getenv()` from `~/.Renviron`. The pre-commit hook
   (`_dev/check_repo_safety.sh`) blocks big files and key-like strings; never bypass it.
 - Git: single `master` branch, commit via `/save`, never force-push, never rewrite history.
+- Licence: code is MIT (`LICENSE`), text and charts are CC BY 4.0 (`LICENSE-CONTENT.md`), set
+  site-wide by `license: "CC BY"` in `posts/_metadata.yml`. Data is never relicensed: every post
+  README must name each source's own licence, and material obtained by request (not from an
+  open-data portal) needs its terms checked before it goes into a release.
 - Drafts: new posts start `draft: true`; `draft-mode: gone` keeps them off the public site.
   Only `/publish` flips a post live, after `/review-post`.
 - Do not change `_quarto.yml` theme or `custom.scss` palette without asking; the palette must stay

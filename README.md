@@ -32,6 +32,6 @@ attached to this repo. No API keys are needed.
 
 ## Licence
 
-<!-- TODO: choose a licence. Common choice: MIT for code, CC BY 4.0 for text and charts. -->
-Licence to be confirmed. Reuse with attribution to Charting Waterloo Region is welcome.
-Data files keep the licence of their original source, listed in each post's README.
+- **Code** (R scripts, Quarto config, styling, templates): [MIT](LICENSE).
+- **Text, charts, and images**: [CC BY 4.0](LICENSE-CONTENT.md). Reuse freely with credit to Charting Waterloo Region.
+- **Data files** keep the licence of their original source, listed in each post's README.

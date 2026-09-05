@@ -5,6 +5,10 @@ title-block-banner: true
 author: "Greg Berberich"
 date-modified: last-modified
 
+# Adds a "Reuse" box with the CC BY badge at the end of every post.
+# Text and charts are CC BY 4.0; code is MIT (see LICENSE and LICENSE-CONTENT.md).
+license: "CC BY"
+
 # Posts show prose, charts, and tables, not code. Readers who want the code use
 # the "view source" link in the page header or clone the repo (see reproduce.qmd).
 execute:

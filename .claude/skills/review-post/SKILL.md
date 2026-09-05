@@ -49,7 +49,10 @@ For every `ggplot` chunk:
 - `R/01_get_data.R` recreates everything in `data-raw/` (download or `cwr_data_download()`), and
   `R/02_clean_data.R` recreates everything in `data/`.
 - No file over 25 MB in `data/` unless it is in `.gitignore` and in a release.
-- README lists each source with URL, licence, and access date.
+- README lists each source with URL, licence, and access date. The licence must be the source's own
+  (e.g. Statistics Canada Open Licence, Open Government Licence – Kitchener), never "CC BY" or "MIT";
+  files obtained by request rather than from an open-data portal need their terms confirmed.
+- The post does not override `license:` in its YAML (site default is CC BY, set in `posts/_metadata.yml`).
 - The post ends with the Reproducibility callout (session info, links).
 - No `Sys.getenv()` secret is required, or the README says which and how to get it.
 
