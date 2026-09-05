@@ -1,0 +1,8 @@
+---
+title: "Page not found"
+toc: false
+---
+
+That page does not exist, or the post has moved.
+
+Go back to the [list of posts](index.qmd) or use the search box in the menu bar.

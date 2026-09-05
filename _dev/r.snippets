@@ -1,0 +1,2606 @@
+snippet lib
+	library(${1:package})
+
+snippet req
+	require(${1:package})
+
+snippet src
+	source("${1:file.R}")
+
+snippet ret
+	return(${1:code})
+
+snippet if
+	if (${1:condition}) {
+		${0}
+	}
+
+snippet el
+	else {
+		${0}
+	}
+
+snippet ei
+	else if (${1:condition}) {
+		${0}
+	}
+
+snippet fun
+	${1:name} <- function(${2:variables}) {
+		${0}
+	}
+
+snippet for
+	for (${1:variable} in ${2:vector}) {
+		${0}
+	}
+
+snippet while
+	while (${1:condition}) {
+		${0}
+	}
+
+snippet switch
+	switch (${1:object},
+		${2:case} = ${3:action}
+	)
+
+snippet shinyapp
+	library(shiny)
+	
+	ui <- fluidPage(
+	  ${0}
+	)
+	
+	server <- function(input, output, session) {
+	  
+	}
+	
+	shinyApp(ui, server)
+
+snippet shinymod
+	${1:name}UI <- function(id) {
+	  ns <- NS(id)
+	  tagList(
+		${0}
+	  )
+	}
+	
+	${1:name}Server <- function(id) {
+	  moduleServer(
+	    id,
+	    function(input, output, session) {
+	      
+	    }
+	  )
+	}
+
+snippet ggtitles
+	labs(
+		title = "${1:Title}",
+		subtitle = "${2:Subtitle}",
+		caption = "Source: ${3:Source} | *Charting Waterloo Region*"
+	) +
+
+snippet ggscalex_cont
+	scale_x_continuous(
+	  #limits = c(min, max),
+	  #breaks = c(min, max, by), end_max),
+	  labels = label_number(scale = ${4:1}, suffix = "${5:}", big.mark = ""),
+	  #minor_breaks = seq(min, max, 1),
+	  expand = expansion(mult = c(0.02, 0.05)),
+	  position = "${7:bottom}"
+	) +
+	guides(x = guide_axis(minor.ticks = TRUE)) +
+
+snippet ggscaley_cont
+	scale_y_continuous(
+	  #limits = c(${1:min}, ${2:max}),
+	  breaks = c(seq(${1:min}, ${2:max}, ${3:by}), ${2:max}),
+	  labels = label_number(scale = ${4:1}, suffix = "${5:}", big.mark = ","),
+	  #minor_breaks = seq(${1:min}, ${2:max}, ${6:1}),
+	  expand = expansion(mult = c(0.0, 0.05)),
+	  position = "right"
+	) +
+
+snippet ggscalex_date
+	# x_min and x_max must be defined before using this scale
+	scale_x_date(
+	  # Option 1: automatic breaks
+	  date_breaks = "${1:5 years}",
+	  # Option 2: manual breaks anchored to data start - comment out date_breaks above
+	  # breaks = c(
+	  #   x_min,   # change if want start at different date
+	  #   seq.Date(
+	  #     as.Date(paste0(year(x_min) + ${2:5}, "-01-01")),  # adjust month/day number if first date isn't in January 1
+	  #     x_max,   # change if want start at different date
+	  #     by = "${2:5} years"
+	  # )),
+	  date_labels = "${3:%Y}",
+	  # Option 1: automatic breaks
+	  date_minor_breaks = "${4:1 year}",
+	  # Option 2: manual breaks anchored to desired start - comment out date_breaks above
+	  #minor_breaks = seq.Date(
+		  #  as.Date("min_minor_date"),
+		  #  as.Date("max_minor_date"),
+		  #  by = "1 years"
+		#),
+	  expand = expansion(mult = c(0.02, 0.05))
+	) +
+	guides(x = guide_axis(minor.ticks = TRUE)) +
+
+snippet ggscalex_disc
+	scale_x_discrete(
+	  #limits = c("${1:level1}", "${2:level2}"),  # use to reorder or restrict levels
+	  labels = c(
+	    "${1:level1}" = "${3:label1}",
+	    "${2:level2}" = "${4:label2}"
+	  ),
+	  expand = expansion(mult = c(0.05, 0.05)),
+	  position = "${5:bottom}"
+	) +
+
+snippet ggscaley_disc
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	# y_labels <- plot_data |> select(y_variable, y_label) |> deframe()
+	scale_y_discrete(
+	  #limits = c("${1:level1}", "${2:level2}"),  # use to reorder or restrict levels
+	  labels = y_labels,
+	  expand = expansion(mult = c(0.05, 0.05)),
+	  position = "left"
+	) +
+	theme(
+	  axis.text.y.left = element_markdown()
+	) +
+
+snippet ggscale_color
+	# adjust number of colors/names to suit data
+	scale_color_manual(
+		values = set_names(
+			manual_5_colours, 
+			c(
+				"${1:group1}", 
+				"${2:group2}", 
+				"${3:group3}",
+				"${4:group4}",
+				"${5:group5}"
+			)
+		),
+		#guide = "none"    # uncomment if want no legend
+	) +
+
+snippet ggscale_fill
+	# adjust number of colors/names to suit data
+	scale_fill_manual(
+		values = set_names(
+			manual_5_colours, 
+			c(
+				"${1:group1}", 
+				"${2:group2}", 
+				"${3:group3}",
+				"${4:group4}",
+				"${5:group5}"
+			)
+		),
+		#guide = "none"    # uncomment if want no legend
+	) +
+
+snippet ggviridis
+	scale_${1:color}_viridis_${2:d}(name = "${3:Legend title}")
+
+snippet gglegend
+	theme(
+		legend.position = "inside",
+		  legend.position.inside = c(-0.0, 1.02),
+		  legend.justification = "left",
+		  legend.box = "horizontal",
+		  #legend.margin = margin(t = 20, b = 20),
+		  legend.direction = "horizontal",
+		  legend.title = element_blank(),
+		  legend.text = element_text(
+		    size = base_size * 0.8,
+		    margin = margin(r = 10)
+		  ),
+		  #legend.key = element_blank(),
+		  legend.spacing = unit(0.1, "cm"),
+		  legend.box.spacing = unit(0.1, "cm")
+	) +
+
+snippet ggfacet
+	facet_wrap(
+		~ ${1:variable},
+		ncol = ${2:3},
+		scales = "${3:free_y}"
+	) +
+	
+snippet ggannotate
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	annotate(
+		"${1:text}",
+		x = ${2:x_position}, 
+		y = ${3:y_position},  
+		# If have discrete y labels but a continuous y axis, use line below
+		# y = plot_data |> filter(discrete_y == "y_label") |> pull(cont_y_variable),
+		hjust = 0,    # left-justified at x position
+		vjust = 0.5,  # centre-aligned at y positionn
+		label = "${4:Annotation text}",
+		size = ${5:3.2},
+		fontface = "bold",
+		color = "${6:grey30}"
+	) +
+	
+snippet gggridx
+	theme(
+		axis.line.x = element_blank(),
+		axis.ticks.x = element_blank(),
+		axis.text.x = element_text(margin = margin(t = 0, b = 1)),
+		panel.grid.major.x = element_line(
+			color = cowboysilver, 
+			linewidth = 0.3
+		)
+	) +
+	
+snippet ggguides
+	guides(x = guide_axis(minor.ticks = TRUE)) +
+
+snippet ggsave
+	ggsave(
+		filename = here("${1:output}", "${2:plot_name}.png"),
+		width = ${3:8}, 
+		height = ${4:6},
+		dpi = 300,
+		bg = "white"
+	) +
+
+snippet	ggvertbar_text
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning 
+	geom_text(
+	  data = \(x) filter(x, filter_var == "filter_value"),  # filter if want to label subset of stacked bars
+	  aes(label = comma(value_var, accuracy = 1), y = y_value),
+	  color = "white",
+	  size = 3.2
+	) +
+
+snippet gggeom_text
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	geom_text(
+	  aes(
+	    x = ${1:x_variable},
+	    y = ${2:y_variable},
+	    label = ${3:label_variable}
+	  ),
+	  colour = "${4:grey30}",
+	  size = ${5:3.2},
+	  fontface = "${6:plain}",      # plain, bold, italic, bold.italic
+	  hjust = ${7:0.5},             # 0 = left, 0.5 = centre, 1 = right
+	  vjust = ${8:0.5},             # 0 = bottom, 0.5 = centre, 1 = top
+	  nudge_x = ${9:0},
+	  nudge_y = ${10:0},
+	  angle = ${11:0},
+	  lineheight = ${12:1.2},       # for multi-line labels via \n
+	  na.rm = TRUE,
+	  inherit.aes = ${13:FALSE}
+	) +
+
+snippet gglabel
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	geom_label(
+	  aes(
+	    x = ${1:x_variable},
+	    y = ${2:y_variable},
+	    label = ${3:label_variable}
+	  ),
+	  colour = "${4:grey30}",        # text colour
+	  fill = "${5:white}",          # box background colour
+	  linewidth = ${6:0},           # box border width; 0 = no border
+	  size = ${7:3.2},
+	  fontface = "${8:plain}",      # plain, bold, italic, bold.italic
+	  hjust = ${9:0.5},             # 0 = left, 0.5 = centre, 1 = right
+	  vjust = ${10:0.5},            # 0 = bottom, 0.5 = centre, 1 = top
+	  nudge_x = ${11:0},
+	  nudge_y = ${12:0},
+	  label.padding = unit(${13:0.25}, "lines"),  # internal padding around text
+	  label.r = unit(${14:0.15}, "lines"),        # corner radius; 0 = square corners
+	  na.rm = TRUE,
+	  inherit.aes = ${15:FALSE}
+	) +
+	
+snippet ggyaxis_break_label
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Axis break indicator - squiggly line below lowest y gridline
+	# Indicates y axis does not start at zero
+	#annotate(
+	#  "text",
+	#  x = Inf,
+	#  y = label_y,    # set to halfway between lowest y break and min y limit
+	#  label = "~",  
+	#  colour = "grey30",
+	#  hjust = 1.0,  # adjust to suit regular axis labels above (> 0.5 shifts left)
+	#  vjust = 0.5,  # centered at y position set above
+	#  size = 6      # adjust if needed
+	#) +
+	
+	# needed if squiggly is clipped at panel edge
+	#coord_cartesian(clip = "off") +
+		  
+snippet ggcolours
+	# set custom colours and colour groups
+	habsred <- "#AF1E2D"
+	habsred50 <- prismatic::clr_mix(habsred, "white", ratio = 0.5)
+	cowboysilver <- "#869397"
+	cowboysilver50 <- prismatic::clr_mix(cowboysilver, "white", ratio = 0.5)
+	cowboysilver_alpha30 <- adjustcolor(cowboysilver, alpha.f = 0.3)
+	dodgerblue <- "dodgerblue4"
+	dodgerblue50 <- prismatic::clr_mix(dodgerblue, "white", ratio = 0.5)
+	manual_5_colours <- c(habsred, habsred50, cowboysilver, dodgerblue50, dodgerblue)
+	manual_4_colours <- c(habsred, habsred50, dodgerblue50, dodgerblue)
+	manual_3_colours <- c(habsred, cowboysilver, dodgerblue)
+	manual_2_colours <- c(cowboysilver, dodgerblue)
+
+snippet ggtufte
+	{r create-ggplot-themes, include=FALSE, cache=FALSE}
+	# Create the Tufte-inspired theme
+	theme_tufte <- function(base_size = 13, base_family = "") {
+		theme_minimal(base_size = base_size, base_family = base_family) +
+			theme(
+			  # Text elements
+			  plot.title = element_markdown(
+			    size = base_size * 1.0,
+			    hjust = 0,
+			    vjust = 1,
+			    margin = margin(0, 0, 5, 0),
+			    face = "bold"
+			  ),
+			  plot.subtitle = element_markdown(
+			    size = base_size * 0.7,
+			    hjust = 0,
+			    vjust = 1,
+			    margin = margin(0, 0, 10, 0),
+			    color = "black",
+			    face = "bold"
+			  ),
+			  plot.caption = element_markdown(
+			    size = base_size * 0.6,
+			    hjust = 0,
+			    vjust = 1,
+			    margin = margin(t = 10),
+			    color = cowboysilver
+			  ),
+			
+			  # Axis elements - minimal but functional
+			  axis.title.x = element_blank(),
+			  axis.title.y = element_blank(),
+			  axis.text.x = element_text(
+			    size = base_size * 0.8,
+			    margin = margin(t = base_size * 0.25)
+			  ),
+			  axis.text.y = element_markdown(
+			    size = base_size * 0.8,
+			    margin = margin(r = base_size * 0.25),
+			    hjust = 0
+			  ),
+			
+			  # Minimal axis lines - only where data meets axis
+			  axis.line.x = element_line(
+			    color = "black",
+			    linewidth = 0.5,
+			    linetype = "solid"
+			  ),
+			  axis.line.y = element_blank(),
+			
+			  # Axis ticks
+			  axis.ticks.x = element_line(color = "black", linewidth = 0.5),
+			  axis.ticks.length.x = unit(0.15, "cm"),
+			  axis.minor.ticks.length = rel(0.5),
+			
+			  # Gridlines
+			  panel.grid.major.y = element_line(
+			    color = "grey80",
+			    linewidth = 0.3
+			  ),
+			  panel.grid.major.x = element_blank(),
+			  panel.grid.minor.x = element_blank(),
+			  panel.grid.minor.y = element_blank(),
+			
+			  # Legend - clean and minimal
+			  legend.position = "inside",
+			  legend.position.inside = c(-0.0, 1.02),
+			  legend.justification = "left",
+			  legend.box = "horizontal",
+			  #legend.margin = margin(t = 20, b = 20),
+			  legend.direction = "horizontal",
+			  legend.title = element_blank(),
+			  legend.text = element_text(
+			    size = base_size * 0.8,
+			    margin = margin(r = 10)
+			  ),
+			  #legend.key = element_blank(),
+			  legend.spacing = unit(0.1, "cm"),
+			  legend.box.spacing = unit(0.1, "cm"),
+			
+			  # Faceting - minimal
+			  strip.text = element_text(
+			  hjust = 0,
+			  size = base_size * 0.8,
+			  margin = margin(b = base_size * 0.5),
+			  face = "bold"
+			  ),
+			  strip.background = element_blank(),
+			  panel.spacing.y = unit(1.5, "lines"),
+			
+			  # Plot settings - left justify all
+			  plot.margin = margin(
+			    t = base_size,
+			    r = base_size,
+			    b = base_size,
+			    l = base_size
+			  ),
+			  plot.title.position = "plot",
+			  plot.caption.position = "plot",
+			
+			  # Remove panel border
+			  panel.border = element_blank(),
+			
+			  # Background
+			  plot.background = element_rect(fill = "white", color = NA),
+			  panel.background = element_rect(fill = "white", color = NA)
+			)
+	}
+	
+	# Set as the default theme for all plots
+	theme_set(theme_tufte(base_size = 13, base_family = ""))
+	
+	# create base size object
+	base_size <- 13
+
+snippet gglollipop
+	plot_data <- ${1:data_object} |>
+	  mutate(
+	    ${2:y_variable} = reorder(${2:y_variable}, ${3:x_variable}),
+	    y_label = if_else(${2:y_variable} == "${4:bold_y_value}", "**${4:bold_y_value}**", as.character(${2:y_variable}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${2:y_variable}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(x = ${3:x_variable}, y = ${2:y_variable})) +
+	
+	  geom_segment(aes(
+	    x = 0, xend = ${3:x_variable},
+	    y = ${2:y_variable},
+	    yend = ${2:y_variable}),
+	    color = "grey50", linewidth = 0.7) +
+	
+	  geom_point(
+	    aes(
+	      x = ${3:x_variable},
+	      y = ${2:y_variable}
+	    ),
+	    shape = 19, size = 4,
+	    color = dodgerblue
+	  ) +
+	  
+	  geom_vline(
+	    xintercept = 0, 
+	    color = "black", 
+	    linewidth = 0.5
+	  ) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  theme(
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank(),
+			axis.text.y.left = element_markdown()
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet gglollipoplabel
+	plot_data <- ${1:data_object} |>
+	  mutate(
+	    ${2:y_variable} = reorder(${2:y_variable}, ${3:x_variable}),
+	    y_label = if_else(${2:y_variable} == "${4:bold_y_value}", "**${4:bold_y_value}**", as.character(${2:y_variable}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${2:y_variable}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(x = ${3:x_variable}, y = ${2:y_variable})) +
+	
+	  geom_segment(aes(
+	    x = 0, xend = ${3:x_variable},
+	    y = ${2:y_variable},
+	    yend = ${2:y_variable}),
+	    color = "grey50", linewidth = 0.7) +
+	
+	  geom_point(
+	    aes(
+	      x = ${3:x_variable},
+	      y = ${2:y_variable}
+	    ),
+	    shape = 19, size = 4,
+	    color = dodgerblue
+	  ) +
+	
+	  # Direct point labels replacing x axis
+	  geom_text(
+	    aes(
+	      x = ${3:x_variable},
+	      y = ${2:y_variable},
+	      label = label_number(big.mark = ",", scale = ${5:1}, suffix = "${6:}")(${3:x_variable})
+	    ),
+	    nudge_x = ${7:2},    # in data units; adjust after initial render
+	    hjust = 0,
+	    vjust = 0.5,
+	    size = 3.2,
+	    colour = "grey30"
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  scale_x_continuous(
+	    expand = expansion(mult = c(0.02, 0))
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: no x axis or gridlines - direct labels replace them
+	  # clip = "off" allows labels to extend beyond panel edge
+	  theme(
+	    axis.text.x = element_blank(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_blank(),
+	    panel.grid.major.y = element_blank(),
+	    axis.text.y.left = element_markdown()
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggline
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Define groups based on y variable
+	orig_groups <- c("${1:group1_orig}", "${2:group2_orig}", "${3:group3_orig}", "${4:group4_orig}", "${5:group5_orig}")
+	renamed_groups <- c("${6:group1_name}", "${7:group2_name}", "${8:group3_name}", "${9:group4_name}", "${10:group5_name}") # define display names
+	
+	# OPTION 1: Multiple columns that need pivoting (no predefined groups)
+	# Uncomment and use this section if you have separate columns to pivot
+	# # group_columns <- c("group1_column", "group2_column", "group3_column", "group4_column")  # Corresponding column names
+	# 
+	# plot_data <- data |>
+	#   	filter(grouping_variable == "group_value") |>
+	#   	select(
+	# 		${11:x_variable}, 
+	#  		all_of(set_names(group_columns, renamed_groups))  # Rename columns during selection
+	#   	) |> 
+	#   	pivot_longer(
+	#     		-${11:x_variable}, 
+	#     		names_to = "${12:colour_variable}", 
+	#     		values_to = "${13:y_variable}"
+	#   	)
+	
+	# OPTION 2: Data already in long format (predefined groups, no pivoting)
+	# Use this section if your data already has grouping and y columns
+	# Define plot data
+	plot_data <- ${14:source} |> 
+		mutate(
+			${12:colour_variable} = str_replace_all(${12:colour_variable}, set_names(renamed_groups, orig_groups))
+		)
+		
+	# Set x min and max
+	x_min = plot_data |> pull(${11:x_variable}) |> min()
+	x_max = plot_data |> pull(${11:x_variable}) |> max()
+	
+	# Define scale colours
+	group_colours <- set_names(manual_5_colours, renamed_groups)  # replace manual_5_colours if need fewer/custom colours
+	
+
+	# Create explicit label positions - manually positioned to avoid overlaps - uncomment once values known
+	#label_data <- tibble(
+	#  	x = c(x_group1, x_group2, x_group3, x_group4, x_group5),
+	#  	y = c(y_group1, y_group2, y_group3, y_group4, y_group5),
+	#  	label = renamed_groups,
+	#		fontface = c("plain", "plain", "plain", "plain", "plain"),	 # set desired to "bold"
+	## 	If want label scoped to one facet panel (facet_level), uncomment and edit spec below
+	## 	Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
+	## 	facet_var = factor("facet_level", levels = levels(${7:plot_data}\$facet_var))
+	#)
+	
+	ggplot(plot_data, aes(x = ${11:x_variable}, y = ${13:y_variable}, colour = ${12:colour_variable})) +
+	
+		# commented out until label placements determined
+		#geom_label(
+		#  data = label_data,
+		#  aes(
+		#    x = x,
+		#    y = y,
+		#    label = label,
+		#    fontface = fontface
+		#  ),
+		#  colour = "grey30",
+		#  fill = "white", 
+		#  linewidth = 0,
+		#  size = 3.2,
+		#  hjust = 0,       # 0 left, 1 right, 0.5 centered
+		#  vjust = 0,	    # 0 bottom, 1 top, 0.5 centered
+		#  inherit.aes = FALSE
+		#) +
+	
+		geom_line(linewidth = 0.8) +
+		
+		scale_x_continuous(
+		  #limits = c(min, max),
+		  #breaks = seq(min, max, by),
+		  labels = label_number(big.mark = "", scale = 1, suffix = ""),
+		  minor_breaks = seq(x_min, x_max, 1),
+		  expand = expansion(mult = c(0.02, 0.05)),
+		  position = "bottom"
+		) +
+		
+		scale_y_continuous(
+		  #limits = c(min, max),
+		  position = "right",
+		  #breaks = seq(min, max, by),
+		  labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+		  expand = expansion(mult = c(0, 0.05))
+		) +
+		
+		scale_colour_manual(
+		  values = group_colours,
+		  guide = "none"
+		) +
+		
+		guides(x = guide_axis(minor.ticks = TRUE)) +
+		
+		# Right-axis label positioning: sit labels above gridlines
+		theme(
+		    axis.text.y.right = element_text(
+		      size = rel(1),
+		      hjust = 1.0,
+		      vjust = -0.5,
+		      margin = margin(r = 12, l = -20)
+		    )
+		  ) +
+		
+		labs(
+		  title = "Title",
+		  subtitle = "Subtitle<br>",
+		  caption = "Source: Source | *Charting Waterloo Region*"
+		)
+	
+snippet ggdumbbell
+	plot_data <- ${1:data_object} |>
+	  filter(${2:x_column} %in% c(${3:value1}, ${4:value2})) |>
+	  pivot_wider(
+	    id_cols = ${5:y_column},
+	    names_from = ${2:x_column},
+	    values_from = ${6:value_column}
+	  ) |>
+	  mutate(
+	    ${5:y_column} = reorder(${5:y_column}, `${3:value1}`),
+	    y_label = if_else(${5:y_column} == "${7:highlight_value}", "**${7:highlight_value}**", as.character(${5:y_column}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${5:y_column}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot() +
+	
+	  # Background reference segment spanning full x range
+	  geom_segment(aes(
+	    x = 0,
+	    xend = ${10:max_x},
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey80",
+	    linewidth = 0.3
+	  ) +
+	
+	  # Dumbbell segment connecting x1 to x2
+	  geom_segment(aes(
+	    x = `${3:value1}`,
+	    xend = `${4:value2}`,
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey50",
+	    linewidth = 0.7
+	  ) +
+	
+	  geom_point(aes(
+	    x = `${3:value1}`,
+	    y = ${5:y_column},
+	    color = "${8:x1_label}"
+	    ),
+	    shape = 19, size = 4
+	  ) +
+	
+	  geom_point(aes(
+	    x = `${4:value2}`,
+	    y = ${5:y_column},
+	    color = "${9:x2_label}"
+	    ),
+	    shape = 19, size = 4
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  scale_color_manual(
+	    values = c(
+	      "${8:x1_label}" = cowboysilver,
+	      "${9:x2_label}" = dodgerblue
+	    ),
+	    name = NULL,
+	    breaks = c("${8:x1_label}", "${9:x2_label}")
+	  ) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(0, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.05)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank(),
+	    legend.position = "inside",
+	    legend.justification = c(0, 1),
+	    legend.position.inside = c(0.05, 0.9),
+	    legend.direction = "vertical",
+	    legend.background = element_rect(fill = "white", color = NA)
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+
+snippet ggarrow
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_source} |>
+	  filter(${2:x_column} %in% c(${3:value1}, ${4:value2})) |>
+	  pivot_wider(
+	    id_cols = ${5:y_column},
+	    names_from = ${2:x_column},
+	    values_from = ${6:value_column}
+	  ) |>
+	  mutate(
+	    ${5:y_column} = reorder(${5:y_column}, `${3:value1}`),
+	    y_label = if_else(${5:y_column} == "${7:highlight_value}", "**${7:highlight_value}**", as.character(${5:y_column}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${5:y_column}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(y = ${5:y_column})) +
+	
+	  # Background reference segment spanning full x range
+	  geom_segment(aes(
+	    x = 0,
+	    xend = ${8:max_x},
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey80",
+	    linewidth = 0.3
+	  ) +
+	
+	  geom_vline(xintercept = 0, linewidth = 0.5) +
+	
+	  geom_segment(
+	    aes(x = `${3:value1}`, xend = `${4:value2}`, yend = ${5:y_column}),
+	    arrow = arrow(length = unit(0.3, "cm"), type = "open"),
+	    linewidth = 1.0,
+	    color = dodgerblue
+	  ) +
+	
+	  annotate(
+	    "label",
+	    x = ${9:label_x},
+	    y = ${10:label_y},
+	    label = "${11:annotation_text}",
+	    fill = "white",
+	    color = "grey30",
+	    linewidth = 0,
+	    size = 3.2
+	  ) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(0, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.05)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank()
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggvertbar
+	${1:plot_data} |>
+	  mutate(${2:x_variable} = fct_reorder(${2:x_variable}, ${3:y_variable})) |>
+	  ggplot(aes(x = ${2:x_variable}, y = ${3:y_variable})) +
+	
+	  geom_col(
+	    fill = dodgerblue,
+	    width = 0.7
+	  ) +
+	
+	  # OPTION: direct bar labels - if using, see notes below
+	  # threshold controls inside/outside split - set to min(y_variable) for all inside,
+	  # Inf for all outside
+	  # geom_text(
+	  #   data = ${1:plot_data} |> filter(${3:y_variable} >= ${4:threshold}),
+	  #   aes(x = ${2:x_variable}, y = ${3:y_variable},
+	  #       label = label_number(big.mark = ",", scale = ${5:1}, suffix = "${6:}")(${3:y_variable})),
+	  #   nudge_y = ${7:-2},      # negative = inside top of bar; in data units
+	  #   hjust = 0.5,
+	  #   size = 3.2,
+	  #   colour = "white"
+	  # ) +
+	  # geom_text(
+	  #   data = ${1:plot_data} |> filter(${3:y_variable} < ${4:threshold}),
+	  #   aes(x = ${2:x_variable}, y = ${3:y_variable},
+	  #       label = label_number(big.mark = ",", scale = ${5:1}, suffix = "${6:}")(${3:y_variable})),
+	  #   nudge_y = ${8:2},       # positive = above bar; in data units
+	  #   hjust = 0.5,
+	  #   size = 3.2,
+	  #   colour = "grey30"
+	  # ) +
+	  # Notes if using direct labels:
+	  # - comment out scale_y_continuous below and replace with:
+	  #   scale_y_continuous(expand = expansion(mult = c(0, 0.05)))
+	  # - comment out axis.text.y.right in theme() below
+	  # - add to theme(): panel.grid.major.y = element_blank()
+	  # - consider removing right margin from plot.margin in theme() below
+	
+	  scale_x_discrete(
+	    #breaks = seq(min, max, by),
+	    #minor_breaks = seq(min, max, by),
+	    #labels = label_number(big.mark = "", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.15)),
+	    position = "bottom"
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    position = "right",
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0, 0.05))
+	  ) +
+	
+	  guides(x = guide_axis(minor.ticks = FALSE)) +
+	
+	  # Right-axis label positioning: sit labels above gridlines
+	  theme(
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -12)
+	    ),
+	    plot.margin = margin(t = 13, l = 13, b = 13, r = 200),
+	    axis.ticks.x = element_blank()
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	
+snippet gghorbar
+	plot_data <- ${1:plot_data} |>
+	  mutate(
+	    ${2:y_variable} = reorder(${2:y_variable}, ${3:x_variable}),
+	    y_label = if_else(${2:y_variable} == "${4:bold_y_value}", "**${4:bold_y_value}**", as.character(${2:y_variable}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${2:y_variable}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(x = ${3:x_variable}, y = ${2:y_variable}, fill = ${5:group_variable})) +
+	
+	  geom_col(
+	    #fill = dodgerblue,
+	    width = 0.7
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  # OPTION: direct bar labels - if using, see notes below
+	  # threshold controls inside/outside split - set to min(x_variable) for all inside,
+	  # -Inf for all outside
+	  # geom_text(
+	  #   data = plot_data |> filter(${3:x_variable} >= ${11:threshold}),
+	  #   aes(x = ${3:x_variable}, y = ${2:y_variable},
+	  #       label = label_number(big.mark = ",", scale = ${12:1}, suffix = "${13:}")(${3:x_variable})),
+	  #   nudge_x = ${14:-2},     # negative = inside right of bar; in data units
+	  #   hjust = 1,
+	  #   vjust = 0.5,
+	  #   size = 3.2,
+	  #   colour = "white"
+	  # ) +
+	  # geom_text(
+	  #   data = plot_data |> filter(${3:x_variable} < ${11:threshold}),
+	  #   aes(x = ${3:x_variable}, y = ${2:y_variable},
+	  #       label = label_number(big.mark = ",", scale = ${12:1}, suffix = "${13:}")(${3:x_variable})),
+	  #   nudge_x = ${15:2},      # positive = right of bar; in data units
+	  #   hjust = 0,
+	  #   vjust = 0.5,
+	  #   size = 3.2,
+	  #   colour = "grey30"
+	  # ) +
+	  # Notes if using direct labels:
+	  # - comment out scale_x_continuous below and replace with:
+	  #   scale_x_continuous(expand = expansion(mult = c(0, 0.05)))
+	  # - comment out axis.ticks.x and panel.grid.major.x in theme() below
+	  # - add to theme(): axis.text.x = element_blank(), axis.line.x = element_blank()
+	  # - add coord_cartesian(clip = "off") if outside labels are clipped
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # adjust number of colors/names to suit data
+	  scale_fill_manual(
+	    values = set_names(
+	      manual_5_colours,
+	      c(
+	        "${6:group1}",
+	        "${7:group2}",
+	        "${8:group3}",
+	        "${9:group4}",
+	        "${10:group5}"
+	      )
+	    ),
+	    #guide = "none"    # uncomment if want no legend
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank()
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggscatter
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_source} |>
+	  pivot_wider(
+	    id_cols = ${2:column_id},
+	    names_from = ${3:column_names},
+	    values_from = ${4:column_values}
+	  )
+	
+	# Point label nudge values - set per-point after initial render
+	# nudge values are in the same units as the x and y axes
+	# nudge_data <- plot_data |>
+	#   mutate(
+	#     nudge_x = case_when(
+	#       ${2:column_id} == "id1" ~ 0,
+	#       ${2:column_id} == "id2" ~ 0,
+	#       ${2:column_id} == "id3" ~ 0,
+	#       ${2:column_id} == "id4" ~ 0,
+	#       ${2:column_id} == "id5" ~ 0,
+	#       .default = 0
+	#     ),
+	#     nudge_y = case_when(
+	#       ${2:column_id} == "id1" ~ 0,
+	#       ${2:column_id} == "id2" ~ 0,
+	#       ${2:column_id} == "id3" ~ 0,
+	#       ${2:column_id} == "id4" ~ 0,
+	#       ${2:column_id} == "id5" ~ 0,
+	#       .default = 0
+	#     )
+	#   )
+	
+	plot_data |>
+	  ggplot(aes(x = ${5:x_variable}, y = ${6:y_variable})) +
+	
+	  # Point labels - drawn before geom_point so points render on top
+	  # commented out until nudge values determined
+	  # geom_label(
+	  #   data = nudge_data,
+	  #   aes(
+	  #     x = ${5:x_variable} + nudge_x,
+	  #     y = ${6:y_variable} + nudge_y,
+	  #     label = `${7:label_variable}`
+	  #   ),
+	  #   size = 3.2,
+	  #   fill = "white",
+	  #   linewidth = 0,
+	  #   inherit.aes = FALSE
+	  # ) +
+	
+	  geom_point(size = 2, colour = dodgerblue) +
+	
+	  #geom_smooth(
+	  #  linewidth = 1.0, 
+	  #  colour = dodgerblue,
+	  #  method = "loess",
+	  #  formula = y ~ x,
+	  #  na.rm = TRUE
+	  #) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    #minor_breaks = seq(min, max, by),
+	    expand = expansion(mult = c(0.02, 0.05)),
+	    position = "bottom"
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by), 
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    position = "right",
+	    expand = expansion(mult = c(0, 0.05))
+	  ) +
+	
+	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	
+	  # place y axis title above y axis, aligned with labels
+	  annotation_custom(
+	    grob = textGrob(
+	      "${8:y_title}",
+	      x = 1, y = 1,
+	      hjust = 1,
+	      vjust = -1.4,
+	      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+	    )
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  # Right-axis label positioning: sit labels above gridlines
+	  theme(
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -15)
+	    ),
+	    axis.title.x = element_text(
+	      size = base_size * 0.8,
+	      face = "bold",
+	      margin = margin(t = 5)
+	    )
+	  ) +
+	
+	  labs(
+	    x = "${9:x_title}",
+	    title = "Title",
+	    subtitle = "Subtitle<br>",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+		
+snippet ggslope
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Define groups based on y variable
+	orig_groups <- c("${1:group1_orig}", "${2:group2_orig}", "${3:group3_orig}", "${4:group4_orig}", "${55:group5_orig}")
+	renamed_groups <- c("${6:group1_name}", "${7:group2_name}", "${8:group3_name}", "${9:group4_name}", "${10:group5_name}") # define display names
+
+	# Define plot data
+	plot_data <- ${11:source} |> 
+		filter(
+		  ${12:x_variable} %in% c(${13:x1_variable}, ${14:x2_variable})
+		) |>
+		mutate(
+			${15:colour_var} = str_replace_all(${15:colour_var}, set_names(renamed_groups, orig_groups))
+		)
+		
+	# Set x min and max
+	x_min = plot_data |> pull(${12:x_variable}) |> min()
+	x_max = plot_data |> pull(${12:x_variable}) |> max()
+	
+	# Define line colours
+	group_colours <- set_names(manual_5_colours, renamed_groups)  # adjust for number of groups
+	
+	# Label positions - adjust x and y values once known
+	#label_data <- tibble(
+	#  x     = c(x1, x2, x3, x4, x5),
+	#  y     = c(y1, y2, y3, y4, y5),
+	#  label = renamed_groups,
+	#	 fontface = c("plain", "plain", "plain", "plain", "plain"),  # set desired to bold
+	#  If want label scoped to one facet panel (facet_level), uncomment and edit spec below
+	#	 Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
+	#	 facet_var = factor("facet_level", levels = levels(${7:plot_data}\$facet_var)),
+	#)
+	
+	ggplot(plot_data, aes(x = ${12:x_variable}, y = ${16:y_variable}, colour = ${15:colour_var}, group = ${17:group_var})) +
+	
+	  # commented out until label placements determined
+		#geom_label(
+		#  data = label_data,
+		#  aes(
+		#    x = x,
+		#    y = y,
+		#    label = label,
+		#    fontface = fontface
+		#  ),
+		#	 colour = "grey30",
+		#  fill = "white", 
+		#  linewidth = 0,
+		#  size = 3.2,
+		#  hjust = 0,       # 0 left, 1 right, 0.5 default centered
+		#	 vjust = 0,				# 0 bottom, 1 top, 0.5 default centered
+		#  inherit.aes = FALSE
+		#) +
+	
+	  geom_line(linewidth = 0.8) +
+	  
+	  geom_point(size = 3.1, colour = "white") +  # add white point to obscure line ends
+	
+	  geom_point(size = 3.0) +
+	
+	  scale_x_continuous(
+	    breaks = c(x_min, x_max),
+	    expand = expansion(mult = c(0.05, 0.08))
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    position = "right",
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0, 0.05))
+	  ) +
+	
+	  scale_colour_manual(
+	    values = group_colours,
+	    guide = "none"
+	  ) +
+	
+	  # Right-axis label positioning: sit labels above gridlines
+	  theme(
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -20)
+	    ),
+	    plot.margin = margin(t = 13, l = 13, b = 13, r = 200)   # make plot area thinner
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle<br>",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggheatrank
+	# HEATMAP TEMPLATE FOR RANKED DATA
+	# Replace placeholders: data_ranked, x_var, y_var, ranking_var, colors, breaks,
+	# labels, x axis breaks, legend coords
+	
+	# Create y-axis ordering vector
+	# Calculate average ranking and reorder regions (best at top)
+	row_order <- ${1:data_ranked} |> 
+	  group_by(${2:y_var}) |> 
+	  summarise(avg_rank = mean(${3:ranking_var}, na.rm = TRUE)) |>  # adjust for ranking method
+	  arrange(avg_rank) |>  # add desc() if lower avg is better
+	  pull(${2:y_var})
+	
+	# Define special formatting
+	highlight_row <- "${4:special_row_name}"  # Row to highlight (optional)
+	
+	# Prepare data with ordering and special formatting
+	plot_data <- ${1:data_ranked} |> 
+	  mutate(
+	    row_factor = factor(${2:y_var}, levels = row_order),
+	    row_label = if_else(${2:y_var} == highlight_row, paste0("**", highlight_row, "**"), as.character(${2:y_var}))
+	  )
+	  
+	# Set x min and max
+	x_min = plot_data |> pull(${5:x_var}) |> min()
+	x_max = plot_data |> pull(${5:x_var}) |> max()
+	  
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(row_factor, row_label) |> deframe()
+	
+	# Define fill scale parameters
+	fill_colors <- alpha(${6:dodgerblue4}, c(0.1, 0.4, 0.7, 1.0))  # Adjust alphas as needed (one fewer than num breaks)
+	#fill_breaks <- c(break1, break2, break3, break4, break5)          # Adjust breaks
+	fill_labels <- c("label1", "label2", "label3", "label4", "label5")  # Adjust labels
+	
+	ggplot(plot_data, aes(x = ${5:x_var}, y = row_factor, fill = ${3:ranking_var})) +
+	  
+	  geom_tile(color = "white", linewidth = 0.5) +
+	  
+	  scale_fill_stepsn(
+	    colors = fill_colors,
+	    n.breaks = 5,
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    #breaks = fill_breaks,
+	    #labels = fill_labels,
+	    na.value = "black",
+	    guide = guide_coloursteps(
+	      reverse = FALSE, 
+	      show.limits = FALSE,
+	      barwidth = unit(4, "cm"),
+	      barheight = unit(0.4, "cm"),
+	      frame.colour = "black",
+	      frame.linewidth = 0.3,
+	      label.vjust = -0.0
+	    )
+	  ) +
+	  
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    #minor_breaks = seq(x_min, x_max, 1),
+	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.0, 0.0)),
+	    position = "bottom"
+	  ) +
+	  
+	  scale_y_discrete(
+	    labels = y_labels
+	  ) +
+	  
+	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	  
+	  # Heatmap: remove all gridlines (tiles define the structure),
+	  theme(
+	  	axis.text.y.left = element_markdown(),
+	    panel.grid.major.y = element_blank(),
+	    legend.position = "top"
+	  ) +
+	  
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggheatraw
+	# HEATMAP (RAW VALUES) TEMPLATE
+	# Replace placeholders: data_source, x_var, y_var, value_var, colors, breaks, labels
+	
+	# Create y-axis ordering vector
+	# Order rows by mean of raw value (highest at top)
+	row_order <- ${1:data_source} |> 
+	  group_by(${2:y_var}) |> 
+	  summarise(avg_val = mean(${3:value_var}, na.rm = TRUE)) |>
+	  arrange(desc(avg_val)) |>  # remove desc() if lower avg should be at top
+	  pull(${2:y_var})
+	
+	# Define special formatting
+	highlight_row <- "${4:special_row_name}"  # Row to highlight (optional)
+	
+	# Prepare data with ordering and special formatting
+	plot_data <- ${1:data_source} |> 
+	  mutate(
+	    row_factor = factor(${2:y_var}, levels = row_order),
+	    row_label = if_else(${2:y_var} == highlight_row, paste0("**", highlight_row, "**"), as.character(${2:y_var}))
+	  )
+	  
+	# Set x min and max
+	x_min = plot_data |> pull(${5:x_var}) |> min()
+	x_max = plot_data |> pull(${5:x_var}) |> max()
+	  
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(row_factor, row_label) |> deframe()
+	
+	# Define fill scale parameters
+	fill_colors <- alpha(${6:dodgerblue4}, c(0.1, 0.4, 0.7, 1.0))  # Adjust alphas as needed (one fewer than num breaks)
+	#fill_breaks <- c(break1, break2, break3, break4, break5)           # Set breaks based on data range
+	fill_labels <- c("label1", "label2", "label3", "label4", "label5")  # Adjust labels
+	
+	ggplot(plot_data, aes(x = ${5:x_var}, y = row_factor, fill = ${3:value_var})) +
+	  
+	  geom_tile(color = "white", linewidth = 0.5) +
+	  
+	  # Optional: add value labels inside tiles
+	  #geom_text(
+	  #  aes(label = label_number(big.mark = ",", scale = 1, suffix = "")(${3:value_var})),
+	  #  colour = "white",
+	  #  size = 3.2
+	  #) +
+	  
+	  scale_fill_stepsn(
+	    colors = fill_colors,
+	    n.breaks = 5,
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    #breaks = fill_breaks,
+	    #labels = fill_labels,
+	    na.value = "grey80",
+	    guide = guide_coloursteps(
+	      reverse = FALSE,
+	      show.limits = FALSE,
+	      barwidth = unit(4, "cm"),
+	      barheight = unit(0.4, "cm"),
+	      frame.colour = "black",
+	      frame.linewidth = 0.3,
+	      label.vjust = -0.0
+	    )
+	  ) +
+	  
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    #minor_breaks = seq(x_min, x_max, 1),
+	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.0, 0.0)),
+	    position = "bottom"
+	  ) +
+	  
+	  scale_y_discrete(
+	    labels = y_labels
+	  ) +
+	  
+	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	  
+	  # Heatmap: remove all gridlines (tiles define the structure),
+	  theme(
+	  	axis.text.y.left = element_markdown(),
+	    panel.grid.major.y = element_blank(),
+	    legend.position = "top"
+	  ) +
+	  
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	
+snippet ggmultiples
+	make_multiples_plot <- function(data, multiple_label, show_title = FALSE) {
+		data |>
+		  filter(${1:facet_variable} == multiple_label) |>
+		  mutate(${2:y_variable} = fct_reorder(${2:y_variable}, ${3:x_variable})) |>
+		  # INSERT CHART SNIPPET HERE (must start with ggplot(...))
+		  # Replace labs(title = ...) with: 
+		  labs(title = multiple_label) +
+			theme(
+			  plot.title = element_markdown(size = base_size * 0.8),
+			  legend.position = "none"
+			)
+		}
+		
+	plot_data <- ${4:main_table} |>
+		select(
+		  ${3:x_variable} = ${5:x_column},
+		  ${2:y_variable} = ${6:y_column},
+		  ${1:facet_variable} = ${7:facet_column}
+		)
+	
+	p1 <- make_multiples_plot(plot_data, "${8:multiple_label1}")
+	p2 <- make_multiples_plot(plot_data, "${9:multiple_label2}")
+	p3 <- make_multiples_plot(plot_data, "${10:multiple_label3}")
+	p4 <- make_multiples_plot(plot_data, "${11:multiple_label4}")
+	
+	(p1 / p2 / p3 / p4) +
+	plot_annotation(
+	  title = "Title",
+	  subtitle = "Subtitle",
+	  caption = "Source: Source | *Charting Waterloo Region*"
+	)
+
+snippet ggcompbar_horiz
+	${1:data_source} |>
+	  pivot_wider(
+	    id_cols = ${2:y_variable},
+	    names_from = ${3:group_var},
+	    values_from = ${4:value_var}
+	  ) |>
+	  mutate(${2:y_variable} = fct_reorder(${2:y_variable}, `${5:x1_name}`)) |>
+	  ggplot() +
+	  geom_col(aes(y = ${2:y_variable}, x = `${5:x1_name}`, fill = "${5:x1_name}"), width = 0.5) +
+	  geom_col(aes(y = ${2:y_variable}, x = `${6:x2_name}`, fill = "${6:x2_name}"), width = 0.3) +
+	  # OPTION: replace second geom_col above with this code if want line instead of bar
+	  # geom_segment(
+	  #   aes(
+	  #     y = as.numeric(${2:y_variable}) - 0.3,
+	  #     yend = as.numeric(${2:y_variable}) + 0.3,
+	  #     x = `${6:x2_name}`,
+	  #     xend = `${6:x2_name}`
+	  #   ),
+	  #   colour = cowboysilver,
+	  #   linewidth = ${7:1.0}
+	  # ) +
+	  scale_fill_manual(
+	    values = c(
+	      "${5:x1_name}" = dodgerblue,
+	      "${6:x2_name}" = cowboysilver   # remove if using comparison line instead of bar
+	    )
+	  ) +
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0, 0.05)),
+	    position = "top"
+	  ) +
+	  scale_y_discrete(
+	    position = "left"
+	  ) +
+	  # Horizontal chart: swap tufte's default grid orientation
+	  theme(
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank(),
+	    # Inside legend, stacked, anchored at bottom-right corner, white background
+	    legend.position = "inside",
+	    legend.position.inside = c(${8:0.95}, ${9:0.05}),  # x, y as plot proportions
+	    legend.justification = c(1, 0),                      # anchor: right edge, bottom edge
+	    legend.direction = "vertical",
+	    legend.background = element_rect(fill = "white", color = NA)
+	  ) +
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+
+snippet ggcompbar_vert
+	# set fig.width to help reduce gap between bars
+	${1:data_source} |>
+	  pivot_wider(
+	    id_cols = ${2:x_variable},
+	    names_from = ${3:group_var},
+	    values_from = ${4:value_var}
+	  ) |>
+	  mutate(${2:x_variable} = fct_reorder(${2:x_variable}, `${5:y1_name}`)) |>
+	  ggplot() +
+	  geom_col(aes(x = ${2:x_variable}, y = `${5:y1_name}`, fill = "${5:y1_name}"), width = 0.5) +
+	  geom_col(aes(x = ${2:x_variable}, y = `${6:y2_name}`, fill = "${6:y2_name}"), width = 0.3) +
+	  # OPTION: replace second geom_col above with this code if want line instead of bar
+		# geom_segment(
+		#   aes(
+		#     x = as.numeric(${2:x_variable}) - 0.3,
+		#     xend = as.numeric(${2:x_variable}) + 0.3,
+		#     y = `${6:y2_name}`,
+		#     yend = `${6:y2_name}`
+		#   ),
+		#   colour = cowboysilver,
+		#   linewidth = ${7:1.0}
+		# ) +
+	  scale_fill_manual(
+	    values = c(
+	      "${5:y1_name}" = dodgerblue,
+	      "${6:y2_name}" = cowboysilver   # remove if using comparison line instead of bar
+	    )
+	  ) +
+	  scale_x_discrete(
+	    expand = expansion(mult = c(0.02, 0.15)),
+	    position = "bottom"
+	  ) +
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    position = "right",
+	    expand = expansion(mult = c(0, 0.05)),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = "")
+	  ) +
+	  theme(
+	    # Inside legend, stacked, anchored at top-left corner, white background
+	    legend.position = "inside",
+	    legend.position.inside = c(${8:0.05}, ${9:0.95}),  # x, y as plot proportions
+	    legend.justification = c(0, 1),                      # anchor: left edge, top edge
+	    legend.direction = "vertical",
+	    legend.background = element_rect(fill = "white", color = NA),
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -13)
+	    ),
+			axis.ticks.x = element_blank()
+	  ) +
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+
+snippet ggribbon
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Filter to rows needed for ribbon/line layers
+	plot_data <- ${1:data_source} |>
+	  filter(${2:group_var} %in% c("${3:ymin_name}", "${4:ymax_name}"))
+	
+	# Prep ribbon data (wide format needed for ymin/ymax)
+	ribbon_data <- plot_data |>
+	  pivot_wider(
+	    id_cols = ${5:x_var},
+	    names_from = ${2:group_var},
+	    values_from = ${6:y_var}
+	  )
+	
+	# create x axis min and max
+	x_min <- plot_data |> pull(${5:x_var}) |> min()
+	x_max <- plot_data |> pull(${5:x_var}) |> max()
+	
+	# Label data - adjust x and y positions once known
+	# ribbon label
+	# ribbon_label <- tibble(
+	#   x = x_position,
+	#   y = y_position,
+	#   label = "label",
+	# 	If want label scoped to one facet panel (facet_level), uncomment and edit spec below
+	# 	Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
+	# 	facet_var = factor("facet_level", levels = levels(${7:plot_data}\$facet_var)),
+	# )
+	  
+	# line labels
+	# label_data <- tibble(
+	#   x = c(y_min_x, y_max_x),
+	#   y = c(y_min_y, y_max_y),
+	#   label = c("${3:ymin_name}", "${4:ymax_name}"),
+	# 	If want label scoped to one facet panel (facet_level), uncomment and edit spec below
+	# 	Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
+	# 	facet_var = factor("facet_level", levels = levels(${7:plot_data}\$facet_var)),
+	#   fontface = c("plain", "plain")    # edit if want any bolded
+	# )
+	
+	plot_data |>
+	  ggplot(aes(x = ${5:x_var}, y = ${6:y_var}, color = ${2:group_var})) +
+	
+	  geom_ribbon(
+	    data = ribbon_data,
+	    aes(x = ${5:x_var}, ymin = `${3:ymin_name}`, ymax = `${4:ymax_name}`),
+	    inherit.aes = FALSE,
+	    fill = cowboysilver,
+	    alpha = 0.3
+	  ) +
+	  
+	  # line labels - commented out until label placements determined
+	  # geom_label(
+	  #   data = label_data,
+	  #   aes(
+	  #     x = x,
+	  #     y = y,
+	  #     label = label,
+	  #     fontface = fontface   
+	  #   ),
+	  #   colour = "grey30",
+	  #   fill = "white",
+	  #   linewidth = 0,
+	  #   size = 3.2,
+	  #   hjust = 0,
+	  #   vjust = 0,
+	  #   inherit.aes = FALSE
+	  # ) +
+	
+	  geom_line(linewidth = 0.8) +
+	
+	  # ribbon label
+	  # geom_text(
+	  #   data = ribbon_label,
+	  #   aes(x = x, y = y, label = label),
+	  #   inherit.aes = FALSE,
+	  #   colour = "grey30",
+	  #   vjust = 0,
+	  #   size = 3.2
+	  # ) +
+	
+	  scale_color_manual(
+	    values = c(
+	      "${3:ymin_name}" = cowboysilver,
+	      "${4:ymax_name}" = dodgerblue
+	    ),
+	    guide = "none"
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    position = "right",
+	    #scale_y_log10(
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0, 0.05))
+	  ) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    position = "bottom",
+	    #breaks = seq(x_min, x_max, by),
+	    minor_breaks = seq(x_min, x_max, 1),
+	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.05))
+	  ) +
+	  #scale_x_date(
+	  #  breaks = c(x_min, seq.Date(
+	  #    as.Date(paste0(year(x_min) + 5, "-01-01")),
+	  #    x_max,
+	  #    by = "5 years"
+	  #  )),
+	  #	 date_breaks = "5 years",  # delete this if specifying breaks in line above
+	  #  date_labels = "%Y",
+	  #  minor_breaks = seq.Date(x_min, x_max, by = "year"),
+	  #  expand = expansion(mult = c(0.02, 0.05))
+	  #) +
+	  
+	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	
+	  # Right-axis label positioning: sit labels above gridlines
+	  theme(
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -20)
+	    )
+	  ) +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle<br>",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggbubble
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_source} |>
+	  #filter(str_detect(${2:column_names}, "${3:filter_text}")) |>
+	  pivot_wider(
+	    id_cols = ${4:column_id},
+	    names_from = ${2:column_names},
+	    values_from = ${5:column_values}
+	  )
+	
+	x_min <- plot_data |> pull(`${6:x_variable}`) |> min(na.rm = TRUE)
+	x_max <- plot_data |> pull(`${6:x_variable}`) |> max(na.rm = TRUE)
+	
+	# Bubble size legend - uncomment and adjust positions/values after initial render
+	# legend_x: x-axis data value for the centre of both reference bubbles
+	# legend_y_large/small: y-axis data values for bubble centres; separate them
+	# enough that the large bubble doesn't overlap the small one - adjust by eye
+	# large_value/small_value: pick two representative values from your size variable
+	# (e.g. round numbers near the max and median)
+	# label_x_nudge: rightward offset from bubble centre to label, in x data units
+	# label_y_nudge: upward offset from bubble centre to label, in y data units
+	# size_legend <- tibble(
+	#   x            = c(legend_x, legend_x),
+	#   y            = c(legend_y_large, legend_y_small),
+	#   size         = c(large_value, small_value),
+	#   label_x_nudge = c(nudge_x, nudge_x),
+	#   label_y_nudge = c(nudge_y_large, nudge_y_small),
+	#   label        = c("large_label", "small_label")
+	# )
+	
+	# Point label nudge values - set per-point after initial render
+	# nudge values are in the same units as the x and y axes
+	# nudge_data <- plot_data |>
+	#   mutate(
+	#     nudge_x = case_when(
+	#       ${4:column_id} == "id1" ~ 0,
+	#       ${4:column_id} == "id2" ~ 0,
+	#       ${4:column_id} == "id3" ~ 0,
+	#       ${4:column_id} == "id4" ~ 0,
+	#       ${4:column_id} == "id5" ~ 0,
+	#       .default = 0
+	#     ),
+	#     nudge_y = case_when(
+	#       ${4:column_id} == "id1" ~ 0,
+	#       ${4:column_id} == "id2" ~ 0,
+	#       ${4:column_id} == "id3" ~ 0,
+	#       ${4:column_id} == "id4" ~ 0,
+	#       ${4:column_id} == "id5" ~ 0,
+	#       .default = 0
+	#     )
+	#   )
+	
+	plot_data |>
+	  ggplot(aes(x = `${6:x_variable}`, y = `${7:y_variable}`, size = `${8:size_variable}`)) +
+	
+	  # Point labels - drawn before geom_point so bubbles render on top
+	  # commented out until nudge values determined
+	  # geom_label(
+	  #   data = nudge_data,
+	  #   aes(
+	  #     x = `${6:x_variable}` + nudge_x,
+	  #     y = `${7:y_variable}` + nudge_y,
+	  #     label = `${9:label_variable}`
+	  #   ),
+	  #   size = 3.2,
+	  #   fill = "white",
+	  #   linewidth = 0,
+	  #   inherit.aes = FALSE
+	  # ) +
+	
+	  geom_point(alpha = 0.7, colour = dodgerblue) +
+	
+	  # Bubble size legend - uncomment after initial render
+	  ## legend title uses annotate("label") for white background with no border
+	  # annotate(
+	  #   "label",
+	  #   x = legend_x, y = legend_y_title,
+	  #   label = "legend_title",
+	  #   hjust = 0.5,
+	  #   vjust = 0.0,
+	  #   fill = "white",
+	  #   linewidth = 0,
+	  #   fontface = "bold",
+	  #   size = 3.2
+	  # ) +
+	  ## shape = 21 with fill = "white" gives white-filled outline circles
+	  # geom_point(
+	  #   data = size_legend,
+	  #   aes(x = x, y = y, size = size),
+	  #   shape = 21,
+	  #   colour = "black",
+	  #   fill = "white",
+	  #   inherit.aes = FALSE
+	  # ) +
+	  ## segments run horizontally from bubble centre to label position
+	  # geom_segment(
+	  #   data = size_legend,
+	  #   aes(x = x, xend = x + label_x_nudge, y = y + label_y_nudge, yend = y + label_y_nudge),
+	  #   colour = "black",
+	  #   linewidth = 0.3,
+	  #   inherit.aes = FALSE
+	  # ) +
+	  # geom_label(
+	  #   data = size_legend,
+	  #   aes(x = x + label_x_nudge, y = y + label_y_nudge, label = label),
+	  #   hjust = 0,
+	  #   size = 3.2,
+	  #   fill = "white",
+	  #   linewidth = 0,
+	  #   inherit.aes = FALSE
+	  # ) +
+	
+	  scale_size_area(
+	    max_size = ${10:15},
+	    guide = "none"
+	  ) +
+	
+	  scale_x_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(x_min, x_max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    minor_breaks = seq(x_min, x_max, ${11:1}),    # set by = based on x scale
+	    expand = expansion(mult = c(0.02, 0.05)),
+	    position = "bottom"
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    #breaks = seq(min, max, by),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    position = "right"
+	    expand = expansion(mult = c(0.0, 0.05))   
+	  ) +
+	
+	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	
+	  # place y axis title above y axis, aligned with labels
+	  annotation_custom(
+	    grob = textGrob(
+	      "${12:y_title}",
+	      x = 1, y = 1,
+	      hjust = 1,
+	      vjust = -1.4,
+	      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+	    )
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  # Right-axis label positioning: sit labels above gridlines
+	  theme(
+	    axis.text.y.right = element_text(
+	      size = rel(1),
+	      hjust = 1.0,
+	      vjust = -0.5,
+	      margin = margin(r = 12, l = -15)
+	    ),
+	    axis.title.x = element_text(
+	      size = base_size * 0.8,
+	      face = "bold",
+	      margin = margin(t = 5)
+	    )
+	  ) +
+	
+	  labs(
+	    x = "${13:x_title}",
+	    title = "Title",
+	    subtitle = "Subtitle<br>",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggshadedbars
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Select bar length variable
+	bar_data <- ${1:data_source} |>
+	  filter(${2:group_col} == "${3:x_group}") |>
+	  select(${4:y_column}, ${5:x_column}) |>
+	  mutate(${5:x_column} = round(${5:x_column}, ${6:0}))
+	
+	# Pivot bar width variable and join
+	plot_data <- ${1:data_source} |>
+	  filter(${2:group_col} == "${7:width_group}") |>
+	  pivot_wider(
+	    id_cols = ${4:y_column},
+	    names_from = ${2:group_col},
+	    values_from = ${8:value_col}
+	  ) |>
+	  mutate(`${7:width_group}` = round(`${7:width_group}`, ${9:0})) |>
+	  left_join(bar_data, by = "${4:y_column}") |>
+	  arrange(${5:x_column}) |>
+	  mutate(
+	    # Normalise width to 0-1; adjust ${10:0.9} to control max bar thickness
+	    width_norm = `${7:width_group}` / max(`${7:width_group}`, na.rm = TRUE) * ${10:0.9},
+	    # Compute y positions with fixed gap; adjust ${11:0.025} to control spacing
+	    y_pos = cumsum(width_norm) - width_norm / 2 + row_number() * ${11:0.025},
+	    y_min = y_pos - width_norm / 2,
+	    y_max = y_pos + width_norm / 2
+	  )
+	
+	# Top bar values for bracket positioning
+	top_bar_ymax <- plot_data |> slice_max(y_pos) |> pull(y_max)
+	top_bar_ymin <- plot_data |> slice_max(y_pos) |> pull(y_min)
+	
+	plot_data |>
+	  ggplot() +
+	
+	  # Background bar
+	  geom_rect(
+	    aes(xmin = 0, xmax = ${12:max_x}, ymin = y_min, ymax = y_max),
+	    fill = cowboysilver30
+	  ) +
+	
+	  # Foreground bar
+	  geom_rect(
+	    aes(xmin = 0, xmax = ${5:x_column}, ymin = y_min, ymax = y_max),
+	    fill = dodgerblue
+	  ) +
+	
+	  # Label at end of dark bar
+	  geom_text(
+	    aes(x = ${5:x_column}, y = y_pos, label = label_number(accuracy = 1, scale = 1, suffix = "${13:bar_suffix}")(${5:x_column})),
+	    hjust = -0.2,
+	    size = 3.2
+	  ) +
+	
+	  # Right-side value labels
+	  geom_text(
+	    aes(x = ${14:label_x}, y = y_pos, label = label_number(accuracy = ${15:1}, scale = ${16:1})(`${7:width_group}`)),
+	    hjust = 0,
+	    size = 3.2
+	  ) +
+	
+	  # Left column header above chart - comment out if using inside bar label below
+	  # annotate(
+	  #   "text",
+	  #   x = 0, y = Inf,
+	  #   label = "${17:left_header}",
+	  #   hjust = 0, vjust = 0,
+	  #   size = 3.2,
+	  #   fontface = "bold"
+	  # ) +
+	
+	  # OPTION: Left column header inside a bar - comment out header above if using this
+	  # Filter to the bar you want to place the label in
+	  annotate(
+	    "text",
+	    x = 1,
+	    y = plot_data |> filter(${4:y_column} == "${18:label_bar}") |> pull(y_pos),
+	    label = "${17:left_header}",
+	    hjust = 0,
+	    vjust = 0.5,
+	    size = 3.2,
+	    fontface = "bold",
+	    colour = "white"
+	  ) +
+	
+	  # Right column header
+	  annotate(
+	    "text",
+	    x = ${19:right_header_x}, y = Inf,
+	    label = "${20:right_header}",
+	    hjust = 1, vjust = 0.3,
+	    size = 3.2, fontface = "bold"
+	  ) +
+	
+	  # Bracket connecting right header to top bar
+	  # Top horizontal tick at top of top bar
+	  annotate(
+	    "segment",
+	    x = ${21:bracket_x_inner}, xend = ${22:bracket_x_outer},
+	    y = top_bar_ymax, yend = top_bar_ymax,
+	    colour = "black", linewidth = 0.3
+	  ) +
+	  # Bottom horizontal tick at bottom of top bar
+	  annotate(
+	    "segment",
+	    x = ${21:bracket_x_inner}, xend = ${22:bracket_x_outer},
+	    y = top_bar_ymin, yend = top_bar_ymin,
+	    colour = "black", linewidth = 0.3
+	  ) +
+	  # Vertical line from bottom tick up toward header; adjust + ${23:0.05} to stop below header
+	  annotate(
+	    "segment",
+	    x = ${22:bracket_x_outer}, xend = ${22:bracket_x_outer},
+	    y = top_bar_ymin, yend = top_bar_ymax + ${23:0.05},
+	    colour = "black", linewidth = 0.3
+	  ) +
+	
+	  scale_x_continuous(
+	    limits = c(0, ${19:right_header_x})
+	  ) +
+	
+	  scale_y_continuous(
+	    #limits = c(min, max),
+	    breaks = plot_data$y_pos,
+	    labels = plot_data$${4:y_column},
+	    expand = expansion(mult = c(0.05, 0.05))
+	  ) +
+	
+	  # Remove all x axis elements - bars and direct labels replace them
+	  # clip = "off" needed to show column headers above panel
+	  theme(
+	    axis.text.x = element_blank(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_blank(),
+	    panel.grid.major.y = element_blank()
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet ggarea
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# Define groups based on y variable
+	orig_groups <- c("${1:group1_orig}", "${2:group2_orig}", "${3:group3_orig}", "${4:group4_orig}", "${5:group5_orig}")
+	renamed_groups <- c("${6:group1_name}", "${7:group2_name}", "${8:group3_name}", "${9:group4_name}", "${10:group5_name}") # define display names
+	
+	# OPTION 1: Multiple columns that need pivoting (no predefined groups)
+	# Uncomment and use this section if you have separate columns to pivot
+	# # group_columns <- c("group1_column", "group2_column", "group3_column", "group4_column")  # Corresponding column names
+	# 
+	# plot_data <- data |>
+	#   	filter(grouping_variable == "group_value") |>
+	#   	select(
+	# 		${11:x_variable}, 
+	#  		all_of(set_names(group_columns, renamed_groups))  # Rename columns during selection
+	#   	) |> 
+	#   	pivot_longer(
+	#     		-${11:x_variable}, 
+	#     		names_to = "${12:colour_variable}", 
+	#     		values_to = "${13:y_variable}"
+	#   	)
+	
+	# OPTION 2: Data already in long format (predefined groups, no pivoting)
+	# Use this section if your data already has grouping and y columns
+	# Define plot data
+	plot_data <- ${14:source} |> 
+		mutate(
+			${12:colour_variable} = str_replace_all(${12:colour_variable}, set_names(renamed_groups, orig_groups))
+		)
+		
+	# Set x min and max
+	x_min = plot_data |> pull(${11:x_variable}) |> min()
+	x_max = plot_data |> pull(${11:x_variable}) |> max()
+	
+	# Define scale colours
+	group_colours <- set_names(manual_5_colours, renamed_groups)  # replace manual_5_colours if need fewer/custom colours
+	
+
+	# Create explicit label positions - manually positioned to avoid overlaps - uncomment once values known
+	#label_data <- tibble(
+	#  	x = c(x_group1, x_group2, x_group3, x_group4, x_group5),
+	#  	y = c(y_group1, y_group2, y_group3, y_group4, y_group5),
+	#  	label = renamed_groups,
+	#		fontface = c("plain", "plain", "plain", "plain", "plain"),	 # set desired to "bold"
+	## 	If want label scoped to one facet panel (facet_level), uncomment and edit spec below
+	## 	Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
+	## 	facet_var = factor("facet_level", levels = levels(${7:plot_data}\$facet_var))
+	#)
+	
+	ggplot(plot_data, aes(x = ${11:x_variable}, y = ${13:y_variable}, fill = ${12:colour_variable})) +
+	
+		geom_area() +
+	
+		# commented out until label placements determined
+		#geom_text(
+		#  data = label_data,
+		#  aes(
+		#    x = x,
+		#    y = y,
+		#    label = label,
+		#    fontface = fontface
+		#  ),
+		#	 colour = "white",
+		#  size = 3.2,
+		#  hjust = 0,       # 0 left, 1 right, 0.5 default centered
+		#	 vjust = 0,				# 0 bottom, 1 top, 0.5 default centered
+		#  inherit.aes = FALSE
+		#) +
+		
+		scale_x_continuous(
+		  #limits = c(min, max),
+		  #breaks = seq(min, max, by),
+		  labels = label_number(big.mark = "", scale = 1, suffix = ""),
+		  minor_breaks = seq(x_min, x_max, 1),
+		  expand = expansion(mult = c(0.02, 0.05)),
+		  position = "bottom"
+		) +
+		
+		scale_y_continuous(
+		  #limits = c(min, max),
+		  position = "right",
+		  #breaks = seq(min, max, by),
+		  labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+		  expand = expansion(mult = c(0.0, 0.05))
+		) +
+		
+		scale_fill_manual(
+		  values = group_colours,
+		  guide = "none"
+		) +
+		
+		guides(x = guide_axis(minor.ticks = TRUE)) +
+		
+		# Right-axis label positioning: sit labels above gridlines
+		theme(
+		    axis.text.y.right = element_text(
+		      size = rel(1),
+		      hjust = 1.0,
+		      vjust = -0.5,
+		      margin = margin(r = 12, l = -20)
+		    )
+		  ) +
+		
+		labs(
+		  title = "Title",
+		  subtitle = "Subtitle<br>",
+		  caption = "Source: Source | *Charting Waterloo Region*"
+		)
+		
+snippet gglollipoprect
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_object} |>
+	  mutate(
+	    ${2:y_variable} = reorder(${2:y_variable}, ${3:x_variable}),
+	    ${3:x_variable} = round(${3:x_variable}, ${5:0}),
+	    ${6:rect_variable} = round(${6:rect_variable}, ${7:0}),
+	    y_label = if_else(${2:y_variable} == "${4:bold_y_value}", "**${4:bold_y_value}**", as.character(${2:y_variable}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${2:y_variable}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(x = ${3:x_variable}, y = ${2:y_variable})) +
+	
+	  geom_segment(aes(
+	    x = 0, xend = ${3:x_variable},
+	    y = ${2:y_variable}, yend = ${2:y_variable}),
+	    color = "grey50", linewidth = 0.7
+	  ) +
+	
+	  geom_point(
+	    aes(x = ${3:x_variable}, y = ${2:y_variable}),
+	    shape = 19, size = 4,
+	    color = dodgerblue
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  # Boxed right-side data labels
+	  # formatC pads positive numbers with a space to match width of negatives
+	  geom_label(
+	    aes(
+	      x = ${8:rect_x},
+	      y = ${2:y_variable},
+	      label = paste0(formatC(${6:rect_variable}, format = "f", digits = ${9:1}, flag = " "), "${10:rect_suffix}")
+	    ),
+	    hjust = 1,
+	    size = 3.2,
+	    fill = "grey90",
+	    colour = "black",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  # Shaded column header above rectangles
+	  annotate(
+	    "label",
+	    x = ${8:rect_x},
+	    y = Inf,
+	    label = "${11:rect_header}",
+	    hjust = 1,
+	    vjust = -1.0,  # lower is higher
+	    size = 3.2,
+	    fontface = "plain",
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  scale_x_continuous(
+	    limits = c(${12:x_min}, ${8:rect_x}),
+	    #breaks = seq(${12:x_min}, ${13:x_max}, ${14:by}),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.3)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  # clip = "off" needed to show rectangles and header beyond panel
+	  theme(
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank(),
+	    axis.text.y.left = element_markdown()
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+	  
+snippet gghorbarrect
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:plot_data} |>
+	  mutate(
+	    ${2:y_variable} = reorder(${2:y_variable}, ${3:x_variable}),
+	    ${4:rect_variable} = round(${4:rect_variable}, ${5:0}),
+	    y_label = if_else(${2:y_variable} == "${6:bold_y_value}", "**${6:bold_y_value}**", as.character(${2:y_variable}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${2:y_variable}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(x = ${3:x_variable}, y = ${2:y_variable}, fill = ${7:group_variable})) +
+	
+	  geom_col(
+	    #fill = dodgerblue,
+	    width = 0.7
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  # Boxed right-side data labels
+	  geom_label(
+	    aes(
+	      x = ${8:rect_x},
+	      y = ${2:y_variable},
+	      label = paste0(formatC(${4:rect_variable}, format = "f", digits = ${9:1}, flag = " "), "${10:rect_suffix}")
+	    ),
+	    hjust = 1,
+	    size = 3.2,
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  # Shaded column header above rectangles
+	  annotate(
+	    "label",
+	    x = ${8:rect_x},
+	    y = Inf,
+	    label = "${11:rect_header}",
+	    hjust = 1,
+	    vjust = -1.0,
+	    size = 3.2,
+	    fontface = "plain",
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  scale_x_continuous(
+	    limits = c(${12:x_min}, ${8:rect_x}),
+	    #breaks = seq(${12:x_min}, ${13:x_max}, ${14:by}),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.3)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # adjust number of colors/names to suit data
+	  scale_fill_manual(
+	    values = set_names(
+	      manual_5_colours,
+	      c(
+	        "${15:group1}",
+	        "${16:group2}",
+	        "${17:group3}",
+	        "${18:group4}",
+	        "${19:group5}"
+	      )
+	    ),
+	    #guide = "none"    # uncomment if want no legend
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  # clip = "off" needed to show rectangles and header beyond panel
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank()
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+
+snippet ggdumbbellrect
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_object} |>
+	  filter(${2:x_column} %in% c(${3:value1}, ${4:value2})) |>
+	  pivot_wider(
+	    id_cols = ${5:y_column},
+	    names_from = ${2:x_column},
+	    values_from = ${6:value_column}
+	  ) |>
+	  mutate(
+	    ${5:y_column} = reorder(${5:y_column}, `${3:value1}`),
+	    ${11:rect_variable} = round(${11:rect_variable}, ${12:0}),
+	    y_label = if_else(${5:y_column} == "${7:highlight_value}", "**${7:highlight_value}**", as.character(${5:y_column}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${5:y_column}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot() +
+	
+	  # Background reference segment spanning full x range
+	  geom_segment(aes(
+	    x = 0,
+	    xend = ${10:max_x},
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey80",
+	    linewidth = 0.3
+	  ) +
+	
+	  # Dumbbell segment connecting x1 to x2
+	  geom_segment(aes(
+	    x = `${3:value1}`,
+	    xend = `${4:value2}`,
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey50",
+	    linewidth = 0.7
+	  ) +
+	
+	  geom_point(aes(
+	    x = `${3:value1}`,
+	    y = ${5:y_column},
+	    color = "${8:x1_label}"
+	    ),
+	    shape = 19, size = 4
+	  ) +
+	
+	  geom_point(aes(
+	    x = `${4:value2}`,
+	    y = ${5:y_column},
+	    color = "${9:x2_label}"
+	    ),
+	    shape = 19, size = 4
+	  ) +
+	
+	  geom_vline(
+	    xintercept = 0,
+	    color = "black",
+	    linewidth = 0.5
+	  ) +
+	
+	  # Boxed right-side data labels
+	  geom_label(
+	    aes(
+	      x = ${13:rect_x},
+	      y = ${5:y_column},
+	      label = paste0(formatC(${11:rect_variable}, format = "f", digits = ${14:1}, flag = " "), "${15:rect_suffix}")
+	    ),
+	    hjust = 1,
+	    size = 3.2,
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  # Shaded column header above rectangles
+	  annotate(
+	    "label",
+	    x = ${13:rect_x},
+	    y = Inf,
+	    label = "${16:rect_header}",
+	    hjust = 1,
+	    vjust = -1.0,
+	    size = 3.2,
+	    fontface = "plain",
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  scale_color_manual(
+	    values = c(
+	      "${8:x1_label}" = cowboysilver,
+	      "${9:x2_label}" = dodgerblue
+	    ),
+	    name = NULL,
+	    breaks = c("${8:x1_label}", "${9:x2_label}")
+	  ) +
+	
+	  scale_x_continuous(
+	    limits = c(${17:x_min}, ${13:rect_x}),
+	    #breaks = seq(${17:x_min}, ${18:x_max}, ${19:by}),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.3)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  # clip = "off" needed to show rectangles and header beyond panel
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank(),
+	    legend.position = "inside",
+	    legend.justification = c(0, 1),
+	    legend.position.inside = c(0.05, 0.9),
+	    legend.direction = "vertical",
+	    legend.background = element_rect(fill = "white", color = NA)
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )
+
+snippet ggarrowrect
+	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	plot_data <- ${1:data_source} |>
+	  filter(${2:x_column} %in% c(${3:value1}, ${4:value2})) |>
+	  pivot_wider(
+	    id_cols = ${5:y_column},
+	    names_from = ${2:x_column},
+	    values_from = ${6:value_column}
+	  ) |>
+	  mutate(
+	    ${5:y_column} = reorder(${5:y_column}, `${3:value1}`),
+	    ${12:rect_variable} = round(${12:rect_variable}, ${13:0}),
+	    y_label = if_else(${5:y_column} == "${7:highlight_value}", "**${7:highlight_value}**", as.character(${5:y_column}))
+	  )
+	
+	# Pre-compute labels to avoid data masking issue in scale_y_discrete
+	y_labels <- plot_data |> select(${5:y_column}, y_label) |> deframe()
+	
+	plot_data |>
+	  ggplot(aes(y = ${5:y_column})) +
+	
+	  # Background reference segment spanning full x range
+	  geom_segment(aes(
+	    x = 0,
+	    xend = ${8:max_x},
+	    y = ${5:y_column},
+	    yend = ${5:y_column}
+	    ),
+	    color = "grey80",
+	    linewidth = 0.3
+	  ) +
+	
+	  geom_vline(xintercept = 0, linewidth = 0.5) +
+	
+	  geom_segment(
+	    aes(x = `${3:value1}`, xend = `${4:value2}`, yend = ${5:y_column}),
+	    arrow = arrow(length = unit(0.3, "cm"), type = "open"),
+	    linewidth = 1.0,
+	    color = dodgerblue
+	  ) +
+	
+	  annotate(
+	    "label",
+	    x = ${9:label_x},
+	    y = ${10:label_y},
+	    label = "${11:annotation_text}",
+	    fill = "white",
+	    linewidth = 0,
+	    size = 3.2
+	  ) +
+	
+	  # Boxed right-side data labels
+	  geom_label(
+	    aes(
+	      x = ${14:rect_x},
+	      y = ${5:y_column},
+	      label = paste0(formatC(${12:rect_variable}, format = "f", digits = ${15:1}, flag = " "), "${16:rect_suffix}")
+	    ),
+	    hjust = 1,
+	    size = 3.2,
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  # Shaded column header above rectangles
+	  annotate(
+	    "label",
+	    x = ${14:rect_x},
+	    y = Inf,
+	    label = "${17:rect_header}",
+	    hjust = 1,
+	    vjust = -1.0,
+	    size = 3.2,
+	    fontface = "plain",
+	    fill = "grey90",
+	    colour = "grey30",
+	    linewidth = 0,
+	    label.padding = unit(0.3, "lines")
+	  ) +
+	
+	  scale_x_continuous(
+	    limits = c(${18:x_min}, ${14:rect_x}),
+	    #breaks = seq(${18:x_min}, ${19:x_max}, ${20:by}),
+	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+	    expand = expansion(mult = c(0.02, 0.3)),
+	    position = "top"
+	  ) +
+	
+	  scale_y_discrete(
+	    position = "left",
+	    labels = y_labels
+	  ) +
+	
+	  # Horizontal chart: swap tufte's default grid orientation
+	  # clip = "off" needed to show rectangles and header beyond panel
+	  theme(
+	    axis.text.y.left = element_markdown(),
+	    axis.ticks.x = element_blank(),
+	    axis.line.x = element_blank(),
+	    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+	    panel.grid.major.y = element_blank()
+	  ) +
+	
+	  coord_cartesian(clip = "off") +
+	
+	  labs(
+	    title = "Title",
+	    subtitle = "Subtitle",
+	    caption = "Source: Source | *Charting Waterloo Region*"
+	  )

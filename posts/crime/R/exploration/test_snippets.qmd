@@ -1,0 +1,4646 @@
+---
+title: "Crime in Waterloo Region - Snippet Chart Styles"
+draft: true
+format: 
+  html:
+    css: |
+      "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body { 
+        font-family: 'Inter', sans-serif; 
+      }"
+editor: visual
+execute:
+  fig-dpi: 400
+  fig-width: 10
+  fig-height: 6
+  out-width: "100%"
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r load-libraries, include=FALSE}
+here::i_am("posts/crime/R/exploration/test_snippets.qmd")
+
+library(tidyverse)
+library(scales)
+library(here)
+library(gt)
+library(tidytext)
+library(janitor)
+library(cansim)
+library(broom)
+library(gtExtras)
+library(conflicted)
+library(ggtext)
+library(grid)
+library(slider)
+
+conflicts_prefer(dplyr::filter, dplyr::select, dplyr::mutate, dplyr::lag)
+
+knitr::opts_chunk$set(dev = "ragg_png", dpi = 400)
+
+number_options(big.mark = "")
+```
+
+```{r load-data}
+incidents <- read_rds(here("posts", "crime", "data", "clean", "criminal_incidents.rds"))
+
+incident_totals <- read_rds(here("posts", "crime", "data", "clean", "criminal_incident_totals.rds"))
+
+incident_summary <-  read_rds(here("posts", "crime", "data", "clean", "criminal_incident_summary.rds"))
+
+csi <- read_rds(here("posts", "crime", "data", "clean", "crime_severity_index.rds"))
+
+homicide_victims <- read_rds(here("posts", "crime", "data", "clean", "homicide_victims.rds"))
+
+hate_crimes <- read_rds(here("posts", "crime", "data", "clean", "hate_crimes.rds"))
+
+cyber_crimes <- read_rds(here("posts", "crime", "data", "clean", "cyber_crimes.rds"))
+
+ipv_victims <- read_rds(here("posts", "crime", "data", "clean", "family_ipv_victims.rds"))
+
+personnel<- read_rds(here("posts", "crime", "data", "clean", "personnel.rds"))
+
+big_12_financials <- read_rds(here("posts", "crime", "data", "clean", "big_12_financial_summary.rds"))
+```
+
+```{r create-ggplot-themes, include=FALSE}
+# set custom colours and colour groups (ggcolours snippet)
+ontgreen <- "darkgreen"
+habsred <- "#AF1E2D"
+habsred50 <- prismatic::clr_mix(habsred, "white", ratio = 0.5)
+cowboysilver <- "#869397"
+cowboysilver50 <- prismatic::clr_mix(cowboysilver, "white", ratio = 0.5)
+cowboysilver_alpha30 <- adjustcolor(cowboysilver, alpha.f = 0.3)
+dodgerblue <- "dodgerblue4"
+dodgerblue50 <- prismatic::clr_mix(dodgerblue, "white", ratio = 0.5)
+manual_5_colours <- c(habsred, habsred50, cowboysilver, dodgerblue50, dodgerblue)
+manual_4_colours <- c(habsred, habsred50, dodgerblue50, dodgerblue)
+manual_3_colours <- c(habsred, cowboysilver, dodgerblue)
+manual_2_colours <- c(cowboysilver, dodgerblue)
+
+# Create the Tufte-inspired theme (ggtufte snippet)
+theme_tufte <- function(base_size = 13, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) +
+    theme(
+      # Text elements
+      plot.title = element_markdown(
+        size = base_size * 1.0,
+        hjust = 0,
+        vjust = 1,
+        margin = margin(0, 0, 5, 0),
+        face = "bold"
+      ),
+      plot.subtitle = element_markdown(
+        size = base_size * 0.7,
+        hjust = 0,
+        vjust = 1,
+        margin = margin(0, 0, 10, 0),
+        color = "black",
+        face = "bold"
+      ),
+      plot.caption = element_markdown(
+        size = base_size * 0.6,
+        hjust = 0,
+        vjust = 1,
+        margin = margin(t = 10),
+        color = cowboysilver
+      ),
+
+      # Axis elements - minimal but functional
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.x = element_text(
+        size = base_size * 0.8,
+        margin = margin(t = base_size * 0.25)
+      ),
+      axis.text.y = element_markdown(
+        size = base_size * 0.8,
+        margin = margin(r = base_size * 0.25),
+        hjust = 0
+      ),
+
+      # Minimal axis lines - only where data meets axis
+      axis.line.x = element_line(
+        color = "black",
+        linewidth = 0.5,
+        linetype = "solid"
+      ),
+      axis.line.y = element_blank(),
+
+      # Axis ticks
+      axis.ticks.x = element_line(color = "black", linewidth = 0.5),
+      axis.ticks.length.x = unit(0.15, "cm"),
+      axis.minor.ticks.length = rel(0.5),
+
+      # Gridlines
+      panel.grid.major.y = element_line(
+        color = "grey80",
+        linewidth = 0.3
+      ),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+
+      # Legend - clean and minimal
+      legend.position = "inside",
+      legend.position.inside = c(-0.0, 1.02),
+      legend.justification = "left",
+      legend.box = "horizontal",
+      #legend.margin = margin(t = 20, b = 20),
+      legend.direction = "horizontal",
+      legend.title = element_blank(),
+      legend.text = element_text(
+        size = base_size * 0.8,
+        margin = margin(r = 10)
+      ),
+      #legend.key = element_blank(),
+      legend.spacing = unit(0.1, "cm"),
+      legend.box.spacing = unit(0.1, "cm"),
+
+      # Faceting - minimal
+      strip.text = element_text(
+      hjust = 0,
+      size = base_size * 0.8,
+      margin = margin(b = base_size * 0.5),
+      face = "bold"
+      ),
+      strip.background = element_blank(),
+      panel.spacing.y = unit(1.5, "lines"),
+
+      # Plot settings - left justify all
+      plot.margin = margin(
+        t = base_size,
+        r = base_size,
+        b = base_size,
+        l = base_size
+      ),
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+
+      # Remove panel border
+      panel.border = element_blank(),
+
+      # Background
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.background = element_rect(fill = "white", color = NA)
+    )
+}
+
+# Set as the default theme for all plots
+theme_set(theme_tufte(base_size = 13, base_family = ""))
+
+# create base size object
+base_size <- 13
+
+# consistent colours for the regions compared throughout
+comp_colours <- c(
+  "WRPS" = dodgerblue,
+  "Canada" = habsred,
+  "Ontario" = ontgreen,
+  "Other Big 12" = cowboysilver50
+)
+
+# colours for the WRPS vs nearby cities comparisons
+local_colours <- c(
+  "WRPS" = dodgerblue,
+  "Guelph" = dodgerblue50,
+  "London" = cowboysilver,
+  "Hamilton" = habsred
+)
+```
+
+```{r create-big-12-tibble}
+big_12 <- personnel |>
+  filter(region %in% c("Canada", "Ontario") | in_big_12) |>
+  mutate(comparison_group = if_else(region %in% c("Canada", "Ontario", "WRPS"), region, "Other Big 12"))
+
+big_12_join <- big_12 |>
+  select(geo_uid, in_big_12, comparison_group) |>
+  distinct()
+
+csi <- csi |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incident_summary <- incident_summary |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incident_totals <- incident_totals |>
+  left_join(big_12_join, join_by(geo_uid))
+
+incidents <- incidents |>
+  left_join(big_12_join, join_by(geo_uid))
+
+big_12_financials <- big_12_financials |>
+  left_join(big_12_join |> select(-in_big_12), join_by(geo_uid))
+
+# cities used for the local comparisons
+local_cities <- names(local_colours)
+```
+
+```{r set-reference-years}
+# First and latest year in each table - every year reference in the titles, subtitles
+# and axes below flows from these, so the file updates itself as new data arrives
+first_year_incidents <- min(incidents$year)
+latest_year_incidents <- max(incidents$year)
+
+first_year_incident_summary <- min(incident_summary$year)
+latest_year_incident_summary <- max(incident_summary$year)
+
+first_year_csi <- min(csi$year)
+latest_year_csi <- max(csi$year)
+
+first_year_personnel <- min(personnel$year)
+latest_year_personnel <- max(personnel$year)
+
+first_year_financials <- min(big_12_financials$year)
+latest_year_financials <- max(big_12_financials$year)
+
+first_year_homicides <- min(homicide_victims$year)
+latest_year_homicides <- max(homicide_victims$year)
+
+# baselines for the rolling ten-year comparisons
+decade_ago_incidents <- latest_year_incidents - 10
+decade_ago_personnel <- latest_year_personnel - 10
+
+# the personnel survey skips years - name the gaps in the captions rather than hard-coding them
+personnel_missing_years <- setdiff(first_year_personnel:latest_year_personnel, personnel$year) |>
+  as.character() |>
+  str_flatten_comma(last = " and ")
+
+# financial reporting lags for some services, so use the most recent year in which
+# all but at most one of the Big 12 reported, and name the non-reporters in the subtitle
+latest_year_financials_reported <- big_12_financials |>
+  filter(!is.na(total_exp_per_capita)) |>
+  count(year) |>
+  filter(n >= max(n) - 1) |>
+  slice_max(year, n = 1) |>
+  pull(year)
+
+financials_not_reporting <- setdiff(
+  unique(big_12_financials$region),
+  big_12_financials |>
+    filter(year == latest_year_financials_reported, !is.na(total_exp_per_capita)) |>
+    pull(region)
+) |>
+  str_flatten_comma(last = " and ")
+```
+
+Every chart below uses the same data as `test.qmd`; only the styling has been rebuilt from the snippets in `r.snippets`. The snippet used is named in a comment at the top of each chunk.
+
+## Criminal Incidents
+
+### Waterloo Region, Ontario, and Canada
+
+```{r plot-incidents-vs-Can-Ont}
+# ggline
+plot_data <- incident_summary |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_all, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    breaks = seq(x_min, x_max, 5),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.08)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 15, l = -25)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+[Police-Reported Crime Statistics in Canada, `r latest_year_incident_summary` - Stats Can Analysis](https://www150.statcan.gc.ca/n1/daily-quotidien/250722/dq250722a-eng.htm)
+
+## Homicide Victims
+
+### Canada
+
+```{r plot_hom-victims-cma}
+# ggline + ggannotate
+# first year the CMA / non-CMA split is reported
+first_year_cma <- homicide_victims |>
+  filter(city == "Total CMA", !is.na(incidents_per_100k)) |>
+  pull(year) |>
+  min()
+
+plot_data <- homicide_victims |>
+  filter(province == "Canada")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(
+  manual_3_colours,
+  c("Total All Regions", "Total Non-CMA", "Total CMA")
+)
+
+# Federal governing party, with the year each period began
+party_data <- tibble(
+  start = c(1961, 1963, 1968, 1979, 1980, 1984, 1993, 2006, 2015),
+  label = c("C", "L", "L", "C", "L", "C", "L", "C", "L")
+) |>
+  mutate(mid = (start + lead(start, default = x_max)) / 2)
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k, colour = city)) +
+
+  # Party change markers
+  geom_vline(
+    data = party_data |> filter(start > x_min),
+    aes(xintercept = start),
+    linetype = "dashed",
+    alpha = 0.7,
+    colour = cowboysilver,
+    inherit.aes = FALSE
+  ) +
+
+  geom_line(linewidth = 0.5) +
+
+  # Party in power labels
+  geom_text(
+    data = party_data,
+    aes(x = mid, y = Inf, label = label),
+    vjust = 1.4,
+    size = 3.2,
+    colour = "grey30",
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    breaks = seq(x_min, x_max, 10),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    limits = c(1.2, 3.2),
+    breaks = seq(1.2, 2.8, 0.4),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.07))
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Homicide Victims in Canada, per 100,000 people: {first_year_homicides}-{latest_year_homicides}"),
+    subtitle = str_glue("Including breakdown between Census Metropolitan Areas and Non-CMAs for {first_year_cma}-{latest_year_homicides}<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+### Waterloo Region, Ontario, and Canada
+
+```{r homicide-wrps}
+# ggline
+plot_data <- homicide_victims |>
+  filter(
+    city %in% c("Total CMA", "KWC"),
+    province %in% c("Canada", "Ontario"),
+    year >= 1981    # no data at CMA level before 1981
+  ) |> 
+  mutate(
+    city = case_when(
+      city == "KWC" ~ "KWC CMA",
+      province == "Ontario" ~ "All Ontario CMAs",
+      province == "Canada" ~ "All Canadian CMAs"
+    )
+  )
+
+line_colours <- c(
+  "KWC CMA" = dodgerblue,
+  "All Canadian CMAs" = habsred,
+  "All Ontario CMAs" = ontgreen
+)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k, colour = city)) +
+  
+  geom_line(linewidth = 0.5) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    breaks = seq(x_min, x_max, 5),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+  
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+  
+  scale_colour_manual(
+    values = line_colours
+  ) +
+  
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+  
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+  
+  labs(
+    title = "Homicide victims",
+    subtitle = "Incidents per 100,000 residents<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r homicide-wrps-3yr-mov-avg}
+# ggline
+plot_data <- homicide_victims |>
+  filter(
+    city %in% c("Total CMA", "KWC"),
+    province %in% c("Canada", "Ontario"),
+    year >= 1981    # no data at CMA level before 1981
+  ) |> 
+  mutate(
+    city = case_when(
+      city == "KWC" ~ "KWC CMA",
+      province == "Ontario" ~ "All Ontario CMAs",
+      province == "Canada" ~ "All Canadian CMAs"
+    )
+  ) |> 
+  group_by(city) |> 
+  arrange(year) |>      # essential: slider works on position, not on the year value
+  mutate(
+    ma_3_incidents_per_100k = slide_dbl(
+      incidents_per_100k,            # column to average
+      .f = mean,        # function applied to each window
+      .before = 2,      # 2 prior rows + current row = 3-year window
+      .complete = TRUE  # NA until a full window exists
+    )
+  ) |> 
+  ungroup() |> 
+  filter(!is.na(ma_3_incidents_per_100k))
+
+line_colours <- c(
+  "KWC CMA" = dodgerblue,
+  "All Canadian CMAs" = habsred,
+  "All Ontario CMAs" = ontgreen
+)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+ggplot(plot_data, aes(x = year, y = ma_3_incidents_per_100k, colour = city)) +
+  
+  geom_line(linewidth = 0.5) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    breaks = seq(x_min, x_max, 5),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+  
+  scale_y_continuous(
+    position = "right",
+    limits = c(0, 3),
+    breaks = seq(0, 2.5, 0.5),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+  
+  scale_colour_manual(
+    values = line_colours
+  ) +
+  
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+  
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    )
+  ) +
+  
+  labs(
+    title = "Homicide victims",
+    subtitle = "Incidents per 100,000 residents, three-year moving average<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+
+
+```
+
+## Crime Severity Index
+
+### Waterloo Region, Ontario, and Canada
+
+```{r plot-csi-vs-Can-Ont}
+# ggline
+plot_data <- csi |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = csi, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Crime Severity Index",
+    subtitle = str_glue("{first_year_csi}-{latest_year_csi}<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+### Waterloo Region and Nearby Cities
+
+```{r plot-incidents-local}
+# ggline
+plot_data <- incident_summary |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_all, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-local}
+# ggline
+plot_data <- csi |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = csi, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Violent Crime
+
+### Waterloo Region, Ontario, and Canada
+
+```{r plot-violent-incidents-vs-Can-Ont}
+# ggline
+plot_data <- incident_summary |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_violent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Largest Increases Over the Past Decade
+
+```{r decade-change-data}
+incidents_decade_change <- incidents |>
+  group_by(region, type, category, subcategory, class, violation_master) |>
+  summarise(
+    incidents_per_100k_start = sum(incidents_per_100k[year == decade_ago_incidents], na.rm = TRUE),
+    incidents_per_100k_latest = sum(incidents_per_100k[year == latest_year_incidents], na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    change_vs_start = incidents_per_100k_latest - incidents_per_100k_start,
+    perc_change_vs_start = case_when(
+      incidents_per_100k_start == 0 ~ str_glue("Zero in {decade_ago_incidents}"),  # Avoid division by zero
+      TRUE ~ as.character(round(change_vs_start / incidents_per_100k_start * 100, 1))
+    )
+  ) |>
+  arrange(region, type, desc(change_vs_start))
+```
+
+```{r violent-incidents-top10-increases-decade}
+# gglollipop
+plot_data <- incidents_decade_change |>
+  filter(
+    region == "WRPS",
+    type == "Violent"
+  ) |>
+  slice_max(n = 10, order_by = change_vs_start) |>
+  mutate(
+    violation_master = reorder(violation_master, change_vs_start),
+    y_label = as.character(violation_master)
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(violation_master, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = change_vs_start, y = violation_master)) +
+
+  geom_segment(aes(
+    x = 0, xend = change_vs_start,
+    y = violation_master,
+    yend = violation_master),
+    color = "grey50", linewidth = 0.7) +
+
+  geom_point(
+    aes(
+      x = change_vs_start,
+      y = violation_master
+    ),
+    shape = 19, size = 3,
+    color = dodgerblue
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank(),
+    axis.text.y.left = element_markdown()
+  ) +
+
+  labs(
+    title = "Top 10 Increases in Violent Crime",
+    subtitle = str_glue("Increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r violent-incidents-top10-perc-increases-decade}
+# gglollipop
+plot_data <- incidents_decade_change |>
+  filter(
+    region == "WRPS",
+    type == "Violent",
+    perc_change_vs_start != "Zero in 2015",
+    incidents_per_100k_start >= 1
+  ) |> 
+  mutate(perc_change_vs_start = as.numeric(perc_change_vs_start)) |> 
+  slice_max(n = 10, order_by = perc_change_vs_start) |>
+  mutate(
+    violation_master = reorder(violation_master, perc_change_vs_start),
+    y_label = as.character(violation_master)
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(violation_master, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = perc_change_vs_start, y = violation_master)) +
+  
+  geom_segment(aes(
+    x = 0, xend = perc_change_vs_start,
+    y = violation_master,
+    yend = violation_master),
+    color = "grey50", linewidth = 0.7) +
+  
+  geom_point(
+    aes(
+      x = perc_change_vs_start,
+      y = violation_master
+    ),
+    shape = 19, size = 3,
+    color = dodgerblue
+  ) +
+  
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+  
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+  
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank(),
+    axis.text.y.left = element_markdown()
+  ) +
+  
+  labs(
+    title = "Top 10 Increases in Violent Crime",
+    subtitle = str_glue("Percentage increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-nonviolent-crimes-wrps-top10-increases-decade}
+# gglollipoplabel
+plot_data <- incidents_decade_change |>
+  filter(
+    region == "WRPS",
+    type == "Non-Violent"
+  ) |>
+  slice_max(n = 10, order_by = change_vs_start) |>
+  mutate(
+    violation_master = reorder(violation_master, change_vs_start),
+    y_label = str_wrap(as.character(violation_master), 50)
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(violation_master, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = change_vs_start, y = violation_master)) +
+
+  geom_segment(aes(
+    x = 0, xend = change_vs_start,
+    y = violation_master,
+    yend = violation_master),
+    color = "grey50", linewidth = 0.7) +
+
+  geom_point(
+    aes(
+      x = change_vs_start,
+      y = violation_master
+    ),
+    shape = 19, size = 3,
+    color = dodgerblue
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: no x axis or gridlines - direct labels replace them
+  # clip = "off" allows labels to extend beyond panel edge
+  theme(
+    #axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = "Top 10 Increases in Non-Violent Crime",
+    subtitle = str_glue("Increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r nonviolent-incidents-top10-perc-increases-decade}
+# gglollipop
+plot_data <- incidents_decade_change |>
+  filter(
+    region == "WRPS",
+    type == "Non-Violent",
+    perc_change_vs_start != "Zero in 2015",
+    incidents_per_100k_start >= 1
+  ) |> 
+  mutate(perc_change_vs_start = as.numeric(perc_change_vs_start)) |> 
+  slice_max(n = 10, order_by = perc_change_vs_start) |>
+  mutate(
+    violation_master = reorder(violation_master, perc_change_vs_start),
+    y_label = str_wrap(as.character(violation_master), 50)
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(violation_master, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = perc_change_vs_start, y = violation_master)) +
+  
+  geom_segment(aes(
+    x = 0, xend = perc_change_vs_start,
+    y = violation_master,
+    yend = violation_master),
+    color = "grey50", linewidth = 0.7) +
+  
+  geom_point(
+    aes(
+      x = perc_change_vs_start,
+      y = violation_master
+    ),
+    shape = 19, size = 3,
+    color = dodgerblue
+  ) +
+  
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+  
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+  
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+  
+  labs(
+    title = "Top 10 Increases in Non-Violent Crime",
+    subtitle = str_glue("Percentage increase in incidents per 100,000 residents, Waterloo Region, {latest_year_incidents} vs {decade_ago_incidents}"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Selected Offences
+
+```{r assaults-base-wrps, fig.height=10, fig.width=7}
+plot_data <- incidents |>
+  filter(
+    region %in% c("Canada", "Ontario", "WRPS"),
+    ucr_code %in% c("135", "1410", "1420", "1430", "1440", "1470", "1480")
+  ) |>
+  mutate(violation_master = replace_when(violation_master, class == "Other Assaults" ~ "Other Assaults")) |> 
+  summarise(incidents_per_100k = sum(incidents_per_100k), .by = c(year, region, violation_master)) |> 
+  group_by(region, violation_master) |> 
+  mutate(base_incidents = incidents_per_100k / first(incidents_per_100k, order_by = year) * 100) |>
+  ungroup()
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = base_incidents, colour = region)) +
+  
+  geom_line(linewidth = 0.5) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+  
+  scale_y_continuous(
+    position = "right",
+    expand_limits(y = 0),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+  
+  scale_colour_manual(
+    values = group_colours
+  ) +
+  
+  facet_wrap(
+    ~ violation_master,
+    ncol = 2,
+    scales = "free_y"
+  ) +
+  
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+  
+  theme(
+    legend.position = "top",
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+  
+  labs(
+    title = "Assaults",
+    subtitle = str_glue("Incidents per 100,000 residents, {first_year_incidents} = 100<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r sex-assaults-base-wrps, fig.height=10, fig.width=7}
+plot_data <- incidents |>
+  filter(
+    !is.na(incidents_per_100k),
+    region %in% c("Canada", "Ontario", "WRPS"),
+    str_detect(violation_master, "Sexual Assault") | class == "Sexual Violations Against Children"
+  ) |>
+  mutate(
+    violation_master = as.character(violation_master),
+    violation_master = replace_when(violation_master, class == "Sexual Violations Against Children" ~ "Sexual Violations Against Children")
+  ) |> 
+  # crimes against children phased in over several year, 2015 is first year when all in effect, so ignore pre-2015 for consistency in crimes
+  filter(!(year < 2015 & violation_master == "Sexual Violations Against Children")) |> 
+  summarise(incidents_per_100k = sum(incidents_per_100k), .by = c(year, region, violation_master)) |> 
+  group_by(region, violation_master) |> 
+  mutate(base_incidents = incidents_per_100k / first(incidents_per_100k, order_by = year) * 100) |>
+  ungroup()
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = base_incidents, colour = region)) +
+  
+  geom_line(linewidth = 0.5) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+  
+  scale_y_continuous(
+    position = "right",
+    expand_limits(y = 0),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+  
+  scale_colour_manual(
+    values = group_colours
+  ) +
+  
+  facet_wrap(
+    ~ violation_master,
+    ncol = 2,
+    scales = "free_y"
+  ) +
+  
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+  
+  theme(
+    legend.position = "top",
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+  
+  labs(
+    title = "Sexual Assaults",
+    subtitle = str_glue("Incidents per 100,000 residents, {first_year_incidents} and 2015 = 100<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r sex-assaults-wrps, fig.height=10, fig.width=7}
+
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k, colour = region)) +
+  
+  geom_line(linewidth = 0.5) +
+  
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+  
+  scale_y_continuous(
+    position = "right",
+    #expand_limits(y = 0),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+  
+  scale_colour_manual(
+    values = group_colours
+  ) +
+  
+  facet_wrap(
+    ~ violation_master,
+    ncol = 2,
+    scales = "free_y"
+  ) +
+  
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+  
+  theme(
+    legend.position = "top",
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+  
+  labs(
+    title = "Sexual Assaults",
+    subtitle = str_glue("Incidents per 100,000 residents<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r vehicle-theft-base-wrps}
+# ggline
+plot_data <- incidents |>
+  filter(
+    region %in% c("Canada", "Ontario", "WRPS"),
+    violation_master == "Motor Vehicle Theft"
+  ) |>
+  group_by(region) |>
+  mutate(base_incidents = incidents_per_100k / first(incidents_per_100k, order_by = year) * 100) |>
+  ungroup()
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = base_incidents, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Motor Vehicle Theft",
+    subtitle = str_glue("Change in incidents per 100,000 residents, {first_year_incidents} = 100<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r vehicle-theft-wrps}
+# ggline
+plot_data <- incidents |>
+  filter(
+    region %in% c("Canada", "Ontario", "WRPS"),
+    violation_master == "Motor Vehicle Theft"
+  )
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Motor Vehicle Theft",
+    subtitle = "Incidents per 100,000 residents<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r abduction-under-14-wrps, fig.height=7, fig.width=8}
+# ggvertbar + ggfacet
+plot_data <- incidents |>
+  filter(
+    region == "WRPS",
+    str_detect(violation_master, "Abduction Under 14")
+  ) |>
+  mutate(
+    violation_master = str_replace_all(violation_master, c(
+      "Abduction Under 14,* " = "",
+      "by" = "By",
+      "Not" = "Not by")
+    ))
+
+plot_data |>
+  ggplot(aes(x = year, y = incidents_per_100k)) +
+
+  geom_col(
+    fill = dodgerblue,
+    width = 0.7
+  ) +
+
+  facet_wrap(
+    ~ violation_master,
+    ncol = 1,
+    scales = "free_y"
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.03)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = FALSE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -12)
+    ),
+    axis.ticks.x = element_blank()
+  ) +
+
+  labs(
+    title = "Abductions Under 14",
+    subtitle = "Incidents per 100,000 residents",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Violent Crime Severity Index
+
+```{r plot-csi-violent-incidents-vs-Can-Ont}
+# ggline
+plot_data <- csi |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = csi_violent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-violent-incidents-vs-Can-Ont-yoy}
+# ggline
+plot_data <- csi |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = yoy_perc_change_csi_violent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.05, 0.05))
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "Year-over-year change, %<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+### Violent Crime in Waterloo Region and Nearby Cities
+
+```{r plot-violent-incidents-local}
+# ggline
+plot_data <- incident_summary |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_violent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-violent-incidents-local}
+# ggline
+plot_data <- csi |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = csi_violent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Non-Violent Crime
+
+### Waterloo Region, Ontario, and Canada
+
+```{r plot-nonviolent-incidents-vs-Can-Ont}
+# ggline
+plot_data <- incident_summary |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_nonviolent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Non-Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-nonviolent-vs-Can-Ont}
+# ggline
+plot_data <- csi |>
+  filter(str_detect(region, "WRPS|Canada|Ontario"))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = csi_nonviolent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Non-Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+### Non-Violent Crime in Waterloo Region and Nearby Cities
+
+```{r plot-nonviolent-incidents-local}
+# ggline
+plot_data <- incident_summary |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = incidents_per_100k_nonviolent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Number of Non-Violent Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
+    subtitle = "Per 100,000 population<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-nonviolent-local}
+# ggline
+plot_data <- csi |>
+  filter(region %in% local_cities)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- local_colours
+
+ggplot(plot_data, aes(x = year, y = csi_nonviolent, colour = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = str_glue("Non-Violent Crime Severity Index: {first_year_csi}-{latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## The Big 12 Police Services
+
+### Criminal Incidents and Crime Severity
+
+```{r plot-big12-ranked-incidents}
+# gghorbar (direct bar labels option) + ggfacet
+plot_data <- incident_summary |>
+  filter(
+    in_big_12,
+    year == latest_year_incident_summary
+  ) |>
+  select(region, comparison_group, incidents_per_100k_all, incidents_per_100k_violent, incidents_per_100k_nonviolent) |>
+  pivot_longer(
+    cols = c(incidents_per_100k_all, incidents_per_100k_violent, incidents_per_100k_nonviolent),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric_label = case_when(
+      metric == "incidents_per_100k_all" ~ "Total",
+      metric == "incidents_per_100k_violent" ~ "Violent",
+      metric == "incidents_per_100k_nonviolent" ~ "Non-Violent"
+    ),
+    metric_label = factor(metric_label, levels = c("Total", "Violent", "Non-Violent"))
+  ) |>
+  group_by(metric) |>
+  mutate(region = reorder_within(region, value, metric)) |>
+  ungroup()
+
+plot_data |>
+  ggplot(aes(x = value, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  # Direct bar labels, inside right of bar
+  geom_text(
+    aes(x = value, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 1)(value)),
+    hjust = 1.15,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  facet_wrap(
+    ~ metric_label,
+    ncol = 3,
+    scales = "free"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_reordered() +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS"))
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Criminal Incidents: {latest_year_incident_summary}"),
+    subtitle = "per 100,000 residents<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-big12-ranked-csi}
+# gghorbar (direct bar labels option) + ggfacet
+plot_data <- csi |>
+  filter(
+    in_big_12,
+    year == latest_year_csi
+  ) |>
+  select(region, comparison_group, csi, csi_violent, csi_nonviolent) |>
+  pivot_longer(
+    cols = c(csi, csi_violent, csi_nonviolent),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric_label = case_when(
+      metric == "csi" ~ "All",
+      metric == "csi_violent" ~ "Violent",
+      metric == "csi_nonviolent" ~ "Non-Violent"
+    ),
+    metric_label = factor(metric_label, levels = c("All", "Violent", "Non-Violent"))
+  ) |>
+  group_by(metric) |>
+  mutate(region = reorder_within(region, value, metric)) |>
+  ungroup()
+
+plot_data |>
+  ggplot(aes(x = value, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  geom_text(
+    aes(x = value, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 0.1)(value)),
+    hjust = 1.15,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  facet_wrap(
+    ~ metric_label,
+    ncol = 3,
+    scales = "free"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_reordered() +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS"))
+  ) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Crime Severity Index: {latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-big12-ranked-officers-per-incident}
+# gghorbar (direct bar labels option) + ggfacet
+plot_data <- big_12 |>
+  filter(
+    in_big_12,
+    year == latest_year_personnel
+  ) |>
+  select(region, comparison_group, incidents_per_officer, incidents_per_officer_violent, incidents_per_officer_nonviolent) |>
+  pivot_longer(
+    cols = c(3:5),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric_label = case_when(
+      metric == "incidents_per_officer" ~ "All Crimes",
+      metric == "incidents_per_officer_violent" ~ "Violent Crimes",
+      metric == "incidents_per_officer_nonviolent" ~ "Non-Violent Crimes"
+    ),
+    metric_label = factor(metric_label, levels = c("All Crimes", "Violent Crimes", "Non-Violent Crimes"))
+  ) |>
+  group_by(metric) |>
+  mutate(region = reorder_within(region, value, metric)) |>
+  ungroup()
+
+plot_data |>
+  ggplot(aes(x = value, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  geom_text(
+    aes(x = value, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 0.1)(value)),
+    hjust = 1.15,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  facet_wrap(
+    ~ metric_label,
+    ncol = 3,
+    scales = "free"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_reordered() +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS"))
+  ) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Incidents per Officer: {latest_year_personnel}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+From `r latest_year_financials` WRPS Budget Information Package (Windsor is missing; year not noted, but WRPS number is close to my number calculated for 2022 based on 2022 WRPS Annual Report figures)
+
+![](images/clipboard-60580425.png)
+
+## Crime Severity and Clearance Rates in Waterloo Region
+
+```{r plot-csi-clearance-wrps, fig.height=10, fig.width=10}
+# ggline + ggfacet
+# Define groups based on y variable
+orig_groups <- c("base_csi", "base_clearance_rate")
+renamed_groups <- c("CSI", "Clearance Rate")
+
+plot_data <- csi |>
+  filter(region == "WRPS") |>
+  select(year, base_csi:base_clearance_rate_nonviolent) |>
+  pivot_longer(
+    cols = base_csi:base_clearance_rate_nonviolent,
+    names_to = "metric",
+    values_to = "base_rate"
+  ) |>
+  mutate(
+    type = case_when(
+      str_detect(metric, "_violent$") ~ "Violent Crimes",
+      str_detect(metric, "_nonviolent$") ~ "Non-violent Crimes",
+      TRUE ~ "All Crimes"
+    ),
+    statistic = case_when(
+      str_detect(metric, "base_csi") ~ "CSI",
+      str_detect(metric, "base_clearance_rate") ~ "Clearance Rate"
+    )
+  ) |>
+  filter(!is.na(statistic)) |>
+  arrange(type, year)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_2_colours, rev(renamed_groups))
+
+# Direct line labels, placed in the "All Crimes" panel only
+label_data <- plot_data |>
+  filter(year == 2006, type == "All Crimes") |>
+  mutate(
+    label = statistic,
+    fontface = "bold",
+    nudge_y = 5
+  )
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = statistic)) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = year,
+      y = base_rate + nudge_y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 1,
+    vjust = 0,
+    inherit.aes = FALSE
+  ) +
+
+  facet_wrap(
+    ~ type,
+    ncol = 1,
+    scales = "free_y"
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Trends in Crime Severity Index and CSI-Weighted Clearance Rate",
+    subtitle = str_glue("Waterloo Region, {first_year_csi}-{latest_year_csi}, {first_year_csi} = 100<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-csi-incidents-wrps, fig.height=10, fig.width=8}
+# ggline + ggfacet
+renamed_groups <- c("CSI", "Incidents/100k")
+
+plot_data <- csi |>
+  filter(region == "WRPS") |>
+  select(year, region, starts_with("base_csi")) |>
+  left_join(
+    incident_summary |>
+      select(year, region, starts_with("base_incidents_per_100k")),
+      join_by(year, region)
+    ) |>
+  pivot_longer(
+    cols = base_csi:base_incidents_per_100k_nonviolent,
+    names_to = "metric",
+    values_to = "base_rate"
+  ) |>
+  mutate(
+    type = case_when(
+      str_detect(metric, "_violent$") ~ "Violent Crimes",
+      str_detect(metric, "_nonviolent$") ~ "Non-violent Crimes",
+      TRUE ~ "All Crimes"
+    ),
+    statistic = case_when(
+      str_detect(metric, "csi") ~ "CSI",
+      str_detect(metric, "incidents") ~ "Incidents/100k"
+    )
+  ) |>
+  filter(!is.na(statistic)) |>
+  arrange(type, year)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_2_colours, rev(renamed_groups))
+
+# Direct line labels, placed in the "All Crimes" panel only
+label_data <- plot_data |>
+  filter(year == 2009, type == "All Crimes") |>
+  mutate(
+    label = statistic,
+    fontface = "bold",
+    nudge_y = 2
+  )
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = statistic)) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = year,
+      y = base_rate + nudge_y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 0.5,
+    vjust = 0,
+    inherit.aes = FALSE
+  ) +
+
+  facet_wrap(
+    ~ type,
+    ncol = 1,
+    scales = "free_y"
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Trends in CSI and Incidents per 100,000",
+    subtitle = str_glue("Waterloo Region, {first_year_csi}-{latest_year_csi}, {first_year_csi} = 100<br>"),
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Police Staffing and Spending in Waterloo Region
+
+```{r plot-cop-civ-staffing-wr}
+# ggline
+renamed_groups <- c("Officers", "Civilians")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(year, Officers = officers_per_100k, Civilians = civilians_per_100k) |>
+  pivot_longer(-year, names_to = "dept", values_to = "staffing_per_100k")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(rev(manual_2_colours), renamed_groups)
+
+ggplot(plot_data, aes(x = year, y = staffing_per_100k, colour = dept)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "WRPS Officer and Civilian Staffing Levels",
+    subtitle = "Positions per 100,000 residents<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-salaries-expenses-officers-base-wr}
+# ggline (direct line labels)
+renamed_groups <- c("Salaries", "Expenses", "Civilians", "Officers")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(
+    year,
+    Salaries = base_salaries_per_capita,
+    Expenses = base_total_exp_per_capita,
+    Officers = base_officers_per_100k,
+    Civilians = base_civilians_per_100k
+  ) |>
+  pivot_longer(-year, names_to = "category", values_to = "base_rate")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_4_colours, c("Civilians", "Officers", "Expenses", "Salaries"))
+
+# Create explicit label positions - manually positioned to avoid overlaps
+label_data <- tibble(
+  x = c(2004, 2008, 2004, 2002),
+  y = c(125, 133, 110, 100),
+  label = c("Salaries", "Expenses", "Civilians", "Officers"),
+  fontface = c("plain", "plain", "plain", "plain"),
+  hjust = c(1.0, 0.0, 0.0, 0.0),
+  vjust = c(1.0, 1.0, 1.0, 1.0)
+)
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = category)) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = x,
+      y = y,
+      label = label,
+      fontface = fontface,
+      hjust = hjust,
+      vjust = vjust
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "WRPS Salaries, Total Expenses,<br>Officers, and Civilians per Capita",
+    subtitle = str_glue("{first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-salaries-expenses-incidents-base-wr}
+# ggline
+renamed_groups <- c("Salaries", "Expenses", "Violent", "Nonviolent")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(year, Salaries = base_salaries_per_capita, Expenses = base_total_exp_per_capita, Violent = base_incidents_per_100k_violent, Nonviolent = base_incidents_per_100k_nonviolent) |>
+  pivot_longer(-year, names_to = "category", values_to = "base_rate")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_4_colours, c("Violent", "Nonviolent", "Expenses", "Salaries"))
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = category)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "WRPS Salaries, Total Expenses, and Criminal Incidents per Capita",
+    subtitle = str_glue("{first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-salaries-expenses-incidents-per-officer-base-wr}
+# ggline
+plot_data <- personnel |>
+  filter(region == "Halton") |>
+  select(year, Salaries = base_salaries_per_capita, Expenses = base_total_exp_per_capita, Violent = base_incidents_per_officer_violent, Nonviolent = base_incidents_per_officer_nonviolent) |>
+  pivot_longer(-year, names_to = "category", values_to = "base_rate")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_4_colours, c("Violent", "Nonviolent", "Expenses", "Salaries"))
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = category)) +
+
+  geom_line(linewidth = 0.5) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Halton Salaries, Total Expenses, and Criminal Incidents per Officer",
+    subtitle = str_glue("{first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+### Police Expenditures Across the Big 12
+
+```{r plot-big12-exp-per-capita-rank}
+# gghorbar
+plot_data <- big_12_financials |>
+  filter(
+    year == latest_year_financials_reported,
+    !is.na(total_exp_per_capita)
+  ) |>
+  mutate(
+    region = reorder(region, total_exp_per_capita),
+    y_label = if_else(region == "WRPS", "**WRPS**", as.character(region))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(region, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = total_exp_per_capita, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_x_continuous(
+    labels = label_dollar(),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS")),
+    guide = "none"
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = str_glue("Total Police Expenditures per Capita: {latest_year_financials_reported}"),
+    subtitle = str_glue("no {financials_not_reporting} data, {latest_year_financials} $"),
+    caption = "Source: Ontario Financial Information Returns | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-cop-civ-staffing-area}
+# ggarea
+renamed_groups <- c("Officers", "Civilians")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(year, Officers = prop_officers, Civilians = prop_civilians) |>
+  pivot_longer(-year, names_to = "dept", values_to = "staffing_prop")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(rev(manual_2_colours), renamed_groups)
+
+# Mean officer share sets the boundary between the two bands
+mean_officers <- plot_data |>
+  filter(dept == "Officers") |>
+  pull(staffing_prop) |>
+  mean(na.rm = TRUE)
+
+# Create explicit label positions - inside each band
+label_data <- tibble(
+  x = median(c(x_min, x_max)),
+  y = c(mean_officers / 2, mean_officers + (100 - mean_officers) / 2),
+  label = renamed_groups,
+  fontface = c("bold", "bold")
+)
+
+# Officer share at the first and latest year
+end_labels <- plot_data |>
+  filter(dept == "Officers", year %in% c(x_min, x_max))
+
+ggplot(plot_data, aes(x = year, y = staffing_prop, fill = dept)) +
+
+  geom_area() +
+
+  geom_text(
+    data = label_data,
+    aes(
+      x = x,
+      y = y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "white",
+    size = 3.2,
+    hjust = 0.5,
+    vjust = 0.5,
+    inherit.aes = FALSE
+  ) +
+
+  geom_text(
+    data = end_labels,
+    aes(
+      x = if_else(year == x_min, year - 1, year + 1),
+      y = staffing_prop,
+      label = label_number(accuracy = 0.1, suffix = "%")(staffing_prop)
+    ),
+    colour = dodgerblue,
+    size = 3.2,
+    fontface = "bold",
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.04, 0.04)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.0, 0.05))
+  ) +
+
+  scale_fill_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "WRPS Officer and Civilian Staffing Levels",
+    subtitle = str_glue("Proportion of total staffing, {first_year_personnel}-{latest_year_personnel}<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-officer-prop-wrps}
+# ggvertbar (continuous x - one bar per year)
+plot_data <- personnel |>
+  filter(region == "WRPS")
+
+plot_data |>
+  ggplot(aes(x = year, y = prop_officers)) +
+
+  geom_col(
+    fill = dodgerblue,
+    width = 0.7
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.02)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = FALSE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -12)
+    ),
+    axis.ticks.x = element_blank()
+  ) +
+
+  labs(
+    title = "WRPS Officer Staffing Levels",
+    subtitle = "Officers as proportion of total staffing, %",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-base-cop-civ-staffing-wr}
+# ggline (direct line labels, decade reference lines)
+renamed_groups <- c("Officers", "Civilians", "CSI")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, CSI = base_csi) |>
+  pivot_longer(-year, names_to = "stat", values_to = "base_rate")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_3_colours, c("CSI", "Civilians", "Officers"))
+
+# Decade-ago values and percentage changes for reference lines and labels
+baseline_decade_ago <- plot_data |>
+  filter(year == decade_ago_personnel) |>
+  select(stat, baseline_value = base_rate)
+
+final_year_data <- plot_data |>
+  filter(year == max(year)) |>
+  select(stat, final_value = base_rate, final_year = year)
+
+pct_changes <- baseline_decade_ago |>
+  left_join(final_year_data, by = "stat") |>
+  mutate(
+    pct_change = round(((final_value - baseline_value) / baseline_value) * 100, 1),
+    pct_label = case_when(
+      pct_change > 0 ~ paste0("+", pct_change, "%"),
+      TRUE ~ paste0(pct_change, "%")
+    )
+  )
+
+# Direct line labels
+label_data <- plot_data |>
+  filter(year == 2005) |>
+  mutate(
+    label = stat,
+    fontface = "plain",
+    nudge_y = if_else(stat == "Civilians", 4, -4)
+  )
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = stat)) +
+
+  # Reference lines from the decade-ago value
+  geom_segment(
+    data = pct_changes,
+    aes(x = decade_ago_personnel, xend = x_max,
+        y = baseline_value, yend = baseline_value,
+        colour = stat),
+    linetype = "dashed",
+    alpha = 0.6,
+    linewidth = 0.5
+  ) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_point(
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
+    aes(colour = stat),
+    size = 2
+  ) +
+
+  # Values at the decade-ago and latest year
+  geom_text(
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
+    aes(label = label_number(accuracy = 1)(base_rate)),
+    show.legend = FALSE,
+    size = 3.2,
+    vjust = -0.8
+  ) +
+
+  # Percentage change between the reference line and the trend line
+  geom_text(
+    data = pct_changes,
+    aes(x = final_year - 1,
+        y = (baseline_value + final_value) / 2,
+        label = pct_label,
+        colour = stat),
+    show.legend = FALSE,
+    size = 3.2,
+    fontface = "bold",
+    hjust = 0.5
+  ) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = year,
+      y = base_rate + nudge_y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 0.5,
+    vjust = 0.5,
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.05, 0.05))
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Trends in WRPS Staffing Levels vs Crime Severity Index",
+    subtitle = str_glue("Staffing based on positions per 100,000 population,<br>percentage change {latest_year_personnel} vs {decade_ago_personnel} also reported, {first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada. Table 35-10-0077-01 | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-base-cop-civ-staffing-clearance-wr}
+# ggline (direct line labels, decade reference lines)
+renamed_groups <- c("Officers", "Civilians", "Clearance")
+
+plot_data <- personnel |>
+  filter(region == "WRPS") |>
+  select(year, Officers = base_officers_per_100k, Civilians = base_civilians_per_100k, Clearance = base_clearance_rate) |>
+  pivot_longer(-year, names_to = "stat", values_to = "base_rate")
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- set_names(manual_3_colours, c("Clearance", "Civilians", "Officers"))
+
+# Decade-ago values and percentage changes for reference lines and labels
+baseline_decade_ago <- plot_data |>
+  filter(year == decade_ago_personnel) |>
+  select(stat, baseline_value = base_rate)
+
+final_year_data <- plot_data |>
+  filter(year == max(year)) |>
+  select(stat, final_value = base_rate, final_year = year)
+
+pct_changes <- baseline_decade_ago |>
+  left_join(final_year_data, by = "stat") |>
+  mutate(
+    pct_change = round(((final_value - baseline_value) / baseline_value) * 100, 1),
+    pct_label = case_when(
+      pct_change > 0 ~ paste0("+", pct_change, "%"),
+      TRUE ~ paste0(pct_change, "%")
+    )
+  )
+
+# Direct line labels
+label_data <- plot_data |>
+  filter(year == 2005) |>
+  mutate(
+    label = stat,
+    fontface = "plain",
+    nudge_y = if_else(stat == "Civilians", 4, -4)
+  )
+
+ggplot(plot_data, aes(x = year, y = base_rate, colour = stat)) +
+
+  geom_segment(
+    data = pct_changes,
+    aes(x = decade_ago_personnel, xend = x_max,
+        y = baseline_value, yend = baseline_value,
+        colour = stat),
+    linetype = "dashed",
+    alpha = 0.6,
+    linewidth = 0.5
+  ) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_point(
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
+    aes(colour = stat),
+    size = 2
+  ) +
+
+  geom_text(
+    data = plot_data |>
+      filter(year %in% c(decade_ago_personnel, max(year))),
+    aes(label = label_number(accuracy = 1)(base_rate)),
+    show.legend = FALSE,
+    size = 3.2,
+    vjust = -0.8
+  ) +
+
+  geom_text(
+    data = pct_changes,
+    aes(x = final_year - 1,
+        y = (baseline_value + final_value) / 2,
+        label = pct_label,
+        colour = stat),
+    show.legend = FALSE,
+    size = 3.2,
+    fontface = "bold",
+    hjust = 0.5
+  ) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = year,
+      y = base_rate + nudge_y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 0.5,
+    vjust = 0.5,
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.05, 0.05))
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Trends in WRPS Staffing Levels vs Clearance Rate",
+    subtitle = str_glue("Staffing based on positions per 100,000 population,<br>percentage change {latest_year_personnel} vs {decade_ago_personnel} also reported, {first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada. Table 35-10-0077-01 | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-officer-civilian-ratio-wrps}
+# ggribbon (single series, shaded to the axis floor)
+plot_data <- personnel |>
+  filter(region == "WRPS", !is.na(officer_civilian_ratio))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Ribbon floor - the lowest gridline
+ribbon_floor <- 1.5
+
+plot_data |>
+  ggplot(aes(x = year, y = officer_civilian_ratio)) +
+
+  geom_ribbon(
+    aes(ymin = ribbon_floor, ymax = officer_civilian_ratio),
+    fill = cowboysilver,
+    alpha = 0.3
+  ) +
+
+  geom_line(linewidth = 0.8, colour = dodgerblue) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    breaks = seq(1.5, 3.0, 0.3),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Ratio of WRPS Officer to Civilian Staffing Levels",
+    subtitle = "Number of officers per civilian staff person<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+### Spending, Staffing, and Outcomes
+
+```{r plot-officer-civilian-ratio-vs-csi-wrps, fig.height=5, fig.width=7}
+# ggscatter
+plot_data <- personnel |>
+  filter(region == "Ontario")
+
+plot_data |>
+  ggplot(aes(x = officer_civilian_ratio, y = weighted_clearance_rate)) +
+
+  geom_point(size = 2, colour = dodgerblue) +
+
+  geom_smooth(
+    linewidth = 1.0,
+    colour = habsred,
+    method = "loess",
+    formula = y ~ x,
+    na.rm = TRUE
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = "%"),
+    position = "right",
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # place y axis title above y axis, aligned with labels
+  annotation_custom(
+    grob = textGrob(
+      "Weighted clearance rate",
+      x = 1, y = 1,
+      hjust = 1,
+      vjust = -1.4,
+      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+    )
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    ),
+    axis.title.x = element_text(
+      size = base_size * 0.8,
+      face = "bold",
+      margin = margin(t = 5)
+    )
+  ) +
+
+  labs(
+    x = "Officers per civilian staff person",
+    title = "Officer-Civilian Ratio vs Clearance Rate",
+    subtitle = str_glue("Ontario, {first_year_personnel}-{latest_year_personnel}<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-clearance-vs-salaries-big12, fig.height=5, fig.width=7}
+# ggscatter
+plot_data <- personnel |>
+  filter(region == "WRPS")
+
+plot_data |>
+  ggplot(aes(x = salaries_per_capita, y = weighted_clearance_rate)) +
+
+  geom_point(size = 2, colour = dodgerblue) +
+
+  geom_smooth(
+    linewidth = 1.0,
+    colour = habsred,
+    method = "loess",
+    formula = y ~ x,
+    na.rm = TRUE
+  ) +
+
+  scale_x_continuous(
+    labels = label_dollar(),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = "%"),
+    position = "right",
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  annotation_custom(
+    grob = textGrob(
+      "Weighted clearance rate",
+      x = 1, y = 1,
+      hjust = 1,
+      vjust = -1.4,
+      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+    )
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    ),
+    axis.title.x = element_text(
+      size = base_size * 0.8,
+      face = "bold",
+      margin = margin(t = 5)
+    )
+  ) +
+
+  labs(
+    x = "Salaries per capita",
+    title = "Total Salaries per Capita vs Clearance Rate",
+    subtitle = str_glue("WRPS, {first_year_personnel}-{latest_year_personnel}<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-csi-vs-salaries-big12, fig.height=5, fig.width=7}
+# ggscatter
+plot_data <- personnel |>
+  filter(region == "WRPS")
+
+plot_data |>
+  ggplot(aes(x = salaries_per_capita, y = csi)) +
+
+  geom_point(size = 2, colour = dodgerblue) +
+
+  geom_smooth(
+    linewidth = 1.0,
+    colour = habsred,
+    method = "loess",
+    formula = y ~ x,
+    na.rm = TRUE
+  ) +
+
+  scale_x_continuous(
+    labels = label_dollar(),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "right",
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  annotation_custom(
+    grob = textGrob(
+      "Crime Severity Index",
+      x = 1, y = 1,
+      hjust = 1,
+      vjust = -1.4,
+      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+    )
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    ),
+    axis.title.x = element_text(
+      size = base_size * 0.8,
+      face = "bold",
+      margin = margin(t = 5)
+    )
+  ) +
+
+  labs(
+    x = "Salaries per capita",
+    title = "Total Salaries per Capita vs CSI",
+    subtitle = str_glue("WRPS, {first_year_personnel}-{latest_year_personnel}<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-incidents-vs-salaries-big12, fig.height=5, fig.width=7}
+# ggscatter
+plot_data <- personnel |>
+  filter(region == "WRPS")
+
+plot_data |>
+  ggplot(aes(x = salaries_per_capita, y = incidents_per_100k)) +
+
+  geom_point(size = 2, colour = dodgerblue) +
+
+  geom_smooth(
+    linewidth = 1.0,
+    colour = habsred,
+    method = "loess",
+    formula = y ~ x,
+    na.rm = TRUE
+  ) +
+
+  scale_x_continuous(
+    labels = label_dollar(),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "right",
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  annotation_custom(
+    grob = textGrob(
+      "Incidents per 100,000",
+      x = 1, y = 1,
+      hjust = 1,
+      vjust = -1.4,
+      gp = gpar(fontsize = base_size * 0.8, fontface = "bold")
+    )
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -15)
+    ),
+    axis.title.x = element_text(
+      size = base_size * 0.8,
+      face = "bold",
+      margin = margin(t = 5)
+    )
+  ) +
+
+  labs(
+    x = "Salaries per capita",
+    title = "Total Salaries per Capita vs Criminal Incidents per 100,000",
+    subtitle = str_glue("WRPS, {first_year_personnel}-{latest_year_personnel}<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+## Clearance Rates
+
+```{r plot-clearance-rates-big12}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = weighted_clearance_rate, group = region)) +
+
+  # Background layer - Other Big 12
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  # Foreground layer - everything else
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "CSI-Weighted Clearance Rates, %",
+    subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-big12-clearance}
+# gglollipoplabel
+plot_data <- csi |>
+  filter(
+    in_big_12,
+    year == latest_year_csi
+  ) |>
+  mutate(
+    region = reorder(region, weighted_clearance_rate),
+    y_label = if_else(region == "WRPS", "**WRPS**", as.character(region))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(region, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = weighted_clearance_rate, y = region)) +
+
+  geom_segment(aes(
+    x = 0, xend = weighted_clearance_rate,
+    y = region,
+    yend = region),
+    color = "grey50", linewidth = 0.7) +
+
+  geom_point(
+    aes(
+      x = weighted_clearance_rate,
+      y = region
+    ),
+    shape = 19, size = 3,
+    color = dodgerblue
+  ) +
+
+  # Direct point labels replacing x axis
+  geom_text(
+    aes(
+      x = weighted_clearance_rate,
+      y = region,
+      label = label_number(big.mark = ",", scale = 1, suffix = "%", accuracy = 0.1)(weighted_clearance_rate)
+    ),
+    nudge_x = 1.5,    # in data units; adjust after initial render
+    hjust = 0,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "grey30"
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0.02, 0.08))
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: no x axis or gridlines - direct labels replace them
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.text.y.left = element_markdown()
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Weighted Clearance Rate of Big 12, %: {latest_year_csi}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r big-12-ranked-data}
+big_12_ranked <- csi |>
+  filter(in_big_12) |>
+  group_by(year) |>
+  mutate(
+    clearance_rank = row_number(desc(weighted_clearance_rate)),
+    csi_rank = row_number(csi),
+    weighted_clearance_rate_violent = round(weighted_clearance_rate_violent, 1)
+  ) |>
+  ungroup() |>
+  select(
+    year,
+    region,
+    csi,
+    weighted_clearance_rate,
+    weighted_clearance_rate_violent,
+    csi_rank,
+    clearance_rank,
+    comparison_group
+  ) |>
+  arrange(year, clearance_rank)
+
+# Ordinal labels for rank axes
+ordinal_labels <- function(x) {
+  paste0(x, case_when(
+    x %% 100 %in% 11:13 ~ "th",
+    x %% 10 == 1 ~ "st",
+    x %% 10 == 2 ~ "nd",
+    x %% 10 == 3 ~ "rd",
+    TRUE ~ "th"
+  ))
+}
+```
+
+```{r clearance-rank-by-year-big-12}
+# ggline (step variant)
+plot_data <- big_12_ranked |>
+  filter(region == "WRPS") |>
+  arrange(year) |>
+  mutate(
+    prev_rank = lag(clearance_rank, default = NA),
+    line_from_above = !is.na(prev_rank) & prev_rank < clearance_rank,
+    vjust_position = if_else(line_from_above, 1.5, -0.8)
+  )
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+n_forces <- max(big_12_ranked$clearance_rank, na.rm = TRUE)
+
+plot_data |>
+  ggplot(aes(x = year, y = clearance_rank)) +
+
+  geom_step(linewidth = 0.8, colour = dodgerblue) +
+
+  geom_point(size = 2, colour = dodgerblue) +
+
+  geom_text(
+    aes(
+      label = label_number(accuracy = 1)(weighted_clearance_rate),
+      vjust = vjust_position
+    ),
+    size = 3.2,
+    colour = "grey30"
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_reverse(
+    position = "right",
+    breaks = 1:n_forces,
+    labels = ordinal_labels(1:n_forces),
+    limits = c(n_forces, 0.5)
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "WRPS Clearance Rate Ranking Among Big 12 Police Services",
+    subtitle = "Point labels report weighted clearance rates<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r test-heat-map}
+# ggheatrank
+# Create y-axis ordering vector
+row_order <- big_12_ranked |>
+  group_by(region) |>
+  summarise(avg_rank = mean(clearance_rank, na.rm = TRUE)) |>
+  arrange(desc(avg_rank)) |>  # reverse order so best (lowest avg) appears at top
+  pull(region)
+
+# Define special formatting
+highlight_row <- "WRPS"
+
+# Prepare data with ordering and special formatting
+plot_data <- big_12_ranked |>
+  mutate(
+    row_factor = factor(region, levels = row_order),
+    row_label = if_else(region == highlight_row, paste0("**", highlight_row, "**"), as.character(region))
+  )
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(row_factor, row_label) |> deframe()
+
+# Define fill scale parameters
+fill_colors <- alpha(dodgerblue, c(1.0, 0.7, 0.4, 0.1))
+fill_breaks <- c(1, 3, 6, 9, 12)
+fill_labels <- ordinal_labels(fill_breaks)
+
+ggplot(plot_data, aes(x = year, y = row_factor, fill = clearance_rank)) +
+
+  geom_tile(color = "white", linewidth = 0.5) +
+
+  scale_fill_stepsn(
+    colors = fill_colors,
+    breaks = fill_breaks,
+    labels = fill_labels,
+    na.value = "black",
+    guide = guide_coloursteps(
+      reverse = TRUE,
+      show.limits = FALSE,
+      barwidth = unit(4, "cm"),
+      barheight = unit(0.4, "cm"),
+      frame.colour = "black",
+      frame.linewidth = 0.3,
+      label.vjust = -0.0
+    )
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.0, 0.0)),
+    position = "bottom"
+  ) +
+
+  scale_y_discrete(
+    labels = y_labels
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Heatmap: remove all gridlines (tiles define the structure)
+  theme(
+    axis.text.y.left = element_markdown(),
+    panel.grid.major.y = element_blank(),
+    legend.position = "top"
+  ) +
+
+  labs(
+    title = "Ranking of Big 12 Forces by Weighted Clearance Rate",
+    subtitle = "Ordered best to worst by average ranking",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r heatmap-clearance-rates-big12}
+# ggheatraw
+# Order rows by mean of raw value (highest at top)
+row_order <- big_12_ranked |>
+  group_by(region) |>
+  summarise(avg_val = mean(weighted_clearance_rate_violent, na.rm = TRUE)) |>
+  arrange(avg_val) |>
+  pull(region)
+
+# Define special formatting
+highlight_row <- "WRPS"
+
+# Prepare data with ordering and special formatting
+plot_data <- big_12_ranked |>
+  mutate(
+    row_factor = factor(region, levels = row_order),
+    row_label = if_else(region == highlight_row, paste0("**", highlight_row, "**"), as.character(region))
+  )
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(row_factor, row_label) |> deframe()
+
+# Define fill scale parameters
+fill_colors <- alpha(dodgerblue, c(0.1, 0.4, 0.7, 1.0))
+
+ggplot(plot_data, aes(x = year, y = row_factor, fill = weighted_clearance_rate_violent)) +
+
+  geom_tile(color = "white", linewidth = 0.5) +
+
+  scale_fill_stepsn(
+    colors = fill_colors,
+    n.breaks = 5,
+    labels = label_number(big.mark = ",", scale = 1, suffix = "%"),
+    na.value = "grey80",
+    guide = guide_coloursteps(
+      reverse = FALSE,
+      show.limits = FALSE,
+      barwidth = unit(4, "cm"),
+      barheight = unit(0.4, "cm"),
+      frame.colour = "black",
+      frame.linewidth = 0.3,
+      label.vjust = -0.0
+    )
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.0, 0.0)),
+    position = "bottom"
+  ) +
+
+  scale_y_discrete(
+    labels = y_labels
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    panel.grid.major.y = element_blank(),
+    legend.position = "top"
+  ) +
+
+  labs(
+    title = "CSI-Weighted Clearance Rates for Violent Crimes",
+    subtitle = "Big 12, ordered best to worst by average clearance rate",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Officer Staffing Across the Big 12
+
+```{r plot-officers-per-100k-big12}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = officers_per_100k, group = region)) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "WRPS Staffing Relative to Canada, Ontario, and Other Big 12 Forces",
+    subtitle = "Officers per 100,000 people<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-off-per-100k-slope, fig.height=6, fig.width=8}
+# ggslope
+plot_data <- big_12 |>
+  filter(year %in% c(min(year, na.rm = TRUE), max(year, na.rm = TRUE)))
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define line colours
+group_colours <- comp_colours
+
+# Label positions - taken from each group's value in the first year
+label_data <- plot_data |>
+  filter(year == x_min) |>
+  summarise(
+    y = mean(officers_per_100k, na.rm = TRUE),
+    .by = comparison_group
+  ) |>
+  mutate(
+    x = if_else(comparison_group == "Other Big 12", mean(c(x_min, x_max)), x_min - 0.5),
+    label = comparison_group,
+    fontface = if_else(comparison_group == "WRPS", "bold", "plain"),
+    hjust = if_else(comparison_group == "Other Big 12", 0.5, 1)
+  )
+
+ggplot(plot_data, aes(x = year, y = officers_per_100k, colour = comparison_group, group = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_point(size = 3.1, colour = "white") +  # white point to obscure line ends
+
+  geom_point(size = 3.0) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = x,
+      y = y,
+      label = label,
+      fontface = fontface,
+      hjust = hjust
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    vjust = 0.5,
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    breaks = c(x_min, x_max),
+    expand = expansion(mult = c(0.20, 0.08))
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    ),
+    plot.margin = margin(t = 13, l = 13, b = 13, r = 100)   # make plot area thinner
+  ) +
+
+  labs(
+    title = str_glue("Officer Staffing {first_year_personnel} vs {latest_year_personnel}"),
+    subtitle = "Officers per 100,000 people<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region*")
+  )
+```
+
+```{r slope-officers-local, fig.height=6, fig.width=8}
+# ggslope
+renamed_groups <- c("WRPS", "London", "Guelph", "Hamilton")
+
+plot_data <- personnel |>
+  filter(
+    year %in% c(min(year), latest_year_personnel),
+    region %in% renamed_groups
+  ) |>
+  select(year, region, officers_per_100k)
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define line colours
+group_colours <- set_names(manual_4_colours, c("Hamilton", "Guelph", "London", "WRPS"))
+
+# Label positions - taken from each group's value in the first year
+label_data <- plot_data |>
+  filter(year == x_min) |>
+  mutate(
+    x = x_min - 0.5,
+    y = officers_per_100k,
+    label = region,
+    fontface = if_else(region == "WRPS", "bold", "plain")
+  )
+
+ggplot(plot_data, aes(x = year, y = officers_per_100k, colour = region, group = region)) +
+
+  geom_line(linewidth = 0.5) +
+
+  geom_point(size = 3.1, colour = "white") +
+
+  geom_point(size = 3.0) +
+
+  geom_label(
+    data = label_data,
+    aes(
+      x = x,
+      y = y,
+      label = label,
+      fontface = fontface
+    ),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 1,
+    vjust = 0.5,
+    inherit.aes = FALSE
+  ) +
+
+  scale_x_continuous(
+    breaks = c(x_min, x_max),
+    expand = expansion(mult = c(0.15, 0.08))
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours,
+    guide = "none"
+  ) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    ),
+    plot.margin = margin(t = 13, l = 13, b = 13, r = 100)
+  ) +
+
+  labs(
+    title = str_glue("Change in Officer Staffing: {first_year_personnel} vs {latest_year_personnel}"),
+    subtitle = "Officers per 100,000 residents<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region*")
+  )
+```
+
+```{r plot-off-civ-per-100k-change-since-base-year, fig.height=7, fig.width=8}
+# ggdumbbell
+plot_data <- big_12 |>
+  filter(year == latest_year_personnel) |>
+  mutate(
+    perc_change_officers_per_100k = base_officers_per_100k - 100,
+    perc_change_civilians_per_100k = base_civilians_per_100k - 100
+  ) |>
+  select(
+    region,
+    perc_change_officers_per_100k,
+    perc_change_civilians_per_100k,
+    in_big_12
+  )
+
+# Order: Canada and Ontario first, then Big 12 by officer change descending
+big_12_order <- plot_data |>
+  filter(in_big_12) |>
+  arrange(desc(perc_change_officers_per_100k))
+
+ordered_regions <- c("Canada", "Ontario", as.character(big_12_order$region))
+
+plot_data <- plot_data |>
+  mutate(
+    region = factor(region, levels = rev(ordered_regions)),
+    y_label = if_else(region == "WRPS", "**WRPS**", as.character(region))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(region, y_label) |> deframe()
+
+# Reference segment spans the full data range
+ref_min <- min(plot_data$perc_change_civilians_per_100k, plot_data$perc_change_officers_per_100k, na.rm = TRUE)
+ref_max <- max(plot_data$perc_change_civilians_per_100k, plot_data$perc_change_officers_per_100k, na.rm = TRUE)
+
+plot_data |>
+  ggplot() +
+
+  # Background reference segment spanning full x range
+  geom_segment(aes(
+    x = ref_min,
+    xend = ref_max,
+    y = region,
+    yend = region
+    ),
+    color = "grey80",
+    linewidth = 0.3
+  ) +
+
+  # Dumbbell segment connecting the two values
+  geom_segment(aes(
+    x = perc_change_officers_per_100k,
+    xend = perc_change_civilians_per_100k,
+    y = region,
+    yend = region
+    ),
+    color = "grey50",
+    linewidth = 0.7
+  ) +
+
+  geom_point(aes(
+    x = perc_change_civilians_per_100k,
+    y = region,
+    color = "Civilians per 100k"
+    ),
+    shape = 19, size = 3
+  ) +
+
+  geom_point(aes(
+    x = perc_change_officers_per_100k,
+    y = region,
+    color = "Officers per 100k"
+    ),
+    shape = 19, size = 3
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "Civilians per 100k" = cowboysilver,
+      "Officers per 100k" = dodgerblue
+    ),
+    name = NULL,
+    breaks = c("Officers per 100k", "Civilians per 100k")
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = ",", scale = 1, suffix = "%"),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank(),
+    legend.position = "inside",
+    legend.justification = c(1, 0),                 # anchor: right edge, bottom edge
+    legend.position.inside = c(0.98, 0.03),         # empty space in the lower right
+    legend.direction = "vertical",
+    legend.background = element_rect(fill = "white", color = NA)
+  ) +
+
+  labs(
+    title = "Change in Officer and Civilian Staffing Levels",
+    subtitle = str_glue("Big 12, Canada, and Ontario, {latest_year_personnel} vs {first_year_personnel}, % change"),
+    caption = "Source: Statistics Canada. Tables 35-10-0076-01, 35-10-0077-01 | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-base-officers-per-100k-big12}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = base_officers_per_100k, group = region)) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Changes in WRPS Staffing Relative to Canada, Ontario, and Other Big 12 Forces",
+    subtitle = str_glue("Officers per 100,000 people, {first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-officer-civilian-ratio-big12}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = officer_civilian_ratio, group = region)) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Ratio of Officer to Civilian Staffing Levels",
+    subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-base-officer-civilian-ratio-big12}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = base_officer_civilian_ratio, group = region)) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Changes in Ratio of Officer to Civilian Staffing Levels",
+    subtitle = str_glue("WRPS vs Canada, Ontario, and Other Big 12 Forces; {first_year_personnel} = 100<br>"),
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-Big12-ranked-staffing}
+# gghorbar (direct bar labels option) + ggfacet
+plot_data <- big_12 |>
+  filter(
+    year == latest_year_personnel,
+    in_big_12
+  ) |>
+  select(region, comparison_group, officers_per_100k, civilians_per_100k, officer_civilian_ratio) |>
+  pivot_longer(
+    cols = c(officers_per_100k, civilians_per_100k, officer_civilian_ratio),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric_label = case_when(
+      metric == "officers_per_100k" ~ "Officers per 100k",
+      metric == "civilians_per_100k" ~ "Civilians per 100k",
+      metric == "officer_civilian_ratio" ~ "Officer-Civilian Ratio"
+    ),
+    metric_label = factor(metric_label, levels = c("Officers per 100k", "Civilians per 100k", "Officer-Civilian Ratio"))
+  ) |>
+  group_by(metric) |>
+  mutate(region = reorder_within(region, value, metric)) |>
+  ungroup()
+
+plot_data |>
+  ggplot(aes(x = value, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  geom_text(
+    aes(x = value, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 0.1)(value)),
+    hjust = 1.15,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  facet_wrap(
+    ~ metric_label,
+    ncol = 3,
+    scales = "free"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_reordered() +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS"))
+  ) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Staffing Levels of Big 12 Police Services: {latest_year_personnel}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+```{r plot-Big12-ranked-auth-strength}
+# gghorbar (direct bar labels option) + ggfacet
+plot_data <- big_12 |>
+  filter(
+    year == latest_year_personnel,
+    !region %in% c("Canada", "Ontario")
+  ) |>
+  select(region, comparison_group, officers_per_100k, auth_strength_per_100k, actual_vs_auth) |>
+  pivot_longer(
+    cols = c(officers_per_100k, auth_strength_per_100k, actual_vs_auth),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric_label = case_when(
+      metric == "officers_per_100k" ~ "Officers per 100k",
+      metric == "auth_strength_per_100k" ~ "Authorized Officers per 100k",
+      metric == "actual_vs_auth" ~ "Actual as % of Authorized"
+    ),
+    metric_label = factor(metric_label, levels = c("Officers per 100k", "Authorized Officers per 100k", "Actual as % of Authorized"))
+  ) |>
+  group_by(metric) |>
+  mutate(region = reorder_within(region, value, metric)) |>
+  ungroup()
+
+plot_data |>
+  ggplot(aes(x = value, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  geom_text(
+    aes(x = value, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 0.1)(value)),
+    hjust = 1.15,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  facet_wrap(
+    ~ metric_label,
+    ncol = 3,
+    scales = "free"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_reordered() +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS"))
+  ) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Actual vs Authorized Officer Staffing of Big 12 Police Services: {latest_year_personnel}"),
+    subtitle = "<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```
+
+## Gender Composition of Police Services
+
+```{r plot-big12-prop-female}
+# ggline
+plot_data <- big_12
+
+# Set x min and max
+x_min <- plot_data |> pull(year) |> min()
+x_max <- plot_data |> pull(year) |> max()
+
+# Define scale colours
+group_colours <- comp_colours
+
+ggplot(plot_data, aes(x = year, y = prop_female, group = region)) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group == "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.5,
+    alpha = 0.7
+  ) +
+
+  geom_line(
+    data = plot_data |> filter(comparison_group != "Other Big 12"),
+    aes(colour = comparison_group),
+    linewidth = 0.8
+  ) +
+
+  scale_x_continuous(
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05))   # lines should not sit on the axis
+  ) +
+
+  scale_colour_manual(
+    values = group_colours
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Proportion of Officers Who are Female",
+    subtitle = "WRPS vs Canada, Ontario, and Other Big 12 Forces<br>",
+    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region* | no data for {personnel_missing_years}")
+  )
+```
+
+```{r plot-big12-female-rank}
+# gghorbar
+plot_data <- big_12 |>
+  filter(
+    year == latest_year_personnel,
+    !region %in% c("Canada", "Ontario")
+  ) |>
+  mutate(
+    region = reorder(region, prop_female),
+    y_label = if_else(region == "WRPS", "**WRPS**", as.character(region))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(region, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(x = prop_female, y = region, fill = comparison_group)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  # Direct bar labels, inside right of bar
+  geom_text(
+    aes(x = prop_female, y = region,
+        label = label_number(big.mark = ",", scale = 1, accuracy = 0.1)(prop_female)),
+    hjust = 1.3,
+    vjust = 0.5,
+    size = 3.2,
+    colour = "white"
+  ) +
+
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  scale_fill_manual(
+    values = set_names(manual_2_colours, c("Other Big 12", "WRPS")),
+    guide = "none"
+  ) +
+
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    # sit the legend above the facet strips rather than on top of them
+    legend.position = "top",
+    legend.justification = "left"
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = str_glue("Proportion of Officers Who are Female: {latest_year_personnel}"),
+    subtitle = "%<br>",
+    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+  )
+```

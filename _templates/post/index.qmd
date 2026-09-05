@@ -1,0 +1,71 @@
+---
+title: "{{title}}"
+description: "One sentence for the listing card: the question and the answer."
+date: "{{date}}"
+categories: []
+image: images/thumbnail.png
+draft: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/{{slug}}/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Post-specific packages go here, and in R/packages.R
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+# example <- read_csv(here("posts", "{{slug}}", "data", "example.csv"))
+```
+
+<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+
+## First finding as a plain-language heading
+
+<!-- One or two paragraphs, then one chart. -->
+
+```{r}
+#| label: fig-first
+#| fig-cap: "Caption shown under the chart."
+#| fig-alt: "What the chart shows, for screen readers."
+#| fig-height: 5
+#| fig-width: 8
+
+# Pick a template from the cwr-charts skill and build the chart here.
+```
+
+## Second finding
+
+```{r}
+#| label: tbl-first
+#| tbl-cap: "Caption shown under the table."
+
+# gt table here (one table per chunk).
+```
+
+## Data and methods
+
+<!-- Where the data came from (links), what was excluded and why, any caveats
+     a careful reader should know. Full source table is in README.md. -->
+
+::: {.callout-note collapse="true"}
+## Reproducibility
+
+Code and data for this post: [`posts/{{slug}}/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+
+```{r}
+#| label: session-info
+#| echo: false
+
+sessioninfo::session_info(pkgs = "attached")
+```
+:::

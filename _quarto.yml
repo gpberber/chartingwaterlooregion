@@ -1,23 +1,77 @@
+# Site configuration for Charting Waterloo Region.
+# Post-level defaults live in posts/_metadata.yml. House colours live in custom.scss
+# (and, for charts, in R/theme_cwr.R). Keep the two palettes in sync.
+
 project:
   type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "!posts/*/R/"      # exploration notebooks and scripts are not site pages
+    - "!posts/*/app/"    # Shiny apps are deployed separately, never rendered here
+    - "!_dev/"
+    - "!_templates/"
+  resources:
+    - images/           # favicon, logo, placeholder thumbnail, social card
+
+execute:
+  freeze: auto           # re-run R only when a post source changes; results cached in _freeze/
 
 website:
   title: "Charting Waterloo Region"
+  description: "Charts and plain-language analysis about life in Waterloo Region, built from open data."
+  site-url: https://gpberber.github.io/chartingwaterlooregion
+  repo-url: https://github.com/gpberber/chartingwaterlooregion
+  repo-actions: [source, issue]   # "view source" and "report an issue" links on every page
+  favicon: images/favicon.svg
+  image: images/social-card.png   # default preview image when a link is shared
+  open-graph: true
+  twitter-card: true
+  draft-mode: gone                # posts with draft: true are not rendered at all
+  search:
+    location: navbar
+    type: overlay
   navbar:
+    logo: images/logo.svg
+    logo-alt: "Charting Waterloo Region"
+    title: false
+    left:
+      - text: Posts
+        href: index.qmd
+      - text: About
+        href: about.qmd
+      - text: Reproduce a post
+        href: reproduce.qmd
     right:
-      - about.qmd
-      - icon: linkedin
-        href: https://www.linkedin.com/in/greg-berberich/
       - icon: github
         href: https://github.com/gpberber/chartingwaterlooregion
+        aria-label: GitHub repository
+      - icon: rss
+        href: index.xml
+        aria-label: RSS feed
+  page-footer:
+    left: "© 2026 Greg Berberich · Charting Waterloo Region"
+    center: "Charts and code are free to reuse with attribution. Data sources are credited in each post."
+    right: "Built with [Quarto](https://quarto.org)"
+
 format:
   html:
-    theme: 
-      - simply
+    theme:
+      - litera
       - custom.scss
-    css: styles.css
-    grid: 
+    toc: true
+    toc-depth: 2
+    toc-location: right
+    toc-title: "On this page"
+    lightbox: true                 # click a chart to enlarge it
+    link-external-newwindow: true
+    grid:
       body-width: 1000px
+    fig-dpi: 300
+    df-print: paged
+    code-copy: true
+    knitr:
+      opts_chunk:
+        dev: ragg_png              # crisp text rendering with ragg
 
-editor: visual
-
+editor: source

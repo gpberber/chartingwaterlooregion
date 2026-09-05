@@ -1,8 +1,23 @@
-# options specified here will apply to all posts in this folder
+# Defaults applied to every post under posts/. A post can override any of these
+# in its own YAML header. Site-wide settings live in _quarto.yml.
 
-# freeze computational output
-# (see https://quarto.org/docs/projects/code-execution.html#freeze)
-freeze: true
-
-# Enable banner style title blocks
 title-block-banner: true
+author: "Greg Berberich"
+date-modified: last-modified
+
+# Posts show prose, charts, and tables, not code. Readers who want the code use
+# the "view source" link in the page header or clone the repo (see reproduce.qmd).
+execute:
+  echo: false
+  warning: false
+  message: false
+
+# Chart defaults; set fig-height / fig-width per chunk when a chart needs it.
+fig-width: 8
+fig-height: 5
+fig-align: center
+tbl-cap-location: bottom
+
+crossref:
+  fig-prefix: Figure
+  tbl-prefix: Table

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Git pre-commit hook: runs the repo safety check before every commit.
+# Installed by copying this file to .git/hooks/pre-commit (see README.md here).
+repo_root=$(git rev-parse --show-toplevel)
+bash "$repo_root/_dev/check_repo_safety.sh"

@@ -1,3 +1,108 @@
 /*-- scss:defaults --*/
-// Base document colors
-$navbar-bg: #604A7B;
+// ---------------------------------------------------------------------------
+// Charting Waterloo Region house style
+// Base theme: litera. Colours mirror R/theme_cwr.R so charts and pages match.
+// ---------------------------------------------------------------------------
+
+// Typography: Inter for the site (charts use Inter too when it is installed locally)
+$web-font-path: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
+$font-family-sans-serif: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+// litera sets paragraphs in $font-family-serif (Georgia); we want one face everywhere
+$font-family-serif: $font-family-sans-serif;
+$font-size-base: 1.05rem;
+$headings-font-weight: 600;
+$line-height-base: 1.6;
+
+// House palette (same hex values as the R colour objects)
+$cwr-blue: #104E8B;      // dodgerblue4  - focus colour (Waterloo Region)
+$cwr-red: #AF1E2D;       // habsred      - contrast colour (Canada, highlights)
+$cwr-grey: #869397;      // cowboysilver - context colour (other places, captions)
+$cwr-blue-50: mix($cwr-blue, white, 50%);
+$cwr-grey-50: mix($cwr-grey, white, 50%);
+$cwr-grey-15: mix($cwr-grey, white, 15%);
+
+$primary: $cwr-blue;
+$secondary: $cwr-grey;
+$body-color: #222222;
+$link-color: $cwr-blue;
+$link-hover-color: $cwr-red;
+$navbar-bg: $cwr-blue;
+$navbar-fg: #ffffff;
+$navbar-hl: #ffffff;
+$footer-bg: $cwr-grey-15;
+$footer-fg: #4a5457;
+$code-bg: $cwr-grey-15;
+$code-color: #333333;
+
+/*-- scss:rules --*/
+// ---------------------------------------------------------------------------
+// Navbar and title banner
+// ---------------------------------------------------------------------------
+.navbar .navbar-brand img { max-height: 32px; }
+.navbar .nav-link { font-weight: 500; }
+
+.quarto-title-banner {
+  background-color: $cwr-blue;
+  .title { font-weight: 700; letter-spacing: -0.01em; }
+  .subtitle, .description { color: rgba(255, 255, 255, 0.85); }
+}
+.quarto-title-meta-heading { color: $cwr-grey; }
+
+// ---------------------------------------------------------------------------
+// Post listing on the home page
+// ---------------------------------------------------------------------------
+.quarto-listing-default {
+  .quarto-post {
+    border-bottom: 1px solid $cwr-grey-50;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    .thumbnail img { border-radius: 4px; border: 1px solid $cwr-grey-50; }
+    .listing-title { font-weight: 600; font-size: 1.35rem; }
+    .listing-description { color: #444; }
+    .listing-date, .listing-reading-time { color: $cwr-grey; }
+  }
+}
+.listing-category, .quarto-category {
+  border-color: $cwr-grey-50 !important;
+  color: $cwr-grey !important;
+  font-size: 0.75rem;
+}
+
+// ---------------------------------------------------------------------------
+// Figures and tables
+// ---------------------------------------------------------------------------
+figure figcaption, .figure-caption, .quarto-float-caption {
+  color: $cwr-grey;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.gt_table { font-family: inherit; }
+.gt_sourcenote, .gt_footnote { color: $cwr-grey; }
+
+// ---------------------------------------------------------------------------
+// Embedded Shiny apps (see the shiny-post skill for the HTML pattern)
+// ---------------------------------------------------------------------------
+.shiny-embed {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0 0.25rem 0;
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+}
+.shiny-embed-link {
+  font-size: 0.85rem;
+  color: $cwr-grey;
+  margin-bottom: 1.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Callouts and misc
+// ---------------------------------------------------------------------------
+.callout-note { border-left-color: $cwr-blue; }
+.callout-tip { border-left-color: $cwr-grey; }
+.callout.callout-style-default > .callout-header { font-weight: 600; }
+
+blockquote { border-left: 3px solid $cwr-grey-50; color: #444; }

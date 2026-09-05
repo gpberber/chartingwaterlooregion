@@ -1,12 +1,39 @@
 ---
-title: "About Charting Waterloo Region"
+title: "About"
+image: images/logo.svg
 about:
   template: solana
+  image-shape: rounded
+  image-width: 12em
   links:
-    - icon: linkedin
-      href: https://www.linkedin.com/in/greg-berberich/
     - icon: github
+      text: GitHub
       href: https://github.com/gpberber/chartingwaterlooregion
+    - icon: rss
+      text: RSS feed
+      href: index.xml
+toc: false
 ---
 
-This blog is dedicated to keeping Waterloo Region residents informed about their community using charts full of interesting data about the Region.
+## What this is
+
+Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.
+
+Every chart is built in R and every post can be reproduced from the code and data in the [GitHub repository](https://github.com/gpberber/chartingwaterlooregion). See [Reproduce a post](reproduce.qmd) for the steps.
+
+## Who writes it
+
+Posts are written by Greg Berberich.
+
+<!-- TODO: add a short bio (background, why this region, why open data) and swap
+     images/logo.svg above for a photo if you want one on this page. -->
+
+## How the posts are made
+
+- **Sources are public.** Statistics Canada tables, municipal open-data portals, published reports. Each post lists its sources, with links and licences, in a data section at the end.
+- **Charts follow one style.** Direct labels instead of legends, no chart junk, the same three colours throughout: blue for Waterloo Region, red for a comparison such as Canada, grey for context.
+- **Nothing is hidden.** The code, the cleaned data, and the rendered results all live in the repository. Large files are attached to GitHub Releases so anyone can download them.
+
+## Contact and corrections
+
+Spotted an error or have a question about the data? [Open an issue on GitHub](https://github.com/gpberber/chartingwaterlooregion/issues).

@@ -1,0 +1,6 @@
+# Quarto profile used ONLY for local preview of unfinished posts:
+#   quarto preview --profile draft
+# It overrides draft-mode so posts marked draft: true appear in the listing.
+# The public site (plain quarto render / quarto publish) never includes drafts.
+website:
+  draft-mode: visible

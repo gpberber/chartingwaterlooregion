@@ -1,0 +1,60 @@
+---
+title: "Reproduce a post"
+description: "How to run the code behind any post on your own computer."
+toc: true
+---
+
+Every post on this site is a [Quarto](https://quarto.org) document with R code that reads data, makes charts, and writes the text you see. You can run it yourself.
+
+## 1. Install the tools
+
+- [R](https://cran.r-project.org/) (version 4.5 or newer)
+- [RStudio](https://posit.co/download/rstudio-desktop/) (optional but convenient)
+- [Quarto](https://quarto.org/docs/get-started/) (version 1.9 or newer)
+
+## 2. Get the code
+
+Clone the repository, or download it as a zip from GitHub and unzip it.
+
+```bash
+git clone https://github.com/gpberber/chartingwaterlooregion.git
+cd chartingwaterlooregion
+```
+
+## 3. Install the R packages
+
+Open R in the project folder and run:
+
+```r
+source("R/packages.R")
+install_missing()
+```
+
+This installs every package used on the site. The exact versions used to render each post are printed in the collapsed **Reproducibility** section at the bottom of that post.
+
+## 4. Get the data for a post
+
+Each post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.
+
+```r
+source("posts/<post-slug>/R/01_get_data.R")
+```
+
+Replace `<post-slug>` with the folder name shown in the URL of the post, for example `kitchener-school-collisions`. The README in each post folder lists the original sources and their licences.
+
+## 5. Render the post
+
+From a terminal in the project folder:
+
+```bash
+quarto render posts/<post-slug>
+```
+
+The rendered page appears in `_site/posts/<post-slug>/index.html`. Open it in a browser.
+
+## Notes
+
+- **No keys required.** All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.
+- **Cached results.** The repository includes Quarto's `_freeze` cache, so you can render the whole site without re-running any R code: `quarto render` at the project root.
+- **House chart style.** Colours and the ggplot2 theme live in `R/theme_cwr.R`. Source it in your own scripts to make charts that match.
+- **Questions.** [Open an issue](https://github.com/gpberber/chartingwaterlooregion/issues) if something does not work.

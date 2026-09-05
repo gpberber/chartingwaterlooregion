@@ -1,0 +1,526 @@
+---
+title: "Collisions near Kitchener schools"
+description: "Pedestrian collisions in Kitchener fell steadily from 2015 to 2022, near schools and everywhere else, and about half happened where traffic controls were already in place."
+date: "2025-01-30"
+categories: [Open Data, Road Safety, Kitchener]
+image: images/thumbnail.jpg
+draft: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/kitchener-school-collisions/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Map helpers (leaflet) specific to this post
+source(here("posts", "kitchener-school-collisions", "R", "helpers.R"))
+```
+
+```{r}
+#| label: load-data
+#| include: false
+
+# Every collision in Kitchener, flagged with whether it was within 250 m of a school
+all_collisions <- read_csv(
+  here("posts", "kitchener-school-collisions", "data", "collisions_with_proximity_to_schools.csv")
+) |>
+  mutate(
+    time_period = case_when(
+      accident_hour < 6 ~ "12AM - 6AM",
+      accident_hour < 12 ~ "6AM - 12PM",
+      accident_hour < 18 ~ "12PM - 6PM",
+      .default = "6PM - 12AM"
+    )
+  )
+
+# One row per school and time window, with collision counts
+collisions_near_schools <- read_csv(
+  here("posts", "kitchener-school-collisions", "data", "schools_collision_summary.csv")
+)
+
+# The 6 AM to 6 PM window is the one used throughout the post
+collisions_btw_6am_6pm <- collisions_near_schools |>
+  filter(str_detect(time_window, "6am"))
+
+# Count the days of each type in the study period, for per-day rates later
+all_days <- tibble(
+  date = seq.Date(ymd("2015-01-01"), ymd("2022-07-31"), "days"),
+  weekday = wday(date, label = TRUE),
+  month = month(date),
+  on_school_day = !(month %in% c(7, 8)) & !(weekday %in% c("Sat", "Sun")),
+  during_covid_shutdown = case_when(
+    between(date, ymd("2020-03-16"), ymd("2020-06-30")) ~ TRUE,
+    between(date, ymd("2020-12-21"), ymd("2021-02-07")) ~ TRUE,
+    between(date, ymd("2021-04-12"), ymd("2021-06-30")) ~ TRUE,
+    .default = FALSE
+  ),
+  school_day_type = case_when(
+    on_school_day & during_covid_shutdown ~ "Lockdown School Day",
+    on_school_day & !during_covid_shutdown ~ "Regular School Day",
+    .default = "Non-School Day"
+  )
+) |>
+  count(school_day_type, name = "num_days")
+
+time_period_order <- c("12AM - 6AM", "6AM - 12PM", "12PM - 6PM", "6PM - 12AM")
+```
+
+Are the streets around Kitchener's schools more dangerous than the rest of the city? This post looks at every reported collision in Kitchener from January 2015 to June 2022 and asks how many involved pedestrians, how many happened within 250 m of a school, and what kind of traffic control was in place where they happened.
+
+The short answer: pedestrian collisions have been falling across the whole city, the area around schools is no exception, and about half of all pedestrian collisions happened at locations that already had a stop sign, traffic light, or crossing guard.
+
+## Pedestrian collisions fell by more than half
+
+There were 231 collisions involving a pedestrian in the study period. The number per year fell steadily, from 42 in 2015 to 18 in 2021 (@fig-ped-by-year-all-days). The 2022 figure covers only the first six months.
+
+```{r}
+#| label: fig-ped-by-year-all-days
+#| fig-cap: "Collisions involving a pedestrian in Kitchener, by year."
+#| fig-alt: "Bar chart of pedestrian collisions per year from 2015 to 2022, falling from 42 in 2015 to 18 in 2021, with a partial-year figure for 2022."
+#| fig-height: 4.5
+#| fig-width: 8
+
+ped_by_year <- all_collisions |>
+  filter(pedestrianinvolved) |>
+  count(accident_year, name = "collisions") |>
+  mutate(accident_year = factor(accident_year))
+
+ped_by_year |>
+  ggplot(aes(x = accident_year, y = collisions)) +
+
+  geom_col(fill = dodgerblue, width = 0.7) +
+
+  # Direct labels inside the top of each bar replace the y axis
+  geom_text(
+    aes(label = collisions),
+    vjust = 1.6,
+    colour = "white",
+    size = label_size
+  ) +
+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+
+  # Bars carry their own values, so drop the y axis text and gridlines
+  theme(
+    axis.text.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+
+  labs(
+    title = "Pedestrian collisions in Kitchener fell by more than half since 2015",
+    subtitle = "Collisions involving a pedestrian, by year (2022 is January to June only)",
+    caption = cwr_caption("City of Kitchener open data")
+  )
+```
+
+## About half happened where traffic controls were in place
+
+Just over half of all pedestrian collisions (129 of 231, or 56%) occurred at locations with some type of traffic control in place: traffic signals, stop signs, pedestrian crossovers, or crossing guards (@fig-traffic-control-all-ped-collisions).
+
+```{r}
+#| label: fig-traffic-control-all-ped-collisions
+#| fig-cap: "Pedestrian collisions by the type of traffic control at the location."
+#| fig-alt: "Horizontal bar chart of pedestrian collisions by traffic control type. Traffic signals and no control are the two largest categories."
+#| fig-height: 5
+#| fig-width: 8
+
+ped_by_control <- all_collisions |>
+  filter(pedestrianinvolved) |>
+  count(trafficcontrol, name = "collisions") |>
+  mutate(
+    trafficcontrol = fct_reorder(trafficcontrol, collisions),
+    control_present = if_else(
+      trafficcontrol %in% c("No control", "unknown"),
+      "No control or unknown",
+      "Traffic control present"
+    )
+  )
+
+ped_by_control |>
+  ggplot(aes(x = collisions, y = trafficcontrol, fill = control_present)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+
+  # Direct labels to the right of each bar replace the x axis
+  geom_text(
+    aes(label = collisions),
+    hjust = -0.3,
+    colour = "grey30",
+    size = label_size
+  ) +
+
+  scale_x_continuous(expand = expansion(mult = c(0, 0.08))) +
+
+  scale_fill_manual(
+    values = c(
+      "Traffic control present" = dodgerblue,
+      "No control or unknown" = cowboysilver
+    ),
+    guide = "none"
+  ) +
+
+  # Horizontal chart with direct labels: no x axis or gridlines at all
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = "About half of pedestrian collisions happened at controlled locations",
+    subtitle = "Pedestrian collisions 2015 to mid-2022 by traffic control at the location.<br><span style='color:#104E8B'>**Blue**</span> = some control in place, grey = none or unknown",
+    caption = cwr_caption("City of Kitchener open data")
+  )
+```
+
+## Collisions near schools follow the same trend
+
+Of the 231 pedestrian collisions, 28 happened within 250 m of a school on a school day between 6 AM and 6 PM. (One of these was within 250 m of two schools, so the school-by-school counts in @tbl-schped add to 29.)
+
+```{r}
+#| label: tbl-schped
+#| tbl-cap: "Schools with at least one pedestrian collision within 250 m on a school day, 6 AM to 6 PM."
+
+collisions_btw_6am_6pm |>
+  group_by(school_name) |>
+  summarise(num_collisions = sum(pedestrian_collisions), .groups = "drop") |>
+  filter(num_collisions > 0) |>
+  arrange(desc(num_collisions)) |>
+  gt(rowname_col = "school_name") |>
+  cols_label(num_collisions = "Pedestrian collisions") |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+Comparing the area within 250 m of a school to the rest of the city, on regular school days (excluding the pandemic closure periods) between 6 AM and 6 PM, both show the same steady decline (@fig-ped-by-year).
+
+```{r}
+#| label: fig-ped-by-year
+#| fig-cap: "Pedestrian collisions on regular school days between 6 AM and 6 PM, inside and outside 250 m of a school."
+#| fig-alt: "Two bar charts by year, one for collisions within 250 m of a school and one for collisions beyond 250 m. Both decline from 2015 to 2022."
+#| fig-height: 6
+#| fig-width: 8
+
+proximity_levels <- c("Within 250 m of a school", "Beyond 250 m from a school")
+
+ped_school_days <- all_collisions |>
+  filter(
+    pedestrianinvolved,
+    str_detect(school_day_type, "Reg"),
+    btw_6am_6pm
+  ) |>
+  mutate(
+    accident_year = factor(accident_year, levels = 2015:2022),
+    school_proximity = factor(
+      if_else(near_school, proximity_levels[1], proximity_levels[2]),
+      levels = proximity_levels
+    )
+  ) |>
+  # .drop = FALSE keeps years with zero collisions so every panel has all years
+  count(school_proximity, accident_year, name = "collisions", .drop = FALSE)
+
+ped_school_days |>
+  ggplot(aes(x = accident_year, y = collisions, fill = school_proximity)) +
+
+  geom_col(width = 0.7) +
+
+  # Labels above the bars; counts near schools are too small for inside labels
+  geom_text(
+    aes(label = collisions),
+    vjust = -0.5,
+    colour = "grey30",
+    size = label_size
+  ) +
+
+  facet_wrap(~ school_proximity, ncol = 1) +
+
+  scale_fill_manual(
+    values = set_names(c(dodgerblue, cowboysilver), proximity_levels),
+    guide = "none"
+  ) +
+
+  scale_x_discrete(drop = FALSE) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+
+  theme(
+    axis.text.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+
+  labs(
+    title = "Near schools or not, pedestrian collisions declined",
+    subtitle = "Pedestrian collisions on regular school days, 6 AM to 6 PM, by year (2022 is January to June only)",
+    caption = cwr_caption("City of Kitchener open data")
+  )
+```
+
+The pattern by traffic control also holds near schools: 15 of the 28 pedestrian collisions (54%) happened where some control was in place (@fig-traffic-control).
+
+```{r}
+#| label: fig-traffic-control
+#| fig-cap: "Pedestrian collisions within 250 m of a school, by traffic control at the location."
+#| fig-alt: "Horizontal bar chart of the 28 pedestrian collisions near schools by traffic control type."
+#| fig-height: 4.5
+#| fig-width: 8
+
+school_ped_by_control <- all_collisions |>
+  filter(
+    near_school,
+    btw_6am_6pm,
+    str_detect(school_day_type, "Reg"),
+    pedestrianinvolved
+  ) |>
+  count(trafficcontrol, name = "collisions") |>
+  mutate(
+    trafficcontrol = fct_reorder(trafficcontrol, collisions),
+    control_present = if_else(
+      trafficcontrol %in% c("No control", "unknown"),
+      "No control or unknown",
+      "Traffic control present"
+    )
+  )
+
+school_ped_by_control |>
+  ggplot(aes(x = collisions, y = trafficcontrol, fill = control_present)) +
+
+  geom_col(width = 0.7) +
+
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+
+  geom_text(
+    aes(label = collisions),
+    hjust = -0.4,
+    colour = "grey30",
+    size = label_size
+  ) +
+
+  scale_x_continuous(expand = expansion(mult = c(0, 0.08))) +
+
+  scale_fill_manual(
+    values = c(
+      "Traffic control present" = dodgerblue,
+      "No control or unknown" = cowboysilver
+    ),
+    guide = "none"
+  ) +
+
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  coord_cartesian(clip = "off") +
+
+  labs(
+    title = "Near schools too, about half of collisions were at controlled locations",
+    subtitle = "The 28 pedestrian collisions within 250 m of a school on school days, 6 AM to 6 PM.<br><span style='color:#104E8B'>**Blue**</span> = some control in place, grey = none or unknown",
+    caption = cwr_caption("City of Kitchener open data")
+  )
+```
+
+## Most collisions near schools involve no pedestrian or cyclist
+
+@tbl-all-coll-near-sch counts every collision within 250 m of a school on a school day between 6 AM and 6 PM, with pedestrian and cyclist collisions broken out. The vast majority, about 95%, involved neither.
+
+```{r}
+#| label: tbl-all-coll-near-sch
+#| tbl-cap: "Collisions of any kind within 250 m of a school on school days, 6 AM to 6 PM."
+
+collisions_btw_6am_6pm |>
+  group_by(school_name) |>
+  summarise(across(ends_with("_collisions"), sum), .groups = "drop") |>
+  filter(total_collisions > 0) |>
+  arrange(desc(total_collisions)) |>
+  gt(rowname_col = "school_name") |>
+  cols_label(
+    pedestrian_collisions = "Pedestrians",
+    cyclist_collisions = "Cyclists",
+    other_collisions = "Other",
+    total_collisions = "Total"
+  ) |>
+  grand_summary_rows(
+    columns = everything(),
+    fns = list(Total ~ sum(.))
+  ) |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+## Time of day and type of day
+
+@tbl-by-day-type breaks the collisions near schools down by the type of day (regular school day, pandemic lockdown school day, or non-school day) and the time of day.
+
+```{r}
+#| label: tbl-by-day-type
+#| tbl-cap: "Collisions within 250 m of a school by type of day and time of day."
+
+coll_by_day_type <- all_collisions |>
+  filter(near_school) |>
+  group_by(school_day_type, time_period) |>
+  summarise(across(ends_with("involved"), sum), .groups = "drop") |>
+  mutate(
+    total_collisions = pedestrianinvolved + cyclistinvolved + no_ped_cyc_involved,
+    pedestrian_perc = pedestrianinvolved / total_collisions,
+    cyclist_perc = cyclistinvolved / total_collisions,
+    other_perc = no_ped_cyc_involved / total_collisions
+  )
+
+coll_by_day_type |>
+  group_by(time_period) |>
+  gt(rowname_col = "school_day_type") |>
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total",
+    pedestrian_perc = "Pedestrians",
+    cyclist_perc = "Cyclists",
+    other_perc = "Other"
+  ) |>
+  fmt_percent(columns = ends_with("perc"), decimals = 1) |>
+  tab_spanner(label = md("**Number of collisions**"), columns = 3:6) |>
+  tab_spanner(label = md("**Share of collisions**"), columns = 7:9) |>
+  row_group_order(groups = time_period_order) |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+Because the three types of day are not equally common, @tbl-colls-per-day shows the same counts as a rate per day.
+
+```{r}
+#| label: tbl-colls-per-day
+#| tbl-cap: "Collisions per day within 250 m of a school, by type of day and time of day."
+
+coll_by_day_type |>
+  left_join(all_days, by = "school_day_type") |>
+  mutate(across(3:6, \(x) x / num_days)) |>
+  select(-(7:10)) |>
+  group_by(time_period) |>
+  gt(rowname_col = "school_day_type") |>
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total"
+  ) |>
+  fmt_number(columns = everything(), decimals = 3) |>
+  row_group_order(groups = time_period_order) |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+## Near schools versus the rest of the city
+
+@tbl-by-nearness-to-school compares collisions inside and outside the 250 m boundary on regular school days, by time of day, and @tbl-colls-per-day-by-proximity puts them on a per-day basis.
+
+```{r}
+#| label: tbl-by-nearness-to-school
+#| tbl-cap: "Collisions on regular school days by school proximity and time of day."
+
+proximity_labels <- c("Within 250 m of a school", "Beyond 250 m from a school")
+
+coll_by_nearness <- all_collisions |>
+  filter(school_day_type == "Regular School Day") |>
+  mutate(near_school = if_else(near_school, proximity_labels[1], proximity_labels[2])) |>
+  group_by(near_school, time_period) |>
+  summarise(across(ends_with("involved"), sum), .groups = "drop") |>
+  mutate(
+    total_collisions = pedestrianinvolved + cyclistinvolved + no_ped_cyc_involved,
+    pedestrian_perc = pedestrianinvolved / total_collisions,
+    cyclist_perc = cyclistinvolved / total_collisions,
+    other_perc = no_ped_cyc_involved / total_collisions
+  ) |>
+  arrange(factor(time_period, levels = time_period_order))
+
+coll_by_nearness |>
+  group_by(near_school) |>
+  gt(rowname_col = "time_period") |>
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total",
+    pedestrian_perc = "Pedestrians",
+    cyclist_perc = "Cyclists",
+    other_perc = "Other"
+  ) |>
+  fmt_percent(columns = ends_with("perc"), decimals = 1) |>
+  tab_spanner(label = md("**Number of collisions**"), columns = 3:6) |>
+  tab_spanner(label = md("**Share of collisions**"), columns = 7:9) |>
+  row_group_order(groups = proximity_labels) |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+```{r}
+#| label: tbl-colls-per-day-by-proximity
+#| tbl-cap: "Collisions per regular school day by school proximity and time of day."
+
+num_reg_days <- all_days |>
+  filter(school_day_type == "Regular School Day") |>
+  pull(num_days)
+
+coll_by_nearness |>
+  mutate(across(3:6, \(x) x / num_reg_days)) |>
+  select(-(7:9)) |>
+  group_by(near_school) |>
+  gt(rowname_col = "time_period") |>
+  cols_label(
+    pedestrianinvolved = "Pedestrians",
+    cyclistinvolved = "Cyclists",
+    no_ped_cyc_involved = "Other",
+    total_collisions = "Total"
+  ) |>
+  fmt_number(columns = everything(), decimals = 2) |>
+  row_group_order(groups = proximity_labels) |>
+  tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
+  tab_source_note("Source: City of Kitchener open data | Charting Waterloo Region")
+```
+
+## Map of collisions near schools
+
+The map in @fig-map-collisions shows the number and type of collisions within 250 m of each Kitchener school on regular school days between 6 AM and 6 PM. Hover over a circle for the school name and click it for the collision counts. A circle with a number groups several nearby schools; click it to zoom in.
+
+```{r}
+#| label: fig-map-collisions
+#| fig-cap: "Collisions within 250 m of a school on regular school days, 6 AM to 6 PM."
+
+collisions_btw_6am_6pm |>
+  filter(str_detect(school_day_type, "Reg")) |>
+  create_school_collision_map()
+```
+
+## Data and methods
+
+- **Collisions** come from the City of Kitchener open data portal and cover January 2015 to June 2022. Each record has a location, date and hour, the type of traffic control at the location, and whether a pedestrian or cyclist was involved.
+- **Schools** are the public (Waterloo Region District School Board) and Catholic (Waterloo Catholic District School Board) schools in Kitchener, geocoded from their published addresses.
+- **Near a school** means within 250 m of a school's geocoded address, measured as straight-line distance.
+- **School day** means a weekday outside July and August. Pandemic closure periods (March to June 2020, late December 2020 to early February 2021, mid-April to June 2021) are treated separately as lockdown school days.
+
+The full source list, with links and licences, is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-school-collisions).
+
+::: {.callout-note collapse="true"}
+## Reproducibility
+
+Code and data for this post: [`posts/kitchener-school-collisions/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-school-collisions) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+
+```{r}
+#| label: session-info
+
+sessioninfo::session_info(pkgs = "attached")
+```
+:::
