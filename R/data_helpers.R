@@ -96,8 +96,10 @@ cwr_data_list <- function(slug, kind = c("data-raw", "data"), version = NULL,
 
 # Download every file attached to a release into the post's data folder.
 # version = NULL means the newest version. Works without a token on a public repo.
+# subdir: optional folder inside data-raw/ or data/ to download into, for
+# releases whose files live in a subfolder (e.g. "raw_occurrence_data_files").
 cwr_data_download <- function(slug, kind = c("data-raw", "data"), version = NULL,
-                              root = c("posts", "datasets")) {
+                              root = c("posts", "datasets"), subdir = NULL) {
   kind <- match.arg(kind)
   root <- match.arg(root)
   if (is.null(version)) version <- cwr_data_latest_version(slug, kind, root)
@@ -105,7 +107,7 @@ cwr_data_download <- function(slug, kind = c("data-raw", "data"), version = NULL
     stop("No release found for ", root, "/", slug, " and kind '", kind, "'.")
   }
   assets <- cwr_data_list(slug, kind, version, root)
-  dest <- here(root, slug, kind)
+  dest <- if (is.null(subdir)) here(root, slug, kind) else here(root, slug, kind, subdir)
   dir.create(dest, showWarnings = FALSE, recursive = TRUE)
   message("Downloading ", nrow(assets), " file(s) from ", cwr_data_tag(slug, kind, version, root), " into ", dest)
   walk2(assets$url, assets$file_name, \(url, name) {
@@ -151,7 +153,9 @@ cwr_data_upload <- function(slug, files, kind = c("data-raw", "data"), version =
   upload_url <- str_remove(release$upload_url, "\\{.*\\}$")
   existing <- map_chr(release$assets, "name")
 
-  walk2(paths, files, \(path, name) {
+  # Asset names are plain file names: GitHub turns "/" into "." otherwise. Files
+  # from a subfolder are downloaded back into it with cwr_data_download(subdir = ...).
+  walk2(paths, basename(files), \(path, name) {
     if (name %in% existing) {
       message("  replacing ", name)
       asset_id <- release$assets[[which(existing == name)]]$id

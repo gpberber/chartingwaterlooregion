@@ -57,9 +57,19 @@ police_fir        <- read_crime("police_fir.rds")                 # municipal Fi
 big_12_financials <- read_crime("big_12_financial_summary.rds")   # Big 12 spending summary
 
 # ---- Waterloo Region occurrences (WRPS) --------------------------------------
-# Derived from occurrence data obtained by request from WRPS; the file stays local
-# until the terms of use are confirmed. Load it explicitly when a post needs it:
-#   wat_region_occurrences <- read_crime("wat_region_occurrences.rds")
+# 3 million police-reported occurrences, 2014 onward, from the yearly WRPS public
+# release. The file is 161 MB so it lives in GitHub Release data-dataset-crime-v1
+# rather than in git. It is not loaded here by default; a post that needs it calls:
+#   wat_region_occurrences <- load_wrps_occurrences()
+# and must show `wrps_disclaimer` (defined in helpers.R) in its Data and methods section.
+load_wrps_occurrences <- function() {
+  path <- file.path(crime_data_dir, "wat_region_occurrences.parquet")
+  if (!file.exists(path)) {
+    source(here("R", "data_helpers.R"))
+    cwr_data_download("crime", kind = "data", root = "datasets")
+  }
+  read_parquet(path)
+}
 
 # ---- Shared definitions used across crime posts ------------------------------
 source(here("datasets", "crime", "R", "helpers.R"))

@@ -55,7 +55,7 @@ fir_raw <- read_csv(here("datasets", "crime", "data-raw", "municipal_fir.csv")) 
 # actually re-running that section.
 
 # occurrence_raw <- read_rds(here("datasets", "crime", "data-raw", "occurrence_data.rds"))
-# occurrence_old <- read_rds(here("datasets", "crime", "data", "wat_region_occurrences.rds"))
+# occurrence_old <- read_parquet(here("datasets", "crime", "data", "wat_region_occurrences.parquet"))
 # occurrence_new <- anti_join(occurrence_raw, occurrence_old, join_by(occurrence_number))
 
 
@@ -1264,7 +1264,7 @@ wat_region_occurrences <- wat_region_occurrences |>
   across(all_of(cols_to_factor), as_factor)
 
 # Save clean file
-saveRDS(wat_region_occurrences, here("datasets", "crime", "data", "wat_region_occurrences.rds"))
+write_parquet(wat_region_occurrences, here("datasets", "crime", "data", "wat_region_occurrences.parquet"))
 
 
 

@@ -119,3 +119,18 @@ get_waterloo_cities <- function(
   # Return the data invisibly
   return(invisible(cities_data))
 }
+# ---------------------------------------------------------------------------
+# WRPS occurrence data disclaimer
+# ---------------------------------------------------------------------------
+# WRPS publishes its occurrence dataset for public analysis with this condition
+# attached. Every post that uses wat_region_occurrences must show it, for
+# example in a callout in the Data and methods section:
+#   ::: {.callout-note}
+#   `r wrps_disclaimer`
+#   :::
+wrps_disclaimer <- paste(
+  "This analysis uses the Waterloo Regional Police Service (WRPS) occurrence dataset.",
+  "Any statements, conclusions, or publications based upon this WRPS occurrence data",
+  "made by non-WRPS employees are made without the authorization of WRPS and are not",
+  "the opinion of the WRPS."
+)

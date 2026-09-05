@@ -137,6 +137,12 @@ new_col_names <- c("occurrence_number", "geographic_location",
                    "total_unit_service_time"
 ) 
 
+# The yearly Excel exports come from the WRPS website (Occurrence Data page).
+# They are also attached to GitHub Release data-raw-dataset-crime-v1 so old years
+# stay available; fetch them all with:
+#   source(here("R", "data_helpers.R"))
+#   cwr_data_download("crime", kind = "data-raw", root = "datasets", subdir = "raw_occurrence_data_files")
+
 # Get a list of all Excel files in the raw_occurrence_data folder
 excel_files <- list.files(
   path = here("datasets", "crime", "data-raw", "raw_occurrence_data_files"),

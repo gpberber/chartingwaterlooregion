@@ -21,8 +21,8 @@
 **/data-raw/
 # Large clean files (> 25 MB) are listed here explicitly by /share-data
 # and live in GitHub Releases instead.
-# Derived from WRPS occurrence data obtained by request; terms not yet confirmed, stays local
-datasets/crime/data/wat_region_occurrences.rds
+# 161 MB: in GitHub Release data-dataset-crime-v1 (see datasets/crime/README.md)
+datasets/crime/data/wat_region_occurrences.parquet
 
 # ---- Background reading (copyrighted PDFs etc.) ----
 # Lives outside the repo at ../chartingwaterlooregion-background/<slug>/

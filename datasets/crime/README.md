@@ -38,7 +38,7 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | Police personnel | Statistics Canada | 35-10-0077-01, 35-10-0076-01 | Statistics Canada Open Licence |
 | UCR violation codes | Statistics Canada, CCJCSS reference PDFs | `data-raw/ucr_codes/` | Statistics Canada Open Licence |
 | Municipal Financial Information Returns, 2000 to 2025 | Ontario Ministry of Municipal Affairs and Housing | https://efis.fma.csc.gov.on.ca/fir/ | Open Government Licence – Ontario <!-- TODO: confirm --> |
-| WRPS occurrence data (Excel exports) | Waterloo Regional Police Service, obtained by request | `data-raw/raw_occurrence_data_files/` | **Terms not confirmed.** Not shared until they are. |
+| WRPS occurrence data, 2014 to 2024 (yearly Excel exports) | Waterloo Regional Police Service, Occurrence Data page <!-- TODO: add URL --> | `data-raw/raw_occurrence_data_files/`; also GitHub Release `data-raw-dataset-crime-v1` | Public release for data analysis; no formal licence stated. WRPS requires this disclaimer on any publication: "Any statements, conclusions, or publications based upon this WRPS occurrence data made by non-WRPS employees are made without the authorization of WRPS and are not the opinion of the WRPS." Posts show it via `wrps_disclaimer` from `helpers.R`. |
 
 ## Files in `data/`
 
@@ -52,7 +52,7 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | `hate_crimes.rds`, `cyber_crimes.rds` | Offence-type counts | Yes |
 | `personnel.rds` | Officers and civilians by service x year | Yes |
 | `police_fir.rds`, `big_12_financial_summary.rds` | Policing lines from municipal financial returns | Yes |
-| `wat_region_occurrences.rds` | WRPS occurrences, cleaned | No: local only until terms confirmed |
+| `wat_region_occurrences.parquet` | WRPS occurrences, cleaned (3 million rows, 161 MB) | No: GitHub Release `data-dataset-crime-v1`; `load_wrps_occurrences()` fetches it on first use |
 | `ucr_codes.xlsx`, `wrps_expenditures.csv` | Small lookups | Yes |
 
 ## Reproduce
@@ -65,14 +65,22 @@ source("datasets/crime/R/01_get_data.R")                        # downloads raw 
 source("datasets/crime/R/02_clean_data.R")                      # rebuilds data/
 ```
 
-Every cleaned file except the WRPS-derived one is committed, so a post can be rendered straight
-from a clone without running the pipeline. `01_get_data.R` downloads several gigabytes of raw
+Every cleaned file except the WRPS occurrences table is committed, so most crime posts render
+straight from a clone without running the pipeline. The WRPS table is fetched from a release the
+first time `load_wrps_occurrences()` runs. `01_get_data.R` downloads several gigabytes of raw
 tables and takes a while; only run it to refresh the data.
+
+To get just the raw WRPS Excel exports without the Statistics Canada downloads:
+
+```r
+source("R/data_helpers.R")
+cwr_data_download("crime", kind = "data-raw", root = "datasets", subdir = "raw_occurrence_data_files")
+```
 
 ## Versions
 
-| Date | Change |
-|---|---|
-| 2026-09-05 | Statistics Canada tables as downloaded August 2026; Financial Information Returns 2000 to 2025 |
+| Date | Release tags | Change |
+|---|---|---|
+| 2026-09-05 | `data-dataset-crime-v1`, `data-raw-dataset-crime-v1` | Statistics Canada tables as downloaded August 2026; Financial Information Returns 2000 to 2025; WRPS occurrences 2014 to 2024 |
 
-When the data is refreshed, add a row here and mention the date in any post that re-renders.
+When the data is refreshed, bump the release version, add a row here, and mention the date in any post that re-renders.
