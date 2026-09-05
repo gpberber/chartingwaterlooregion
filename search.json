@@ -1,0 +1,156 @@
+[
+  {
+    "objectID": "reproduce.html",
+    "href": "reproduce.html",
+    "title": "Reproduce a post",
+    "section": "",
+    "text": "Every post on this site is a Quarto document with R code that reads data, makes charts, and writes the text you see. You can run it yourself."
+  },
+  {
+    "objectID": "reproduce.html#install-the-tools",
+    "href": "reproduce.html#install-the-tools",
+    "title": "Reproduce a post",
+    "section": "1. Install the tools",
+    "text": "1. Install the tools\n\nR (version 4.5 or newer)\nRStudio (optional but convenient)\nQuarto (version 1.9 or newer)"
+  },
+  {
+    "objectID": "reproduce.html#get-the-code",
+    "href": "reproduce.html#get-the-code",
+    "title": "Reproduce a post",
+    "section": "2. Get the code",
+    "text": "2. Get the code\nClone the repository, or download it as a zip from GitHub and unzip it.\ngit clone https://github.com/gpberber/chartingwaterlooregion.git\ncd chartingwaterlooregion"
+  },
+  {
+    "objectID": "reproduce.html#install-the-r-packages",
+    "href": "reproduce.html#install-the-r-packages",
+    "title": "Reproduce a post",
+    "section": "3. Install the R packages",
+    "text": "3. Install the R packages\nOpen R in the project folder and run:\nsource(\"R/packages.R\")\ninstall_missing()\nThis installs every package used on the site. The exact versions used to render each post are printed in the collapsed Reproducibility section at the bottom of that post."
+  },
+  {
+    "objectID": "reproduce.html#get-the-data-for-a-post",
+    "href": "reproduce.html#get-the-data-for-a-post",
+    "title": "Reproduce a post",
+    "section": "4. Get the data for a post",
+    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-school-collisions. The README in each post folder lists the original sources and their licences."
+  },
+  {
+    "objectID": "reproduce.html#render-the-post",
+    "href": "reproduce.html#render-the-post",
+    "title": "Reproduce a post",
+    "section": "5. Render the post",
+    "text": "5. Render the post\nFrom a terminal in the project folder:\nquarto render posts/&lt;post-slug&gt;\nThe rendered page appears in _site/posts/&lt;post-slug&gt;/index.html. Open it in a browser."
+  },
+  {
+    "objectID": "reproduce.html#notes",
+    "href": "reproduce.html#notes",
+    "title": "Reproduce a post",
+    "section": "Notes",
+    "text": "Notes\n\nNo keys required. All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.\nCached results. The repository includes Quarto’s _freeze cache, so you can render the whole site without re-running any R code: quarto render at the project root.\nHouse chart style. Colours and the ggplot2 theme live in R/theme_cwr.R. Source it in your own scripts to make charts that match.\nQuestions. Open an issue if something does not work."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
+  },
+  {
+    "objectID": "about.html#what-this-is",
+    "href": "about.html#what-this-is",
+    "title": "About",
+    "section": "",
+    "text": "Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
+  },
+  {
+    "objectID": "about.html#who-writes-it",
+    "href": "about.html#who-writes-it",
+    "title": "About",
+    "section": "Who writes it",
+    "text": "Who writes it\nPosts are written by Greg Berberich."
+  },
+  {
+    "objectID": "about.html#how-the-posts-are-made",
+    "href": "about.html#how-the-posts-are-made",
+    "title": "About",
+    "section": "How the posts are made",
+    "text": "How the posts are made\n\nSources are public. Statistics Canada tables, municipal open-data portals, published reports. Each post lists its sources, with links and licences, in a data section at the end.\nCharts follow one style. Direct labels instead of legends, no chart junk, the same three colours throughout: blue for Waterloo Region, red for a comparison such as Canada, grey for context.\nNothing is hidden. The code, the cleaned data, and the rendered results all live in the repository. Large files are attached to GitHub Releases so anyone can download them."
+  },
+  {
+    "objectID": "about.html#contact-and-corrections",
+    "href": "about.html#contact-and-corrections",
+    "title": "About",
+    "section": "Contact and corrections",
+    "text": "Contact and corrections\nSpotted an error or have a question about the data? Open an issue on GitHub."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Charting Waterloo Region",
+    "section": "",
+    "text": "Collisions near Kitchener schools\n\n\n\nOpen Data\n\nRoad Safety\n\nKitchener\n\n\n\nPedestrian collisions in Kitchener fell steadily from 2015 to 2022, near schools and everywhere else, and about half happened where traffic controls were already in place.\n\n\n\n\n\nJan 30, 2025\n\n15 min\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html",
+    "href": "posts/kitchener-school-collisions/index.html",
+    "title": "Collisions near Kitchener schools",
+    "section": "",
+    "text": "Are the streets around Kitchener’s schools more dangerous than the rest of the city? This post looks at every reported collision in Kitchener from January 2015 to June 2022 and asks how many involved pedestrians, how many happened within 250 m of a school, and what kind of traffic control was in place where they happened.\nThe short answer: pedestrian collisions have been falling across the whole city, the area around schools is no exception, and about half of all pedestrian collisions happened at locations that already had a stop sign, traffic light, or crossing guard."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#pedestrian-collisions-fell-by-more-than-half",
+    "href": "posts/kitchener-school-collisions/index.html#pedestrian-collisions-fell-by-more-than-half",
+    "title": "Collisions near Kitchener schools",
+    "section": "Pedestrian collisions fell by more than half",
+    "text": "Pedestrian collisions fell by more than half\nThere were 231 collisions involving a pedestrian in the study period. The number per year fell steadily, from 42 in 2015 to 18 in 2021 (Figure 1). The 2022 figure covers only the first six months.\n\n\n\n\n\n\n\n\nFigure 1: Collisions involving a pedestrian in Kitchener, by year."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#about-half-happened-where-traffic-controls-were-in-place",
+    "href": "posts/kitchener-school-collisions/index.html#about-half-happened-where-traffic-controls-were-in-place",
+    "title": "Collisions near Kitchener schools",
+    "section": "About half happened where traffic controls were in place",
+    "text": "About half happened where traffic controls were in place\nJust over half of all pedestrian collisions (129 of 231, or 56%) occurred at locations with some type of traffic control in place: traffic signals, stop signs, pedestrian crossovers, or crossing guards (Figure 2).\n\n\n\n\n\n\n\n\nFigure 2: Pedestrian collisions by the type of traffic control at the location."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#collisions-near-schools-follow-the-same-trend",
+    "href": "posts/kitchener-school-collisions/index.html#collisions-near-schools-follow-the-same-trend",
+    "title": "Collisions near Kitchener schools",
+    "section": "Collisions near schools follow the same trend",
+    "text": "Collisions near schools follow the same trend\nOf the 231 pedestrian collisions, 28 happened within 250 m of a school on a school day between 6 AM and 6 PM. (One of these was within 250 m of two schools, so the school-by-school counts in Table 1 add to 29.)\n\n\n\n\n\n\n\n\n\n\n\n\nPedestrian collisions\n\n\n\n\nJohn Sweeney\n4\n\n\nKitchener-Waterloo Collegiate & Vocational School\n4\n\n\nMargaret Avenue Senior Public School\n3\n\n\nWilliamsburg Public School\n3\n\n\nKing Edward Public School\n2\n\n\nPioneer Park Public School\n2\n\n\nSt. Anne Kit\n2\n\n\nQueensmount Senior Public School\n1\n\n\nSaint John Paul II\n1\n\n\nSandhills Public School\n1\n\n\nSheppard Public School\n1\n\n\nSt. Bernadette\n1\n\n\nSt. Timothy\n1\n\n\nSunnyside Senior Public School\n1\n\n\nW T Townshend Public School\n1\n\n\nWilson Avenue Public School\n1\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 1: Schools with at least one pedestrian collision within 250 m on a school day, 6 AM to 6 PM.\n\n\n\n\nComparing the area within 250 m of a school to the rest of the city, on regular school days (excluding the pandemic closure periods) between 6 AM and 6 PM, both show the same steady decline (Figure 3).\n\n\n\n\n\n\n\n\nFigure 3: Pedestrian collisions on regular school days between 6 AM and 6 PM, inside and outside 250 m of a school.\n\n\n\n\n\nThe pattern by traffic control also holds near schools: 15 of the 28 pedestrian collisions (54%) happened where some control was in place (Figure 4).\n\n\n\n\n\n\n\n\nFigure 4: Pedestrian collisions within 250 m of a school, by traffic control at the location."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#most-collisions-near-schools-involve-no-pedestrian-or-cyclist",
+    "href": "posts/kitchener-school-collisions/index.html#most-collisions-near-schools-involve-no-pedestrian-or-cyclist",
+    "title": "Collisions near Kitchener schools",
+    "section": "Most collisions near schools involve no pedestrian or cyclist",
+    "text": "Most collisions near schools involve no pedestrian or cyclist\nTable 2 counts every collision within 250 m of a school on a school day between 6 AM and 6 PM, with pedestrian and cyclist collisions broken out. The vast majority, about 95%, involved neither.\n\n\n\n\n\n\n\n\n\n\n\n\nPedestrians\nCyclists\nOther\nTotal\n\n\n\n\nKitchener-Waterloo Collegiate & Vocational School\n4\n0\n52\n56\n\n\nHuron Heights Secondary School\n0\n1\n36\n37\n\n\nCameron Heights Collegiate Institute\n0\n4\n32\n36\n\n\nPioneer Park Public School\n2\n1\n33\n36\n\n\nKing Edward Public School\n2\n0\n28\n30\n\n\nMargaret Avenue Senior Public School\n3\n2\n25\n30\n\n\nSt. Bernadette\n1\n0\n29\n30\n\n\nWilliamsburg Public School\n3\n1\n19\n23\n\n\nQueen Elizabeth Public School\n0\n0\n22\n22\n\n\nSt. John\n0\n0\n21\n21\n\n\nJ F Carmichael Public School\n0\n0\n18\n18\n\n\nJean Steckle Public School\n0\n0\n18\n18\n\n\nJohn Sweeney\n4\n0\n13\n17\n\n\nSt. Mary's High School\n0\n0\n17\n17\n\n\nWestmount Public School\n0\n1\n16\n17\n\n\nSuddaby Public School\n0\n0\n16\n16\n\n\nSt. Mark\n0\n0\n14\n14\n\n\nSt. Timothy\n1\n0\n13\n14\n\n\nAlpine Public School\n0\n0\n13\n13\n\n\nW T Townshend Public School\n1\n0\n11\n12\n\n\nGlencairn Public School\n0\n0\n11\n11\n\n\nWilson Avenue Public School\n1\n0\n10\n11\n\n\nDriftwood Park Public School\n0\n0\n10\n10\n\n\nForest Hill Public School\n0\n0\n10\n10\n\n\nMeadowlane Public School\n0\n0\n10\n10\n\n\nSouthridge Public School\n0\n0\n10\n10\n\n\nSmithson Public School\n0\n1\n8\n9\n\n\nDoon Public School\n0\n1\n7\n8\n\n\nOur Lady of Grace\n0\n0\n8\n8\n\n\nRockway Public School\n0\n0\n8\n8\n\n\nSunnyside Senior Public School\n1\n0\n7\n8\n\n\nBrigadoon Public School\n0\n0\n7\n7\n\n\nCourtland Senior Public School\n0\n0\n7\n7\n\n\nFranklin Public School\n0\n0\n7\n7\n\n\nJ W Gerth Public School\n0\n0\n7\n7\n\n\nQueensmount Senior Public School\n1\n0\n6\n7\n\n\nSheppard Public School\n1\n0\n6\n7\n\n\nSt. Daniel\n0\n0\n7\n7\n\n\nCrestview Public School\n0\n0\n6\n6\n\n\nGrand River Collegiate Institute\n0\n0\n6\n6\n\n\nHoward Robertson Public School\n0\n0\n6\n6\n\n\nResurrection Catholic Secondary School\n0\n0\n6\n6\n\n\nRosemount School\n0\n0\n6\n6\n\n\nSaint John Paul II\n1\n0\n5\n6\n\n\nStanley Park Senior Public School\n0\n0\n6\n6\n\n\nBlessed Sacrament\n0\n0\n5\n5\n\n\nEastwood Collegiate Institute\n0\n0\n5\n5\n\n\nJohn Darling Public School\n0\n0\n5\n5\n\n\nPrueter Public School\n0\n0\n5\n5\n\n\nSandhills Public School\n1\n0\n4\n5\n\n\nSt. Aloysius\n0\n0\n5\n5\n\n\nSt. Anne Kit\n2\n0\n3\n5\n\n\nSt. Paul\n0\n0\n5\n5\n\n\nSt. Teresa Kitchener\n0\n0\n5\n5\n\n\nTrillium Public School\n0\n0\n5\n5\n\n\nBridgeport Public School\n0\n0\n4\n4\n\n\nCountry Hills Public School\n0\n0\n4\n4\n\n\nLackner Woods Public School\n0\n0\n4\n4\n\n\nSt. Kateri Tekakwitha\n0\n0\n4\n4\n\n\nWestheights Public School\n0\n0\n4\n4\n\n\nGroh Public School\n0\n0\n3\n3\n\n\nHillside Public School\n0\n1\n2\n3\n\n\nHuron Natural Area Outdoor Environmental Education Centre\n0\n0\n3\n3\n\n\nSt. Dominic Savio\n0\n0\n3\n3\n\n\nCanadian Martyrs\n0\n0\n2\n2\n\n\nChicopee Hills Public School\n0\n0\n2\n2\n\n\nForest Heights Collegiate Institute\n0\n0\n2\n2\n\n\nLaurentian Senior Public School\n0\n0\n2\n2\n\n\nMackenzie King Public School\n0\n1\n1\n2\n\n\nMonsignor R.M. Haller\n0\n0\n2\n2\n\n\nTotal\n29\n14\n722\n765\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 2: Collisions of any kind within 250 m of a school on school days, 6 AM to 6 PM."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#time-of-day-and-type-of-day",
+    "href": "posts/kitchener-school-collisions/index.html#time-of-day-and-type-of-day",
+    "title": "Collisions near Kitchener schools",
+    "section": "Time of day and type of day",
+    "text": "Time of day and type of day\nTable 3 breaks the collisions near schools down by the type of day (regular school day, pandemic lockdown school day, or non-school day) and the time of day.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNumber of collisions\n\n\nShare of collisions\n\n\n\nPedestrians\nCyclists\nOther\nTotal\nPedestrians\nCyclists\nOther\n\n\n\n\n12AM - 6AM\n\n\nLockdown School Day\n0\n0\n1\n1\n0.0%\n0.0%\n100.0%\n\n\nNon-School Day\n0\n0\n40\n40\n0.0%\n0.0%\n100.0%\n\n\nRegular School Day\n1\n1\n29\n31\n3.2%\n3.2%\n93.5%\n\n\n6AM - 12PM\n\n\nLockdown School Day\n0\n2\n14\n16\n0.0%\n12.5%\n87.5%\n\n\nNon-School Day\n2\n1\n105\n108\n1.9%\n0.9%\n97.2%\n\n\nRegular School Day\n11\n4\n314\n329\n3.3%\n1.2%\n95.4%\n\n\n12PM - 6PM\n\n\nLockdown School Day\n0\n0\n21\n21\n0.0%\n0.0%\n100.0%\n\n\nNon-School Day\n4\n2\n200\n206\n1.9%\n1.0%\n97.1%\n\n\nRegular School Day\n17\n8\n350\n375\n4.5%\n2.1%\n93.3%\n\n\n6PM - 12AM\n\n\nLockdown School Day\n0\n0\n14\n14\n0.0%\n0.0%\n100.0%\n\n\nNon-School Day\n7\n3\n101\n111\n6.3%\n2.7%\n91.0%\n\n\nRegular School Day\n8\n4\n146\n158\n5.1%\n2.5%\n92.4%\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 3: Collisions within 250 m of a school by type of day and time of day.\n\n\n\n\nBecause the three types of day are not equally common, Table 4 shows the same counts as a rate per day.\n\n\n\n\n\n\n\n\n\n\n\n\nPedestrians\nCyclists\nOther\nTotal\n\n\n\n\n12AM - 6AM\n\n\nLockdown School Day\n0.000\n0.000\n0.006\n0.006\n\n\nNon-School Day\n0.000\n0.000\n0.036\n0.036\n\n\nRegular School Day\n0.001\n0.001\n0.020\n0.021\n\n\n6AM - 12PM\n\n\nLockdown School Day\n0.000\n0.012\n0.082\n0.094\n\n\nNon-School Day\n0.002\n0.001\n0.093\n0.096\n\n\nRegular School Day\n0.007\n0.003\n0.213\n0.223\n\n\n12PM - 6PM\n\n\nLockdown School Day\n0.000\n0.000\n0.124\n0.124\n\n\nNon-School Day\n0.004\n0.002\n0.178\n0.183\n\n\nRegular School Day\n0.012\n0.005\n0.237\n0.254\n\n\n6PM - 12AM\n\n\nLockdown School Day\n0.000\n0.000\n0.082\n0.082\n\n\nNon-School Day\n0.006\n0.003\n0.090\n0.099\n\n\nRegular School Day\n0.005\n0.003\n0.099\n0.107\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 4: Collisions per day within 250 m of a school, by type of day and time of day."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#near-schools-versus-the-rest-of-the-city",
+    "href": "posts/kitchener-school-collisions/index.html#near-schools-versus-the-rest-of-the-city",
+    "title": "Collisions near Kitchener schools",
+    "section": "Near schools versus the rest of the city",
+    "text": "Near schools versus the rest of the city\nTable 5 compares collisions inside and outside the 250 m boundary on regular school days, by time of day, and Table 6 puts them on a per-day basis.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNumber of collisions\n\n\nShare of collisions\n\n\n\nPedestrians\nCyclists\nOther\nTotal\nPedestrians\nCyclists\nOther\n\n\n\n\nWithin 250 m of a school\n\n\n12AM - 6AM\n1\n1\n29\n31\n3.2%\n3.2%\n93.5%\n\n\n6AM - 12PM\n11\n4\n314\n329\n3.3%\n1.2%\n95.4%\n\n\n12PM - 6PM\n17\n8\n350\n375\n4.5%\n2.1%\n93.3%\n\n\n6PM - 12AM\n8\n4\n146\n158\n5.1%\n2.5%\n92.4%\n\n\nBeyond 250 m from a school\n\n\n12AM - 6AM\n3\n1\n164\n168\n1.8%\n0.6%\n97.6%\n\n\n6AM - 12PM\n38\n24\n1397\n1459\n2.6%\n1.6%\n95.8%\n\n\n12PM - 6PM\n48\n39\n1906\n1993\n2.4%\n2.0%\n95.6%\n\n\n6PM - 12AM\n36\n13\n840\n889\n4.0%\n1.5%\n94.5%\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 5: Collisions on regular school days by school proximity and time of day.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPedestrians\nCyclists\nOther\nTotal\n\n\n\n\nWithin 250 m of a school\n\n\n12AM - 6AM\n0.00\n0.00\n0.02\n0.02\n\n\n6AM - 12PM\n0.01\n0.00\n0.21\n0.22\n\n\n12PM - 6PM\n0.01\n0.01\n0.24\n0.25\n\n\n6PM - 12AM\n0.01\n0.00\n0.10\n0.11\n\n\nBeyond 250 m from a school\n\n\n12AM - 6AM\n0.00\n0.00\n0.11\n0.11\n\n\n6AM - 12PM\n0.03\n0.02\n0.95\n0.99\n\n\n12PM - 6PM\n0.03\n0.03\n1.29\n1.35\n\n\n6PM - 12AM\n0.02\n0.01\n0.57\n0.60\n\n\n\nSource: City of Kitchener open data | Charting Waterloo Region\n\n\n\n\n\n\n\n\n\nTable 6: Collisions per regular school day by school proximity and time of day."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#map-of-collisions-near-schools",
+    "href": "posts/kitchener-school-collisions/index.html#map-of-collisions-near-schools",
+    "title": "Collisions near Kitchener schools",
+    "section": "Map of collisions near schools",
+    "text": "Map of collisions near schools\nThe map in Figure 5 shows the number and type of collisions within 250 m of each Kitchener school on regular school days between 6 AM and 6 PM. Hover over a circle for the school name and click it for the collision counts. A circle with a number groups several nearby schools; click it to zoom in.\n\n\n\n\n\n\n\n\nFigure 5: Collisions within 250 m of a school on regular school days, 6 AM to 6 PM."
+  },
+  {
+    "objectID": "posts/kitchener-school-collisions/index.html#data-and-methods",
+    "href": "posts/kitchener-school-collisions/index.html#data-and-methods",
+    "title": "Collisions near Kitchener schools",
+    "section": "Data and methods",
+    "text": "Data and methods\n\nCollisions come from the City of Kitchener open data portal and cover January 2015 to June 2022. Each record has a location, date and hour, the type of traffic control at the location, and whether a pedestrian or cyclist was involved.\nSchools are the public (Waterloo Region District School Board) and Catholic (Waterloo Catholic District School Board) schools in Kitchener, geocoded from their published addresses.\nNear a school means within 250 m of a school’s geocoded address, measured as straight-line distance.\nSchool day means a weekday outside July and August. Pandemic closure periods (March to June 2020, late December 2020 to early February 2021, mid-April to June 2021) are treated separately as lockdown school days.\n\nThe full source list, with links and licences, is in the post’s README.\n\n\n\n\n\n\nNoteReproducibility\n\n\n\n\n\nCode and data for this post: posts/kitchener-school-collisions/ on GitHub. See Reproduce a post for the steps.\n\n\n─ Session info ───────────────────────────────────────────────────────────────\n setting  value\n version  R version 4.5.3 (2026-03-11 ucrt)\n os       Windows 11 x64 (build 26200)\n system   x86_64, mingw32\n ui       RTerm\n language (EN)\n collate  English_Canada.utf8\n ctype    English_Canada.utf8\n tz       America/Toronto\n date     2026-09-05\n pandoc   3.7.0.2 @ C:/Users/gregb/AppData/Local/Pandoc/ (via rmarkdown)\n quarto   1.9.38 @ C:\\\\PROGRA~1\\\\Quarto\\\\bin\\\\quarto.exe\n\n─ Packages ───────────────────────────────────────────────────────────────────\n package    * version date (UTC) lib source\n conflicted * 1.2.0   2023-02-01 [1] CRAN (R 4.2.3)\n dplyr      * 1.2.1   2026-04-03 [1] CRAN (R 4.5.2)\n forcats    * 1.0.1   2025-09-25 [1] CRAN (R 4.5.3)\n geosphere  * 1.6-8   2026-04-05 [1] CRAN (R 4.5.3)\n ggplot2    * 4.0.3   2026-04-22 [1] CRAN (R 4.5.3)\n ggtext     * 0.1.2   2022-09-16 [1] CRAN (R 4.4.3)\n gt         * 1.3.0   2026-01-22 [1] CRAN (R 4.5.3)\n gtExtras   * 0.6.2   2026-01-17 [1] CRAN (R 4.5.3)\n here       * 1.0.2   2025-09-15 [1] CRAN (R 4.5.3)\n janitor    * 2.2.1   2024-12-22 [1] CRAN (R 4.5.3)\n leaflet    * 2.2.3   2025-09-04 [1] CRAN (R 4.5.1)\n lubridate  * 1.9.5   2026-02-04 [1] CRAN (R 4.5.3)\n patchwork  * 1.3.2   2025-08-25 [1] CRAN (R 4.4.3)\n purrr      * 1.2.2   2026-04-10 [1] CRAN (R 4.5.2)\n readr      * 2.2.0   2026-02-19 [1] CRAN (R 4.5.3)\n rvest      * 1.0.5   2025-08-29 [1] CRAN (R 4.5.1)\n scales     * 1.4.0   2025-04-24 [1] CRAN (R 4.5.3)\n sf         * 1.1-2   2026-07-23 [1] CRAN (R 4.5.3)\n stringr    * 1.6.0   2025-11-04 [1] CRAN (R 4.5.3)\n tibble     * 3.3.1   2026-01-11 [1] CRAN (R 4.5.2)\n tidyr      * 1.3.2   2025-12-19 [1] CRAN (R 4.5.3)\n tidyverse  * 2.0.0   2023-02-22 [1] CRAN (R 4.5.2)\n\n [1] C:/R/R-4.5.3/library\n * ── Packages attached to the search path.\n\n──────────────────────────────────────────────────────────────────────────────"
+  }
+]
