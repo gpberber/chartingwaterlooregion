@@ -16,6 +16,10 @@ here::i_am("posts/kitchener-phone-queues/index.qmd")
 # House colours, ggplot2 theme, and the packages every post uses
 source(here::here("R", "theme_cwr.R"))
 
+# Data download bundle helpers; data_bundle_version is the release version linked at the end
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
 # Post-specific packages
 library(changepoint)
 library(segmented)
@@ -1724,3 +1728,24 @@ queue_19_23_month |>
       plot.title = element_markdown()
     )
 ```
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+Code and data for this post: [`posts/kitchener-phone-queues/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-queues) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+
+**Download the data:** [`r cwr_bundle_name("kitchener-phone-queues", data_bundle_version)`](`r cwr_bundle_url("kitchener-phone-queues", data_bundle_version)`) holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
+
+```{r}
+#| label: tbl-dictionary
+#| tbl-cap: "Data dictionary for the tables used in this post."
+
+cwr_dictionary_table("kitchener-phone-queues")
+```
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

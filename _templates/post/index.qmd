@@ -17,6 +17,11 @@ here::i_am("posts/{{slug}}/index.qmd")
 # House colours, ggplot2 theme, and the packages every post uses
 source(here::here("R", "theme_cwr.R"))
 
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
 # Post-specific packages go here, and in R/packages.R
 ```
 
@@ -58,13 +63,22 @@ source(here::here("R", "theme_cwr.R"))
      a careful reader should know. Full source table is in README.md. -->
 
 ::: {.callout-note collapse="true"}
-## Reproducibility
+## Reproducibility and data download
 
 Code and data for this post: [`posts/{{slug}}/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
 
+**Download the data:** [`r cwr_bundle_name("{{slug}}", data_bundle_version)`](`r cwr_bundle_url("{{slug}}", data_bundle_version)`) holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
+
+```{r}
+#| label: tbl-dictionary
+#| tbl-cap: "Data dictionary for the tables used in this post."
+
+# Driven by data/tables.csv and data/dictionary.csv; /review-post checks they are complete
+cwr_dictionary_table("{{slug}}")
+```
+
 ```{r}
 #| label: session-info
-#| echo: false
 
 cwr_session_info()
 ```

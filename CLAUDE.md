@@ -44,6 +44,11 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   per chunk, every figure has `fig-cap` and `fig-alt`, caption through `cwr_caption()`. Tables are gt only.
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
+- Data download: every post lists the tables it uses in `data/tables.csv` and documents every
+  column in `data/dictionary.csv`. `R/data_bundle.R` turns those into a zip (CSV, Parquet, Excel,
+  dictionary, README) attached to release `data-<slug>-v<n>`; `/publish` builds it and the post's
+  Reproducibility box links to it and shows the dictionary. Bundles are per post only, never for
+  a dataset on its own.
 - Secrets: none in the repo. Read keys with `Sys.getenv()` from `~/.Renviron`. The pre-commit hook
   (`_dev/check_repo_safety.sh`) blocks big files and key-like strings; never bypass it.
 - Git: single `master` branch, commit via `/save`, never force-push, never rewrite history.

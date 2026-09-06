@@ -59,6 +59,10 @@ quarto render posts/<post-slug>
 
 The rendered page appears in `_site/posts/<post-slug>/index.html`. Open it in a browser.
 
+## Just want the data?
+
+Every post ends with a collapsed **Reproducibility and data download** box. It links to a zip file holding each table the post used as CSV and Parquet files, an Excel workbook, a data dictionary describing every column, and a README with the sources and their licences. No R needed.
+
 ## Notes
 
 - **No keys required.** All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.

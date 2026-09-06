@@ -133,6 +133,22 @@ cwr_data_upload <- function(slug, files, kind = c("data-raw", "data"), version =
   missing <- paths[!file.exists(paths)]
   if (length(missing) > 0) stop("Files not found: ", paste(missing, collapse = ", "))
 
+  cwr_release_upload(
+    tag = tag,
+    paths = paths,
+    title = paste0("Data for ", root, "/", slug, " (", kind, ", v", version, ")"),
+    body = paste0(
+      "Data files for ", root, "/", slug, " in this repository. ",
+      "Download from R with cwr_data_download('", slug, "', kind = '", kind,
+      "', version = ", version, ", root = '", root, "') after sourcing R/data_helpers.R."
+    )
+  )
+}
+
+# Low-level: attach files to a release (creating it with the given title and
+# body if it does not exist yet). Used by cwr_data_upload() and by the data
+# bundle builder in R/data_bundle.R.
+cwr_release_upload <- function(tag, paths, title = tag, body = "") {
   release <- cwr_release(tag)
   if (is.null(release)) {
     message("Creating release ", tag)
@@ -140,12 +156,8 @@ cwr_data_upload <- function(slug, files, kind = c("data-raw", "data"), version =
       "POST /repos/{repo}/releases",
       repo = cwr_repo,
       tag_name = tag,
-      name = paste0("Data for ", root, "/", slug, " (", kind, ", v", version, ")"),
-      body = paste0(
-        "Data files for ", root, "/", slug, " in this repository. ",
-        "Download from R with cwr_data_download('", slug, "', kind = '", kind,
-        "', version = ", version, ", root = '", root, "') after sourcing R/data_helpers.R."
-      )
+      name = title,
+      body = body
     )
   }
 
@@ -155,7 +167,7 @@ cwr_data_upload <- function(slug, files, kind = c("data-raw", "data"), version =
 
   # Asset names are plain file names: GitHub turns "/" into "." otherwise. Files
   # from a subfolder are downloaded back into it with cwr_data_download(subdir = ...).
-  walk2(paths, basename(files), \(path, name) {
+  walk2(paths, basename(paths), \(path, name) {
     if (name %in% existing) {
       message("  replacing ", name)
       asset_id <- release$assets[[which(existing == name)]]$id

@@ -1,0 +1,13 @@
+table,column,description,units
+queue_data_clean,date,Calendar date the metric refers to,YYYY-MM-DD
+queue_data_clean,metric,"Name of the metric as reported by the City. One of 17: average and maximum handle and queue times, average speed of answer, calls presented / handled / abandoned (total and within the service-level threshold), the percentage versions of those counts, four variants of percentage of service level met, and the service-level target",
+queue_data_clean,value,"Value of the metric on that date. Seconds for times, number of calls for counts, percent on a 0 to 100 scale for percentages",varies by metric
+queue_data_clean,holiday,TRUE if the date is an Ontario statutory holiday,
+queue_data_clean,year,Calendar year of the date,
+queue_data_clean,month,Three-letter month abbreviation (Jan to Dec),
+queue_data_clean,month_num,Month as a number (1 = January),
+queue_data_clean,year_month,First day of the month the date falls in; useful for monthly grouping,YYYY-MM-DD
+queue_data_clean,day_of_week,Three-letter day of the week (Mon to Sun),
+queue_data_clean,type_of_day,Weekday or Weekend,
+queue_data_clean,weekend_holiday,TRUE if the date is a weekend day or a statutory holiday,
+queue_data_clean,covid_lockdown,TRUE if the date falls in one of the Ontario COVID-19 lockdown periods used in the analysis (17 Mar to 16 Jul 2020; 26 Dec 2020 to 9 Feb 2021; 8 Apr to 15 Jul 2021; 5 Jan to 20 Mar 2022),

@@ -36,6 +36,7 @@ chartingwaterlooregion/
   R/
     theme_cwr.R          house chart style: colours, theme_cwr(), cwr_caption(), cwr_session_info()
     data_helpers.R       move big files to and from GitHub Releases
+    data_bundle.R        build each post's downloadable data zip and data dictionary
     packages.R           every package the site uses; install_missing()
   posts/
     _metadata.yml        defaults for every post (author, licence, echo: false, figure sizes)
@@ -71,6 +72,8 @@ posts/housing-starts/
   R/02_clean_data.R  turns data-raw/ into small tidy files in data/
   data-raw/          raw inputs (gitignored, never committed)
   data/              tidy files the post reads (committed when under 25 MB)
+  data/tables.csv    one row per table the post uses (drives the reader download, 3.3)
+  data/dictionary.csv  one row per column of those tables
   images/            thumbnail.png plus any static images
 ../chartingwaterlooregion-background/housing-starts/   PDFs, articles, notes
 ```
@@ -84,7 +87,7 @@ If the post draws on a shared dataset (section 5), say so when asked; Claude wir
 ### 3.2 Get and clean the data
 
 1. Write `R/01_get_data.R` so it recreates `data-raw/` from scratch: download from the open-data
-   portal, pull Statistics Canada tables with `cansim`, or fetch from a GitHub Release (3.6).
+   portal, pull Statistics Canada tables with `cansim`, or fetch from a GitHub Release (section 6).
    Files you downloaded by hand from a portal still need a script that fetches them again.
 2. Write `R/02_clean_data.R` to produce the tidy files the post needs in `data/`. Call
    `janitor::clean_names()` right after every read. Keep each output under 25 MB.
@@ -99,7 +102,38 @@ If the post draws on a shared dataset (section 5), say so when asked; Claude wir
 
 Claude can write both scripts if you describe the source; it follows the same conventions.
 
-### 3.3 Write the post
+### 3.3 Describe the tables so readers can download them
+
+Every post offers its data as a zip for readers who just want the numbers. Two small CSV files
+in `data/` drive that, and they are the only part a machine cannot generate:
+
+- `data/tables.csv`: one row per table the post reads. Columns: `table` (a short name),
+  `file` (path from the project root, so it can point into the post's `data/` or into
+  `datasets/<name>/data/`), `description`, `source`, `licence`, `notes` (for example a required
+  disclaimer).
+- `data/dictionary.csv`: one row per column of every table. Columns: `table`, `column`,
+  `description`, `units`. Types and example values are read from the data automatically.
+
+Claude drafts both from the cleaning script when asked; check the wording. A helper refuses to
+build the bundle if any column is undocumented, so the dictionary cannot drift:
+
+```r
+source("R/data_bundle.R")
+cwr_dictionary_check("housing-starts")
+```
+
+The post's setup chunk (already in the template) sets `data_bundle_version <- 1`. Bump it
+whenever the data changes after publishing, so links in old copies of the post keep pointing
+at the data they were built from.
+
+What readers get, at publish time (3.7), is `<slug>-data-v<n>.zip` attached to the post's
+GitHub Release, containing each table as CSV and Parquet, one Excel workbook when every table
+fits Excel, `data_dictionary.csv`, and a README with sources and licences. The post's
+Reproducibility box links to the zip and shows the dictionary as a table. Bundles exist only
+for posts: a dataset in `datasets/` gets one only through the posts that use it, and only the
+tables those posts actually read.
+
+### 3.4 Write the post
 
 The template gives the structure: an opening paragraph with the question and the answer,
 sections with plain-language headings, one chart or table per section, a Data and methods
@@ -118,7 +152,7 @@ section, and a collapsed Reproducibility box at the end.
 - **Setup chunk.** The template already has `here::i_am(...)` and
   `source(here::here("R", "theme_cwr.R"))`. Add post-specific `library()` calls under it.
 
-### 3.4 Preview
+### 3.5 Preview
 
 ```
 /preview housing-starts
@@ -133,7 +167,7 @@ quarto preview --profile draft
 
 then open http://localhost:4200/posts/housing-starts/. The preview re-renders on every save.
 
-### 3.5 Review
+### 3.6 Review
 
 ```
 /review-post housing-starts
@@ -144,14 +178,15 @@ alt text, tables, `here()` paths, packages listed, README sources and licences, 
 categories, reproducibility box, and a run of the safety check. Fix what it finds
 (Claude offers to), then re-run until clean.
 
-### 3.6 Publish
+### 3.7 Publish
 
 ```
 /publish housing-starts
 ```
 
-Claude confirms the post should go public, flips `draft: false`, renders the full site,
-runs the safety check, commits, pushes, deploys with `quarto publish gh-pages`, then opens
+Claude confirms the post should go public, flips `draft: false`, checks the data dictionary
+and builds and uploads the data bundle (3.3), renders the full site, runs the safety check,
+commits, pushes, deploys with `quarto publish gh-pages`, then opens
 the live URL and confirms it loads. The site updates within a minute or two. By hand:
 
 ```bash
@@ -162,11 +197,12 @@ git push origin master
 quarto publish gh-pages --no-render --no-prompt
 ```
 
-### 3.7 Update a published post
+### 3.8 Update a published post
 
 Edit `index.qmd`, run `/preview`, then `/publish` with no argument. Quarto adds a "Modified"
-date automatically. If the data changed, re-run the scripts in `R/` first and mention the
-refresh date in the post.
+date automatically. If the data changed, re-run the scripts in `R/` first, bump
+`data_bundle_version` in the setup chunk so a new zip is built, and mention the refresh date
+in the post.
 
 ## 4. Save work at any time
 
@@ -230,7 +266,8 @@ The post README notes which dataset it uses and the date or version of the data.
 
 When the source publishes a new year: run `01_get_data.R` and `02_clean_data.R`, add a row to
 the README version table, bump the release version if any file lives in a release, then
-re-render and re-publish the posts that use it (their Modified date updates).
+re-render and re-publish the posts that use it (their Modified date updates), bumping each
+post's `data_bundle_version` so readers get a fresh zip.
 
 `datasets/crime/` is the worked example, with eleven Statistics Canada tables, Ontario
 Financial Information Returns, and the WRPS occurrence data.
@@ -304,6 +341,8 @@ install_missing()`, run the post's (or dataset's) `01_get_data.R` and `02_clean_
   read with `Sys.getenv()`, never in code);
 - the Reproducibility box at the end of the post prints package versions
   (`cwr_session_info()` does this without exposing local paths).
+- `data/tables.csv` and `data/dictionary.csv` are complete, so the post offers a download
+  bundle with a dictionary (`cwr_dictionary_check()` passes).
 
 ## 11. Manual command reference
 
@@ -318,6 +357,7 @@ install_missing()`, run the post's (or dataset's) `01_get_data.R` and `02_clean_
 | Save to GitHub | `git add -A` then `git commit -m "message"` then `git push origin master` |
 | Undo edits to one file since last commit | `git checkout -- path/to/file` |
 | Safety check by hand | `bash _dev/check_repo_safety.sh` (after `git add -A`) |
+| Build a data bundle by hand | `Rscript -e 'source("R/data_bundle.R"); cwr_data_bundle("<slug>", version = 1)'` |
 | Rebuild chart templates after editing snippets | `Rscript _dev/build_chart_references.R` |
 
 ## 12. Troubleshooting
@@ -340,6 +380,8 @@ install_missing()`, run the post's (or dataset's) `01_get_data.R` and `02_clean_
 - **`quarto preview` port already in use.** Another preview is running; stop it, or add
   `--port 4201`.
 - **Token missing when uploading data.** Run the two `usethis` / `gitcreds` lines in section 6.
+- **Bundle build stops with "dictionary.csv is missing these columns".** A cleaning script added
+  or renamed a column; add a row for it in `data/dictionary.csv` and run again.
 
 ## 13. Skills at a glance
 

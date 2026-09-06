@@ -26,9 +26,11 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    version in the README, and keep the post's own `R/` scripts for story-specific summaries only.
 8. Ask the user for 2 to 4 categories (existing ones are listed on the home page; reuse where possible)
    and a one-sentence `description` for the listing card; fill them in.
-9. Report what was created and the three next steps: put raw data in `data-raw/` (or write
+9. Report what was created and the next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it), write `R/02_clean_data.R` to produce small tidy files in `data/`,
-   then write the post using the `cwr-charts` skill. Preview with `/preview <slug>`.
+   fill `data/tables.csv` and `data/dictionary.csv` for every table the post reads (these drive the
+   reader download bundle and the dictionary shown in the post; Claude can draft the descriptions
+   from the cleaning script), then write the post using the `cwr-charts` skill. Preview with `/preview <slug>`.
 
 ## Rules to remind the user of
 

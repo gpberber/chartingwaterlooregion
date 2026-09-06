@@ -55,7 +55,12 @@ For every `ggplot` chunk:
 - A post that uses WRPS occurrence data (`load_wrps_occurrences()` or `wat_region_occurrences`)
   shows `wrps_disclaimer` in its Data and methods section; WRPS requires it on any publication.
 - The post does not override `license:` in its YAML (site default is CC BY, set in `posts/_metadata.yml`).
-- The post ends with the Reproducibility callout (session info, links).
+- The post ends with the "Reproducibility and data download" callout (download link, dictionary
+  table, session info) and its setup chunk sources `R/data_bundle.R` and sets `data_bundle_version`.
+- `data/tables.csv` lists every table the post reads (including any from `datasets/`), with
+  description, source and licence filled in; `data/dictionary.csv` describes every column.
+  Run `Rscript -e 'source(here::here("R","data_bundle.R")); cwr_dictionary_check("<slug>")'`
+  and report the result. If the data changed since the last bundle, `data_bundle_version` must be bumped.
 - No `Sys.getenv()` secret is required, or the README says which and how to get it.
 
 ## 5. Metadata
