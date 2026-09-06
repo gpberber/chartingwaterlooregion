@@ -730,6 +730,630 @@ alternative hypothesis: two.sided</code></pre>
 </div>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Reproducibility and data download
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Code and data for this post: <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-queues"><code>posts/kitchener-phone-queues/</code></a> on GitHub. See <a href="../../reproduce.html">Reproduce a post</a> for the steps.</p>
+<p><strong>Download the data:</strong> <a href="https://github.com/gpberber/chartingwaterlooregion/releases/download/data-kitchener-phone-queues-v1/kitchener-phone-queues-data-v1.zip">kitchener-phone-queues-data-v1.zip</a> holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.</p>
+<div class="cell">
+<div id="tbl-dictionary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-dictionary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="iedmkfrwmg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#iedmkfrwmg table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#iedmkfrwmg thead, #iedmkfrwmg tbody, #iedmkfrwmg tfoot, #iedmkfrwmg tr, #iedmkfrwmg td, #iedmkfrwmg th {
+  border-style: none;
+}
+
+#iedmkfrwmg p {
+  margin: 0;
+  padding: 0;
+}
+
+#iedmkfrwmg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 13px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#iedmkfrwmg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#iedmkfrwmg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#iedmkfrwmg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#iedmkfrwmg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#iedmkfrwmg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#iedmkfrwmg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#iedmkfrwmg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#iedmkfrwmg .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#iedmkfrwmg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#iedmkfrwmg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iedmkfrwmg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#iedmkfrwmg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#iedmkfrwmg .gt_row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#iedmkfrwmg .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iedmkfrwmg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#iedmkfrwmg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#iedmkfrwmg .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#iedmkfrwmg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iedmkfrwmg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#iedmkfrwmg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iedmkfrwmg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#iedmkfrwmg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iedmkfrwmg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iedmkfrwmg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iedmkfrwmg .gt_left {
+  text-align: left;
+}
+
+#iedmkfrwmg .gt_center {
+  text-align: center;
+}
+
+#iedmkfrwmg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#iedmkfrwmg .gt_font_normal {
+  font-weight: normal;
+}
+
+#iedmkfrwmg .gt_font_bold {
+  font-weight: bold;
+}
+
+#iedmkfrwmg .gt_font_italic {
+  font-style: italic;
+}
+
+#iedmkfrwmg .gt_super {
+  font-size: 65%;
+}
+
+#iedmkfrwmg .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#iedmkfrwmg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#iedmkfrwmg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#iedmkfrwmg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#iedmkfrwmg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#iedmkfrwmg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#iedmkfrwmg .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#iedmkfrwmg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#iedmkfrwmg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table cell table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="column" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Column</th>
+<th id="type" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Type</th>
+<th id="description" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Description</th>
+<th id="units" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Units</th>
+<th id="example" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Values</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="gt_group_heading_row odd">
+<th colspan="5" id="queue_data_clean" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold" scope="colgroup">queue_data_clean</th>
+</tr>
+<tr class="gt_row_group_first even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">date</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">date</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Calendar date the metric refers to</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units">YYYY-MM-DD</td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">2019-02-21 to 2023-07-30</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">metric</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Name of the metric as reported by the City. One of 17: average and maximum handle and queue times, average speed of answer, calls presented / handled / abandoned (total and within the service-level threshold), the percentage versions of those counts, four variants of percentage of service level met, and the service-level target</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">Avg Handle Time; Avg Queue Time; Avg Speed of Answer; ... (17 distinct values)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">value</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Value of the metric on that date. Seconds for times, number of calls for counts, percent on a 0 to 100 scale for percentages</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units">varies by metric</td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">0 to 5908</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">holiday</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date is an Ontario statutory holiday</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">year</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Calendar year of the date</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">2019 to 2023</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">month</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Three-letter month abbreviation (Jan to Dec)</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">Feb; Mar; Apr; ... (12 distinct values)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">month_num</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Month as a number (1 = January)</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">1 to 12</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">year_month</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">date</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">First day of the month the date falls in; useful for monthly grouping</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units">YYYY-MM-DD</td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">2019-02-01 to 2023-07-01</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">day_of_week</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Three-letter day of the week (Mon to Sun)</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">Thu; Fri; Sat; ... (7 distinct values)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">type_of_day</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">Weekday or Weekend</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">Weekday; Weekend</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_data_clean  column">weekend_holiday</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date is a weekend day or a statutory holiday</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_data_clean  column">covid_lockdown</td>
+<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
+<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date falls in one of the Ontario COVID-19 lockdown periods used in the analysis (17 Mar to 16 Jul 2020; 26 Dec 2020 to 9 Feb 2021; 8 Apr to 15 Jul 2021; 5 Jan to 20 Mar 2022)</td>
+<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
+<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="5" class="gt_sourcenote">Generated from the data with R/data_bundle.R; descriptions from data/dictionary.csv</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-dictionary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Data dictionary for the tables used in this post.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
+OS:        Windows 11 x64 (build 26200)
+Rendered:  2026-09-06
+Quarto:    1.9.38
+
+     package version       date         source
+       arrow  25.0.1 2026-08-23 CRAN (R 4.5.3)
+ changepoint     2.3 2024-11-04 CRAN (R 4.4.3)
+  conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)
+       dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)
+     forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)
+     ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)
+      ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)
+          gt   1.3.0 2026-01-22 CRAN (R 4.5.3)
+    gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)
+        here   1.0.2 2025-09-15 CRAN (R 4.5.3)
+     janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)
+   lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)
+        MASS  7.3-66 2026-07-15 CRAN (R 4.5.3)
+        nlme 3.1-171 2026-09-01 CRAN (R 4.5.3)
+   patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)
+     prophet   1.1.7 2026-01-22 CRAN (R 4.5.2)
+       purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)
+        Rcpp   1.1.2 2026-07-05 CRAN (R 4.5.3)
+       readr   2.2.0 2026-02-19 CRAN (R 4.5.3)
+       rlang   1.3.0 2026-07-05 CRAN (R 4.5.3)
+      scales   1.4.0 2025-04-24 CRAN (R 4.5.3)
+   segmented   2.2-1 2026-01-29 CRAN (R 4.5.3)
+     stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)
+      tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)
+       tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)
+   tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)
+         zoo   1.9-0 2026-07-31 CRAN (R 4.5.3)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 
 
 </section>
