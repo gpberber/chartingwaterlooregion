@@ -23,6 +23,7 @@ website:
   description: "Charts and plain-language analysis about life in Waterloo Region, built from open data."
   site-url: https://gpberber.github.io/chartingwaterlooregion
   repo-url: https://github.com/gpberber/chartingwaterlooregion
+  repo-branch: master             # Quarto assumes "main" unless told otherwise
   repo-actions: [source, issue]   # "view source" and "report an issue" links on every page
   favicon: images/favicon.svg
   image: images/social-card.png   # default preview image when a link is shared
