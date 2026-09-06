@@ -5,9 +5,11 @@ title-block-banner: true
 author: "Greg Berberich"
 date-modified: last-modified
 
-# Adds a "Reuse" box with the CC BY badge at the end of every post.
+# Adds a "Reusing this post" box at the end of every post (heading set in _quarto.yml).
 # Text and charts are CC BY 4.0; code is MIT (see LICENSE and LICENSE-CONTENT.md).
-license: "CC BY"
+license:
+  text: "The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above."
+  url: https://creativecommons.org/licenses/by/4.0/
 
 # Posts show prose, charts, and tables, not code. Readers who want the code use
 # the "view source" link in the page header or clone the repo (see reproduce.qmd).

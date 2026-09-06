@@ -56,6 +56,10 @@ website:
     center: "Text and charts [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Code [MIT](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE) · Data as credited in each post"
     right: "Built with [Quarto](https://quarto.org)"
 
+# Rename the appendix heading Quarto adds for the post licence (default "Reuse")
+language:
+  section-title-reuse: "Reusing this post"
+
 format:
   html:
     theme:

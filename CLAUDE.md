@@ -48,7 +48,8 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   (`_dev/check_repo_safety.sh`) blocks big files and key-like strings; never bypass it.
 - Git: single `master` branch, commit via `/save`, never force-push, never rewrite history.
 - Licence: code is MIT (`LICENSE`), text and charts are CC BY 4.0 (`LICENSE-CONTENT.md`), set
-  site-wide by `license: "CC BY"` in `posts/_metadata.yml`. Data is never relicensed: every post
+  site-wide by the `license:` block in `posts/_metadata.yml` (heading "Reusing this post", set by
+  `language: section-title-reuse` in `_quarto.yml`). Data is never relicensed: every post
   README must name each source's own licence, and material obtained by request (not from an
   open-data portal) needs its terms checked before it goes into a release. WRPS occurrence data
   carries a required disclaimer: posts using it show `wrps_disclaimer` (datasets/crime/R/helpers.R).
