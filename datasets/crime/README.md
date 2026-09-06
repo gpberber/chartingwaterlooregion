@@ -37,8 +37,8 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | Family and intimate-partner violence victims | Statistics Canada | 35-10-0200-01, 35-10-0202-01 | Statistics Canada Open Licence |
 | Police personnel | Statistics Canada | 35-10-0077-01, 35-10-0076-01 | Statistics Canada Open Licence |
 | UCR violation codes | Statistics Canada, CCJCSS reference PDFs | `data-raw/ucr_codes/` | Statistics Canada Open Licence |
-| Municipal Financial Information Returns, 2000 to 2025 | Ontario Ministry of Municipal Affairs and Housing | https://efis.fma.csc.gov.on.ca/fir/ | Open Government Licence – Ontario <!-- TODO: confirm --> |
-| WRPS occurrence data, 2014 to 2024 (yearly Excel exports) | Waterloo Regional Police Service, Occurrence Data page <!-- TODO: add URL --> | `data-raw/raw_occurrence_data_files/`; also GitHub Release `data-raw-dataset-crime-v1` | Public release for data analysis; no formal licence stated. WRPS requires this disclaimer on any publication: "Any statements, conclusions, or publications based upon this WRPS occurrence data made by non-WRPS employees are made without the authorization of WRPS and are not the opinion of the WRPS." Posts show it via `wrps_disclaimer` from `helpers.R`. |
+| Municipal Financial Information Returns, 2000 to 2025 | Ontario Ministry of Municipal Affairs and Housing | https://efis.fma.csc.gov.on.ca/fir/ | Open Government Licence – Ontario |
+| WRPS occurrence data, 2014 to 2024 (yearly Excel exports) | Waterloo Regional Police Service | https://wrps.ca/front-page/statistics-and-data ; `data-raw/raw_occurrence_data_files/`; also GitHub Release `data-raw-dataset-crime-v1` | Public release for data analysis; no formal licence stated. WRPS requires this disclaimer on any publication: "Any statements, conclusions, or publications based upon this WRPS occurrence data made by non-WRPS employees are made without the authorization of WRPS and are not the opinion of the WRPS." Posts show it via `wrps_disclaimer` from `helpers.R`. |
 
 ## Files in `data/`
 

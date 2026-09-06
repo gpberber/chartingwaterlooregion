@@ -23,7 +23,7 @@
 #
 # Usage from a post's or dataset's R/01_get_data.R (no token needed):
 #   source(here::here("R", "data_helpers.R"))
-#   cwr_data_download("kitchener-school-collisions", kind = "data-raw")
+#   cwr_data_download("kitchener-phone-queues", kind = "data-raw")
 #   cwr_data_download("crime", kind = "data", root = "datasets")
 #
 # Usage when publishing (the /share-data skill runs this; needs a token):

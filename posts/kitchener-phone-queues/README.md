@@ -1,6 +1,6 @@
 # Kitchener phone queues
 
-Post: https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/ (draft, not yet published)
+Post: https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/
 
 ## Data sources
 
@@ -22,7 +22,7 @@ source("posts/kitchener-phone-queues/R/01_get_data.R")      # fills data-raw/
 source("posts/kitchener-phone-queues/R/02_clean_data.R")    # fills data/queue_data_clean.csv
 ```
 
-Then `quarto render posts/kitchener-phone-queues --profile draft` from a terminal.
+Then `quarto render posts/kitchener-phone-queues` from a terminal.
 
 ## Notes
 
