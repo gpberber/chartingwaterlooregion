@@ -59,7 +59,7 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   open-data portal) needs its terms checked before it goes into a release. WRPS occurrence data
   carries a required disclaimer: posts using it show `wrps_disclaimer` (datasets/crime/R/helpers.R).
 - Post types: the first entry in `categories` is `Snapshot` (a few simple charts, read in under
-  6 minutes) or `Deep dive` (longer, more rigorous); then 2 to 3 topic categories.
+  5 minutes) or `Deep dive` (longer, more rigorous); then 2 to 3 topic categories.
 - Drafts: new posts start `draft: true`; `draft-mode: gone` keeps them off the public site.
   Only `/publish` flips a post live, after `/review-post`.
 - Do not change `_quarto.yml` theme or `custom.scss` palette without asking; the palette must stay

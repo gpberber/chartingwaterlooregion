@@ -70,10 +70,10 @@ Claude asks which kind of post it is, for a one-sentence description (shown on t
 
 There are two kinds of post, and the kind is always the first entry in `categories`:
 
-- **Snapshot**: a few simple charts and some basic analysis, read in under 6 minutes.
+- **Snapshot**: a few simple charts and some basic analysis, read in under 5 minutes.
 - **Deep dive**: a longer, more rigorous analysis with no length limit.
 
-`/review-post` checks the label against the post's length (prose words plus the number of charts and tables): a Snapshot that would take more than 6 minutes is either cut down or relabelled. Quarto's listing-card reading-time estimate is switched off because it counts table cells and runs far too high. On the home page the two labels are clickable categories, so a reader can filter to one kind. If the site ever has enough posts to justify separate "Snapshots" and "Deep dives" pages, they can be built from the same field with a listing that uses `include: categories: Snapshot`; nothing needs to be relabelled.
+`/review-post` checks the label against the post's length (prose words plus the number of charts and tables): a Snapshot that would take more than 5 minutes is either cut down or relabelled. Quarto's listing-card reading-time estimate is switched off because it counts table cells and runs far too high. On the home page the two labels are clickable categories, so a reader can filter to one kind. If the site ever has enough posts to justify separate "Snapshots" and "Deep dives" pages, they can be built from the same field with a listing that uses `include: categories: Snapshot`; nothing needs to be relabelled.
 
 If the post draws on a shared dataset (section 5), say so when asked; Claude wires the `load.R` line into the setup chunk and you skip most of 3.2.
 

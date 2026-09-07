@@ -98,7 +98,10 @@ cwr_font <- function(family = "Inter") {
 # gridlines only, no y axis line, no axis titles (put units in the subtitle),
 # left-aligned title block, legend tucked above the plot at the left.
 # All text sizes are multiples of base_size so one number scales everything.
-theme_cwr <- function(base_size = 13, base_family = cwr_font()) {
+# base_size 16 (not ggplot2's default 11) because charts are drawn 7 inches
+# wide and then shrunk to about 320 px on a phone: at that scale 16 pt text
+# lands near 7 pt on screen, which is the smallest that stays readable.
+theme_cwr <- function(base_size = 16, base_family = cwr_font()) {
   theme_minimal(base_size = base_size, base_family = base_family) +
     theme(
       # Text elements. element_markdown() (from ggtext) means titles can
@@ -188,10 +191,10 @@ theme_cwr <- function(base_size = 13, base_family = cwr_font()) {
 }
 
 # Make it the default for every ggplot in the session
-theme_set(theme_cwr(base_size = 13))
+theme_set(theme_cwr(base_size = 16))
 
 # The templates refer to base_size for text sizes inside geoms and annotations
-base_size <- 13
+base_size <- 16
 
 # ---- 5. Helpers ----------------------------------------------------------
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01 | *Charting Waterloo Region*"
@@ -200,8 +203,9 @@ cwr_caption <- function(source) {
 }
 
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.
-# 3.2 mm is roughly 9 pt, the standard label size used across the templates.
-label_size <- 3.2
+# 4 mm is roughly 11 pt, the standard label size used across the templates
+# (scaled up with base_size so direct labels stay readable on a phone).
+label_size <- 4
 
 # Session information for the Reproducibility box at the end of each post.
 # sessioninfo::session_info() would also print the pandoc and quarto install

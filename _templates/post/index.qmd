@@ -2,7 +2,7 @@
 title: "{{title}}"
 description: "One sentence for the listing card: the question and the answer."
 date: "{{date}}"
-categories: [Snapshot]   # first entry is the post type: Snapshot (under 6 min) or Deep dive; then 2 to 3 topics
+categories: [Snapshot]   # first entry is the post type: Snapshot (under 5 min) or Deep dive; then 2 to 3 topics
 image: images/thumbnail.png
 draft: true
 ---
@@ -42,8 +42,8 @@ data_bundle_version <- 1
 #| label: fig-first
 #| fig-cap: "Caption shown under the chart."
 #| fig-alt: "What the chart shows, for screen readers."
-#| fig-height: 5
-#| fig-width: 8
+#| fig-height: 5.5
+#| fig-width: 7
 
 # Pick a template from the cwr-charts skill and build the chart here.
 ```

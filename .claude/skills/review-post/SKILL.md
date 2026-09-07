@@ -67,7 +67,7 @@ For every `ggplot` chunk:
 
 - `title`, `description` (one sentence, used on the listing card), `date`, `categories`, `image` set and the file exists.
 - The first category is `Snapshot` or `Deep dive`, followed by 2 to 3 topic categories. A Snapshot
-  is a few simple charts and basic analysis read in under 6 minutes (roughly 1,000 words of prose
+  is a few simple charts and basic analysis read in under 5 minutes (roughly 800 words of prose
   plus a handful of charts); anything longer or more involved is a Deep dive. Count the prose words
   outside code chunks, note the number of charts and tables, and flag a mismatch, suggesting either
   relabelling or cutting the post down.
