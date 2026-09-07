@@ -17,4 +17,4 @@ title-block-banner: true
 toc: false
 ---
 
-Every post is a **Snapshot** (a few charts and the main point, under six minutes) or a **Deep dive** (a longer, more rigorous analysis). Click a category on the right to show one kind only.
+A **Snapshot** post contains a few charts and some basic analysis and can be read in under five minutes; a **Deep Dive** contains many charts and more-detailed analysis and takes a lot more than five minutes to read. Use the **Categories** at right to filter by post type or topic.
