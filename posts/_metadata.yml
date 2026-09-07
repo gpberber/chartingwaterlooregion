@@ -19,10 +19,9 @@ execute:
   message: false
 
 # Chart defaults; set fig-height / fig-width per chunk when a chart needs it.
-# 8.3 inches wide displays at 797 px, the same width as the paragraphs in the
-# 800 px column, and shrinks to about 320 px on a phone. Height varies by chart
-# (set fig-height in the chunk); 5 is the default. theme_cwr() uses base_size 15
-# so text is a little smaller than the body text at this width.
+# Charts go through cwr_figure() (R/theme_cwr.R), which draws each one twice:
+# 8.3 in wide for desktops (the paragraph width) and 4.2 in wide for phones.
+# These knitr defaults only apply to anything plotted outside cwr_figure().
 fig-width: 8.3
 fig-height: 5
 fig-align: center

@@ -27,7 +27,11 @@ decides. Then offer to apply the fixes.
 ## 2. Charts (apply the cwr-charts skill rules)
 
 For every `ggplot` chunk:
-- Chunk label starts with `fig-`; has `fig-cap` and `fig-alt`; `fig-height`/`fig-width` set if the chart needed tuning.
+- The chart goes through `cwr_figure(p, "fig-<slug>", caption = , alt = , height = , phone_height = )`
+  in a chunk with `#| output: asis`; `caption` and `alt` are filled in. Flag any chart that
+  uses knitr's `fig-cap`/`fig-width` options instead (it would have no phone version).
+- Both PNGs exist in `posts/<slug>/figures/` (`fig-<slug>.png` and `fig-<slug>-phone.png`).
+  Read the `-phone` one scaled to about 320 px: titles wrap, nothing collides with the axis.
 - One chart per chunk, no `print()` of tables in the same chunk.
 - Uses colours and theme from `R/theme_cwr.R` only (flag any literal colour string, `theme_bw`, `theme_classic`, `purple4`).
 - Title states the finding; subtitle has units and period; caption via `cwr_caption()` with the source.

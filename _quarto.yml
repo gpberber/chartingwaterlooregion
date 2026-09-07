@@ -14,6 +14,8 @@ project:
     - "!datasets/"      # shared data pipelines and exploration notebooks
   resources:
     - images/           # favicon, logo, placeholder thumbnail, social card
+    - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
+                        # <source srcset>, which Quarto does not scan for resources
 
 execute:
   freeze: auto           # re-run R only when a post source changes; results cached in _freeze/

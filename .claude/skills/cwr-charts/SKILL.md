@@ -22,6 +22,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption("Source text")` | builds the standard caption |
+| `cwr_figure(p, "fig-id", caption, alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
 
@@ -62,37 +63,44 @@ Read only the reference file you need; each is self-contained.
 6. **Value axis on the right** for vertical charts, labels sitting above gridlines
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the
    x axis on top.
-7. **One chart per chunk**, chunk label `fig-<slug>`, with `fig-cap`, `fig-alt`, and
-   explicit `fig-height`/`fig-width` set before tuning any label position. Default is
-   `fig-width: 8.3`, always: it displays at 797 px, exactly the paragraph width. Vary
-   only `fig-height` (4 for a simple bar chart, 5 for a line chart, more for ranked
-   bars or facets). Wider than 8.3 gets scaled down, and its text with it.
+7. **One chart per chunk, through `cwr_figure()`.** Build the plot as `p`, then call
+   `cwr_figure(p, "fig-<slug>", caption = , alt = , height = , phone_height = )` in a chunk
+   with `#| output: asis` (chunk label without the `fig-` prefix; the id passed to the
+   function carries it, and `@fig-<slug>` cross-references work). It saves two PNGs to the
+   post's `figures/` folder: 8.3 in wide for desktops (exactly the paragraph width) and 4.2 in
+   wide for phones, and emits a `<picture>` so the browser shows the right one. Width is
+   fixed; vary `height` (4 for a simple bar chart, 5 for a line chart, more for ranked bars
+   or facets) and `phone_height` (a little squarer). Never use knitr's `fig-width`/`fig-cap`
+   chunk options for a chart.
 8. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
 9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
-10. **Phones.** Many readers see every chart at about 320 px wide, so text is drawn
-    large (`base_size` 15) and charts are squarer than usual. Keep charts to one idea,
-    few categories, short labels; avoid anything that only works at desktop width
-    (dense small multiples, twelve-series lines, long y-axis labels). When checking a
-    rendered PNG, also view it scaled to about 320 px wide and confirm the labels survive.
+10. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
+    sizes, so text is twice as large relative to the chart and the title and subtitle wrap.
+    Everything else must survive half the width on its own: one idea per chart, few
+    categories, short labels, no annotation placed by a fixed x position near the right
+    edge (put explanations in the subtitle instead), no dense small multiples or
+    twelve-series lines. Always Read both PNGs in `figures/`, the `-phone` one scaled to
+    about 320 px wide, before calling a chart done.
 
 ## Iteration loop for label placement
 
 Templates leave label positions (`nudge_x`, `label_data`, legend coordinates) for you to set
 after seeing the chart. Do not guess blind:
 
-1. Write the chunk in the post with `fig-height` and `fig-width` fixed.
-2. Render just that chart to a PNG in the scratchpad with a short script:
+1. Write the chunk in the post with `height` and `phone_height` fixed.
+2. Render just that chart with a short scratchpad script that `setwd()`s to the scratchpad:
 
    ```r
+   here::i_am("posts/<slug>/index.qmd")
    source(here::here("R", "theme_cwr.R"))
+   setwd("<scratchpad>")
    # load the same data the post loads ...
    p <- <the ggplot code from the chunk>
-   ggsave("<scratchpad>/check.png", p, width = <fig-width>, height = <fig-height>,
-          dpi = 150, bg = "white", device = ragg::agg_png)
+   cwr_figure(p, "fig-<slug>", caption = "x", alt = "x", height = <h>, phone_height = <ph>)
    ```
 
-   Run it with `Rscript`, then **Read the PNG** and look at it.
+   Run it with `Rscript`, then **Read both PNGs** in `<scratchpad>/figures/` and look at them.
 3. Adjust nudges, breaks, margins, or label coordinates. Re-render. Two or three passes is normal.
 4. Copy the final positions back into the post chunk. Delete the scratch script.
 

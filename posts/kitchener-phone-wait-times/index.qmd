@@ -109,28 +109,15 @@ The City measures itself against a common contact-centre yardstick: answer 80% o
 The break came in 2022. Every month that year was below target, and `r mon(worst_month$year_month)` was the low point, with `r pct(worst_month$pct_within)` of calls answered within 30 seconds. The first seven months of 2023 look much like 2022.
 
 ```{r}
-#| label: fig-answered
-#| fig-cap: "Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023."
-#| fig-alt: "Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022."
-#| fig-height: 5
+#| label: answered
+#| output: asis
 
-# ggline (single series) with a target line
-x_min <- min(monthly$year_month)
-x_max <- max(monthly$year_month)
-
-ggplot(monthly, aes(x = year_month, y = pct_within)) +
+# ggline (single series) with a target line; the target is explained in the
+# subtitle rather than a label so nothing collides on the phone version
+p <- ggplot(monthly, aes(x = year_month, y = pct_within)) +
 
   # the City's target, drawn first so the data line sits on top of it
   geom_hline(yintercept = 80, colour = habsred, linetype = "dashed", linewidth = 0.5) +
-  # label sits above the target line from 2022 on, where the data stays below it,
-  # and stops short of the right-hand axis labels
-  annotate(
-    "text",
-    x = ymd("2022-03-01"), y = 80,
-    label = "Target: 80%",
-    hjust = 0, vjust = -0.6,
-    size = label_size, colour = habsred
-  ) +
 
   geom_line(colour = dodgerblue, linewidth = 0.8) +
 
@@ -163,9 +150,19 @@ ggplot(monthly, aes(x = year_month, y = pct_within)) +
 
   labs(
     title = "Calls answered within 30 seconds fell below target in 2022 and stayed there",
-    subtitle = "Share of weekday calls answered within 30 seconds, by month<br>",
+    subtitle = paste0(
+      "Share of weekday calls answered within 30 seconds, by month. ",
+      "<span style='color:", habsred, "'>Dashed line: the City's 80% target</span><br>"
+    ),
     caption = cwr_caption("City of Kitchener Open Data")
   )
+
+cwr_figure(
+  p, "fig-answered",
+  caption = "Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023.",
+  alt = "Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022.",
+  height = 5, phone_height = 4.5
+)
 ```
 
 ## The average wait more than doubled
@@ -175,10 +172,8 @@ Averages hide a lot in a phone queue, since most calls are answered quickly and 
 Volume does not explain it. The centre handled `r label_number(accuracy = 1)(calls_first)` calls on a typical weekday in `r first_year` and `r label_number(accuracy = 1)(calls_last)` in `r last_year`, a rise of `r pct(calls_change_pct)`. The data says nothing about staffing, which is the obvious place to look next.
 
 ```{r}
-#| label: fig-wait
-#| fig-cap: "Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July."
-#| fig-alt: "Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023."
-#| fig-height: 4
+#| label: wait
+#| output: asis
 
 # ggvertbar with direct labels in place of the value axis
 plot_data <- yearly |>
@@ -189,7 +184,7 @@ plot_data <- yearly |>
     focus = year >= 2022
   )
 
-ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
+p <- ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
 
   geom_col(width = 0.7) +
 
@@ -222,6 +217,13 @@ ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
     subtitle = "Average seconds a weekday caller waited before being answered or hanging up",
     caption = cwr_caption("City of Kitchener Open Data")
   )
+
+cwr_figure(
+  p, "fig-wait",
+  caption = "Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July.",
+  alt = "Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023.",
+  height = 4, phone_height = 3.8
+)
 ```
 
 ## Early summer is the crunch
@@ -229,16 +231,14 @@ ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
 Whatever the year, the phones are busiest in `r month.name[busiest$month]` and quietest in `r month.name[quietest$month]`, and the answer rate follows the volume: over the whole period, `r pct(by_month |> filter(month == busiest$month) |> pull(pct_within))` of June calls were answered on time against `r pct(by_month |> filter(month == "Jan") |> pull(pct_within))` in January. Property tax bills, summer recreation registration and moving season all land in the same few weeks. A centre that just meets its target in a quiet month will miss it in a busy one unless staffing moves with the calendar.
 
 ```{r}
-#| label: fig-season
-#| fig-cap: "Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023."
-#| fig-alt: "Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted."
-#| fig-height: 4
+#| label: season
+#| output: asis
 
 # ggvertbar, busiest two months highlighted, direct labels in place of the value axis
 plot_data <- by_month |>
   mutate(busy = month %in% c("Jun", "Jul"))
 
-ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
+p <- ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
 
   geom_col(width = 0.7) +
 
@@ -270,6 +270,13 @@ ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
     subtitle = "Average calls per weekday, by month of the year, 2019 to 2023",
     caption = cwr_caption("City of Kitchener Open Data")
   )
+
+cwr_figure(
+  p, "fig-season",
+  caption = "Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023.",
+  alt = "Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted.",
+  height = 4, phone_height = 4
+)
 ```
 
 ## Data and methods

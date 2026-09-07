@@ -39,13 +39,21 @@ data_bundle_version <- 1
 <!-- One or two paragraphs, then one chart. -->
 
 ```{r}
-#| label: fig-first
-#| fig-cap: "Caption shown under the chart."
-#| fig-alt: "What the chart shows, for screen readers."
-#| fig-height: 5
-#| fig-width: 8.3
+#| label: first
+#| output: asis
 
-# Pick a template from the cwr-charts skill and build the chart here.
+# Pick a template from the cwr-charts skill and build the chart as `p`, then hand
+# it to cwr_figure(): it saves a desktop and a phone version of the chart to
+# figures/ and writes the figure (numbered, captioned, cross-referenceable as
+# @fig-first). Vary height by chart; width is fixed at the paragraph width.
+p <- ggplot()
+
+cwr_figure(
+  p, "fig-first",
+  caption = "Caption shown under the chart.",
+  alt = "What the chart shows, for screen readers.",
+  height = 5, phone_height = 4.5
+)
 ```
 
 ## Second finding

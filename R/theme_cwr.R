@@ -208,6 +208,90 @@ cwr_caption <- function(source) {
 # (scaled up with base_size so direct labels stay readable on a phone).
 label_size <- 4
 
+# ---- 6. Responsive figures ------------------------------------------------
+# A chart drawn for the desktop column (8.3 in, 797 px) is shrunk to about
+# 40% on a phone, so its text becomes unreadable however large it is drawn.
+# Sites like Datawrapper solve this by redrawing the chart for the phone.
+# cwr_figure() does the same with two PNGs:
+#
+#   figures/<id>.png        8.3 in wide, for screens 768 px and wider
+#   figures/<id>-phone.png  4.2 in wide, for narrower screens
+#
+# and writes an HTML <picture> element so the browser picks the right one.
+# The phone version is the same ggplot with the same text sizes, so text is
+# about twice as large relative to the chart, and the title and subtitle are
+# allowed to wrap. It is wrapped in a Quarto figure div so the chart still
+# gets a number, a caption and cross-references like any other figure.
+#
+# Use it in a chunk with `output: asis` (see the post template):
+#
+#   ```{r}
+#   #| label: answered
+#   #| output: asis
+#   p <- ggplot(...) + ...
+#   cwr_figure(p, "fig-answered",
+#     caption = "Share of calls answered within 30 seconds, by month.",
+#     alt = "Line chart showing ...",
+#     height = 5, phone_height = 4.5)
+#   ```
+#
+# The PNGs live in the post's figures/ folder and are committed with the
+# post, so a full site render never needs to re-run the R code.
+cwr_figure <- function(plot, id, caption, alt,
+                       width = 8.3, height = 5,
+                       phone_width = 4.2, phone_height = height * 0.9,
+                       dpi = 288) {
+  stopifnot(str_starts(id, "fig-"))
+
+  # Write next to the post: knitr runs with the post folder as the working
+  # directory, and the relative path "figures/..." then works in the HTML too.
+  dir.create("figures", showWarnings = FALSE)
+  desktop_file <- file.path("figures", paste0(id, ".png"))
+  phone_file   <- file.path("figures", paste0(id, "-phone.png"))
+
+  # Phone version: same plot, but titles wrap instead of running off the edge.
+  # element_textbox_simple() (ggtext) is element_markdown() with word wrap.
+  phone_plot <- plot +
+    theme(
+      plot.title = element_textbox_simple(
+        size = base_size * 1.0, face = "bold", lineheight = 1.1,
+        margin = margin(0, 0, 5, 0)
+      ),
+      plot.subtitle = element_textbox_simple(
+        size = base_size * 0.7, face = "bold", lineheight = 1.1,
+        margin = margin(0, 0, 10, 0)
+      ),
+      plot.caption = element_textbox_simple(
+        size = base_size * 0.6, colour = cowboysilver, lineheight = 1.1,
+        margin = margin(t = 10)
+      ),
+      plot.margin = margin(t = 8, r = 8, b = 8, l = 8)
+    )
+
+  ggsave(desktop_file, plot, width = width, height = height,
+         dpi = dpi, bg = "white", device = ragg::agg_png)
+  ggsave(phone_file, phone_plot, width = phone_width, height = phone_height,
+         dpi = dpi, bg = "white", device = ragg::agg_png)
+
+  # The width attributes are the CSS-pixel sizes (inches x 96) so the browser
+  # shows each image at its drawn size and only shrinks it if the column is
+  # narrower. Escape quotes in the alt text so the HTML stays valid.
+  alt <- str_replace_all(alt, '"', "&quot;")
+  cat(
+    "::: {#", id, "}\n",
+    "<picture>\n",
+    '<source media="(max-width: 767px)" srcset="', phone_file, '" ',
+    'width="', round(phone_width * 96), '" height="', round(phone_height * 96), '">\n',
+    '<img src="', desktop_file, '" alt="', alt, '" class="img-fluid figure-img" ',
+    'width="', round(width * 96), '" height="', round(height * 96), '">\n',
+    "</picture>\n\n",
+    caption, "\n",
+    ":::\n",
+    sep = ""
+  )
+  invisible(list(desktop = desktop_file, phone = phone_file))
+}
+
 # Session information for the Reproducibility box at the end of each post.
 # sessioninfo::session_info() would also print the pandoc and quarto install
 # paths, which expose the local user name and folder layout, so this prints
