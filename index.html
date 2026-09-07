@@ -82,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-image','listing-date','listing-title','listing-description','listing-categories','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-image','listing-date','listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
@@ -217,7 +217,7 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2l0eSUyMFNlcnZpY2Vz">City Services <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2l0Y2hlbmVy">Kitchener <span class="quarto-category-count">(1)</span></div><div class="category" data-category="T3BlbiUyMERhdGE=">Open Data <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2l0eSUyMFNlcnZpY2Vz">City Services <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGVlcCUyMGRpdmU=">Deep dive <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2l0Y2hlbmVy">Kitchener <span class="quarto-category-count">(1)</span></div><div class="category" data-category="T3BlbiUyMERhdGE=">Open Data <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -225,13 +225,14 @@ window.Quarto = {
 
 
 
+<p>Every post is a <strong>Snapshot</strong> (a few charts and the main point, under six minutes) or a <strong>Deep dive</strong> (a longer, more rigorous analysis). Click a category on the right to show one kind only.</p>
 
 
 
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="T3BlbiUyMERhdGElMkNDaXR5JTIwU2VydmljZXMlMkNLaXRjaGVuZXI=" data-listing-date-sort="1738731600000" data-listing-file-modified-sort="1788717209532" data-listing-date-modified-sort="1788717209000" data-listing-reading-time-sort="51" data-listing-word-count-sort="10056">
+<div class="quarto-post image-right" data-index="0" data-categories="RGVlcCUyMGRpdmUlMkNPcGVuJTIwRGF0YSUyQ0NpdHklMjBTZXJ2aWNlcyUyQ0tpdGNoZW5lcg==" data-listing-date-sort="1738731600000" data-listing-file-modified-sort="1788739184616" data-listing-date-modified-sort="1788739184000" data-listing-reading-time-sort="51" data-listing-word-count-sort="10056">
 <div class="thumbnail"><a href="./posts/kitchener-phone-queues/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/kitchener-phone-queues/images/perc_answered_within_30_secs.png" class="thumbnail-image">
@@ -242,6 +243,8 @@ window.Quarto = {
 <a href="./posts/kitchener-phone-queues/index.html" class="no-external">Kitchener phone queues</a>
 </h3>
 <div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('RGVlcCUyMGRpdmU='); return false;">Deep dive</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('T3BlbiUyMERhdGE='); return false;">Open Data</div>
 
@@ -259,7 +262,6 @@ window.Quarto = {
 <div class="listing-date">
 Feb 5, 2025
 </div>
-<div class="listing-reading-time">51 min</div>
 </a>
 </div>
 </div>
