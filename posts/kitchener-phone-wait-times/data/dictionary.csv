@@ -1,0 +1,25 @@
+table,column,description,units
+queue_daily,date,Calendar date,YYYY-MM-DD
+queue_daily,year,Calendar year,
+queue_daily,month,Three-letter month abbreviation (Jan to Dec),
+queue_daily,year_month,First day of the month the date falls in,YYYY-MM-DD
+queue_daily,day_of_week,Three-letter day of the week (Mon to Sun),
+queue_daily,holiday,TRUE if the date is an Ontario statutory holiday,
+queue_daily,weekend_or_holiday,TRUE if the date is a Saturday or Sunday or a statutory holiday,
+queue_daily,avg_handle_time,Average length of an answered call from answer to hang-up including hold time,seconds
+queue_daily,avg_queue_time,Average time callers spent waiting in the queue (answered and abandoned calls),seconds
+queue_daily,avg_speed_of_answer,Average time answered calls waited before an agent picked up,seconds
+queue_daily,calls_abandoned,Calls where the caller hung up while waiting in the queue,calls
+queue_daily,abandoned_within_target,Calls abandoned before the 30-second target had elapsed,calls
+queue_daily,calls_handled,Calls answered by an agent,calls
+queue_daily,answered_within_target,Calls answered within the 30-second target,calls
+queue_daily,calls_presented,Calls that entered the queue,calls
+queue_daily,max_handle_time,Longest single call that day,seconds
+queue_daily,max_queue_time,Longest single wait in the queue that day,seconds
+queue_daily,percentage_of_calls_abandoned,calls_abandoned as a share of calls_presented,percent (0 to 100)
+queue_daily,percentage_of_calls_handled,calls_handled as a share of calls_presented,percent (0 to 100)
+queue_daily,pct_handled_within_target,answered_within_target as a share of calls_handled,percent (0 to 100)
+queue_daily,pct_answered_within_target,"answered_within_target as a share of calls_presented; the measure used in the post, where an abandoned call counts as a miss",percent (0 to 100)
+queue_daily,pct_within_target_abandoned_positive,answered_within_target plus abandoned_within_target as a share of calls_presented,percent (0 to 100)
+queue_daily,pct_within_target_excl_abandoned,answered_within_target as a share of calls_presented minus calls_abandoned,percent (0 to 100)
+queue_daily,target_seconds,The service-level target the City measures against (30 on every day),seconds

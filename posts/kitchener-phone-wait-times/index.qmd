@@ -1,0 +1,303 @@
+---
+title: "Kitchener is answering the phone slower than it used to"
+description: "In 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled."
+date: "2026-09-07"
+categories: [Snapshot, City Services, Kitchener, Open Data]
+image: images/thumbnail.png
+draft: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/kitchener-phone-wait-times/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+```
+
+```{r}
+#| label: load-data
+#| include: false
+
+# One row per day, one column per metric; produced by R/02_clean_data.R
+queue_daily <- read_csv(
+  here("posts", "kitchener-phone-wait-times", "data", "queue_daily.csv"),
+  show_col_types = FALSE
+) |>
+  mutate(month = factor(month, levels = month.abb))
+
+# The contact centre runs a skeleton service on weekends and holidays (about a
+# third of the weekday call volume), so every number below is weekdays only.
+weekday <- queue_daily |>
+  filter(!weekend_or_holiday)
+
+# "Within target" throughout means answered within 30 seconds, counting a call
+# that was abandoned while waiting as a miss: the strictest of the four
+# versions the City reports.
+pct_within <- function(answered, presented) 100 * sum(answered) / sum(presented)
+
+yearly <- weekday |>
+  summarise(
+    days          = n(),
+    calls_per_day = mean(calls_presented),
+    pct_within    = pct_within(answered_within_target, calls_presented),
+    pct_abandoned = 100 * sum(calls_abandoned) / sum(calls_presented),
+    avg_wait      = weighted.mean(avg_queue_time, calls_presented),
+    .by = year
+  )
+
+monthly <- weekday |>
+  summarise(
+    calls      = sum(calls_presented),
+    pct_within = pct_within(answered_within_target, calls_presented),
+    avg_wait   = weighted.mean(avg_queue_time, calls_presented),
+    .by = year_month
+  )
+
+# Average weekday across all years, by month of the year (seasonality)
+by_month <- weekday |>
+  summarise(
+    calls_per_day = mean(calls_presented),
+    pct_within    = pct_within(answered_within_target, calls_presented),
+    .by = month
+  ) |>
+  arrange(month)
+
+# Numbers quoted in the text, pulled from the tables above so they cannot drift
+first_year <- min(yearly$year)
+last_year  <- max(yearly$year)
+yr <- function(y, col) yearly |> filter(year == y) |> pull({{ col }})
+pct_first <- yr(first_year, pct_within)
+pct_2022  <- yr(2022, pct_within)
+pct_last  <- yr(last_year, pct_within)
+wait_first <- yr(first_year, avg_wait)
+wait_2022  <- yr(2022, avg_wait)
+wait_last  <- yr(last_year, avg_wait)
+calls_first <- yr(first_year, calls_per_day)
+calls_last  <- yr(last_year, calls_per_day)
+calls_change_pct <- 100 * (calls_last / calls_first - 1)
+best_month  <- monthly |> slice_max(pct_within, n = 1)
+worst_month <- monthly |> slice_min(pct_within, n = 1)
+busiest  <- by_month |> slice_max(calls_per_day, n = 1)
+quietest <- by_month |> slice_min(calls_per_day, n = 1)
+weekend_share <- queue_daily |>
+  summarise(calls = mean(calls_presented), .by = weekend_or_holiday) |>
+  pivot_wider(names_from = weekend_or_holiday, values_from = calls) |>
+  mutate(share = `TRUE` / `FALSE`) |>
+  pull(share)
+
+# Formatting helpers for the prose
+pct <- label_number(accuracy = 1, suffix = "%")
+secs <- label_number(accuracy = 1, suffix = " seconds")
+mon <- \(d) format(d, "%B %Y")
+```
+
+Call the City of Kitchener on a weekday and the odds of someone picking up within half a minute have fallen from `r pct(pct_first)` in `r first_year` to `r pct(pct_last)` in `r last_year`. The average wait in the queue went from `r secs(wait_first)` to `r secs(wait_last)`. Call volumes barely moved over the same period, so the slowdown is not a story about more people phoning in.
+
+## The 80% target held until 2021, then slipped
+
+The City measures itself against a common contact-centre yardstick: answer 80% of calls within 30 seconds. On weekdays in `r first_year` it met that target almost exactly. Through the first two pandemic years it stayed close, with the best months of all in the quiet January and February of 2020 and 2021, when more than `r pct(floor(best_month$pct_within))` of calls were answered on time.
+
+The break came in 2022. Every month that year was below target, and `r mon(worst_month$year_month)` was the low point, with `r pct(worst_month$pct_within)` of calls answered within 30 seconds. The first seven months of 2023 look much like 2022.
+
+```{r}
+#| label: fig-answered
+#| fig-cap: "Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023."
+#| fig-alt: "Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022."
+#| fig-height: 5
+
+# ggline (single series) with a target line
+x_min <- min(monthly$year_month)
+x_max <- max(monthly$year_month)
+
+ggplot(monthly, aes(x = year_month, y = pct_within)) +
+
+  # the City's target, drawn first so the data line sits on top of it
+  geom_hline(yintercept = 80, colour = habsred, linetype = "dashed", linewidth = 0.5) +
+  # label sits above the target line from 2022 on, where the data stays below it,
+  # and stops short of the right-hand axis labels
+  annotate(
+    "text",
+    x = ymd("2022-03-01"), y = 80,
+    label = "Target: 80%",
+    hjust = 0, vjust = -0.6,
+    size = label_size, colour = habsred
+  ) +
+
+  geom_line(colour = dodgerblue, linewidth = 0.8) +
+
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y",
+    date_minor_breaks = "3 months",
+    expand = expansion(mult = c(0.02, 0.05))
+  ) +
+
+  scale_y_continuous(
+    limits = c(50, 100),
+    breaks = seq(50, 100, 10),
+    labels = label_number(suffix = "%"),
+    expand = expansion(mult = c(0, 0.05)),
+    position = "right"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -30)
+    )
+  ) +
+
+  labs(
+    title = "Calls answered within 30 seconds fell below target in 2022 and stayed there",
+    subtitle = "Share of weekday calls answered within 30 seconds, by month<br>",
+    caption = cwr_caption("City of Kitchener Open Data")
+  )
+```
+
+## The average wait more than doubled
+
+Averages hide a lot in a phone queue, since most calls are answered quickly and a few wait a very long time. Even so, the direction is clear. A weekday caller in `r first_year` waited `r secs(wait_first)` on average. In 2022 that was `r secs(wait_2022)`, and the first seven months of `r last_year` averaged `r secs(wait_last)`.
+
+Volume does not explain it. The centre handled `r label_number(accuracy = 1)(calls_first)` calls on a typical weekday in `r first_year` and `r label_number(accuracy = 1)(calls_last)` in `r last_year`, a rise of `r pct(calls_change_pct)`. The data says nothing about staffing, which is the obvious place to look next.
+
+```{r}
+#| label: fig-wait
+#| fig-cap: "Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July."
+#| fig-alt: "Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023."
+#| fig-height: 4
+
+# ggvertbar with direct labels in place of the value axis
+plot_data <- yearly |>
+  mutate(
+    year_label = if_else(year == last_year, paste0(year, "\n(to July)"), as.character(year)),
+    year_label = fct_inorder(year_label),
+    # the two years since the target was missed are the focus
+    focus = year >= 2022
+  )
+
+ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
+
+  geom_col(width = 0.7) +
+
+  geom_text(
+    aes(label = label_number(accuracy = 1, suffix = " s")(avg_wait)),
+    nudge_y = 2,
+    vjust = 0,
+    size = label_size,
+    colour = "grey30"
+  ) +
+
+  scale_fill_manual(
+    values = c(`TRUE` = dodgerblue, `FALSE` = cowboysilver),
+    guide = "none"
+  ) +
+
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+
+  # bars carry their values, so the value axis and gridlines go
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "The average wait in the queue more than doubled",
+    subtitle = "Average seconds a weekday caller waited before being answered or hanging up",
+    caption = cwr_caption("City of Kitchener Open Data")
+  )
+```
+
+## Early summer is the crunch
+
+Whatever the year, the phones are busiest in `r month.name[busiest$month]` and quietest in `r month.name[quietest$month]`, and the answer rate follows the volume: over the whole period, `r pct(by_month |> filter(month == busiest$month) |> pull(pct_within))` of June calls were answered on time against `r pct(by_month |> filter(month == "Jan") |> pull(pct_within))` in January. Property tax bills, summer recreation registration and moving season all land in the same few weeks. A centre that just meets its target in a quiet month will miss it in a busy one unless staffing moves with the calendar.
+
+```{r}
+#| label: fig-season
+#| fig-cap: "Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023."
+#| fig-alt: "Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted."
+#| fig-height: 4
+
+# ggvertbar, busiest two months highlighted, direct labels in place of the value axis
+plot_data <- by_month |>
+  mutate(busy = month %in% c("Jun", "Jul"))
+
+ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
+
+  geom_col(width = 0.7) +
+
+  geom_text(
+    aes(label = label_number(accuracy = 1)(calls_per_day)),
+    nudge_y = 6,
+    vjust = 0,
+    size = label_size,
+    colour = "grey30"
+  ) +
+
+  scale_fill_manual(
+    values = c(`TRUE` = dodgerblue, `FALSE` = cowboysilver),
+    guide = "none"
+  ) +
+
+  scale_x_discrete(expand = expansion(mult = c(0.03, 0.03))) +
+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "June brings a third more calls than December",
+    subtitle = "Average calls per weekday, by month of the year, 2019 to 2023",
+    caption = cwr_caption("City of Kitchener Open Data")
+  )
+```
+
+## Data and methods
+
+The City of Kitchener publishes daily metrics for its main phone queue on its open data portal. This post uses the export covering 26 February 2019 to 30 July 2023, the full range available when it was downloaded in February 2025. Days with an incomplete or duplicated set of metrics (14 of about 1,600) and the partial first month were dropped.
+
+All figures are weekdays excluding Ontario statutory holidays. Weekend and holiday volumes run at roughly `r pct(100 * weekend_share)` of a weekday, on a reduced service, and would flatter every average.
+
+"Answered within 30 seconds" is the share of all calls presented that an agent picked up inside the target, so a caller who hung up while waiting counts as a miss. The City also reports three gentler versions of the same measure, all included in the download below. Waits are the daily average queue time weighted by the number of calls that day.
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+Code and data for this post: [`posts/kitchener-phone-wait-times/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-wait-times) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+
+**Download the data:** [`r cwr_bundle_name("kitchener-phone-wait-times", data_bundle_version)`](`r cwr_bundle_url("kitchener-phone-wait-times", data_bundle_version)`) holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
+
+```{r}
+#| label: tbl-dictionary
+#| tbl-cap: "Data dictionary for the tables used in this post."
+
+# Driven by data/tables.csv and data/dictionary.csv; /review-post checks they are complete
+cwr_dictionary_table("kitchener-phone-wait-times")
+```
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

@@ -98,10 +98,10 @@ cwr_font <- function(family = "Inter") {
 # gridlines only, no y axis line, no axis titles (put units in the subtitle),
 # left-aligned title block, legend tucked above the plot at the left.
 # All text sizes are multiples of base_size so one number scales everything.
-# base_size 15 (not ggplot2's default 11) because charts are drawn 7.5 inches
+# base_size 15 (not ggplot2's default 11) because charts are drawn 8.3 inches
 # wide, shown at that size on a desktop (axis text a little smaller than the
-# body text) and shrunk to about 320 px on a phone, where 15 pt lands near
-# 7 pt on screen, the smallest that stays readable.
+# body text) and shrunk to about 320 px on a phone, where the text is small
+# but the shapes still read; readers can tap a chart to enlarge it.
 theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
   theme_minimal(base_size = base_size, base_family = base_family) +
     theme(

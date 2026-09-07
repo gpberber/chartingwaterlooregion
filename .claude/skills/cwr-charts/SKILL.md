@@ -64,8 +64,9 @@ Read only the reference file you need; each is self-contained.
    x axis on top.
 7. **One chart per chunk**, chunk label `fig-<slug>`, with `fig-cap`, `fig-alt`, and
    explicit `fig-height`/`fig-width` set before tuning any label position. Default is
-   7.5 x 5.5 inches, which displays at its drawn size (720 px) in the 800 px column;
-   never go wider than 8 or the chart is scaled down and its text with it.
+   `fig-width: 8.3`, always: it displays at 797 px, exactly the paragraph width. Vary
+   only `fig-height` (4 for a simple bar chart, 5 for a line chart, more for ranked
+   bars or facets). Wider than 8.3 gets scaled down, and its text with it.
 8. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
 9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.

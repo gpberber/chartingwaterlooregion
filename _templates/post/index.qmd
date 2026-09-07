@@ -42,8 +42,8 @@ data_bundle_version <- 1
 #| label: fig-first
 #| fig-cap: "Caption shown under the chart."
 #| fig-alt: "What the chart shows, for screen readers."
-#| fig-height: 5.5
-#| fig-width: 7.5
+#| fig-height: 5
+#| fig-width: 8.3
 
 # Pick a template from the cwr-charts skill and build the chart here.
 ```

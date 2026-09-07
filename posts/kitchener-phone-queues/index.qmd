@@ -4,7 +4,7 @@ description: "How quickly does the City of Kitchener answer the phone, and what 
 image: images/perc_answered_within_30_secs.png
 date: "2025-02-05"
 categories: [Deep dive, Open Data, City Services, Kitchener]
-draft: false
+draft: true
 ---
 
 ```{r}
