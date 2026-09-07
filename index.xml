@@ -33,56 +33,44 @@
 <h2 class="anchored" data-anchor-id="the-80-target-held-until-2021-then-slipped">The 80% target held until 2021, then slipped</h2>
 <p>The City measures itself against a common contact-centre yardstick: answer 80% of calls within 30 seconds. On weekdays in 2019 it met that target almost exactly. Through the first two pandemic years it stayed close, with the best months of all in the quiet January and February of 2020 and 2021, when more than 90% of calls were answered on time.</p>
 <p>The break came in 2022. Every month that year was below target, and June 2020 was the low point, with 60% of calls answered within 30 seconds. The first seven months of 2023 look much like 2022.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-answered" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022.">
+<div id="fig-answered" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-answered-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-answered-1.png" class="img-fluid figure-img" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." width="796"></a>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-answered-phone.png" width="403" height="432"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-answered.png" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." class="img-fluid figure-img" width="797" height="480"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023.
 </figcaption>
 </figure>
 </div>
-</div>
-</div>
 </section>
 <section id="the-average-wait-more-than-doubled" class="level2">
 <h2 class="anchored" data-anchor-id="the-average-wait-more-than-doubled">The average wait more than doubled</h2>
 <p>Averages hide a lot in a phone queue, since most calls are answered quickly and a few wait a very long time. Even so, the direction is clear. A weekday caller in 2019 waited 26 seconds on average. In 2022 that was 63 seconds, and the first seven months of 2023 averaged 58 seconds.</p>
 <p>Volume does not explain it. The centre handled 329 calls on a typical weekday in 2019 and 351 in 2023, a rise of 7%. The data says nothing about staffing, which is the obvious place to look next.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-wait" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023.">
+<div id="fig-wait" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-wait-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-wait-1.png" class="img-fluid figure-img" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023." width="796"></a>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-wait-phone.png" width="403" height="365"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-wait.png" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023." class="img-fluid figure-img" width="797" height="384"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July.
 </figcaption>
 </figure>
 </div>
-</div>
-</div>
 </section>
 <section id="early-summer-is-the-crunch" class="level2">
 <h2 class="anchored" data-anchor-id="early-summer-is-the-crunch">Early summer is the crunch</h2>
 <p>Whatever the year, the phones are busiest in June and quietest in December, and the answer rate follows the volume: over the whole period, 69% of June calls were answered on time against 81% in January. Property tax bills, summer recreation registration and moving season all land in the same few weeks. A centre that just meets its target in a quiet month will miss it in a busy one unless staffing moves with the calendar.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-season" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted.">
+<div id="fig-season" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-season-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-season-1.png" class="img-fluid figure-img" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted." width="796"></a>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-season-phone.png" width="403" height="384"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-season.png" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted." class="img-fluid figure-img" width="797" height="384"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023.
 </figcaption>
 </figure>
-</div>
-</div>
 </div>
 </section>
 <section id="data-and-methods" class="level2">
@@ -109,23 +97,23 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-dictionary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="oyuxnbbwdw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#oyuxnbbwdw table {
+<div id="vhrndchbgq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vhrndchbgq table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#oyuxnbbwdw thead, #oyuxnbbwdw tbody, #oyuxnbbwdw tfoot, #oyuxnbbwdw tr, #oyuxnbbwdw td, #oyuxnbbwdw th {
+#vhrndchbgq thead, #vhrndchbgq tbody, #vhrndchbgq tfoot, #vhrndchbgq tr, #vhrndchbgq td, #vhrndchbgq th {
   border-style: none;
 }
 
-#oyuxnbbwdw p {
+#vhrndchbgq p {
   margin: 0;
   padding: 0;
 }
 
-#oyuxnbbwdw .gt_table {
+#vhrndchbgq .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -151,12 +139,12 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-left-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_caption {
+#vhrndchbgq .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#oyuxnbbwdw .gt_title {
+#vhrndchbgq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -168,7 +156,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-bottom-width: 0;
 }
 
-#oyuxnbbwdw .gt_subtitle {
+#vhrndchbgq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -180,7 +168,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-top-width: 0;
 }
 
-#oyuxnbbwdw .gt_heading {
+#vhrndchbgq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -192,13 +180,13 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-right-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_bottom_border {
+#vhrndchbgq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_col_headings {
+#vhrndchbgq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -213,7 +201,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-right-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_col_heading {
+#vhrndchbgq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -233,7 +221,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   overflow-x: hidden;
 }
 
-#oyuxnbbwdw .gt_column_spanner_outer {
+#vhrndchbgq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -245,15 +233,15 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 4px;
 }
 
-#oyuxnbbwdw .gt_column_spanner_outer:first-child {
+#vhrndchbgq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#oyuxnbbwdw .gt_column_spanner_outer:last-child {
+#vhrndchbgq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#oyuxnbbwdw .gt_column_spanner {
+#vhrndchbgq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -265,11 +253,11 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   width: 100%;
 }
 
-#oyuxnbbwdw .gt_spanner_row {
+#vhrndchbgq .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#oyuxnbbwdw .gt_group_heading {
+#vhrndchbgq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -295,7 +283,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   text-align: left;
 }
 
-#oyuxnbbwdw .gt_empty_group_heading {
+#vhrndchbgq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -310,15 +298,15 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   vertical-align: middle;
 }
 
-#oyuxnbbwdw .gt_from_md > :first-child {
+#vhrndchbgq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#oyuxnbbwdw .gt_from_md > :last-child {
+#vhrndchbgq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#oyuxnbbwdw .gt_row {
+#vhrndchbgq .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -337,7 +325,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   overflow-x: hidden;
 }
 
-#oyuxnbbwdw .gt_stub {
+#vhrndchbgq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -350,7 +338,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 5px;
 }
 
-#oyuxnbbwdw .gt_stub_row_group {
+#vhrndchbgq .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -364,15 +352,15 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   vertical-align: top;
 }
 
-#oyuxnbbwdw .gt_row_group_first td {
+#vhrndchbgq .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#oyuxnbbwdw .gt_row_group_first th {
+#vhrndchbgq .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#oyuxnbbwdw .gt_summary_row {
+#vhrndchbgq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -382,16 +370,16 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 5px;
 }
 
-#oyuxnbbwdw .gt_first_summary_row {
+#vhrndchbgq .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_first_summary_row.thick {
+#vhrndchbgq .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#oyuxnbbwdw .gt_last_summary_row {
+#vhrndchbgq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -401,7 +389,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-bottom-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_grand_summary_row {
+#vhrndchbgq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -411,7 +399,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 5px;
 }
 
-#oyuxnbbwdw .gt_first_grand_summary_row {
+#vhrndchbgq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -421,7 +409,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-top-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_last_grand_summary_row_top {
+#vhrndchbgq .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -431,11 +419,11 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-bottom-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_striped {
+#vhrndchbgq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#oyuxnbbwdw .gt_table_body {
+#vhrndchbgq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -444,7 +432,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-bottom-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_footnotes {
+#vhrndchbgq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -458,7 +446,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-right-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_footnote {
+#vhrndchbgq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -467,7 +455,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 5px;
 }
 
-#oyuxnbbwdw .gt_sourcenotes {
+#vhrndchbgq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -481,7 +469,7 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   border-right-color: #D3D3D3;
 }
 
-#oyuxnbbwdw .gt_sourcenote {
+#vhrndchbgq .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -489,72 +477,72 @@ Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone 
   padding-right: 5px;
 }
 
-#oyuxnbbwdw .gt_left {
+#vhrndchbgq .gt_left {
   text-align: left;
 }
 
-#oyuxnbbwdw .gt_center {
+#vhrndchbgq .gt_center {
   text-align: center;
 }
 
-#oyuxnbbwdw .gt_right {
+#vhrndchbgq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#oyuxnbbwdw .gt_font_normal {
+#vhrndchbgq .gt_font_normal {
   font-weight: normal;
 }
 
-#oyuxnbbwdw .gt_font_bold {
+#vhrndchbgq .gt_font_bold {
   font-weight: bold;
 }
 
-#oyuxnbbwdw .gt_font_italic {
+#vhrndchbgq .gt_font_italic {
   font-style: italic;
 }
 
-#oyuxnbbwdw .gt_super {
+#vhrndchbgq .gt_super {
   font-size: 65%;
 }
 
-#oyuxnbbwdw .gt_footnote_marks {
+#vhrndchbgq .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#oyuxnbbwdw .gt_asterisk {
+#vhrndchbgq .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#oyuxnbbwdw .gt_indent_1 {
+#vhrndchbgq .gt_indent_1 {
   text-indent: 5px;
 }
 
-#oyuxnbbwdw .gt_indent_2 {
+#vhrndchbgq .gt_indent_2 {
   text-indent: 10px;
 }
 
-#oyuxnbbwdw .gt_indent_3 {
+#vhrndchbgq .gt_indent_3 {
   text-indent: 15px;
 }
 
-#oyuxnbbwdw .gt_indent_4 {
+#vhrndchbgq .gt_indent_4 {
   text-indent: 20px;
 }
 
-#oyuxnbbwdw .gt_indent_5 {
+#vhrndchbgq .gt_indent_5 {
   text-indent: 25px;
 }
 
-#oyuxnbbwdw .katex-display {
+#vhrndchbgq .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#oyuxnbbwdw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#vhrndchbgq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
