@@ -70,6 +70,13 @@
     "text": "Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
   },
   {
+    "objectID": "about.html#two-kinds-of-post",
+    "href": "about.html#two-kinds-of-post",
+    "title": "About",
+    "section": "Two kinds of post",
+    "text": "Two kinds of post\n\nSnapshot. A few charts and some basic analysis, readable in under five minutes.\nDeep dive. Many charts and more detailed analysis, taking a lot more than five minutes.\n\nEvery post is labelled with one or the other, and the categories list on the Posts page filters by kind or by topic."
+  },
+  {
     "objectID": "about.html#who-writes-it",
     "href": "about.html#who-writes-it",
     "title": "About",
@@ -95,7 +102,7 @@
     "href": "index.html",
     "title": "Charting Waterloo Region",
     "section": "",
-    "text": "A Snapshot post contains a few charts and some basic analysis, and can be read in under five minutes; a Deep dive contains many charts and more-detailed analysis, and takes a lot more than five minutes to read. Use the Categories list (beside the posts on a desktop, below them on a phone) to filter by post type or topic.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nKitchener is answering the phone slower than it used to\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\nOpen Data\n\n\n\nIn 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.\n\n\n\n\n\nSep 7, 2026\n\n\n\n\n\nNo matching items"
+    "text": "Kitchener is answering the phone slower than it used to\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\nOpen Data\n\n\n\nIn 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.\n\n\n\n\n\nSep 7, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/kitchener-phone-wait-times/index.html",
