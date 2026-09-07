@@ -40,4 +40,5 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
   Release with `/share-data`.
 - Any file over 25 MB in `data/` also goes to a release.
 - No keys in code; `Sys.getenv("NAME")` reads them from `~/.Renviron`.
-- Thumbnail: save the best chart of the post as `images/thumbnail.png` (4:3 works best).
+- Thumbnail: copy the phone version of the post's best chart (`figures/fig-<name>-phone.png`,
+  made by `cwr_figure()`) to `images/thumbnail.png`; its larger text reads at listing-card size.

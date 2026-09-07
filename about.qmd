@@ -21,6 +21,13 @@ Charting Waterloo Region uses open data to answer plain questions about the plac
 
 Every chart is built in R and every post can be reproduced from the code and data in the [GitHub repository](https://github.com/gpberber/chartingwaterlooregion). See [Reproduce a post](reproduce.qmd) for the steps.
 
+## Two kinds of post
+
+- **Snapshot.** A few charts and some basic analysis, readable in under five minutes.
+- **Deep dive.** Many charts and more detailed analysis, taking a lot more than five minutes.
+
+Every post is labelled with one or the other, and the categories list on the [Posts](index.qmd) page filters by kind or by topic.
+
 ## Who writes it
 
 Posts are written by Greg Berberich.
