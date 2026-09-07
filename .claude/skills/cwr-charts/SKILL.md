@@ -76,12 +76,16 @@ Read only the reference file you need; each is self-contained.
    have no more digits than the story needs. Percentages via `label_percent()`.
 9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
 10. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
-    sizes, so text is twice as large relative to the chart and the title and subtitle wrap.
-    Everything else must survive half the width on its own: one idea per chart, few
-    categories, short labels, no annotation placed by a fixed x position near the right
-    edge (put explanations in the subtitle instead), no dense small multiples or
-    twelve-series lines. Always Read both PNGs in `figures/`, the `-phone` one scaled to
-    about 320 px wide, before calling a chart done.
+    sizes, so text is twice as large relative to the chart. `cwr_figure()` already wraps
+    the title and subtitle, moves right-hand axis labels outside the panel, and scales
+    `geom_text`/`geom_label` sizes by 0.8. Anything else the phone version needs goes in
+    the `phone = list(...)` argument, ggplot pieces added only to that version: a coarser
+    scale (`scale_x_date(date_breaks = "2 years")`), a dropped legend, a wider expansion.
+    Design for half the width from the start: one idea per chart, few categories, short
+    labels, no annotation placed by a fixed x position near the right edge (put explanations
+    in the subtitle instead), no dense small multiples or twelve-series lines. Always Read
+    both PNGs in `figures/`, the `-phone` one scaled to about 320 px wide, before calling a
+    chart done.
 
 ## Iteration loop for label placement
 

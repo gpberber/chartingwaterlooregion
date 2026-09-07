@@ -28,11 +28,13 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    links to. Requires `data/tables.csv` and `data/dictionary.csv` to be filled in (see
    `R/data_bundle.R`); if they are not, stop and ask the user to complete them (Claude can
    draft descriptions from the cleaning script for the user to check).
-3. Stop any running preview server (it renders with the draft profile and writes draft posts
-   into `_site/`), then `quarto render` (no profile) from the project root. It must finish
-   without errors. Check that `_site/posts/<slug>/index.html` exists and that no draft post
+3. Stop any running preview server (it renders with the draft profile and writes draft posts,
+   and a listing that includes them, into `_site/`), then `quarto render` (no profile) from
+   the project root. It must finish without errors. Check that `_site/posts/<slug>/index.html`
+   exists, that `_site/index.html` does not mention any draft slug, and that no draft post
    appears in `_site/posts/`; a public render does not delete a draft's folder left behind by
-   an earlier draft render, so `rm -rf _site/posts/<draft-slug>` for any that remain.
+   an earlier draft render, so `rm -rf _site/posts/<draft-slug>` for any that remain. Never
+   start the preview server between this render and step 8.
 4. `git add -A` then `bash _dev/check_repo_safety.sh`. Stop on any BLOCKED line and fix it
    (usually: a big file that needs `/share-data`, or a file that belongs in `.gitignore`).
 5. `git status --short`: list what will be committed in plain words (which posts, whether `_freeze`

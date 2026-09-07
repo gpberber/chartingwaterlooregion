@@ -237,9 +237,20 @@ label_size <- 4
 #
 # The PNGs live in the post's figures/ folder and are committed with the
 # post, so a full site render never needs to re-run the R code.
+#
+# Three things are changed automatically for the phone version, because the
+# panel is half as wide: titles wrap; right-hand axis labels move outside the
+# panel (the templates tuck them inside, above the gridlines, which collides
+# with the data on a narrow panel); and text drawn with geom_text/geom_label
+# is scaled by phone_text_scale so value labels stay narrower than bars.
+# Anything else that only the phone version needs goes in `phone`, a list of
+# ggplot pieces added to it with `+`, for example:
+#   phone = list(scale_x_date(date_breaks = "2 years", date_labels = "%Y"))
+#   phone = list(theme(legend.position = "none"))
 cwr_figure <- function(plot, id, caption, alt,
                        width = 8.3, height = 5,
                        phone_width = 4.2, phone_height = height * 0.9,
+                       phone = list(), phone_text_scale = 0.8,
                        dpi = 288) {
   stopifnot(str_starts(id, "fig-"))
 
@@ -251,6 +262,8 @@ cwr_figure <- function(plot, id, caption, alt,
 
   # Phone version: same plot, but titles wrap instead of running off the edge.
   # element_textbox_simple() (ggtext) is element_markdown() with word wrap.
+  # theme() merges with what the plot already has, so only the named
+  # properties change (the right-axis text keeps its size and vjust).
   phone_plot <- plot +
     theme(
       plot.title = element_textbox_simple(
@@ -265,11 +278,31 @@ cwr_figure <- function(plot, id, caption, alt,
         size = base_size * 0.6, colour = cowboysilver, lineheight = 1.1,
         margin = margin(t = 10)
       ),
+      axis.text.y.right = element_text(hjust = 0, margin = margin(l = 6, r = 0)),
       plot.margin = margin(t = 8, r = 8, b = 8, l = 8)
     )
 
+  # Per-chart phone adjustments supplied by the caller
+  for (piece in phone) phone_plot <- phone_plot + piece
+
   ggsave(desktop_file, plot, width = width, height = height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
+
+  # Shrink text geoms for the phone. Layers are ggproto objects, which behave
+  # like references: the phone plot and the desktop plot share them. So the
+  # desktop PNG is saved first (above), the sizes are changed in place for the
+  # phone PNG, and then put back so the caller's plot is left as it was.
+  text_layers <- keep(phone_plot$layers, function(layer) {
+    (inherits(layer$geom, "GeomText") || inherits(layer$geom, "GeomLabel")) &&
+      !is.null(layer$aes_params$size)
+  })
+  original_sizes <- map(text_layers, \(layer) layer$aes_params$size)
+  restore_sizes <- function() {
+    walk2(text_layers, original_sizes, \(layer, size) layer$aes_params$size <- size)
+  }
+  on.exit(restore_sizes(), add = TRUE)
+  walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
+
   ggsave(phone_file, phone_plot, width = phone_width, height = phone_height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
 
