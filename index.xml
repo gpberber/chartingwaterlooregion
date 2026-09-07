@@ -17,719 +17,79 @@
 <width>144</width>
 </image>
 <generator>quarto-1.9.38</generator>
-<lastBuildDate>Wed, 05 Feb 2025 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 07 Sep 2026 04:00:00 GMT</lastBuildDate>
 <item>
-  <title>Kitchener phone queues</title>
+  <title>Kitchener is answering the phone slower than it used to</title>
   <dc:creator>Greg Berberich</dc:creator>
-  <link>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/</link>
+  <link>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/</link>
   <description><![CDATA[ 
 
 
 
 
 
+<p>Call the City of Kitchener on a weekday and the odds of someone picking up within half a minute have fallen from 80% in 2019 to 69% in 2023. The average wait in the queue went from 26 seconds to 58 seconds. Call volumes barely moved over the same period, so the slowdown is not a story about more people phoning in.</p>
+<section id="the-80-target-held-until-2021-then-slipped" class="level2">
+<h2 class="anchored" data-anchor-id="the-80-target-held-until-2021-then-slipped">The 80% target held until 2021, then slipped</h2>
+<p>The City measures itself against a common contact-centre yardstick: answer 80% of calls within 30 seconds. On weekdays in 2019 it met that target almost exactly. Through the first two pandemic years it stayed close, with the best months of all in the quiet January and February of 2020 and 2021, when more than 90% of calls were answered on time.</p>
+<p>The break came in 2022. Every month that year was below target, and June 2020 was the low point, with 60% of calls answered within 30 seconds. The first seven months of 2023 look much like 2022.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["num_metrics"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"8","2":"7"},{"1":"9","2":"5"},{"1":"17","2":"1589"},{"1":"24","2":"1"},{"1":"33","2":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
+<div id="fig-answered" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-answered-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-answered-1.png" class="img-fluid figure-img" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." width="796"></a>
 </div>
-</div>
-</div>
-<p>All but 14 (&lt; 1%) of the approximately 1,600 dates have 17 metrics. The two dates with more than 17 metrics have two different values reported for some of the metrics and it’s not possible to tell which ones are correct, so we’ll drop them all. We could impute missing values for the 12 dates that have an incomplete set of 17, but since they represent such a small proportion of the data, we’ll just drop them.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] "Avg Handle Time"                                                          
- [2] "Avg Queue Time"                                                           
- [3] "Avg Speed of Answer"                                                      
- [4] "Calls Abandoned"                                                          
- [5] "Calls Abandoned &lt; Service Level"                                          
- [6] "Calls Handled"                                                            
- [7] "Calls Handled &lt; Service Level"                                            
- [8] "Calls Presented"                                                          
- [9] "Max Handle Time"                                                          
-[10] "Max Queue Time"                                                           
-[11] "Percentage of Calls Abandoned"                                            
-[12] "Percentage of Calls Handled"                                              
-[13] "Percentage of Service Level Met (Handled)"                                
-[14] "Percentage of Service Level Met (With Abandoned Calls Counted Negatively)"
-[15] "Percentage of Service Level Met (With Abandoned Calls Counted Positively)"
-[16] "Percentage of Service Level Met (Without Abandoned Calls)"                
-[17] "Service Level (sec)"                                                      </code></pre>
-</div>
-</div>
-<p>All remaining dates have the same set of 17 metrics.</p>
-<section id="metric-definitions" class="level4">
-<h4 class="anchored" data-anchor-id="metric-definitions">Metric Definitions</h4>
-<p>Here are the definitions of the metrics (as provided by Claude.ai):</p>
-<p><strong>Avg Handle Time</strong>: Average duration of calls from answer to disconnect, including hold time.</p>
-<p><strong>Avg Queue Time</strong>: Average wait time in queue for all calls (both answered and abandoned).</p>
-<p><strong>Avg Speed of Answer</strong>: Average wait time for answered calls only.</p>
-<p><strong>Calls Abandoned</strong>: Total number of calls where the caller hung up while in queue.</p>
-<p><strong>Calls Abandoned &lt; Service Level</strong>: Number of calls abandoned before the service level threshold (e.g., 30 seconds).</p>
-<p><strong>Calls Handled</strong>: Total number of calls answered by agents.</p>
-<p><strong>Calls Handled &lt; Service Level</strong>: Number of calls answered before the service level threshold.</p>
-<p><strong>Calls Presented</strong>: Total number of calls entering the queue.</p>
-<p><strong>Max Handle Time</strong>: Longest duration of any single call from answer to disconnect.</p>
-<p><strong>Max Queue Time</strong>: Longest wait time of any single call in queue.</p>
-<p><strong>Percentage of Calls Abandoned</strong>: (Calls Abandoned / Calls Presented) × 100</p>
-<p><strong>Percentage of Calls Handled</strong>: (Calls Handled / Calls Presented) × 100</p>
-<p><strong>Percentage of Service Level Met (Handled)</strong>: (Calls Handled &lt; Service Level / Calls Handled) × 100</p>
-<p><strong>Percentage of Service Level Met (With Abandoned Calls Counted Negatively)</strong>: (Calls Handled &lt; Service Level / (Calls Presented)) × 100</p>
-<p><strong>Percentage of Service Level Met (With Abandoned Calls Counted Positively)</strong>: ((Calls Handled &lt; Service Level + Calls Abandoned &lt; Service Level) / Calls Presented) × 100</p>
-<p><strong>Percentage of Service Level Met (Without Abandoned Calls)</strong>: (Calls Handled &lt; Service Level / (Calls Presented - Calls Abandoned)) × 100</p>
-<p><strong>Service Level (sec):</strong> The targeted time limit for answering a call once it’s in the queue.</p>
-<p>Also from Claude:</p>
-<p>The most common service level target for municipal customer service centers is typically 80/30 - meaning 80% of calls should be answered within 30 seconds. However, actual targets can vary based on:</p>
-<ul>
-<li><p>Size of municipality</p></li>
-<li><p>Available resources</p></li>
-<li><p>Type of services provided</p></li>
-<li><p>Call complexity</p></li>
-<li><p>Hours of operation</p></li>
-<li><p>Local government priorities and budget</p></li>
-</ul>
-<p>Some municipalities use:</p>
-<ul>
-<li><p>70/30 (70% in 30 seconds) - For smaller centers or those with budget constraints</p></li>
-<li><p>80/20 (80% in 20 seconds) - For centers focusing on quick response</p></li>
-<li><p>90/30 (90% in 30 seconds) - For well-resourced centers prioritizing accessibility</p></li>
-</ul>
-<p>When you see service levels significantly below these targets (like 60% or lower), it often indicates:</p>
-<ul>
-<li><p>Resource constraints</p></li>
-<li><p>Peak period challenges</p></li>
-<li><p>Staffing issues</p></li>
-<li><p>Higher than expected call volumes</p></li>
-</ul>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>      date             holiday             year         month          
- Min.   :2019-02-26   Mode :logical   Min.   :2019   Length:1589       
- 1st Qu.:2020-03-30   FALSE:1548      1st Qu.:2020   Class :character  
- Median :2021-05-11   TRUE :41        Median :2021   Mode  :character  
- Mean   :2021-05-10                   Mean   :2021                     
- 3rd Qu.:2022-06-19                   3rd Qu.:2022                     
- Max.   :2023-07-30                   Max.   :2023                     
-   month_num        year_month         day_of_week        type_of_day       
- Min.   : 1.000   Min.   :2019-02-01   Length:1589        Length:1589       
- 1st Qu.: 4.000   1st Qu.:2020-03-01   Class :character   Class :character  
- Median : 6.000   Median :2021-05-01   Mode  :character   Mode  :character  
- Mean   : 6.372   Mean   :2021-04-25                                        
- 3rd Qu.: 9.000   3rd Qu.:2022-06-01                                        
- Max.   :12.000   Max.   :2023-07-01                                        
- weekend_holiday covid_lockdown  avg_handle_time avg_queue_time  
- Mode :logical   Mode :logical   Min.   : 51.0   Min.   :  5.00  
- FALSE:1099      FALSE:1286      1st Qu.:116.0   1st Qu.: 17.00  
- TRUE :490       TRUE :303       Median :126.0   Median : 26.00  
-                                 Mean   :128.4   Mean   : 38.47  
-                                 3rd Qu.:139.0   3rd Qu.: 44.00  
-                                 Max.   :231.0   Max.   :832.00  
- avg_speed_of_answer calls_abandoned  calls_abandoned_service_level
- Min.   :   4.00     Min.   :  0.00   Min.   :  0.00               
- 1st Qu.:  15.00     1st Qu.:  9.00   1st Qu.:  5.00               
- Median :  24.00     Median : 15.00   Median :  9.00               
- Mean   :  36.83     Mean   : 20.05   Mean   : 10.43               
- 3rd Qu.:  41.00     3rd Qu.: 25.00   3rd Qu.: 14.00               
- Max.   :1263.00     Max.   :480.00   Max.   :322.00               
- calls_handled    calls_handled_service_level calls_presented max_handle_time 
- Min.   :  11.0   Min.   : 10.0               Min.   :  24    Min.   :  79.0  
- 1st Qu.: 117.0   1st Qu.: 94.0               1st Qu.: 128    1st Qu.: 688.0  
- Median : 273.0   Median :224.0               Median : 291    Median : 881.0  
- Mean   : 240.9   Mean   :196.3               Mean   : 261    Mean   : 971.7  
- 3rd Qu.: 323.0   3rd Qu.:266.0               3rd Qu.: 348    3rd Qu.:1153.0  
- Max.   :1835.0   Max.   :413.0               Max.   :1925    Max.   :5001.0  
- max_queue_time   percentage_of_calls_abandoned percentage_of_calls_handled
- Min.   :  10.0   Min.   : 0.000                Min.   : 45.80             
- 1st Qu.: 290.0   1st Qu.: 4.400                1st Qu.: 90.60             
- Median : 435.0   Median : 6.400                Median : 93.60             
- Mean   : 530.9   Mean   : 7.453                Mean   : 92.54             
- 3rd Qu.: 650.0   3rd Qu.: 9.400                3rd Qu.: 95.60             
- Max.   :5908.0   Max.   :54.200                Max.   :100.00             
- percentage_of_service_level_met_handled
- Min.   : 14.90                         
- 1st Qu.: 77.70                         
- Median : 86.40                         
- Mean   : 83.31                         
- 3rd Qu.: 91.50                         
- Max.   :100.00                         
- percentage_of_service_level_met_with_abandoned_calls_counted_negatively
- Min.   :  8.20                                                         
- 1st Qu.: 70.60                                                         
- Median : 80.80                                                         
- Mean   : 77.46                                                         
- 3rd Qu.: 87.00                                                         
- Max.   :100.00                                                         
- percentage_of_service_level_met_with_abandoned_calls_counted_positively
- Min.   : 15.80                                                         
- 1st Qu.: 75.00                                                         
- Median : 84.30                                                         
- Mean   : 81.38                                                         
- 3rd Qu.: 90.30                                                         
- Max.   :100.00                                                         
- percentage_of_service_level_met_without_abandoned_calls service_level_sec
- Min.   :  8.80                                          Min.   :30       
- 1st Qu.: 74.00                                          1st Qu.:30       
- Median : 83.80                                          Median :30       
- Mean   : 80.54                                          Mean   :30       
- 3rd Qu.: 90.00                                          3rd Qu.:30       
- Max.   :100.00                                          Max.   :30       
- total_handle_time_hrs total_queue_time_secs
- Min.   : 0.1558       Min.   :   216       
- 1st Qu.: 4.3508       1st Qu.:  3107       
- Median : 9.1000       Median :  5882       
- Mean   : 8.5554       Mean   : 11449       
- 3rd Qu.:11.4569       3rd Qu.: 12350       
- Max.   :66.7736       Max.   :458432       </code></pre>
-</div>
-</div>
-<p>The “service_level_sec” column (the targeted time within which a call is expected to be handled) is the same for every date, so we can drop it. Also, the data begins on February 26, 2019, so only the final three days of that month are included. We will drop those as well. The period ends on July 30, 2023, so all but the final day of that month are included, so we will retain the July 2023 data.</p>
-<p>We deleted the data for 14 dates that didn’t have the common set of 17 metrics. Let’s see how many other dates are missing from the period covered by the data.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] "2019-12-25" "2020-06-06" "2020-06-07" "2020-06-08" "2020-07-05"
- [6] "2020-07-20" "2020-07-22" "2020-10-03" "2020-12-26" "2021-03-21"
-[11] "2021-04-26" "2021-07-25" "2021-10-09" "2021-11-10" "2022-01-04"
-[16] "2022-02-07" "2022-02-23" "2022-05-05" "2022-10-22" "2023-01-15"
-[21] "2023-01-16" "2023-05-07" "2023-06-30" "2023-07-01" "2023-07-02"
-[26] "2023-07-03" "2023-07-12"</code></pre>
-</div>
-</div>
-<p>There are 27 missing days during the 1,613-day period, so 13 are truly missing from the original dataset in addition to the 14 we dropped above due to odd metric sets. There is no apparent pattern to the missing days and they represent only 1.7% of the total days, so their absence will not hinder the analysis.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/boxplots-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/boxplots-1.png" class="img-fluid figure-img" width="720"></a></p>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="the-average-wait-more-than-doubled" class="level2">
+<h2 class="anchored" data-anchor-id="the-average-wait-more-than-doubled">The average wait more than doubled</h2>
+<p>Averages hide a lot in a phone queue, since most calls are answered quickly and a few wait a very long time. Even so, the direction is clear. A weekday caller in 2019 waited 26 seconds on average. In 2022 that was 63 seconds, and the first seven months of 2023 averaged 58 seconds.</p>
+<p>Volume does not explain it. The centre handled 329 calls on a typical weekday in 2019 and 351 in 2023, a rise of 7%. The data says nothing about staffing, which is the obvious place to look next.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/hist-presented-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/hist-presented-1.png" class="img-fluid figure-img" width="720"></a></p>
+<div id="fig-wait" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-wait-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-wait-1.png" class="img-fluid figure-img" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023." width="796"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="early-summer-is-the-crunch" class="level2">
+<h2 class="anchored" data-anchor-id="early-summer-is-the-crunch">Early summer is the crunch</h2>
+<p>Whatever the year, the phones are busiest in June and quietest in December, and the answer rate follows the volume: over the whole period, 69% of June calls were answered on time against 81% in January. Property tax bills, summer recreation registration and moving season all land in the same few weeks. A centre that just meets its target in a quiet month will miss it in a busy one unless staffing moves with the calendar.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/hist-perc-service-level-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/hist-perc-service-level-1.png" class="img-fluid figure-img" width="720"></a></p>
+<div id="fig-season" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-season-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023."><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/index_files/figure-html/fig-season-1.png" class="img-fluid figure-img" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted." width="796"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/hist-avg-handle-time-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/hist-avg-handle-time-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/hist-avg-queue-time-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/hist-avg-queue-time-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/avg-times-comparison-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/avg-times-comparison-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/calls-presented-day-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/calls-presented-day-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/calls-abandoned-day-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/calls-abandoned-day-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-abandoned-day-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-abandoned-day-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/scatter-queuetime-calls-pres-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/scatter-queuetime-calls-pres-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/scatter-handletime-calls-pres-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/scatter-handletime-calls-pres-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/scatter-queuetime-calls-aband-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/scatter-queuetime-calls-aband-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/service-level-met-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/service-level-met-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/service-level-met-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/service-level-met-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Wilcoxon rank sum test with continuity correction
-
-data:  before_change and after_change
-W = 428210, p-value &lt; 2.2e-16
-alternative hypothesis: true location shift is not equal to 0</code></pre>
-</div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["period"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean_calls"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["median_calls"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd_calls"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["n_days"],"name":[5],"type":["int"],"align":["right"]}],"data":[{"1":"After","2":"73.53217","3":"76.6","4":"14.08304","5":"805"},{"1":"Before","2":"81.47926","3":"83.7","4":"10.65749","5":"781"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/calls-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/calls-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/service-level-met-jul20-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/service-level-met-jul20-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/service-level-met-may22-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/service-level-met-may22-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/scatter-service-level-calls-pres-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/scatter-service-level-calls-pres-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["type_of_day"],"name":[1],"type":["chr"],"align":["left"]},{"label":["corr"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Weekday","2":"-0.5130175"},{"1":"Weekend","2":"-0.6707105"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-calls-aband-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-calls-aband-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/presented-abandrate-base100-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/presented-abandrate-base100-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/presented-aband-base100-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/presented-aband-base100-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/aband-pres-bar-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/aband-pres-bar-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-handled-calls-handled-in-30secs-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-handled-calls-handled-in-30secs-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-aband-calls-aband-30secs-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-aband-calls-aband-30secs-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-calls-aband-svclevel-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-calls-aband-svclevel-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/avg-queue-time-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/avg-queue-time-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/avg-handle-time-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/avg-handle-time-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/max-handle-time-by-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/max-handle-time-by-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["day_of_week"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"Fri","2":"230"},{"1":"Mon","2":"224"},{"1":"Sat","2":"225"},{"1":"Sun","2":"224"},{"1":"Thu","2":"229"},{"1":"Tue","2":"229"},{"1":"Wed","2":"225"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/total-calls-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/total-calls-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/median-calls-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/median-calls-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/aband-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-31"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/aband-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/handle-time-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-32"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/handle-time-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/queue-time-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-33"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/queue-time-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-handled-within-30secs-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-34"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-handled-within-30secs-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/aband-after-30secs-day-of-week-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-35"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/aband-after-30secs-day-of-week-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/calls-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-36"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/calls-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/calls-month-apr20-excluded-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-37"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/calls-month-apr20-excluded-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/aband-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-38"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/aband-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/handle-time-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-39"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/handle-time-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/queue-time-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-40"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/queue-time-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-handled-within-30secs-month-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-41"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-handled-within-30secs-month-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/segmented-model-answered-below-30secs-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-42"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/segmented-model-answered-below-30secs-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Davies' test for a change in the slope
-
-data:  formula = percentage_of_service_level_met_with_abandoned_calls_counted_negatively ~ date ,   method = lm 
-model = gaussian , link = identity  
-segmented variable = date
-'best' at = 18673, n.points = 10, p-value = 5.443e-05
-alternative hypothesis: two.sided</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/segmented-model-pres-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-43"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/segmented-model-pres-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Davies' test for a change in the slope
-
-data:  formula = calls_presented ~ date ,   method = lm 
-model = gaussian , link = identity  
-segmented variable = date
-'best' at = 19388, n.points = 10, p-value = 0.07222
-alternative hypothesis: two.sided</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/segmented-model-avg-queue-time-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-44"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/segmented-model-avg-queue-time-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Davies' test for a change in the slope
-
-data:  formula = avg_queue_time ~ date ,   method = lm 
-model = gaussian , link = identity  
-segmented variable = date
-'best' at = 18672, n.points = 10, p-value = 0.0008553
-alternative hypothesis: two.sided</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/segmented-model-aband-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-45"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/segmented-model-aband-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Davies' test for a change in the slope
-
-data:  formula = percentage_of_calls_abandoned ~ date ,   method = lm 
-model = gaussian , link = identity  
-segmented variable = date
-'best' at = 18851, n.points = 10, p-value = 2.687e-05
-alternative hypothesis: two.sided</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/pres-19-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-46"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/pres-19-23-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-aband-19-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-47"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-aband-19-23-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/avg-handle-19-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-48"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/avg-handle-19-23-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/avg-queue-19-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-49"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/avg-queue-19-23-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="index_files/figure-html/perc-handled-30secs-19-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-50"><img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/index_files/figure-html/perc-handled-30secs-19-23-1.png" class="img-fluid figure-img" width="720"></a></p>
-</figure>
-</div>
-</div>
-</div>
+</section>
+<section id="data-and-methods" class="level2">
+<h2 class="anchored" data-anchor-id="data-and-methods">Data and methods</h2>
+<p>The City of Kitchener publishes daily metrics for its main phone queue on its open data portal. This post uses the export covering 26 February 2019 to 30 July 2023, the full range available when it was downloaded in February 2025. Days with an incomplete or duplicated set of metrics (14 of about 1,600) and the partial first month were dropped.</p>
+<p>All figures are weekdays excluding Ontario statutory holidays. Weekend and holiday volumes run at roughly 31% of a weekday, on a reduced service, and would flatter every average.</p>
+<p>“Answered within 30 seconds” is the share of all calls presented that an agent picked up inside the target, so a caller who hung up while waiting counts as a miss. The City also reports three gentler versions of the same measure, all included in the download below. Waits are the daily average queue time weighted by the number of calls that day.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -742,30 +102,30 @@ alternative hypothesis: two.sided</code></pre>
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Code and data for this post: <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-queues"><code>posts/kitchener-phone-queues/</code></a> on GitHub. See <a href="../../reproduce.html">Reproduce a post</a> for the steps.</p>
-<p><strong>Download the data:</strong> <a href="https://github.com/gpberber/chartingwaterlooregion/releases/download/data-kitchener-phone-queues-v1/kitchener-phone-queues-data-v1.zip">kitchener-phone-queues-data-v1.zip</a> holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.</p>
+<p>Code and data for this post: <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-wait-times"><code>posts/kitchener-phone-wait-times/</code></a> on GitHub. See <a href="../../reproduce.html">Reproduce a post</a> for the steps.</p>
+<p><strong>Download the data:</strong> <a href="https://github.com/gpberber/chartingwaterlooregion/releases/download/data-kitchener-phone-wait-times-v1/kitchener-phone-wait-times-data-v1.zip">kitchener-phone-wait-times-data-v1.zip</a> holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.</p>
 <div class="cell">
 <div id="tbl-dictionary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <div aria-describedby="tbl-dictionary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="iedmkfrwmg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#iedmkfrwmg table {
+<div id="oyuxnbbwdw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#oyuxnbbwdw table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#iedmkfrwmg thead, #iedmkfrwmg tbody, #iedmkfrwmg tfoot, #iedmkfrwmg tr, #iedmkfrwmg td, #iedmkfrwmg th {
+#oyuxnbbwdw thead, #oyuxnbbwdw tbody, #oyuxnbbwdw tfoot, #oyuxnbbwdw tr, #oyuxnbbwdw td, #oyuxnbbwdw th {
   border-style: none;
 }
 
-#iedmkfrwmg p {
+#oyuxnbbwdw p {
   margin: 0;
   padding: 0;
 }
 
-#iedmkfrwmg .gt_table {
+#oyuxnbbwdw .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -791,12 +151,12 @@ alternative hypothesis: two.sided</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_caption {
+#oyuxnbbwdw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#iedmkfrwmg .gt_title {
+#oyuxnbbwdw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -808,7 +168,7 @@ alternative hypothesis: two.sided</code></pre>
   border-bottom-width: 0;
 }
 
-#iedmkfrwmg .gt_subtitle {
+#oyuxnbbwdw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -820,7 +180,7 @@ alternative hypothesis: two.sided</code></pre>
   border-top-width: 0;
 }
 
-#iedmkfrwmg .gt_heading {
+#oyuxnbbwdw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -832,13 +192,13 @@ alternative hypothesis: two.sided</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_bottom_border {
+#oyuxnbbwdw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_col_headings {
+#oyuxnbbwdw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -853,7 +213,7 @@ alternative hypothesis: two.sided</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_col_heading {
+#oyuxnbbwdw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -873,7 +233,7 @@ alternative hypothesis: two.sided</code></pre>
   overflow-x: hidden;
 }
 
-#iedmkfrwmg .gt_column_spanner_outer {
+#oyuxnbbwdw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -885,15 +245,15 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 4px;
 }
 
-#iedmkfrwmg .gt_column_spanner_outer:first-child {
+#oyuxnbbwdw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#iedmkfrwmg .gt_column_spanner_outer:last-child {
+#oyuxnbbwdw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#iedmkfrwmg .gt_column_spanner {
+#oyuxnbbwdw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -905,11 +265,11 @@ alternative hypothesis: two.sided</code></pre>
   width: 100%;
 }
 
-#iedmkfrwmg .gt_spanner_row {
+#oyuxnbbwdw .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#iedmkfrwmg .gt_group_heading {
+#oyuxnbbwdw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -935,7 +295,7 @@ alternative hypothesis: two.sided</code></pre>
   text-align: left;
 }
 
-#iedmkfrwmg .gt_empty_group_heading {
+#oyuxnbbwdw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -950,15 +310,15 @@ alternative hypothesis: two.sided</code></pre>
   vertical-align: middle;
 }
 
-#iedmkfrwmg .gt_from_md > :first-child {
+#oyuxnbbwdw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#iedmkfrwmg .gt_from_md > :last-child {
+#oyuxnbbwdw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#iedmkfrwmg .gt_row {
+#oyuxnbbwdw .gt_row {
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 5px;
@@ -977,7 +337,7 @@ alternative hypothesis: two.sided</code></pre>
   overflow-x: hidden;
 }
 
-#iedmkfrwmg .gt_stub {
+#oyuxnbbwdw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -990,7 +350,7 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 5px;
 }
 
-#iedmkfrwmg .gt_stub_row_group {
+#oyuxnbbwdw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1004,15 +364,15 @@ alternative hypothesis: two.sided</code></pre>
   vertical-align: top;
 }
 
-#iedmkfrwmg .gt_row_group_first td {
+#oyuxnbbwdw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#iedmkfrwmg .gt_row_group_first th {
+#oyuxnbbwdw .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#iedmkfrwmg .gt_summary_row {
+#oyuxnbbwdw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1022,16 +382,16 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 5px;
 }
 
-#iedmkfrwmg .gt_first_summary_row {
+#oyuxnbbwdw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_first_summary_row.thick {
+#oyuxnbbwdw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#iedmkfrwmg .gt_last_summary_row {
+#oyuxnbbwdw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1041,7 +401,7 @@ alternative hypothesis: two.sided</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_grand_summary_row {
+#oyuxnbbwdw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1051,7 +411,7 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 5px;
 }
 
-#iedmkfrwmg .gt_first_grand_summary_row {
+#oyuxnbbwdw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1061,7 +421,7 @@ alternative hypothesis: two.sided</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_last_grand_summary_row_top {
+#oyuxnbbwdw .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1071,11 +431,11 @@ alternative hypothesis: two.sided</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_striped {
+#oyuxnbbwdw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#iedmkfrwmg .gt_table_body {
+#oyuxnbbwdw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1084,7 +444,7 @@ alternative hypothesis: two.sided</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_footnotes {
+#oyuxnbbwdw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1098,7 +458,7 @@ alternative hypothesis: two.sided</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_footnote {
+#oyuxnbbwdw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1107,7 +467,7 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 5px;
 }
 
-#iedmkfrwmg .gt_sourcenotes {
+#oyuxnbbwdw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1121,7 +481,7 @@ alternative hypothesis: two.sided</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#iedmkfrwmg .gt_sourcenote {
+#oyuxnbbwdw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1129,72 +489,72 @@ alternative hypothesis: two.sided</code></pre>
   padding-right: 5px;
 }
 
-#iedmkfrwmg .gt_left {
+#oyuxnbbwdw .gt_left {
   text-align: left;
 }
 
-#iedmkfrwmg .gt_center {
+#oyuxnbbwdw .gt_center {
   text-align: center;
 }
 
-#iedmkfrwmg .gt_right {
+#oyuxnbbwdw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#iedmkfrwmg .gt_font_normal {
+#oyuxnbbwdw .gt_font_normal {
   font-weight: normal;
 }
 
-#iedmkfrwmg .gt_font_bold {
+#oyuxnbbwdw .gt_font_bold {
   font-weight: bold;
 }
 
-#iedmkfrwmg .gt_font_italic {
+#oyuxnbbwdw .gt_font_italic {
   font-style: italic;
 }
 
-#iedmkfrwmg .gt_super {
+#oyuxnbbwdw .gt_super {
   font-size: 65%;
 }
 
-#iedmkfrwmg .gt_footnote_marks {
+#oyuxnbbwdw .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#iedmkfrwmg .gt_asterisk {
+#oyuxnbbwdw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#iedmkfrwmg .gt_indent_1 {
+#oyuxnbbwdw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#iedmkfrwmg .gt_indent_2 {
+#oyuxnbbwdw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#iedmkfrwmg .gt_indent_3 {
+#oyuxnbbwdw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#iedmkfrwmg .gt_indent_4 {
+#oyuxnbbwdw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#iedmkfrwmg .gt_indent_5 {
+#oyuxnbbwdw .gt_indent_5 {
   text-indent: 25px;
 }
 
-#iedmkfrwmg .katex-display {
+#oyuxnbbwdw .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#iedmkfrwmg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#oyuxnbbwdw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1211,91 +571,175 @@ alternative hypothesis: two.sided</code></pre>
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row odd">
-<th colspan="5" id="queue_data_clean" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold" scope="colgroup">queue_data_clean</th>
+<th colspan="5" id="queue_daily" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold" scope="colgroup">queue_daily</th>
 </tr>
 <tr class="gt_row_group_first even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">date</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">date</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Calendar date the metric refers to</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units">YYYY-MM-DD</td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">2019-02-21 to 2023-07-30</td>
+<td class="gt_row gt_left" headers="queue_daily  column">date</td>
+<td class="gt_row gt_left" headers="queue_daily  type">date</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calendar date</td>
+<td class="gt_row gt_left" headers="queue_daily  units">YYYY-MM-DD</td>
+<td class="gt_row gt_left" headers="queue_daily  example">2019-03-01 to 2023-07-30</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">metric</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Name of the metric as reported by the City. One of 17: average and maximum handle and queue times, average speed of answer, calls presented / handled / abandoned (total and within the service-level threshold), the percentage versions of those counts, four variants of percentage of service level met, and the service-level target</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">Avg Handle Time; Avg Queue Time; Avg Speed of Answer; ... (17 distinct values)</td>
+<td class="gt_row gt_left" headers="queue_daily  column">year</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calendar year</td>
+<td class="gt_row gt_left" headers="queue_daily  units"></td>
+<td class="gt_row gt_left" headers="queue_daily  example">2019 to 2023</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">value</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Value of the metric on that date. Seconds for times, number of calls for counts, percent on a 0 to 100 scale for percentages</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units">varies by metric</td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">0 to 5908</td>
+<td class="gt_row gt_left" headers="queue_daily  column">month</td>
+<td class="gt_row gt_left" headers="queue_daily  type">text</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Three-letter month abbreviation (Jan to Dec)</td>
+<td class="gt_row gt_left" headers="queue_daily  units"></td>
+<td class="gt_row gt_left" headers="queue_daily  example">Mar; Apr; May; ... (12 distinct values)</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">holiday</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date is an Ontario statutory holiday</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+<td class="gt_row gt_left" headers="queue_daily  column">year_month</td>
+<td class="gt_row gt_left" headers="queue_daily  type">date</td>
+<td class="gt_row gt_left" headers="queue_daily  description">First day of the month the date falls in</td>
+<td class="gt_row gt_left" headers="queue_daily  units">YYYY-MM-DD</td>
+<td class="gt_row gt_left" headers="queue_daily  example">2019-03-01 to 2023-07-01</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">year</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Calendar year of the date</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">2019 to 2023</td>
+<td class="gt_row gt_left" headers="queue_daily  column">day_of_week</td>
+<td class="gt_row gt_left" headers="queue_daily  type">text</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Three-letter day of the week (Mon to Sun)</td>
+<td class="gt_row gt_left" headers="queue_daily  units"></td>
+<td class="gt_row gt_left" headers="queue_daily  example">Fri; Sat; Sun; ... (7 distinct values)</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">month</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Three-letter month abbreviation (Jan to Dec)</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">Feb; Mar; Apr; ... (12 distinct values)</td>
+<td class="gt_row gt_left" headers="queue_daily  column">holiday</td>
+<td class="gt_row gt_left" headers="queue_daily  type">true/false</td>
+<td class="gt_row gt_left" headers="queue_daily  description">TRUE if the date is an Ontario statutory holiday</td>
+<td class="gt_row gt_left" headers="queue_daily  units"></td>
+<td class="gt_row gt_left" headers="queue_daily  example">TRUE / FALSE</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">month_num</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">number</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Month as a number (1 = January)</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">1 to 12</td>
+<td class="gt_row gt_left" headers="queue_daily  column">weekend_or_holiday</td>
+<td class="gt_row gt_left" headers="queue_daily  type">true/false</td>
+<td class="gt_row gt_left" headers="queue_daily  description">TRUE if the date is a Saturday or Sunday or a statutory holiday</td>
+<td class="gt_row gt_left" headers="queue_daily  units"></td>
+<td class="gt_row gt_left" headers="queue_daily  example">TRUE / FALSE</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">year_month</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">date</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">First day of the month the date falls in; useful for monthly grouping</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units">YYYY-MM-DD</td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">2019-02-01 to 2023-07-01</td>
+<td class="gt_row gt_left" headers="queue_daily  column">calls_presented</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calls that entered the queue</td>
+<td class="gt_row gt_left" headers="queue_daily  units">calls</td>
+<td class="gt_row gt_left" headers="queue_daily  example">24 to 1925</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">day_of_week</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Three-letter day of the week (Mon to Sun)</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">Thu; Fri; Sat; ... (7 distinct values)</td>
+<td class="gt_row gt_left" headers="queue_daily  column">avg_queue_time</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Average time callers spent waiting in the queue (answered and abandoned calls)</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">5 to 832</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">type_of_day</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">text</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">Weekday or Weekend</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">Weekday; Weekend</td>
+<td class="gt_row gt_left" headers="queue_daily  column">max_queue_time</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Longest single wait in the queue that day</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">10 to 5908</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="queue_data_clean  column">weekend_holiday</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date is a weekend day or a statutory holiday</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+<td class="gt_row gt_left" headers="queue_daily  column">calls_handled</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calls answered by an agent</td>
+<td class="gt_row gt_left" headers="queue_daily  units">calls</td>
+<td class="gt_row gt_left" headers="queue_daily  example">11 to 1835</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="queue_data_clean  column">covid_lockdown</td>
-<td class="gt_row gt_left" headers="queue_data_clean  type">true/false</td>
-<td class="gt_row gt_left" headers="queue_data_clean  description">TRUE if the date falls in one of the Ontario COVID-19 lockdown periods used in the analysis (17 Mar to 16 Jul 2020; 26 Dec 2020 to 9 Feb 2021; 8 Apr to 15 Jul 2021; 5 Jan to 20 Mar 2022)</td>
-<td class="gt_row gt_left" headers="queue_data_clean  units"></td>
-<td class="gt_row gt_left" headers="queue_data_clean  example">TRUE / FALSE</td>
+<td class="gt_row gt_left" headers="queue_daily  column">avg_speed_of_answer</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Average time answered calls waited before an agent picked up</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">4 to 1263</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">avg_handle_time</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Average length of an answered call from answer to hang-up including hold time</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">51 to 231</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">max_handle_time</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Longest single call that day</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">79 to 5001</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">calls_abandoned</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calls where the caller hung up while waiting in the queue</td>
+<td class="gt_row gt_left" headers="queue_daily  units">calls</td>
+<td class="gt_row gt_left" headers="queue_daily  example">0 to 480</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">target_seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">The service-level target the City measures against (30 on every day)</td>
+<td class="gt_row gt_left" headers="queue_daily  units">seconds</td>
+<td class="gt_row gt_left" headers="queue_daily  example">30 to 30</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">answered_within_target</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calls answered within the 30-second target</td>
+<td class="gt_row gt_left" headers="queue_daily  units">calls</td>
+<td class="gt_row gt_left" headers="queue_daily  example">10 to 413</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">abandoned_within_target</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">Calls abandoned before the 30-second target had elapsed</td>
+<td class="gt_row gt_left" headers="queue_daily  units">calls</td>
+<td class="gt_row gt_left" headers="queue_daily  example">0 to 322</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">pct_handled_within_target</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">answered_within_target as a share of calls_handled</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">14.9 to 100</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">pct_within_target_excl_abandoned</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">answered_within_target as a share of calls_presented minus calls_abandoned</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">8.8 to 100</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">pct_within_target_abandoned_positive</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">answered_within_target plus abandoned_within_target as a share of calls_presented</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">15.8 to 100</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">pct_answered_within_target</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">answered_within_target as a share of calls_presented; the measure used in the post, where an abandoned call counts as a miss</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">8.2 to 100</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="queue_daily  column">percentage_of_calls_handled</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">calls_handled as a share of calls_presented</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">45.8 to 100</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="queue_daily  column">percentage_of_calls_abandoned</td>
+<td class="gt_row gt_left" headers="queue_daily  type">number</td>
+<td class="gt_row gt_left" headers="queue_daily  description">calls_abandoned as a share of calls_presented</td>
+<td class="gt_row gt_left" headers="queue_daily  units">percent (0 to 100)</td>
+<td class="gt_row gt_left" headers="queue_daily  example">0 to 54.2</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
@@ -1321,34 +765,26 @@ OS:        Windows 11 x64 (build 26200)
 Rendered:  2026-09-07
 Quarto:    1.9.38
 
-     package version       date         source
-       arrow  25.0.1 2026-08-23 CRAN (R 4.5.3)
- changepoint     2.3 2024-11-04 CRAN (R 4.4.3)
-  conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)
-       dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)
-     forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)
-     ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)
-      ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)
-          gt   1.3.0 2026-01-22 CRAN (R 4.5.3)
-    gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)
-        here   1.0.2 2025-09-15 CRAN (R 4.5.3)
-     janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)
-   lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)
-        MASS  7.3-66 2026-07-15 CRAN (R 4.5.3)
-        nlme 3.1-171 2026-09-01 CRAN (R 4.5.3)
-   patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)
-     prophet   1.1.7 2026-01-22 CRAN (R 4.5.2)
-       purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)
-        Rcpp   1.1.2 2026-07-05 CRAN (R 4.5.3)
-       readr   2.2.0 2026-02-19 CRAN (R 4.5.3)
-       rlang   1.3.0 2026-07-05 CRAN (R 4.5.3)
-      scales   1.4.0 2025-04-24 CRAN (R 4.5.3)
-   segmented   2.2-1 2026-01-29 CRAN (R 4.5.3)
-     stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)
-      tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)
-       tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)
-   tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)
-         zoo   1.9-0 2026-07-31 CRAN (R 4.5.3)</code></pre>
+    package version       date         source
+      arrow  25.0.1 2026-08-23 CRAN (R 4.5.3)
+ conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)
+      dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)
+    forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)
+    ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)
+     ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)
+         gt   1.3.0 2026-01-22 CRAN (R 4.5.3)
+   gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)
+       here   1.0.2 2025-09-15 CRAN (R 4.5.3)
+    janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)
+  lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)
+  patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)
+      purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)
+      readr   2.2.0 2026-02-19 CRAN (R 4.5.3)
+     scales   1.4.0 2025-04-24 CRAN (R 4.5.3)
+    stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)
+     tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)
+      tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)
+  tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)</code></pre>
 </div>
 </div>
 </div>
@@ -1359,13 +795,13 @@ Quarto:    1.9.38
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reusing this post</h2><div class="quarto-appendix-contents"><div>The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above.<a rel="license" href="https://creativecommons.org/licenses/by/4.0/">(View License)</a></div></div></section></div> ]]></description>
-  <category>Deep dive</category>
-  <category>Open Data</category>
+  <category>Snapshot</category>
   <category>City Services</category>
   <category>Kitchener</category>
-  <guid>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/</guid>
-  <pubDate>Wed, 05 Feb 2025 05:00:00 GMT</pubDate>
-  <media:content url="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/images/perc_answered_within_30_secs.png" medium="image" type="image/png" height="94" width="144"/>
+  <category>Open Data</category>
+  <guid>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/</guid>
+  <pubDate>Mon, 07 Sep 2026 04:00:00 GMT</pubDate>
+  <media:content url="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/images/thumbnail.png" medium="image" type="image/png" height="87" width="144"/>
 </item>
 </channel>
 </rss>
