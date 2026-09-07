@@ -24,8 +24,10 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
 7. Ask whether the post draws on a shared dataset (list the folders in `datasets/`). If yes, add
    `source(here::here("datasets", "<dataset>", "R", "load.R"))` to the setup chunk, note the dataset
    version in the README, and keep the post's own `R/` scripts for story-specific summaries only.
-8. Ask the user for 2 to 4 categories (existing ones are listed on the home page; reuse where possible)
-   and a one-sentence `description` for the listing card; fill them in.
+8. Ask whether the post is a **Snapshot** (a few simple charts and basic analysis, read in under
+   6 minutes) or a **Deep dive** (longer, more rigorous). That word goes first in `categories`,
+   followed by 2 to 3 topic categories (existing ones are listed on the home page; reuse where
+   possible). Ask for a one-sentence `description` for the listing card; fill them in.
 9. Report what was created and the next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it), write `R/02_clean_data.R` to produce small tidy files in `data/`,
    fill `data/tables.csv` and `data/dictionary.csv` for every table the post reads (these drive the

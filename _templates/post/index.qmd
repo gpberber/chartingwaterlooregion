@@ -2,7 +2,7 @@
 title: "{{title}}"
 description: "One sentence for the listing card: the question and the answer."
 date: "{{date}}"
-categories: []
+categories: [Snapshot]   # first entry is the post type: Snapshot (under 6 min) or Deep dive; then 2 to 3 topics
 image: images/thumbnail.png
 draft: true
 ---

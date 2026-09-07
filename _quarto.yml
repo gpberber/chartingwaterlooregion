@@ -59,7 +59,6 @@ website:
 # Rename the appendix heading Quarto adds for the post licence (default "Reuse")
 language:
   section-title-reuse: "Reusing this post"
-
 format:
   html:
     theme:

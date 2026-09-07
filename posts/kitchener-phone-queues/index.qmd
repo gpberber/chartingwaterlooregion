@@ -3,7 +3,7 @@ title: "Kitchener phone queues"
 description: "How quickly does the City of Kitchener answer the phone, and what changed between 2019 and 2023?"
 image: images/perc_answered_within_30_secs.png
 date: "2025-02-05"
-categories: [Open Data, City Services, Kitchener]
+categories: [Deep dive, Open Data, City Services, Kitchener]
 draft: false
 ---
 

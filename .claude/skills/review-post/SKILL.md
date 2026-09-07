@@ -65,7 +65,12 @@ For every `ggplot` chunk:
 
 ## 5. Metadata
 
-- `title`, `description` (one sentence, used on the listing card), `date`, `categories` (2 to 4), `image` set and the file exists.
+- `title`, `description` (one sentence, used on the listing card), `date`, `categories`, `image` set and the file exists.
+- The first category is `Snapshot` or `Deep dive`, followed by 2 to 3 topic categories. A Snapshot
+  is a few simple charts and basic analysis read in under 6 minutes (roughly 1,000 words of prose
+  plus a handful of charts); anything longer or more involved is a Deep dive. Count the prose words
+  outside code chunks, note the number of charts and tables, and flag a mismatch, suggesting either
+  relabelling or cutting the post down.
 - `draft: true` still present (flag if the user intends to publish and it is false already: fine; if publishing, it must be flipped by /publish).
 - No leftover `format:` overrides that duplicate `posts/_metadata.yml`.
 
