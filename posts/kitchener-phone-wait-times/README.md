@@ -1,6 +1,6 @@
 # Kitchener phone wait times
 
-Post: https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/
+Post: https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/
 
 A Snapshot post: how quickly the City of Kitchener's contact centre answers the phone, 2019 to 2023.
 

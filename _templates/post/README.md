@@ -1,6 +1,6 @@
 # {{title}}
 
-Post: https://gpberber.github.io/chartingwaterlooregion/posts/{{slug}}/
+Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 
 ## Data sources
 

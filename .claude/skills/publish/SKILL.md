@@ -34,7 +34,9 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    exists, that `_site/index.html` does not mention any draft slug, and that no draft post
    appears in `_site/posts/`; a public render does not delete a draft's folder left behind by
    an earlier draft render, so `rm -rf _site/posts/<draft-slug>` for any that remain. Never
-   start the preview server between this render and step 8.
+   start the preview server between this render and step 8. Also confirm `_site/CNAME` exists and
+   contains `chartingwaterlooregion.ca`; without it the publish would strip the custom domain off
+   the `gh-pages` branch and the site would drop back to the github.io address.
 4. `git add -A` then `bash _dev/check_repo_safety.sh`. Stop on any BLOCKED line and fix it
    (usually: a big file that needs `/share-data`, or a file that belongs in `.gitignore`).
 5. `git status --short`: list what will be committed in plain words (which posts, whether `_freeze`
@@ -52,7 +54,7 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
 8. `quarto publish gh-pages --no-render --no-prompt`. This pushes the already-rendered `_site/` to
    the `gh-pages` branch, which GitHub Pages serves. First time only: it creates the branch, and
    the user may need to set Settings → Pages → Source to the `gh-pages` branch on GitHub.
-9. Wait about a minute, then open `https://gpberber.github.io/chartingwaterlooregion/posts/<slug>/`
+9. Wait about a minute, then open `https://chartingwaterlooregion.ca/posts/<slug>/`
    (or the home page) in the Browser pane. Confirm the page loads, the listing shows the post with
    its thumbnail, and charts display. Screenshot it for the user.
 

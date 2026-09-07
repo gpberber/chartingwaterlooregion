@@ -2,7 +2,7 @@
 
 Charts and plain-language analysis about life in Waterloo Region, built from open data.
 
-**Site:** https://gpberber.github.io/chartingwaterlooregion
+**Site:** https://chartingwaterlooregion.ca
 
 ## What is here
 
@@ -17,7 +17,7 @@ Charts and plain-language analysis about life in Waterloo Region, built from ope
 
 ## Reproduce a post
 
-See https://gpberber.github.io/chartingwaterlooregion/reproduce.html, or in short:
+See https://chartingwaterlooregion.ca/reproduce.html, or in short:
 
 ```r
 source("R/packages.R"); install_missing()

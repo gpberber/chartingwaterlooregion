@@ -16,6 +16,8 @@ project:
     - images/           # favicon, logo, placeholder thumbnail, social card
     - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
                         # <source srcset>, which Quarto does not scan for resources
+    - CNAME             # tells GitHub Pages the custom domain; must be republished every
+                        # time, because publishing overwrites the whole gh-pages branch
 
 execute:
   freeze: auto           # re-run R only when a post source changes; results cached in _freeze/
@@ -23,7 +25,7 @@ execute:
 website:
   title: "Charting Waterloo Region"
   description: "Charts and plain-language analysis about life in Waterloo Region, built from open data."
-  site-url: https://gpberber.github.io/chartingwaterlooregion
+  site-url: https://chartingwaterlooregion.ca
   repo-url: https://github.com/gpberber/chartingwaterlooregion
   repo-branch: master             # Quarto assumes "main" unless told otherwise
   repo-actions: [source, issue]   # "view source" and "report an issue" links on every page

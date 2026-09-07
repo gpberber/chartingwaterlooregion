@@ -1,0 +1,3 @@
+# GitHub Pages reads CNAME as a plain one-line file. Keep it Unix line endings so a
+# Windows checkout never rewrites it with a carriage return.
+CNAME text eol=lf

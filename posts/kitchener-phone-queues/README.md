@@ -1,6 +1,6 @@
 # Kitchener phone queues
 
-Post: https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-queues/
+Post: https://chartingwaterlooregion.ca/posts/kitchener-phone-queues/
 
 ## Data sources
 

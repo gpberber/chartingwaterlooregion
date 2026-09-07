@@ -1,7 +1,7 @@
 # Charting Waterloo Region
 
 A Quarto blog of data-analysis posts about Waterloo Region, written in R, published to GitHub
-Pages at https://gpberber.github.io/chartingwaterlooregion. The author is a competent self-taught
+Pages at https://chartingwaterlooregion.ca. The author is a competent self-taught
 R user, new to blogging and to git. Explain git and publishing steps in plain words.
 
 ## Layout

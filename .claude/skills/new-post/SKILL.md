@@ -8,7 +8,7 @@ argument-hint: <slug> "Post title"
 
 Arguments: `$ARGUMENTS` = a slug and a title, e.g. `/new-post housing-starts "Housing starts in Waterloo Region"`.
 If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes the URL:
-`https://gpberber.github.io/chartingwaterlooregion/posts/<slug>/`.
+`https://chartingwaterlooregion.ca/posts/<slug>/`.
 
 ## Steps
 

@@ -7,7 +7,8 @@ How the blog works and how to do everything from writing a post to publishing it
 - **Quarto website.** Every post is a `.qmd` file with R code that reads data, draws charts, and writes tables. `quarto render` runs the code and builds HTML into `_site/`.
 - **Freeze.** Results of running the R code are cached in `_freeze/` and committed to git. A post is only re-executed when its source changes, so a full site render is fast and readers can rebuild the site without any data.
 - **GitHub is the backup and the source.** The repository at https://github.com/gpberber/chartingwaterlooregion holds everything except raw data and background reading. Commit and push often; that is the save button.
-- **GitHub Pages is the host.** `quarto publish gh-pages` copies `_site/` to the `gh-pages` branch, and GitHub serves it at https://gpberber.github.io/chartingwaterlooregion. Nothing runs on a server; rendering always happens on this machine.
+- **GitHub Pages is the host.** `quarto publish gh-pages` copies `_site/` to the `gh-pages` branch, and GitHub serves it at https://chartingwaterlooregion.ca. Nothing runs on a server; rendering always happens on this machine.
+- **The domain is chartingwaterlooregion.ca.** The plain file `CNAME` in the project root holds that one line and is listed under `resources:` in `_quarto.yml`, so every render copies it into `_site/` and every publish puts it back on the `gh-pages` branch. That file is what tells GitHub which domain to answer to; publishing replaces the whole branch, so if the file ever went missing the site would fall back to the github.io address. Never delete it.
 - **Drafts never leak.** A post with `draft: true` is left out of the public site entirely. Preview drafts locally with the `draft` profile.
 
 ## 2. Folder map

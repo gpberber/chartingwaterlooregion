@@ -180,7 +180,7 @@ cwr_data_bundle <- function(slug, version = 1, excel = TRUE, upload = TRUE) {
   dictionary <- cwr_dictionary(slug)
   meta <- rmarkdown::yaml_front_matter(here("posts", slug, "index.qmd"))
   title <- meta$title
-  post_url <- paste0("https://gpberber.github.io/chartingwaterlooregion/posts/", slug, "/")
+  post_url <- paste0("https://chartingwaterlooregion.ca/posts/", slug, "/")
 
   bundle_dir <- file.path(tempdir(), paste0(slug, "-data-v", version))
   unlink(bundle_dir, recursive = TRUE)
@@ -255,7 +255,7 @@ cwr_data_bundle <- function(slug, version = 1, excel = TRUE, upload = TRUE) {
     "Reproduce",
     "---------",
     paste0("Code: https://github.com/", cwr_repo, "/tree/master/posts/", slug),
-    "Steps: https://gpberber.github.io/chartingwaterlooregion/reproduce.html"
+    "Steps: https://chartingwaterlooregion.ca/reproduce.html"
   )
   write_lines(readme, file.path(bundle_dir, "README.txt"))
 

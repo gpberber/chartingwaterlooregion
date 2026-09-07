@@ -1,7 +1,7 @@
 # Licence for text, charts, and images
 
 The written text, charts, figures, and images published on Charting Waterloo Region
-(https://gpberber.github.io/chartingwaterlooregion) and stored in this repository are
+(https://chartingwaterlooregion.ca) and stored in this repository are
 licensed under the **Creative Commons Attribution 4.0 International licence (CC BY 4.0)**.
 
 Full licence: https://creativecommons.org/licenses/by/4.0/
@@ -9,7 +9,7 @@ Full licence: https://creativecommons.org/licenses/by/4.0/
 You may copy, share, adapt, and republish this material for any purpose, including
 commercial use, provided you give credit. A credit line such as
 
-> Chart: Charting Waterloo Region (Greg Berberich), CC BY 4.0, https://gpberber.github.io/chartingwaterlooregion
+> Chart: Charting Waterloo Region (Greg Berberich), CC BY 4.0, https://chartingwaterlooregion.ca
 
 with a link to the post is sufficient. Charts already carry the site name in their caption;
 please keep it.
