@@ -6,13 +6,13 @@
       version="2.0">
 <channel>
 <title>Charting Waterloo Region</title>
-<link>https://gpberber.github.io/chartingwaterlooregion/</link>
-<atom:link href="https://gpberber.github.io/chartingwaterlooregion/index.xml" rel="self" type="application/rss+xml"/>
+<link>https://chartingwaterlooregion.ca/</link>
+<atom:link href="https://chartingwaterlooregion.ca/index.xml" rel="self" type="application/rss+xml"/>
 <description>Charts and plain-language analysis about life in Waterloo Region, built from open data.</description>
 <image>
-<url>https://gpberber.github.io/chartingwaterlooregion/images/social-card.png</url>
+<url>https://chartingwaterlooregion.ca/images/social-card.png</url>
 <title>Charting Waterloo Region</title>
-<link>https://gpberber.github.io/chartingwaterlooregion/</link>
+<link>https://chartingwaterlooregion.ca/</link>
 <height>76</height>
 <width>144</width>
 </image>
@@ -21,7 +21,7 @@
 <item>
   <title>Kitchener is answering the phone slower than it used to</title>
   <dc:creator>Greg Berberich</dc:creator>
-  <link>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/</link>
+  <link>https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/</link>
   <description><![CDATA[ 
 
 
@@ -36,7 +36,7 @@
 <div id="fig-answered" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-answered-phone.png" width="403" height="432"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-answered.png" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." class="img-fluid figure-img" width="797" height="480"> </picture></p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-answered-phone.png" width="403" height="432"> <img src="https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/figures/fig-answered.png" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." class="img-fluid figure-img" width="797" height="480"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-answered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023.
@@ -51,7 +51,7 @@ Figure&nbsp;1: Share of weekday calls to the City of Kitchener answered within 3
 <div id="fig-wait" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-wait-phone.png" width="403" height="365"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-wait.png" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023." class="img-fluid figure-img" width="797" height="384"> </picture></p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-wait-phone.png" width="403" height="365"> <img src="https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/figures/fig-wait.png" alt="Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023." class="img-fluid figure-img" width="797" height="384"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wait-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July.
@@ -65,7 +65,7 @@ Figure&nbsp;2: Average time a weekday caller spent waiting in the City of Kitche
 <div id="fig-season" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-season-phone.png" width="403" height="384"> <img src="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/figures/fig-season.png" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted." class="img-fluid figure-img" width="797" height="384"> </picture></p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-season-phone.png" width="403" height="384"> <img src="https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/figures/fig-season.png" alt="Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted." class="img-fluid figure-img" width="797" height="384"> </picture></p>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-season-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023.
@@ -787,9 +787,9 @@ Quarto:    1.9.38
   <category>City Services</category>
   <category>Kitchener</category>
   <category>Open Data</category>
-  <guid>https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/</guid>
+  <guid>https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/</guid>
   <pubDate>Mon, 07 Sep 2026 04:00:00 GMT</pubDate>
-  <media:content url="https://gpberber.github.io/chartingwaterlooregion/posts/kitchener-phone-wait-times/images/thumbnail.png" medium="image" type="image/png" height="154" width="144"/>
+  <media:content url="https://chartingwaterlooregion.ca/posts/kitchener-phone-wait-times/images/thumbnail.png" medium="image" type="image/png" height="154" width="144"/>
 </item>
 </channel>
 </rss>
