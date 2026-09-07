@@ -311,7 +311,7 @@ queue_data |>
       size = 3.5
     ) +
   scale_y_continuous(breaks = seq(0, 800, 100)) +
-  scale_x_continuous(breaks = seq(0, 800, 50)) +
+  scale_x_continuous(breaks = seq(0, 800, 100)) +
   labs(
     x = "",
     y = "",

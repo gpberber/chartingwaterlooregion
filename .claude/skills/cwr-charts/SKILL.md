@@ -20,7 +20,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `manual_2_colours` ... `manual_5_colours` | ordered palettes; map to groups with `set_names()` |
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
-| `base_size` (16), `label_size` (4) | text sizes used inside geoms and annotations |
+| `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption("Source text")` | builds the standard caption |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
@@ -64,12 +64,13 @@ Read only the reference file you need; each is self-contained.
    x axis on top.
 7. **One chart per chunk**, chunk label `fig-<slug>`, with `fig-cap`, `fig-alt`, and
    explicit `fig-height`/`fig-width` set before tuning any label position. Default is
-   7 x 5.5 inches; go wider than 8 only for long time series.
+   7.5 x 5.5 inches, which displays at its drawn size (720 px) in the 800 px column;
+   never go wider than 8 or the chart is scaled down and its text with it.
 8. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
 9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
 10. **Phones.** Many readers see every chart at about 320 px wide, so text is drawn
-    large (`base_size` 16) and charts are squarer than usual. Keep charts to one idea,
+    large (`base_size` 15) and charts are squarer than usual. Keep charts to one idea,
     few categories, short labels; avoid anything that only works at desktop width
     (dense small multiples, twelve-series lines, long y-axis labels). When checking a
     rendered PNG, also view it scaled to about 320 px wide and confirm the labels survive.

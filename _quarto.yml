@@ -71,12 +71,16 @@ format:
     lightbox: true                 # click a chart to enlarge it
     link-external-newwindow: true
     grid:
-      body-width: 1000px
-    fig-dpi: 300
+      body-width: 800px            # a reading-width column; charts span most of it
+    # Charts display at their drawn size (fig-width inches x 96 px) and shrink only on
+    # narrow screens. fig.retina 3 stores a 288 dpi copy for sharpness and the lightbox.
+    # (fig-dpi 300 without retina made every chart stretch to the full column width.)
+    fig-dpi: 96
     df-print: paged
     code-copy: true
     knitr:
       opts_chunk:
         dev: ragg_png              # crisp text rendering with ragg
+        fig.retina: 3
 
 editor: source

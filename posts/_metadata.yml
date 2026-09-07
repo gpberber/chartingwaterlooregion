@@ -19,9 +19,10 @@ execute:
   message: false
 
 # Chart defaults; set fig-height / fig-width per chunk when a chart needs it.
-# 7 x 5.5 inches (not the usual 8 x 5): a squarer chart shrinks less on a phone,
-# and theme_cwr() uses base_size 16 for the same reason. Keep the two in step.
-fig-width: 7
+# 7.5 x 5.5 inches: displays at 720 px, filling most of the 800 px column on a
+# desktop, and shrinks to about 320 px on a phone. theme_cwr() uses base_size 15
+# so text stays readable at both sizes. Keep the two in step.
+fig-width: 7.5
 fig-height: 5.5
 fig-align: center
 tbl-cap-location: bottom
