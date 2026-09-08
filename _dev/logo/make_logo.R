@@ -231,7 +231,8 @@ glyph <- function(size, pad) {
 # ---- 5. The three files ----------------------------------------------------
 
 # The navbar wordmark. The glyph sits in a square at the left, the site name to
-# its right, both in a 64-tall box that Quarto scales down to the navbar height.
+# its right, laid out in a 436 x 64 box and then cropped to the ink (see below)
+# before Quarto scales it down to the navbar height.
 #
 # The text is left as a <text> element rather than converted to outlines, which
 # is how the previous wordmark did it too. Worth knowing: an SVG loaded through
@@ -239,14 +240,48 @@ glyph <- function(size, pad) {
 # UI or Helvetica rather than in Inter. It is close enough that it has never
 # looked wrong, but that is why the two are not identical.
 glyph_box <- 56
+glyph_pad <- 3
 text_x <- glyph_box + 14
+
+# The wordmark's own settings, named because the box below is derived from them.
+wordmark_size     <- 27
+wordmark_baseline <- 42
+# What the eye reads as the centre of a line of type is the middle of the capital
+# letters, not the middle of the em box: descenders hang below the baseline with
+# nothing to balance them above. Measured in the browser, the capitals of this
+# font stand 19 units tall at 27, so the cap band runs 23 to 42 and its middle
+# line - the one the glyph and the navbar links should both sit on - is 32.5.
+wordmark_cap <- 19
+text_centre  <- wordmark_baseline - wordmark_cap / 2
+
+# Drop the glyph onto that line. fit_box centres a drawing inside the box it is
+# given, so the glyph's ink centre is that box's middle: 28 for a 56-unit box,
+# which is 4.5 units above the wordmark's centre line. Left uncorrected the glyph
+# rides high and the name sits low, and because Quarto centres the whole image in
+# the navbar, "Charting Waterloo Region" ended up with its baseline about 2.7 px
+# below the baseline of "Posts" beside it.
+glyph_dy <- text_centre - glyph_box / 2
 
 # The viewBox is cropped tight to the ink rather than left at the 0 0 436 64 the
 # drawing is laid out in. Quarto scales the logo to the navbar's height, so any
-# empty band inside the box is height the mark does not get to use: the drawing
-# spans y 6.7 to 49.3, and leaving the box 64 tall made the visible wordmark a
-# quarter smaller than the space allowed. The same goes sideways - the text ends
-# at about x 394, and the slack after it was showing up as a gap before "Posts".
+# empty band inside the box is height the mark does not get to use: leaving the
+# box 64 tall made the visible wordmark a quarter smaller than the space allowed.
+# The same goes sideways - the text ends at about x 394, and the slack after it
+# was showing up as a gap before "Posts".
+#
+# The glyph is the tallest thing in the drawing, so its shifted ink sets the top
+# and bottom edges. Recomputed from the same fit_box call that places it, so the
+# box cannot drift out of step with the drawing if the boundary file is redrawn:
+# fit_box leaves the shape starting at dy and running its scaled height, and the
+# region is wider than it is tall, so width is the binding dimension and the
+# drawing floats in the middle of its box vertically.
+glyph_tr     <- fit_box(region, glyph_box, glyph_box, glyph_pad)
+glyph_height <- (st_bbox(region)$ymax - st_bbox(region)$ymin) * glyph_tr$scale
+glyph_top    <- glyph_tr$dy + glyph_dy
+
+# Because the glyph is symmetric about the wordmark's centre line once shifted,
+# so is this box - which is what makes the whole image centre on that line, and
+# the baseline land where the navbar links' baseline already is.
 #
 # The right edge keeps a little more slack than the left because the text width
 # depends on the reader's fonts: an SVG loaded through <img> cannot use the page's
@@ -254,19 +289,26 @@ text_x <- glyph_box + 14
 # Helvetica on a Mac) and only matches Inter on a machine with Inter installed.
 # Measured at 394 in the fallback font; 408 leaves room for a wider face rather
 # than risking the last letter being clipped.
-logo_box <- "0 5 408 46"
+logo_box    <- sprintf("0 %.1f 408 %.1f", glyph_top, glyph_height)
+logo_height <- sprintf("%.1f", glyph_height)
 
 logo_svg <- sprintf(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s" width="408" height="46">
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s" width="408" height="%s">
   <!-- Charting Waterloo Region wordmark: the region, with the three cities in red.
        Built by _dev/logo/make_logo.R - edit that script, not this file. -->
+  <g transform="translate(0 %.1f)">
 %s
-  <text x="%d" y="42" font-family="Inter, \'Segoe UI\', Helvetica, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Charting Waterloo Region</text>
+  </g>
+  <text x="%d" y="%d" font-family="Inter, \'Segoe UI\', Helvetica, Arial, sans-serif" font-size="%d" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Charting Waterloo Region</text>
 </svg>
 ',
   logo_box,
-  glyph(size = glyph_box, pad = 3),
-  text_x
+  logo_height,
+  glyph_dy,
+  glyph(size = glyph_box, pad = glyph_pad),
+  text_x,
+  wordmark_baseline,
+  wordmark_size
 )
 
 # The favicon: the same glyph on a rounded tile, so it has an edge of its own in a

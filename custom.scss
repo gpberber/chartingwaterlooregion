@@ -58,6 +58,27 @@ $code-color: #333333;
 }
 .quarto-title-meta-heading { color: $cwr-grey; }
 
+// Quarto lays the title block's metadata out in two columns, so a post that has
+// an author, a published date and a modified date wraps the third onto a row of
+// its own. Laying the items out along a single implicit row instead puts however
+// many there are side by side, top-aligned, without hard-coding a count: a page
+// with two still gets two equal columns, exactly as before.
+//
+// Except on a phone, where three columns leaves each date too narrow to hold
+// "September 7, 2026" on one line. Below the small breakpoint they go back to
+// two, and the modified date wraps as it does now.
+.quarto-title-meta {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: start;
+
+  @media (max-width: 575.98px) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // About page
 // ---------------------------------------------------------------------------
