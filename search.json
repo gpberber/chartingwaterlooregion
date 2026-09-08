@@ -32,7 +32,7 @@
     "href": "reproduce.html#get-the-data-for-a-post",
     "title": "Reproduce a post",
     "section": "4. Get the data for a post",
-    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-phone-queues. The README in each post folder lists the original sources and their licences.\nSome posts draw on a shared dataset in datasets/&lt;name&gt;/ instead of their own data folder. The post README says which. Each dataset has the same two scripts plus a README with its sources:\nsource(\"datasets/&lt;name&gt;/R/01_get_data.R\")\nsource(\"datasets/&lt;name&gt;/R/02_clean_data.R\")"
+    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-phone-wait-times. The README in each post folder lists the original sources and their licences.\nSome posts draw on a shared dataset in datasets/&lt;name&gt;/ instead of their own data folder. The post README says which. Each dataset has the same two scripts plus a README with its sources:\nsource(\"datasets/&lt;name&gt;/R/01_get_data.R\")\nsource(\"datasets/&lt;name&gt;/R/02_clean_data.R\")"
   },
   {
     "objectID": "reproduce.html#render-the-post",
@@ -54,6 +54,13 @@
     "title": "Reproduce a post",
     "section": "Notes",
     "text": "Notes\n\nNo keys required. All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.\nCached results. The repository includes Quarto’s _freeze cache, so you can render the whole site without re-running any R code: quarto render at the project root.\nHouse chart style. Colours and the ggplot2 theme live in R/theme_cwr.R. Source it in your own scripts to make charts that match.\nQuestions. Email greg@chartingwaterlooregion.ca if something does not work."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Charting Waterloo Region",
+    "section": "",
+    "text": "Kitchener is answering the phone slower than it used to\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\nOpen Data\n\n\n\nIn 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.\n\n\n\n\n\nSep 7, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -103,13 +110,6 @@
     "title": "About",
     "section": "Contact and corrections",
     "text": "Contact and corrections\nSpotted an error or have a question about the data? Email greg@chartingwaterlooregion.ca. Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Charting Waterloo Region",
-    "section": "",
-    "text": "Kitchener is answering the phone slower than it used to\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\nOpen Data\n\n\n\nIn 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.\n\n\n\n\n\nSep 7, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/kitchener-phone-wait-times/index.html",
