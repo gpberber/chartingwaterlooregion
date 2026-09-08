@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 64" width="420" height="64">
-  <!-- Navbar wordmark: bar glyph + site name, drawn in white for the blue navbar -->
-  <rect x="4" y="36" width="10" height="20" rx="2" fill="#C2C9CB"/>
-  <rect x="19" y="22" width="10" height="34" rx="2" fill="#AF1E2D"/>
-  <rect x="34" y="8" width="10" height="48" rx="2" fill="#FFFFFF"/>
-  <text x="58" y="42" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Charting Waterloo Region</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 5 408 46" width="408" height="46">
+  <!-- Charting Waterloo Region wordmark: the region, with the three cities in red.
+       Built by _dev/logo/make_logo.R - edit that script, not this file. -->
+  <path d="M44.6 28.9L47.1 37.1L51.7 36.0L52.2 37.8L52.3 38.7L53.0 41.4L48.6 42.4L49.4 45.1L35.1 48.6L32.3 49.3L29.9 41.1L21.4 43.1L16.1 44.2L12.9 44.9L12.7 35.2L8.4 29.1L3.0 26.1L5.3 21.7L7.7 17.4L11.3 10.9L15.2 13.1L22.1 16.9L23.0 9.6L25.7 6.7L27.2 8.2L38.6 19.3L39.7 18.8L39.3 22.5L40.9 24.4L44.3 28.5L44.6 28.9Z" fill="#FFFFFF" fill-rule="evenodd" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+  <path d="M38.3 31.4L39.4 30.7L40.4 30.3L40.9 29.8L41.8 29.6L43.5 28.6L44.3 28.5L44.6 28.9L47.1 37.1L48.4 41.7L47.6 41.3L46.9 42.0L45.5 42.0L43.2 42.6L42.3 42.4L41.9 42.0L41.7 40.9L41.2 40.1L41.6 39.9L41.2 38.4L42.0 38.2L41.3 37.2L39.7 37.5L39.9 38.0L36.5 38.9L29.7 40.5L28.9 37.9L24.7 32.6L20.8 27.9L31.5 22.6L31.8 23.3L32.4 23.7L32.1 24.1L31.2 24.2L30.4 24.9L30.6 25.6L31.6 25.4L32.1 25.1L32.6 25.3L32.6 25.9L32.0 26.5L32.4 27.3L33.1 27.5L33.4 28.1L33.9 28.1L35.0 27.6L35.7 27.7L35.7 27.7L35.7 27.8L35.4 28.7L35.9 29.7L36.6 30.1L37.7 30.2L38.0 30.8L38.3 31.4Z" fill="#AF1E2D" fill-rule="evenodd" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+  <text x="70" y="42" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Charting Waterloo Region</text>
 </svg>
+
