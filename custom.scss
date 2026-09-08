@@ -59,6 +59,40 @@ $code-color: #333333;
 .quarto-title-meta-heading { color: $cwr-grey; }
 
 // ---------------------------------------------------------------------------
+// About page
+// ---------------------------------------------------------------------------
+// The marquee template stacks the image above everything, which left the mark
+// floating on its own over the "About" heading. Taking it out of the flow puts it
+// on the same line, just after the word.
+//
+// Out of the flow, rather than floated: a float would shorten every line beside
+// it, and the whole point of moving this page to marquee was to give the prose
+// the same width as a post. Absolute positioning sets the mark on the heading's
+// line and leaves the text alone.
+//
+// left: 7rem clears "About" at every size the heading is drawn at. The heading
+// scales with the viewport (the word is 84 px wide in an 800 px window, 96 px in
+// a 1400 px one) while this offset is fixed, so the gap after it ranges from about
+// 23 px to 46 px. Fixed is the right trade here: matching the heading exactly
+// would mean restating Bootstrap's responsive font-size calc in a `left`, which
+// would silently break the day Quarto changed it.
+//
+// The size is set in about.qmd (image-width: 2.7em, about 48 px). It is chosen so
+// that the mark reads as centred on the heading while sitting flush with the top
+// of the content: the heading starts at the very top of the column, so a larger
+// mark could only be centred by pushing it up under the navbar.
+.quarto-about-marquee {
+  position: relative;
+
+  .about-image-container {
+    position: absolute;
+    top: 0;
+    left: 7rem;
+    margin: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Post listing on the home page
 // ---------------------------------------------------------------------------
 .quarto-listing-default {

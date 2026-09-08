@@ -4,7 +4,7 @@ image: images/logo-mark.svg
 about:
   template: marquee
   image-shape: rectangle
-  image-width: 12em
+  image-width: 2.7em
   links:
     - icon: github
       text: GitHub
@@ -35,9 +35,11 @@ Every post is labelled with one or the other, and the categories list on the [Po
 
 Posts are written by Greg Berberich.
 
+```{=html}
 <!-- TODO: add a short bio (background, why this region, why open data). The image
      at the top is the site mark (images/logo-mark.svg); swap it for a photo if you
      would rather have one here. -->
+```
 
 ## How the posts are made
 
@@ -52,4 +54,4 @@ This site counts page views so I know which posts people find useful. The counte
 
 ## Contact and corrections
 
-Spotted an error or have a question about the data? Email [greg@chartingwaterlooregion.ca](mailto:greg@chartingwaterlooregion.ca). Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post.
+Spotted an error or have a question about the data? Email [greg\@chartingwaterlooregion.ca](mailto:greg@chartingwaterlooregion.ca). Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post.
