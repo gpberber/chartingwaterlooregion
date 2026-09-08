@@ -12,6 +12,9 @@ about:
     - icon: rss
       text: RSS feed
       href: index.xml
+    - icon: envelope
+      text: Email
+      href: "mailto:greg@chartingwaterlooregion.ca"
 toc: false
 ---
 
@@ -48,4 +51,4 @@ This site counts page views so I know which posts people find useful. The counte
 
 ## Contact and corrections
 
-Spotted an error or have a question about the data? [Open an issue on GitHub](https://github.com/gpberber/chartingwaterlooregion/issues).
+Spotted an error or have a question about the data? Email [greg@chartingwaterlooregion.ca](mailto:greg@chartingwaterlooregion.ca). Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post.

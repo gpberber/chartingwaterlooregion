@@ -68,4 +68,4 @@ Every post ends with a collapsed **Reproducibility and data download** box. It l
 - **No keys required.** All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.
 - **Cached results.** The repository includes Quarto's `_freeze` cache, so you can render the whole site without re-running any R code: `quarto render` at the project root.
 - **House chart style.** Colours and the ggplot2 theme live in `R/theme_cwr.R`. Source it in your own scripts to make charts that match.
-- **Questions.** [Open an issue](https://github.com/gpberber/chartingwaterlooregion/issues) if something does not work.
+- **Questions.** Email [greg@chartingwaterlooregion.ca](mailto:greg@chartingwaterlooregion.ca) if something does not work.
