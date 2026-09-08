@@ -42,8 +42,9 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 
 - Charts: source `R/theme_cwr.R`, pick a template from the `cwr-charts` skill, one chart or table
   per chunk. Every chart goes through `cwr_figure()` (desktop and phone PNGs in the post's
-  `figures/`, committed) with `caption` and `alt` filled in; source line through `cwr_caption()`.
-  Tables are gt only.
+  `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. Figure
+  numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get
+  no label. Captions are optional and usually omitted. Tables are gt only.
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every

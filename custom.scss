@@ -91,6 +91,13 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   font-size: 0.9rem;
   text-align: left;
 }
+// Deep dives number their charts but rarely caption them, so the caption is
+// often just "Figure 3" - an anchor for @fig- references, not something to read.
+// Quarto marks that case .quarto-uncaptioned; keep it quiet and out of the way.
+.quarto-float-caption.quarto-uncaptioned {
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
 .gt_table { font-family: inherit; }
 .gt_sourcenote, .gt_footnote { color: $cwr-grey; }
 

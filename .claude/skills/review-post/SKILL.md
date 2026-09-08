@@ -27,9 +27,15 @@ decides. Then offer to apply the fixes.
 ## 2. Charts (apply the cwr-charts skill rules)
 
 For every `ggplot` chunk:
-- The chart goes through `cwr_figure(p, "fig-<slug>", caption = , alt = , height = , phone_height = )`
-  in a chunk with `#| output: asis`; `caption` and `alt` are filled in. Flag any chart that
-  uses knitr's `fig-cap`/`fig-width` options instead (it would have no phone version).
+- The chart goes through `cwr_figure(p, "fig-<slug>", alt = , height = , phone_height = )`
+  in a chunk with `#| output: asis`, and `alt` is filled in with what the chart shows. Flag any
+  chart that uses knitr's `fig-cap`/`fig-width` options instead (it would have no phone version).
+- `caption =` is optional; do not ask for one unless the chart needs a note that cannot live in
+  the image. Flag a caption that only repeats the chart's own title or subtitle.
+- Numbering follows the post type by itself. In a **Deep dive**, check every reference to a chart
+  in the prose is written `@fig-<slug>` - flag any literal "Figure 3", which breaks silently the
+  moment a chart is inserted above it. In a **Snapshot**, charts carry no number, so flag prose
+  that refers to one ("as Figure 2 showed"); refer to the chart by what it showed instead.
 - Both PNGs exist in `posts/<slug>/figures/` (`fig-<slug>.png` and `fig-<slug>-phone.png`).
   Read the `-phone` one scaled to about 320 px: titles wrap, nothing collides with the axis.
 - One chart per chunk, no `print()` of tables in the same chunk.

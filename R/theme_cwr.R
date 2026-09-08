@@ -220,8 +220,7 @@ label_size <- 4
 # and writes an HTML <picture> element so the browser picks the right one.
 # The phone version is the same ggplot with the same text sizes, so text is
 # about twice as large relative to the chart, and the title and subtitle are
-# allowed to wrap. It is wrapped in a Quarto figure div so the chart still
-# gets a number, a caption and cross-references like any other figure.
+# allowed to wrap.
 #
 # Use it in a chunk with `output: asis` (see the post template):
 #
@@ -230,10 +229,29 @@ label_size <- 4
 #   #| output: asis
 #   p <- ggplot(...) + ...
 #   cwr_figure(p, "fig-answered",
-#     caption = "Share of calls answered within 30 seconds, by month.",
 #     alt = "Line chart showing ...",
 #     height = 5, phone_height = 4.5)
 #   ```
+#
+# Numbering follows the post type, read from the first entry in the post's
+# `categories`, so there is nothing to set by hand:
+#
+#   Snapshot   bare <picture>. No "Figure 1", nothing under the chart. A
+#              handful of charts read in five minutes do not need numbers, and
+#              the chart's own title and subtitle already say what it shows.
+#   Deep dive  a Quarto figure div carrying the id, which renders as a plain
+#              "Figure 1" underneath and makes @fig-answered work in the prose.
+#              Long posts need a way to point back at a chart from far below it.
+#
+# Quarto produces the bare label by itself when the div holds no caption
+# paragraph, and marks it .quarto-uncaptioned (styled in custom.scss).
+# `number = TRUE` or `FALSE` overrides the post type for one chart.
+#
+# `caption` is optional and usually left out: the source line is already drawn
+# inside the chart by cwr_caption(), and the subtitle carries the explanation.
+# Pass one only when a chart needs a note that does not belong in the image,
+# such as a break in the series. `alt` is never optional - with no caption it
+# is the only description a screen reader has.
 #
 # The PNGs live in the post's figures/ folder and are committed with the
 # post, so a full site render never needs to re-run the R code.
@@ -247,12 +265,21 @@ label_size <- 4
 # ggplot pieces added to it with `+`, for example:
 #   phone = list(scale_x_date(date_breaks = "2 years", date_labels = "%Y"))
 #   phone = list(theme(legend.position = "none"))
-cwr_figure <- function(plot, id, caption, alt,
+cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
                        width = 8.3, height = 5,
                        phone_width = 4.2, phone_height = height * 0.9,
                        phone = list(), phone_text_scale = 0.8,
                        dpi = 288) {
   stopifnot(str_starts(id, "fig-"))
+
+  # Snapshots go unnumbered, deep dives numbered. rmarkdown::metadata is the
+  # post's own YAML as R sees it during the render, so the first category - the
+  # post type - decides it and no post has to set anything. Outside a render (a
+  # chart tried in the console) there is no metadata, so nothing is numbered.
+  if (is.null(number)) {
+    categories <- unlist(rmarkdown::metadata$categories)
+    number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
+  }
 
   # Write next to the post: knitr runs with the post folder as the working
   # directory, and the relative path "figures/..." then works in the HTML too.
@@ -310,19 +337,33 @@ cwr_figure <- function(plot, id, caption, alt,
   # shows each image at its drawn size and only shrinks it if the column is
   # narrower. Escape quotes in the alt text so the HTML stays valid.
   alt <- str_replace_all(alt, '"', "&quot;")
-  cat(
-    "::: {#", id, "}\n",
+  picture <- paste0(
     "<picture>\n",
     '<source media="(max-width: 767px)" srcset="', phone_file, '" ',
     'width="', round(phone_width * 96), '" height="', round(phone_height * 96), '">\n',
     '<img src="', desktop_file, '" alt="', alt, '" class="img-fluid figure-img" ',
     'width="', round(width * 96), '" height="', round(height * 96), '">\n',
-    "</picture>\n\n",
-    caption, "\n",
-    ":::\n",
-    sep = ""
+    "</picture>\n"
   )
-  invisible(list(desktop = desktop_file, phone = phone_file))
+
+  if (number) {
+    # A div named #fig-... is what makes Quarto number the chart and resolve
+    # @fig-... in the prose. The last paragraph inside such a div becomes the
+    # caption, so with no caption the div holds the picture alone and Quarto
+    # renders the bare label by itself (marked .quarto-uncaptioned).
+    cat("::: {#", id, "}\n", picture, sep = "")
+    if (!is.null(caption)) cat("\n", caption, "\n", sep = "")
+    cat(":::\n")
+  } else {
+    # No div: no number, no figure block, just the chart. A caption here is a
+    # plain paragraph wearing Quarto's caption class so it is styled the same.
+    cat(picture)
+    if (!is.null(caption)) {
+      cat('\n<p class="figure-caption">', caption, "</p>\n", sep = "")
+    }
+  }
+
+  invisible(list(desktop = desktop_file, phone = phone_file, numbered = number))
 }
 
 # Session information for the Reproducibility box at the end of each post.

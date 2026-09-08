@@ -22,7 +22,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption("Source text")` | builds the standard caption |
-| `cwr_figure(p, "fig-id", caption, alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `cwr_figure(p, "fig-id", alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
 
@@ -64,14 +64,24 @@ Read only the reference file you need; each is self-contained.
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the
    x axis on top.
 7. **One chart per chunk, through `cwr_figure()`.** Build the plot as `p`, then call
-   `cwr_figure(p, "fig-<slug>", caption = , alt = , height = , phone_height = )` in a chunk
+   `cwr_figure(p, "fig-<slug>", alt = , height = , phone_height = )` in a chunk
    with `#| output: asis` (chunk label without the `fig-` prefix; the id passed to the
-   function carries it, and `@fig-<slug>` cross-references work). It saves two PNGs to the
-   post's `figures/` folder: 8.3 in wide for desktops (exactly the paragraph width) and 4.2 in
-   wide for phones, and emits a `<picture>` so the browser shows the right one. Width is
-   fixed; vary `height` (4 for a simple bar chart, 5 for a line chart, more for ranked bars
-   or facets) and `phone_height` (a little squarer). Never use knitr's `fig-width`/`fig-cap`
-   chunk options for a chart.
+   function carries it). It saves two PNGs to the post's `figures/` folder: 8.3 in wide for
+   desktops (exactly the paragraph width) and 4.2 in wide for phones, and emits a `<picture>`
+   so the browser shows the right one. Width is fixed; vary `height` (4 for a simple bar
+   chart, 5 for a line chart, more for ranked bars or facets) and `phone_height` (a little
+   squarer). Never use knitr's `fig-width`/`fig-cap` chunk options for a chart.
+7a. **Labels and captions follow the post type; do not set them by hand.** A **Deep dive**
+   gets a plain "Figure 1" under each chart, so prose far below can say "as @fig-<slug>
+   showed" - always write the reference as `@fig-<slug>`, never type the number, because
+   inserting a chart renumbers everything after it. A **Snapshot** gets no label at all: a
+   few charts read in five minutes need no numbering, and the chart's own title and subtitle
+   already say what it shows. `cwr_figure()` reads the first entry in the post's
+   `categories` to decide, so a correctly labelled post needs nothing extra.
+   `caption =` is optional and usually omitted - the source line is already drawn inside the
+   chart by `cwr_caption()`. Pass one only for a note that cannot live in the image, such as
+   a break in the series. `alt =` is always required: with no caption it is the only
+   description a screen reader has, so write what the chart shows, not what it is.
 8. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
 9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
@@ -101,7 +111,7 @@ after seeing the chart. Do not guess blind:
    setwd("<scratchpad>")
    # load the same data the post loads ...
    p <- <the ggplot code from the chunk>
-   cwr_figure(p, "fig-<slug>", caption = "x", alt = "x", height = <h>, phone_height = <ph>)
+   cwr_figure(p, "fig-<slug>", alt = "x", height = <h>, phone_height = <ph>)
    ```
 
    Run it with `Rscript`, then **Read both PNGs** in `<scratchpad>/figures/` and look at them.

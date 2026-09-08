@@ -159,7 +159,6 @@ p <- ggplot(monthly, aes(x = year_month, y = pct_within)) +
 
 cwr_figure(
   p, "fig-answered",
-  caption = "Share of weekday calls to the City of Kitchener answered within 30 seconds, by month, March 2019 to July 2023.",
   alt = "Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022.",
   height = 5, phone_height = 4.5
 )
@@ -220,7 +219,6 @@ p <- ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
 
 cwr_figure(
   p, "fig-wait",
-  caption = "Average time a weekday caller spent waiting in the City of Kitchener phone queue, by year. 2023 covers January to July.",
   alt = "Bar chart of average queue time by year: about 26 seconds in 2019, 29 in 2020, 37 in 2021, 63 in 2022 and 58 in the first seven months of 2023.",
   height = 4, phone_height = 3.8
 )
@@ -273,7 +271,6 @@ p <- ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
 
 cwr_figure(
   p, "fig-season",
-  caption = "Average number of calls presented to the City of Kitchener phone queue on a weekday, by month of the year, March 2019 to July 2023.",
   alt = "Bar chart of average weekday calls by month of the year. Calls climb from under 300 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted.",
   height = 4, phone_height = 4
 )
