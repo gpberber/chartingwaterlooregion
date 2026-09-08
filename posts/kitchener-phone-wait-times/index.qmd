@@ -154,7 +154,7 @@ p <- ggplot(monthly, aes(x = year_month, y = pct_within)) +
       "Share of weekday calls answered within 30 seconds, by month. ",
       "<span style='color:", habsred, "'>Dashed line: the City's 80% target</span><br>"
     ),
-    caption = cwr_caption("City of Kitchener Open Data")
+    caption = cwr_caption("City of Kitchener Open Data", credit = TRUE)
   )
 
 cwr_figure(
@@ -214,7 +214,7 @@ p <- ggplot(plot_data, aes(x = year_label, y = avg_wait, fill = focus)) +
   labs(
     title = "The average wait in the queue more than doubled",
     subtitle = "Average seconds a weekday caller waited before being answered or hanging up",
-    caption = cwr_caption("City of Kitchener Open Data")
+    caption = cwr_caption("City of Kitchener Open Data", credit = TRUE)
   )
 
 cwr_figure(
@@ -266,7 +266,7 @@ p <- ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
   labs(
     title = "June brings a third more calls than December",
     subtitle = "Average calls per weekday, by month of the year, 2019 to 2023",
-    caption = cwr_caption("City of Kitchener Open Data")
+    caption = cwr_caption("City of Kitchener Open Data", credit = TRUE)
   )
 
 cwr_figure(
