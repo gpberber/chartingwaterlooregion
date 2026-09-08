@@ -90,6 +90,20 @@ $code-color: #333333;
     left: 7rem;
     margin: 0;
   }
+
+  // Centring the mark on the heading needs two values, because the heading is not
+  // in the same place in the two layouts. From 992px up, Quarto gives the title
+  // block extra headroom and the heading's centre falls 33px below the top of the
+  // column; below that breakpoint it falls about 16px below. The mark is pinned to
+  // the top of the column either way, so it needs the difference added back on the
+  // wide layout to line up.
+  //
+  // Only the wide layout gets a correction. Below 992px the mark already sits within
+  // 8-10px of the heading's centre, and closing that gap would need a negative
+  // offset that lifts it behind the navbar.
+  @media (min-width: 992px) {
+    .about-image-container { top: 0.52rem; }
+  }
 }
 
 // ---------------------------------------------------------------------------
