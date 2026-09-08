@@ -20,12 +20,12 @@
 #
 # Usage (the /publish skill runs this):
 #   source(here::here("R", "data_bundle.R"))
-#   cwr_dictionary_check("kitchener-phone-queues")      # every column documented?
-#   cwr_data_bundle("kitchener-phone-queues", version = 1)   # build zip and upload
+#   cwr_dictionary_check("kitchener-phone-wait-times")      # every column documented?
+#   cwr_data_bundle("kitchener-phone-wait-times", version = 1)   # build zip and upload
 #
 # In a post's Reproducibility box:
-#   cwr_bundle_url("kitchener-phone-queues", 1)         # link to the zip
-#   cwr_dictionary_table("kitchener-phone-queues")      # dictionary as a gt table
+#   cwr_bundle_url("kitchener-phone-wait-times", 1)         # link to the zip
+#   cwr_dictionary_table("kitchener-phone-wait-times")      # dictionary as a gt table
 # ---------------------------------------------------------------------------
 
 library(here)

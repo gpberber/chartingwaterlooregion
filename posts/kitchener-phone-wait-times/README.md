@@ -28,6 +28,7 @@ Then `quarto render posts/kitchener-phone-wait-times` from a terminal.
 
 ## Notes
 
-- The longer exploration of the same data lives in `posts/kitchener-phone-queues/` (a draft).
+- The longer exploration of the same data is a separate R project outside this repository
+  (`../Kitchener Phone Queues/`), moved out of the blog in September 2026.
 - No API keys are needed.
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/kitchener-phone-wait-times/`).
