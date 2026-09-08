@@ -181,8 +181,12 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
       strip.background = element_blank(),
       panel.spacing.y = unit(1.5, "lines"),
 
-      # Whole-plot settings: title and caption align to the plot edge, not the panel
-      plot.margin = margin(t = base_size, r = base_size, b = base_size, l = base_size),
+      # Whole-plot settings: title and caption align to the plot edge, not the panel.
+      # The margin is deliberately tight (6 pt, about 8 px on screen). It used to be
+      # base_size, 15 pt, which put a 20 px white border on all four sides of every
+      # PNG: on the page that read as a gap under the chart, and it inset the chart
+      # from the text column instead of matching the paragraph width.
+      plot.margin = margin(t = 6, r = 6, b = 6, l = 6),
       plot.title.position = "plot",
       plot.caption.position = "plot",
       panel.border = element_blank(),
@@ -337,11 +341,17 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # shows each image at its drawn size and only shrinks it if the column is
   # narrower. Escape quotes in the alt text so the HTML stays valid.
   alt <- str_replace_all(alt, '"', "&quot;")
+
+  # Bootstrap's .figure-img adds margin-bottom: 0.5rem to separate an image from
+  # the caption below it. With no caption that is just a gap, so the class only
+  # goes on a numbered figure, which is the case that can carry one.
+  img_class <- if (number) "img-fluid figure-img" else "img-fluid"
+
   picture <- paste0(
     "<picture>\n",
     '<source media="(max-width: 767px)" srcset="', phone_file, '" ',
     'width="', round(phone_width * 96), '" height="', round(phone_height * 96), '">\n',
-    '<img src="', desktop_file, '" alt="', alt, '" class="img-fluid figure-img" ',
+    '<img src="', desktop_file, '" alt="', alt, '" class="', img_class, '" ',
     'width="', round(width * 96), '" height="', round(height * 96), '">\n',
     "</picture>\n"
   )
