@@ -13,7 +13,7 @@ How the blog works and how to do everything from writing a post to publishing it
   script that `_quarto.yml` pastes into the head of every page. It records page views, where they
   came from, and rough country and browser counts. It sets no cookies and stores nothing that
   identifies a person, which is why the site needs no consent banner. Numbers are at
-  <https://YOURCODE.goatcounter.com>; local previews are ignored.
+  <https://chartingwaterlooregion.goatcounter.com>; local previews are ignored.
 - **Drafts never leak.** A post with `draft: true` is left out of the public site entirely. Preview drafts locally with the `draft` profile.
 
 ## 2. Folder map
