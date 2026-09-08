@@ -55,6 +55,9 @@ website:
       - icon: rss
         href: index.xml
         aria-label: RSS feed
+      - icon: envelope
+        href: "mailto:greg@chartingwaterlooregion.ca"
+        aria-label: Email the author
   page-footer:
     left: "© 2026 Greg Berberich · Charting Waterloo Region"
     center: "Text and charts [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Code [MIT](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE) · Data as credited in each post"
