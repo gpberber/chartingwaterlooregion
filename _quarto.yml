@@ -80,6 +80,9 @@ format:
     # narrow screens. fig.retina 3 stores a 288 dpi copy for sharpness and the lightbox.
     # (fig-dpi 300 without retina made every chart stretch to the full column width.)
     fig-dpi: 96
+    # Page-view counting (GoatCounter). No cookies, so no consent banner is needed.
+    include-in-header:
+      - _includes/analytics.html
     df-print: paged
     code-copy: true
     knitr:

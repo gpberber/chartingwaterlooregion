@@ -9,6 +9,11 @@ How the blog works and how to do everything from writing a post to publishing it
 - **GitHub is the backup and the source.** The repository at https://github.com/gpberber/chartingwaterlooregion holds everything except raw data and background reading. Commit and push often; that is the save button.
 - **GitHub Pages is the host.** `quarto publish gh-pages` copies `_site/` to the `gh-pages` branch, and GitHub serves it at https://chartingwaterlooregion.ca. Nothing runs on a server; rendering always happens on this machine.
 - **The domain is chartingwaterlooregion.ca.** The plain file `CNAME` in the project root holds that one line and is listed under `resources:` in `_quarto.yml`, so every render copies it into `_site/` and every publish puts it back on the `gh-pages` branch. That file is what tells GitHub which domain to answer to; publishing replaces the whole branch, so if the file ever went missing the site would fall back to the github.io address. Never delete it.
+- **Visitors are counted, not tracked.** `_includes/analytics.html` holds a one-line GoatCounter
+  script that `_quarto.yml` pastes into the head of every page. It records page views, where they
+  came from, and rough country and browser counts. It sets no cookies and stores nothing that
+  identifies a person, which is why the site needs no consent banner. Numbers are at
+  <https://YOURCODE.goatcounter.com>; local previews are ignored.
 - **Drafts never leak.** A post with `draft: true` is left out of the public site entirely. Preview drafts locally with the `draft` profile.
 
 ## 2. Folder map
@@ -18,6 +23,8 @@ chartingwaterlooregion/
   _quarto.yml            site settings (navbar, theme, licence heading, what gets rendered)
   _quarto-draft.yml      profile that makes drafts visible for local preview
   custom.scss            site colours and fonts (mirrors R/theme_cwr.R)
+  CNAME                  the custom domain (see section 1); never delete
+  _includes/             snippets pasted into every page's <head> (the visitor counter)
   index.qmd              home page (the post listing)
   about.qmd  reproduce.qmd  404.qmd
   CLAUDE.md              conventions Claude follows in this project

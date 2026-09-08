@@ -6,7 +6,7 @@ Post: https://chartingwaterlooregion.ca/posts/kitchener-phone-queues/
 
 | File in `data-raw/` | What it is | Source | Licence | Accessed |
 |---|---|---|---|---|
-| `kitchener_phone_queue_metrics.csv` | Daily phone queue metrics for the City of Kitchener contact centre, Feb 2019 to Jul 2023 | City of Kitchener Open Data (phone queue metrics dataset) <!-- TODO: confirm URL --> | Open Government Licence – Kitchener <!-- TODO: confirm --> | Feb 2025 |
+| `kitchener_phone_queue_metrics.csv` | Daily phone queue metrics for the City of Kitchener contact centre, Feb 2019 to Jul 2023 | City of Kitchener Open Data (https://open-kitchenergis.opendata.arcgis.com/documents/KitchenerGIS::phone-queue-metrics/about) | Open Government Licence - The Corporation of the City of Kitchener | Feb 2025 |
 | `holidays.csv` | Ontario statutory holidays | https://github.com/uWaterloo/Datasets/blob/master/Holidays/holidays.csv | See repository | Feb 2025 |
 
 The raw metrics file is attached to GitHub Release `data-raw-kitchener-phone-queues-v1`; the holidays

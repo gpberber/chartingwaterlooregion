@@ -37,6 +37,9 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    start the preview server between this render and step 8. Also confirm `_site/CNAME` exists and
    contains `chartingwaterlooregion.ca`; without it the publish would strip the custom domain off
    the `gh-pages` branch and the site would drop back to the github.io address.
+   Also check that `_includes/analytics.html` no longer contains `YOURCODE`: that is the GoatCounter
+   placeholder, and publishing with it means the site counts nothing. If it is still there, stop and
+   ask the user for the code from their goatcounter.com dashboard address.
 4. `git add -A` then `bash _dev/check_repo_safety.sh`. Stop on any BLOCKED line and fix it
    (usually: a big file that needs `/share-data`, or a file that belongs in `.gitignore`).
 5. `git status --short`: list what will be committed in plain words (which posts, whether `_freeze`
