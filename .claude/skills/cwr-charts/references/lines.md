@@ -118,7 +118,7 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_varia
 	labs(
 	  title = "Title",
 	  subtitle = "Subtitle<br>",
-	  caption = "Source: Source | *Charting Waterloo Region*"
+	  caption = cwr_caption("Source")
 	)
 ```
 
@@ -232,7 +232,7 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, fill = <colour_variabl
 	labs(
 	  title = "Title",
 	  subtitle = "Subtitle<br>",
-	  caption = "Source: Source | *Charting Waterloo Region*"
+	  caption = cwr_caption("Source")
 	)
 ```
 
@@ -373,7 +373,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle<br>",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -472,7 +472,7 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_var>,
   labs(
     title = "Title",
     subtitle = "Subtitle<br>",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 

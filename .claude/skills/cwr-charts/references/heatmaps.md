@@ -92,7 +92,7 @@ ggplot(plot_data, aes(x = <x_var>, y = row_factor, fill = <ranking_var>)) +
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -188,7 +188,7 @@ ggplot(plot_data, aes(x = <x_var>, y = row_factor, fill = <value_var>)) +
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 

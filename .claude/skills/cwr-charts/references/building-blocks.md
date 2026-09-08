@@ -14,7 +14,7 @@ labs() with the standard title / subtitle / Source caption.
 labs(
 	title = "<Title>",
 	subtitle = "<Subtitle>",
-	caption = "Source: <Source> | *Charting Waterloo Region*"
+	caption = cwr_caption("<Source>")
 ) +
 ```
 

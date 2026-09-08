@@ -120,7 +120,7 @@ plot_data |>
     x = "<x_title>",
     title = "Title",
     subtitle = "Subtitle<br>",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -296,7 +296,7 @@ plot_data |>
     x = "<x_title>",
     title = "Title",
     subtitle = "Subtitle<br>",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 

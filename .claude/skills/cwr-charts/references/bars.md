@@ -81,7 +81,7 @@ Vertical bars, one value per category, right-hand y axis; optional direct labels
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -182,7 +182,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -290,7 +290,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -352,7 +352,7 @@ Two horizontal bars per category (wide focus bar + narrow comparison bar or tick
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -418,7 +418,7 @@ Two vertical bars per category (wide focus bar + narrow comparison bar or tick).
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -569,7 +569,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 

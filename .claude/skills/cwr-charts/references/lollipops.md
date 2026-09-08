@@ -68,7 +68,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -149,7 +149,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 
@@ -251,7 +251,7 @@ plot_data |>
   labs(
     title = "Title",
     subtitle = "Subtitle",
-    caption = "Source: Source | *Charting Waterloo Region*"
+    caption = cwr_caption("Source")
   )
 ```
 

@@ -21,7 +21,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
-| `cwr_caption("Source text")` | builds the standard caption |
+| `cwr_caption("Source text", credit = FALSE)` | builds the caption; `credit = TRUE` adds the CWR byline (rule 6) |
 | `cwr_figure(p, "fig-id", alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
@@ -51,7 +51,11 @@ Read only the reference file you need; each is self-contained.
 ## Style rules (see references/style-rules.md for the reasoning)
 
 1. **Title says the finding, subtitle says the units and scope.** Subtitle ends with `<br>`
-   when the plot needs breathing room under it. Caption is always `cwr_caption("...")`.
+   when the plot needs breathing room under it. Caption is always `cwr_caption("...")`, naming
+   whoever published the numbers and nobody else. It carries no Charting Waterloo Region byline
+   by default: plotting a publisher's figures as published is their work, not ours. Pass
+   `credit = TRUE` only when the numbers shown were worked out here - a rate calculated, an
+   index based, a model fitted, several sources combined.
 2. **Colour has meaning.** Blue = Waterloo Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
 3. **Direct labels beat legends.** Label line ends, bar ends, or points; then

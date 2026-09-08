@@ -55,7 +55,7 @@ ggplot(plot_data, aes(x = year, y = incidents_per_100k_all, colour = region)) +
   labs(
     title = str_glue("Number of Criminal Incidents: {first_year_incident_summary}-{latest_year_incident_summary}"),
     subtitle = "Per 100,000 population<br>",
-    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+    caption = cwr_caption("Statistics Canada")
   )
 ```
 
@@ -131,7 +131,7 @@ ggplot(plot_data, aes(x = year, y = row_factor, fill = weighted_clearance_rate_v
   labs(
     title = "CSI-Weighted Clearance Rates for Violent Crimes",
     subtitle = "Big 12, ordered best to worst by average clearance rate",
-    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+    caption = cwr_caption("Statistics Canada")
   )
 ```
 
@@ -220,7 +220,7 @@ ggplot(plot_data, aes(x = year, y = officers_per_100k, colour = comparison_group
   labs(
     title = str_glue("Officer Staffing {first_year_personnel} vs {latest_year_personnel}"),
     subtitle = "Officers per 100,000 people<br>",
-    caption = str_glue("Source: Statistics Canada | *Charting Waterloo Region*")
+    caption = cwr_caption("Statistics Canada")
   )
 ```
 
@@ -307,6 +307,6 @@ plot_data |>
   labs(
     title = str_glue("Crime Severity Index: {latest_year_csi}"),
     subtitle = "<br>",
-    caption = "Source: Statistics Canada | *Charting Waterloo Region*"
+    caption = cwr_caption("Statistics Canada")
   )
 ```

@@ -10,8 +10,11 @@ the same call in a situation the templates do not cover.
   Waterloo Region rose faster than in Canada after 2014"), not a variable name.
 - **Subtitle = units and scope** ("Incidents per 100,000 people, 2004 to 2024"). It ends with
   `<br>` when the top of the panel needs space (line charts with labels near the top).
-- **Caption = source**, always through `cwr_caption()`, so every chart ends with
-  `| *Charting Waterloo Region*`. Cite the table number for Statistics Canada.
+- **Caption = source**, always through `cwr_caption()`, naming whoever published the numbers.
+  Cite the table number for Statistics Canada. The caption does **not** carry a Charting
+  Waterloo Region byline by default: plotting a publisher's figures as published is their
+  work, not ours. Pass `credit = TRUE` only when the numbers on the chart were worked out
+  here - a rate we calculated, an index we based, a model we fitted, several sources combined.
 - No axis titles. Units live in the subtitle. The scatter templates place a y title above
   the axis with `annotation_custom(textGrob(...))` because there the axis meaning is not obvious.
 - Text sizes are multiples of `base_size` (13). Inside geoms use `label_size` (3.2 mm).

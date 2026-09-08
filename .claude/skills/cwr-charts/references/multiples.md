@@ -40,7 +40,7 @@ p4 <- make_multiples_plot(plot_data, "<multiple_label4>")
 plot_annotation(
   title = "Title",
   subtitle = "Subtitle",
-  caption = "Source: Source | *Charting Waterloo Region*"
+  caption = cwr_caption("Source")
 )
 ```
 

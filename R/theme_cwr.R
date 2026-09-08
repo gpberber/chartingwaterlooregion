@@ -202,9 +202,20 @@ theme_set(theme_cwr(base_size = 15))
 base_size <- 15
 
 # ---- 5. Helpers ----------------------------------------------------------
-# Standard caption: "Source: Statistics Canada, Table 35-10-0177-01 | *Charting Waterloo Region*"
-cwr_caption <- function(source) {
-  paste0("Source: ", source, " | *Charting Waterloo Region*")
+# Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
+#
+# The caption names whoever published the numbers, and nothing else. A chart that
+# plots a publisher's figures as published is their data, not ours, so putting our
+# name beside theirs would overstate our part in it.
+#
+# `credit = TRUE` adds "| *Charting Waterloo Region*" for a chart whose numbers we
+# worked out ourselves - a rate per 100,000 we calculated, an index we based, a
+# model we fitted, several sources we combined. There the arithmetic is ours and is
+# worth standing behind. Where the line is a judgement call: say the source alone.
+cwr_caption <- function(source, credit = FALSE) {
+  caption <- paste0("Source: ", source)
+  if (credit) caption <- paste0(caption, " | *Charting Waterloo Region*")
+  caption
 }
 
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.

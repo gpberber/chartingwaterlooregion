@@ -79,7 +79,7 @@ snippet ggtitles
 	labs(
 		title = "${1:Title}",
 		subtitle = "${2:Subtitle}",
-		caption = "Source: ${3:Source} | *Charting Waterloo Region*"
+		caption = cwr_caption("${3:Source}")
 	) +
 
 snippet ggscalex_cont
@@ -511,7 +511,7 @@ snippet gglollipop
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet gglollipoplabel
@@ -587,7 +587,7 @@ snippet gglollipoplabel
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggline
@@ -698,7 +698,7 @@ snippet ggline
 		labs(
 		  title = "Title",
 		  subtitle = "Subtitle<br>",
-		  caption = "Source: Source | *Charting Waterloo Region*"
+		  caption = cwr_caption("Source")
 		)
 	
 snippet ggdumbbell
@@ -803,7 +803,7 @@ snippet ggdumbbell
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 
 snippet ggarrow
@@ -882,7 +882,7 @@ snippet ggarrow
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggvertbar
@@ -956,7 +956,7 @@ snippet ggvertbar
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	
 snippet gghorbar
@@ -1052,7 +1052,7 @@ snippet gghorbar
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggscatter
@@ -1165,7 +1165,7 @@ snippet ggscatter
 	    x = "${9:x_title}",
 	    title = "Title",
 	    subtitle = "Subtitle<br>",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 		
 snippet ggslope
@@ -1259,7 +1259,7 @@ snippet ggslope
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle<br>",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggheatrank
@@ -1344,7 +1344,7 @@ snippet ggheatrank
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggheatraw
@@ -1435,7 +1435,7 @@ snippet ggheatraw
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	
 snippet ggmultiples
@@ -1468,7 +1468,7 @@ snippet ggmultiples
 	plot_annotation(
 	  title = "Title",
 	  subtitle = "Subtitle",
-	  caption = "Source: Source | *Charting Waterloo Region*"
+	  caption = cwr_caption("Source")
 	)
 
 snippet ggcompbar_horiz
@@ -1525,7 +1525,7 @@ snippet ggcompbar_horiz
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 
 snippet ggcompbar_vert
@@ -1586,7 +1586,7 @@ snippet ggcompbar_vert
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 
 snippet ggribbon
@@ -1722,7 +1722,7 @@ snippet ggribbon
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle<br>",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggbubble
@@ -1893,7 +1893,7 @@ snippet ggbubble
 	    x = "${13:x_title}",
 	    title = "Title",
 	    subtitle = "Subtitle<br>",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggshadedbars
@@ -2039,7 +2039,7 @@ snippet ggshadedbars
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet ggarea
@@ -2148,7 +2148,7 @@ snippet ggarea
 		labs(
 		  title = "Title",
 		  subtitle = "Subtitle<br>",
-		  caption = "Source: Source | *Charting Waterloo Region*"
+		  caption = cwr_caption("Source")
 		)
 		
 snippet gglollipoprect
@@ -2245,7 +2245,7 @@ snippet gglollipoprect
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 	  
 snippet gghorbarrect
@@ -2348,7 +2348,7 @@ snippet gghorbarrect
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 
 snippet ggdumbbellrect
@@ -2489,7 +2489,7 @@ snippet ggdumbbellrect
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )
 
 snippet ggarrowrect
@@ -2602,5 +2602,5 @@ snippet ggarrowrect
 	  labs(
 	    title = "Title",
 	    subtitle = "Subtitle",
-	    caption = "Source: Source | *Charting Waterloo Region*"
+	    caption = cwr_caption("Source")
 	  )

@@ -40,7 +40,10 @@ For every `ggplot` chunk:
   Read the `-phone` one scaled to about 320 px: titles wrap, nothing collides with the axis.
 - One chart per chunk, no `print()` of tables in the same chunk.
 - Uses colours and theme from `R/theme_cwr.R` only (flag any literal colour string, `theme_bw`, `theme_classic`, `purple4`).
-- Title states the finding; subtitle has units and period; caption via `cwr_caption()` with the source.
+- Title states the finding; subtitle has units and period; caption via `cwr_caption()` naming the
+  publisher of the numbers. `credit = TRUE` (which adds "| *Charting Waterloo Region*") belongs only on a
+  chart whose figures the post worked out itself - a rate, an index, a model, several sources combined.
+  Flag it on a chart that just plots published figures.
 - Direct labels where feasible; legend only if justified; redundant axis text removed when bars are labelled.
 - Focus row/series is bold or blue; comparison red; rest grey.
 - `linewidth` not `size` for lines; `|>` not `%>%`; no `sapply`/`gsub`/`grepl` (stringr/purrr instead).
