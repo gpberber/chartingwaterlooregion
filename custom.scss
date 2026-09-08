@@ -41,6 +41,16 @@ $code-color: #333333;
 .navbar .navbar-brand img { max-height: 32px; }
 .navbar .nav-link { font-weight: 500; }
 
+// The logo is a wordmark, and Bootstrap's .navbar-brand sets overflow: hidden -
+// so anything too wide for the bar loses its right-hand end rather than shrinking.
+// On a phone there is only about 195 px between the menu button and the search
+// icon, which is not enough for "Charting Waterloo Region" at 32 px tall, and the
+// last word was being cut in half. Capping the width lets the whole wordmark
+// scale down to fit instead; height: auto keeps it from being squashed.
+@media (max-width: 991.98px) {
+  .navbar .navbar-brand img { max-width: 100%; height: auto; }
+}
+
 .quarto-title-banner {
   background-color: $cwr-blue;
   .title { font-weight: 700; letter-spacing: -0.01em; }

@@ -1,0 +1,74 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Logo preview</title>
+<!--
+  Shows the generated marks at the sizes they are actually used, next to the
+  bar-glyph versions they replaced. Open it after running _dev/logo/make_logo.R.
+  Quarto ignores _dev/, so this never reaches the site.
+-->
+<style>
+  body { font: 13px "Segoe UI", system-ui, sans-serif; margin: 0; background: #fff; color: #222; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #869397;
+       margin: 20px 16px 6px; font-weight: 600; }
+  .navbar { background: #104E8B; padding: 10px 16px; display: flex; align-items: center; gap: 24px; }
+  .navbar img, .navbar svg { height: 36px; width: auto; }
+  .navbar a { color: #fff; text-decoration: none; font-size: 15px; }
+  .row { display: flex; align-items: flex-end; gap: 26px; padding: 8px 16px 4px; }
+  .row div { text-align: center; color: #869397; font-size: 11px; }
+  .tabstrip { background: #dee1e6; padding: 8px 16px; display: flex; gap: 6px; align-items: center; }
+  .tab { background: #fff; border-radius: 8px 8px 0 0; padding: 8px 14px; display: flex;
+         gap: 8px; align-items: center; font-size: 12px; color: #333; }
+  .tab img, .tab svg { width: 16px; height: 16px; }
+</style>
+
+<h2>Navbar &mdash; new</h2>
+<div class="navbar">
+  <img src="../../images/logo.svg" alt="">
+  <a>Posts</a><a>About</a><a>Reproduce a post</a>
+</div>
+
+<h2>Navbar &mdash; the bar glyph it replaced</h2>
+<div class="navbar">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 64">
+    <rect x="4" y="36" width="10" height="20" rx="2" fill="#C2C9CB"/>
+    <rect x="19" y="22" width="10" height="34" rx="2" fill="#AF1E2D"/>
+    <rect x="34" y="8" width="10" height="48" rx="2" fill="#FFFFFF"/>
+    <text x="58" y="42" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF" letter-spacing="-0.3">Charting Waterloo Region</text>
+  </svg>
+  <a>Posts</a><a>About</a><a>Reproduce a post</a>
+</div>
+
+<h2>Favicon in a tab strip (16 px) &mdash; new, then previous</h2>
+<div class="tabstrip">
+  <div class="tab"><img src="../../images/favicon.svg" alt="">Charting Waterloo Region</div>
+  <div class="tab">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="12" fill="#104E8B"/>
+      <rect x="12" y="34" width="10" height="18" rx="2" fill="#C2C9CB"/>
+      <rect x="27" y="22" width="10" height="30" rx="2" fill="#AF1E2D"/>
+      <rect x="42" y="12" width="10" height="40" rx="2" fill="#FFFFFF"/>
+    </svg>
+    Charting Waterloo Region
+  </div>
+</div>
+
+<h2>Favicon at 16 / 24 / 32 / 48 / 64 px</h2>
+<div class="row">
+  <div><img src="../../images/favicon.svg" width="16"><br>16</div>
+  <div><img src="../../images/favicon.svg" width="24"><br>24</div>
+  <div><img src="../../images/favicon.svg" width="32"><br>32</div>
+  <div><img src="../../images/favicon.svg" width="48"><br>48</div>
+  <div><img src="../../images/favicon.svg" width="64"><br>64</div>
+</div>
+
+<h2>Full-colour mark (logo-mark.svg) at 64 / 128 / 200 px</h2>
+<div class="row">
+  <div><img src="../../images/logo-mark.svg" width="64"><br>64</div>
+  <div><img src="../../images/logo-mark.svg" width="128"><br>128</div>
+  <div><img src="../../images/logo-mark.svg" width="200"><br>200</div>
+</div>
+
+<h2>Social card (social-card.png) &mdash; shown at 600px, as a link preview would</h2>
+<div style="padding: 8px 16px 30px">
+  <img src="../../images/social-card.png" width="600" style="border: 1px solid #dee1e6">
+</div>
