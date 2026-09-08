@@ -53,7 +53,7 @@
     "href": "reproduce.html#notes",
     "title": "Reproduce a post",
     "section": "Notes",
-    "text": "Notes\n\nNo keys required. All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.\nCached results. The repository includes Quarto’s _freeze cache, so you can render the whole site without re-running any R code: quarto render at the project root.\nHouse chart style. Colours and the ggplot2 theme live in R/theme_cwr.R. Source it in your own scripts to make charts that match.\nQuestions. Open an issue if something does not work."
+    "text": "Notes\n\nNo keys required. All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.\nCached results. The repository includes Quarto’s _freeze cache, so you can render the whole site without re-running any R code: quarto render at the project root.\nHouse chart style. Colours and the ggplot2 theme live in R/theme_cwr.R. Source it in your own scripts to make charts that match.\nQuestions. Email greg@chartingwaterlooregion.ca if something does not work."
   },
   {
     "objectID": "about.html",
@@ -102,7 +102,7 @@
     "href": "about.html#contact-and-corrections",
     "title": "About",
     "section": "Contact and corrections",
-    "text": "Contact and corrections\nSpotted an error or have a question about the data? Open an issue on GitHub."
+    "text": "Contact and corrections\nSpotted an error or have a question about the data? Email greg@chartingwaterlooregion.ca. Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post."
   },
   {
     "objectID": "index.html",
