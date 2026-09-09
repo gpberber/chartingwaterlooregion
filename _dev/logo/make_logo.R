@@ -311,9 +311,16 @@ logo_svg <- sprintf(
   wordmark_size
 )
 
-# The favicon: the same glyph on a rounded tile, so it has an edge of its own in a
-# tab strip. The tile is the navbar blue, which is what makes it read as this site
-# rather than as a generic map pin.
+# The favicon: the mark on a rounded tile, so it has an edge of its own in a tab
+# strip. The tile is the navbar blue, which is what makes it read as this site
+# rather than as a generic map pin, and it is what keeps the mark visible on a dark
+# tab strip as well as a light one - on its own the pale end of the ramp disappears
+# into either.
+#
+# No white borders between the municipalities here, unlike logo-mark.svg. A browser
+# draws this at 16px, where a border is less than a pixel wide: it cannot be seen,
+# but it still eats into the shapes and leaves the mark looking chewed. Compared at
+# 16, 32 and 48 before settling this.
 favicon_svg <- sprintf(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <!-- Charting Waterloo Region favicon. Built by _dev/logo/make_logo.R. -->
@@ -322,7 +329,11 @@ favicon_svg <- sprintf(
 </svg>
 ',
   cwr_blue,
-  glyph(size = 64, pad = 5)
+  build_paths(
+    municipalities,
+    population_fills(municipalities, low = pale_red, high = cwr_red),
+    key = "municipality", size = 64, pad = 5
+  )
 )
 
 # The full-colour mark: the population ramp as designed, on a transparent ground,
@@ -421,9 +432,13 @@ invisible(dev.off())
 # Drawn here with grid rather than converted from favicon.svg, so the raster and
 # the vector cannot drift apart - they come from the same shapes on the same run.
 
+# The same mark as favicon.svg, in pixels.
+#
 # `rounded` cuts the tile's corners for the browser tab; iOS masks its own corners
 # and turns transparency black, so the home-screen icon is a full opaque square.
-render_glyph_png <- function(path, px, rounded = TRUE) {
+# `borders` is the white hairline between municipalities: worth having at 180px,
+# where it can be seen, and not at 48 and below, where it cannot.
+render_mark_png <- function(path, px, rounded = TRUE, borders = FALSE) {
   ragg::agg_png(
     path, width = px, height = px, units = "px", res = 72,
     background = if (rounded) "transparent" else cwr_blue
@@ -435,22 +450,22 @@ render_glyph_png <- function(path, px, rounded = TRUE) {
     grid.roundrect(r = unit(12 / 64, "snpc"), gp = gpar(fill = cwr_blue, col = NA))
   }
 
-  # The glyph in a space that counts pixels down from the top, as the SVG does.
+  # The mark in a space that counts pixels down from the top, as the SVG does.
   pushViewport(viewport(xscale = c(0, px), yscale = c(px, 0)))
-  tr <- fit_box(region, px, px, pad = px * 5 / 64)
-  draw <- function(shape, fill) {
-    walk(seq_len(nrow(shape)), \(i) {
-      rings <- place_rings(st_geometry(shape)[[i]], tr)
-      xy <- do.call(rbind, rings)
-      grid.path(
-        x = unit(xy[, 1], "native"), y = unit(xy[, 2], "native"),
-        id = rep(seq_along(rings), map_int(rings, nrow)),
-        rule = "evenodd", gp = gpar(fill = fill, col = NA)
+  fills <- population_fills(municipalities, low = pale_red, high = cwr_red)
+  tr <- fit_box(municipalities, px, px, pad = px * 5 / 64)
+  walk(seq_len(nrow(municipalities)), \(i) {
+    rings <- place_rings(st_geometry(municipalities)[[i]], tr)
+    xy <- do.call(rbind, rings)
+    grid.path(
+      x = unit(xy[, 1], "native"), y = unit(xy[, 2], "native"),
+      id = rep(seq_along(rings), map_int(rings, nrow)), rule = "evenodd",
+      gp = gpar(
+        fill = fills[[municipalities$municipality[i]]],
+        col = if (borders) "#FFFFFF" else NA, lwd = px / 64, linejoin = "round"
       )
-    })
-  }
-  draw(region, "#FFFFFF")   # same frame for both layers, so the core cannot drift
-  draw(core, cwr_red)
+    )
+  })
   invisible(dev.off())
 }
 
@@ -478,14 +493,14 @@ write_ico <- function(pngs, sizes, out) {
 ico_sizes <- c(16, 32, 48)
 ico_files <- map_chr(ico_sizes, \(px) {
   f <- tempfile(fileext = ".png")
-  render_glyph_png(f, px)
+  render_mark_png(f, px)
   f
 })
 write_ico(ico_files, ico_sizes, here("favicon.ico"))
 unlink(ico_files)
 
 # 180px is what current iPhones and iPads ask for; smaller devices scale it down.
-render_glyph_png(here("images", "apple-touch-icon.png"), 180, rounded = FALSE)
+render_mark_png(here("images", "apple-touch-icon.png"), 180, rounded = FALSE, borders = TRUE)
 
 walk(c("logo.svg", "favicon.svg", "logo-mark.svg", "social-card.png",
        "apple-touch-icon.png"), \(f) {
