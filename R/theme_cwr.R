@@ -284,7 +284,7 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
                        width = 8.3, height = 5,
                        phone_width = 4.2, phone_height = height * 0.9,
                        phone = list(), phone_text_scale = 0.8,
-                       dpi = 288) {
+                       dpi = 288, draft_phone = FALSE) {
   stopifnot(str_starts(id, "fig-"))
 
   # Snapshots go unnumbered, deep dives numbered. rmarkdown::metadata is the
@@ -296,11 +296,20 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
     number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
   }
 
-  # Write next to the post: knitr runs with the post folder as the working
-  # directory, and the relative path "figures/..." then works in the HTML too.
-  dir.create("figures", showWarnings = FALSE)
-  desktop_file <- file.path("figures", paste0(id, ".png"))
-  phone_file   <- file.path("figures", paste0(id, "-phone.png"))
+  # Is this a render, or is somebody running the chunk in RStudio to see how the
+  # chart looks? knitr sets this option while it is knitting and not otherwise.
+  drafting <- !isTRUE(getOption("knitr.in.progress"))
+
+  # During a render, write next to the post: knitr runs with the post folder as
+  # the working directory, and the relative path "figures/..." then works in the
+  # HTML too. Drafting, the working directory is the project root instead, where
+  # a figures/ folder does not belong and the committed PNGs must not be touched
+  # by a half-finished chart - so a draft goes to a temporary folder that the
+  # session throws away.
+  out_dir <- if (drafting) file.path(tempdir(), "cwr-figures") else "figures"
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  desktop_file <- file.path(out_dir, paste0(id, ".png"))
+  phone_file   <- file.path(out_dir, paste0(id, "-phone.png"))
 
   # Phone version: same plot, but titles wrap instead of running off the edge.
   # element_textbox_simple() (ggtext) is element_markdown() with word wrap.
@@ -347,6 +356,32 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 
   ggsave(phone_file, phone_plot, width = phone_width, height = phone_height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
+
+  # Drafting, there is no document for the HTML below to go into, so cat()ing it
+  # would print tags to the console and show no chart at all. Draw the PNG into
+  # the graphics device instead and it appears in RStudio's Plots pane.
+  #
+  # The finished PNG rather than the plot object on purpose: printing `plot`
+  # would redraw it at whatever shape the pane happens to be, and this house
+  # style pins label positions to a fixed size, so the pane would show a chart
+  # with the labels in the wrong places. grid.raster draws what ragg actually
+  # produced, at the real proportions. Use the Plots pane's zoom button to see it
+  # full size; `phone = TRUE` shows the narrow version instead.
+  if (drafting) {
+    file <- if (isTRUE(draft_phone)) phone_file else desktop_file
+    if (requireNamespace("png", quietly = TRUE)) {
+      grid.newpage()
+      grid.raster(png::readPNG(file))
+    } else {
+      message('Install the "png" package to see the chart here: install.packages("png")')
+    }
+    message("Drafting, so nothing was written to the post.",
+            "
+  desktop: ", desktop_file,
+            "
+  phone:   ", phone_file)
+    return(invisible(list(desktop = desktop_file, phone = phone_file, numbered = number)))
+  }
 
   # The width attributes are the CSS-pixel sizes (inches x 96) so the browser
   # shows each image at its drawn size and only shrinks it if the column is

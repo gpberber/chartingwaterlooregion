@@ -271,7 +271,7 @@ p <- ggplot(plot_data, aes(x = month, y = calls_per_day, fill = busy)) +
 
 cwr_figure(
   p, "fig-season",
-  alt = "Bar chart of average weekday calls by month of the year. Calls climb from under 267 a day in December and January to a peak near 400 in June, then fall through the autumn. June and July are highlighted.",
+  alt = "Bar chart of average weekday calls by month of the year. Calls climb from 267 a day in December to a peak near 400 in June, then fall through the autumn. June and July are highlighted.",
   height = 4, phone_height = 4
 )
 ```
@@ -289,7 +289,7 @@ All figures are weekdays excluding Ontario statutory holidays. Weekend and holid
 
 Code and data for this post: [`posts/kitchener-phone-wait-times/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-wait-times) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
 
-**Download the data:** [`r cwr_bundle_name("kitchener-phone-wait-times", data_bundle_version)`](%60r%20cwr_bundle_url(%22kitchener-phone-wait-times%22,%20data_bundle_version)%60) holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
+**Download the data:** `r cwr_bundle_link("kitchener-phone-wait-times", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
 
 ```{r}
 #| label: tbl-dictionary

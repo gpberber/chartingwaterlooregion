@@ -171,6 +171,20 @@ cwr_bundle_url <- function(slug, version) {
   )
 }
 
+# The whole markdown link, name and URL together.
+#
+# A post used to write the link by hand as [`r cwr_bundle_name(...)`](`r cwr_bundle_url(...)`).
+# That works, but it puts R code in a link *target*, and RStudio's visual editor
+# rewrites the document through pandoc every time it saves: a target that is not a
+# valid URL comes back percent-encoded, so the code turns into the literal text
+# %60r%20cwr_bundle_url(...)%60 and the download link goes nowhere. It happened
+# once, silently, and rendered without an error because a broken link is still a
+# link. Returning the finished markdown from R keeps the code in an inline span,
+# which the visual editor leaves alone.
+cwr_bundle_link <- function(slug, version) {
+  paste0("[", cwr_bundle_name(slug, version), "](", cwr_bundle_url(slug, version), ")")
+}
+
 # ---- Build (and upload) the bundle -----------------------------------------
 # excel: also write one .xlsx workbook (a sheet per table plus the dictionary)
 #        when every table fits Excel's row limit.
