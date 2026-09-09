@@ -1,10 +1,14 @@
 ---
 title: "About"
-# No `image:` here on purpose. It set the mark beside the heading, but Quarto also
-# uses it as the page's preview picture, so a link to this page arrived in a chat
-# app as a bare SVG that nothing could render. Without it the page falls back to
-# the site card in _quarto.yml, the same as every other page. `marquee` stays -
-# solana and trestle both narrow the prose below a post's width.
+# `image:` is the page's preview picture in a chat app, and it has to be named
+# here: left out, Quarto picks up the first picture in the body, which is now the
+# mark in the hero block below - and a link to this page then arrives as a bare
+# SVG that nothing can render. Naming the site card gives this page the same
+# preview as every other one. The about template also draws `image:` above the
+# heading; custom.scss hides that copy, because the hero says the same thing in
+# live text that reflows. `marquee` stays - solana and trestle both narrow the
+# prose below a post's width.
+image: images/social-card.png
 about:
   template: marquee
   links:
@@ -19,6 +23,26 @@ about:
       href: "mailto:greg@chartingwaterlooregion.ca"
 toc: false
 ---
+
+```{=html}
+<!-- The site card, as live text rather than the picture of it.
+     images/social-card.png says the same thing, but its type is drawn at a fixed
+     1200px wide: on a phone the strapline would land at about seven pixels tall.
+     Set as HTML it reflows, and the wording only has to be kept in step with
+     _quarto.yml's `description` and the card_text() calls in _dev/logo/make_logo.R.
+     custom.scss hides Quarto's own title block here and styles the <h1> below, so
+     that the card sits above the heading instead of underneath it. -->
+<div class="cwr-hero">
+  <div class="cwr-hero-text">
+    <p class="cwr-hero-name">Charting<br>Waterloo Region</p>
+    <p class="cwr-hero-tagline">Charts and analysis about life in Waterloo Region, built from open data.</p>
+  </div>
+  <img class="cwr-hero-mark" src="images/logo-mark.svg" width="256" height="256"
+       alt="The seven municipalities of Waterloo Region, shaded by population.">
+</div>
+
+<h1 class="title">About</h1>
+```
 
 ## What this is
 

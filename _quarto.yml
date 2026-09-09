@@ -26,7 +26,7 @@ execute:
 
 website:
   title: "Charting Waterloo Region"
-  description: "Charts and plain-language analysis about life in Waterloo Region, built from open data."
+  description: "Charts and analysis about life in Waterloo Region, built from open data."
   site-url: https://chartingwaterlooregion.ca
   repo-url: https://github.com/gpberber/chartingwaterlooregion
   repo-branch: master             # Quarto assumes "main" unless told otherwise

@@ -1,6 +1,6 @@
 ---
 title: "Charting Waterloo Region"
-subtitle: "Charts and plain-language analysis about life in Waterloo Region, built from open data."
+subtitle: "Charts and analysis about life in Waterloo Region, built from open data."
 # The preview picture shown when someone pastes a link to the site into a chat app
 # or posts it. Without this, Quarto hands a listing page the image of whichever
 # post happens to be at the top, so a link to the home page previewed as the newest

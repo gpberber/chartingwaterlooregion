@@ -408,3 +408,77 @@ figure figcaption, .figure-caption, .quarto-float-caption {
 .callout.callout-style-default > .callout-header { font-weight: 600; }
 
 blockquote { border-left: 3px solid $cwr-grey-50; color: #444; }
+
+// ---------------------------------------------------------------------------
+// About page hero
+// ---------------------------------------------------------------------------
+// The About page opens with the same lock-up as the sharing card: the name in
+// two lines, the strapline under it, the mark to the right. about.qmd writes it
+// as live text, so it reflows; the card PNG cannot, because its type is drawn at
+// a fixed size.
+//
+// Quarto's about templates put the page title in a header of their own, above
+// the body, which would leave the hero stranded below the "About" heading rather
+// than above it. There is no slot in the template for content ahead of that
+// header, so the header is hidden and about.qmd writes its own <h1 class="title">
+// after the hero. `.quarto-about-marquee` scopes this to pages using an about
+// template, which is only ever about.qmd - ordinary pages and posts keep theirs.
+.quarto-about-marquee > .about-contents > #title-block-header { display: none; }
+
+// The about template also draws the page's `image:` above the heading. That key
+// has to be set - it is what a chat app shows when the page is linked - but the
+// picture it names is the sharing card, which the hero already says in live text.
+// Showing both would print the same three lines twice.
+.quarto-about-marquee > .about-image-container { display: none; }
+
+.cwr-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  margin-bottom: 2rem;
+
+  // Everything scales with the viewport between a phone and the 800px column, so
+  // there is one layout rather than a set of breakpoints to keep in step.
+  .cwr-hero-name {
+    color: $cwr-blue;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.75rem, 6.5vw, 2.9rem);
+    line-height: 1.08;
+    margin: 0 0 0.4rem 0;
+  }
+  .cwr-hero-tagline {
+    color: #4a5457;                // the strapline grey used on the card
+    font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+    line-height: 1.35;
+    margin: 0;
+    max-width: 26em;
+  }
+  .cwr-hero-mark {
+    flex: 0 0 auto;
+    width: clamp(110px, 22vw, 180px);
+    height: auto;
+  }
+}
+
+// Below the small breakpoint the two columns are too narrow to sit side by side,
+// so the mark goes above the name and the block centres.
+@media (max-width: 575.98px) {
+  .cwr-hero {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    .cwr-hero-tagline { max-width: none; }
+  }
+}
+
+// The hand-written heading, matching the one Quarto would have drawn.
+.quarto-about-marquee h1.title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-top: 1px solid $cwr-grey-50;
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

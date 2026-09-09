@@ -417,7 +417,7 @@ card_text <- function(label, x, y, size, colour, face = "plain") {
 
 card_text("Charting", 80, 250, 62, cwr_blue, "bold")
 card_text("Waterloo Region", 80, 318, 62, cwr_blue, "bold")
-card_text("Charts and plain-language analysis about life in", 80, 383, 24, "#4a5457")
+card_text("Charts and analysis about life in", 80, 383, 24, "#4a5457")
 card_text("Waterloo Region, built from open data.", 80, 416, 24, "#4a5457")
 
 invisible(dev.off())
