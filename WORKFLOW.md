@@ -198,6 +198,10 @@ Claude stages everything, runs the safety check, commits with a clear message, a
 
 The safety check (`_dev/check_repo_safety.sh`, also installed as a git pre-commit hook) blocks any commit that includes a file over 25 MB, a `.Renviron` or `.env` file, text that looks like an API key, or a background-reading folder. If it blocks, read its message: the fix is usually `/share-data` for a big file or `git rm --cached` for a file that should be ignored. Never work around it.
 
+**Before you close a session, say "update memories".** `/save` commits the files; it does not carry forward anything Claude worked out along the way. Claude keeps notes about this project between sessions, and a new session starts by reading their titles - so if something came up that a future post should know, that is the moment to have it written down. Worth doing for a decision and the reason behind it ("the tags are white because grey was unreadable on the banner"), a dead end so it is not tried twice, or a trap that cost an hour to find. Not worth doing for anything the repository already records: the code, this guide, or what a commit message says.
+
+A new session in this folder picks those notes up on its own - there is nothing to load and no command to run. Two things to know about them, though. They live under your user account rather than in the repository, so they do not travel to another computer and are not on GitHub; and they are filed under this folder's **path**, so a session opened on a copy of the repo somewhere else starts with none of them. If Claude ever seems to know nothing about the blog, check which folder the session opened in.
+
 ## 5. Shared datasets (data used by several posts)
 
 When a source will feed more than one post, it goes in `datasets/<slug>/` rather than inside a post. Rule: a dataset is **tidy, complete, and general** (every year, every region, no story-specific filtering); a post **filters and summarises** for its own argument. When two posts need the same derived table, that table moves into the dataset.
