@@ -14,6 +14,7 @@ Charts and plain-language analysis about life in Waterloo Region, built from ope
 | `R/data_helpers.R` | Download and upload large data files via GitHub Releases |
 | `R/packages.R` | Every R package used on the site, with an installer |
 | `_freeze/` | Cached render results, so the site builds without re-running the analysis |
+| `fonts/` | The Inter typeface, served by the site itself rather than from a font CDN |
 
 ## Reproduce a post
 
@@ -36,3 +37,4 @@ attached to this repo. No API keys are needed.
 - **Code** (R scripts, Quarto config, styling, templates): [MIT](LICENSE).
 - **Text, charts, and images**: [CC BY 4.0](LICENSE-CONTENT.md). Reuse freely with credit to Charting Waterloo Region.
 - **Data files** keep the licence of their original source, listed in each post's README.
+- **The Inter typeface** in `fonts/` is redistributed under the [SIL Open Font Licence 1.1](fonts/Inter-LICENSE.txt), which is why that licence file sits beside it. The site serves these files itself rather than calling a font CDN, so no reader's browser has to talk to a third party to read a page.

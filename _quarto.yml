@@ -14,6 +14,7 @@ project:
     - "!datasets/"      # shared data pipelines and exploration notebooks
   resources:
     - images/           # favicon, logo, placeholder thumbnail, social card
+    - fonts/            # self-hosted Inter; custom.scss points at these by path
     - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
                         # <source srcset>, which Quarto does not scan for resources
     - CNAME             # tells GitHub Pages the custom domain; must be republished every

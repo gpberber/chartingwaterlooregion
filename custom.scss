@@ -4,8 +4,15 @@
 // Base theme: litera. Colours mirror R/theme_cwr.R so charts and pages match.
 // ---------------------------------------------------------------------------
 
-// Typography: Inter for the site (charts use Inter too when it is installed locally)
-$web-font-path: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
+// Typography: Inter for the site, served from fonts/ (see the @font-face rules
+// below). $web-font-path is deliberately absent: setting it here produced no
+// @import and no <link> in the rendered pages, so for a year the site asked for
+// Inter and never delivered it. Greg has Inter installed on his machine and so
+// saw the design as intended; every other reader fell through to -apple-system or
+// Segoe UI, which is why the navbar lined up on his desktop and not on his iPad.
+// If you ever want the font from a CDN instead, it has to be a real <link>, and
+// it would put a third-party request on every page view - see the Privacy section
+// of about.qmd before doing that.
 $font-family-sans-serif: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 // litera sets paragraphs in $font-family-serif (Georgia); we want one face everywhere
 $font-family-serif: $font-family-sans-serif;
@@ -36,10 +43,71 @@ $code-color: #333333;
 
 /*-- scss:rules --*/
 // ---------------------------------------------------------------------------
+// Inter, self-hosted
+// ---------------------------------------------------------------------------
+// One variable file per subset covers every weight the site uses, which is why
+// font-weight is a range rather than a number - the browser interpolates 500 and
+// 600 from it rather than downloading four files.
+//
+// The paths are root-relative because the site is served from the root of its own
+// domain (see the CNAME). They cannot be relative: this file is compiled into
+// _site/site_libs/bootstrap/, so a bare "fonts/..." would be looked for in there.
+//
+// latin-ext is listed but costs nothing on a normal page: unicode-range tells the
+// browser to fetch it only if the text actually contains a character in that block.
+// Almost nothing here does - French accents all live in the latin range - so it is
+// insurance for the odd name in a dataset rather than weight on every visit.
+//
+// Inter is under the SIL Open Font Licence; fonts/Inter-LICENSE.txt travels with it,
+// as that licence requires. Files came from Google Fonts' subsetted build of v20.
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+// ---------------------------------------------------------------------------
 // Navbar and title banner
 // ---------------------------------------------------------------------------
 .navbar .navbar-brand img { max-height: 32px; }
 .navbar .nav-link { font-weight: 500; }
+
+// Sit the wordmark's baseline on the same line as "Posts" beside it.
+//
+// The logo is centred in the bar, and inside the logo the name is centred on the
+// glyph (make_logo.R does that, and it is the right place for it - it is a fact
+// about the artwork). What is left over is a placement question, and it belongs
+// here, because the number depends on where the navbar's font puts a baseline
+// inside a 25px line box - a CSS fact, not a drawing one.
+//
+// It is also only worth doing now that the site serves Inter itself. Before that
+// the number moved with whatever font the reader happened to have: Greg's locally
+// installed Inter put the links' baseline at 40.4px and the webfont puts it at
+// 39.4px, and an iPad falling through to -apple-system was somewhere else again.
+// A fixed nudge against a font that varies would have been a fix for one machine.
+//
+// Only where there are links to line up with. Below the breakpoint the navbar
+// collapses and the logo sits alone between the menu button and the search icon,
+// where centred is what looks right.
+@media (min-width: 992px) {
+  .navbar .navbar-brand img { position: relative; top: -1.2px; }
+}
 
 // The logo is a wordmark, and Bootstrap's .navbar-brand sets overflow: hidden -
 // so anything too wide for the bar loses its right-hand end rather than shrinking.

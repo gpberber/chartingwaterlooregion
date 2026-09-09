@@ -1,3 +1,8 @@
 # GitHub Pages reads CNAME as a plain one-line file. Keep it Unix line endings so a
 # Windows checkout never rewrites it with a carriage return.
 CNAME text eol=lf
+
+# Font files are binary. Git's auto-detection already gets this right, but a woff2
+# that ever went through line-ending conversion would be silently corrupt and the
+# site would fall back to a system font without an error anywhere - so say it.
+*.woff2 binary
