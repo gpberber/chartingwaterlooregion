@@ -86,6 +86,10 @@ format:
     # Page-view counting (GoatCounter). No cookies, so no consent banner is needed.
     include-in-header:
       - _includes/analytics.html
+    # "Share" button in each post's header (copy link, email). Site-wide, but the
+    # script only acts on pages that have a category row, which means posts only.
+    include-after-body:
+      - _includes/share.html
     df-print: paged
     code-copy: true
     knitr:

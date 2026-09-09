@@ -80,6 +80,101 @@ $code-color: #333333;
 }
 
 // ---------------------------------------------------------------------------
+// Share button (post header)
+// ---------------------------------------------------------------------------
+// _includes/share.html drops this into the banner's category row. margin-left:
+// auto is what right-justifies it: the row is already a flex container, so the
+// automatic margin soaks up all the space left over after the tags.
+//
+// The button copies the tags' shape exactly - same padding, size, radius and
+// uppercase - so it sits on their line rhythm rather than looking bolted on. It
+// is drawn in white where they are muted grey, because it is the one thing in
+// the header a reader can actually press.
+.cwr-share {
+  position: relative;              // the menu and bubble are positioned against this
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.cwr-share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.75em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    color: #ffffff;
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+// The menu and the "Link copied" bubble hang from the same spot, one at a time.
+// Right-aligned to the button rather than left, so a card wider than the button
+// grows into the banner instead of off the edge of the page.
+.cwr-share-menu, .cwr-share-done {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;                     // above the banner and the page below it
+  background: #ffffff;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.cwr-share-done {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: $cwr-blue;
+}
+
+.cwr-share-menu {
+  min-width: 10.5rem;
+  padding: 0.3rem;
+
+  // Nested, not written flat: the banner sets `.quarto-title-banner a { color: #fff }`
+  // to keep links legible on the blue, and that beats a bare `.cwr-share-item` on
+  // specificity - which left "Email" as white text on the menu's white card.
+  .cwr-share-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.9rem;
+    color: $body-color;
+    text-align: left;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+
+    i { font-size: 1.05rem; color: $cwr-grey; }
+
+    &:hover, &:focus-visible {
+      color: $cwr-blue;
+      background: $cwr-grey-15;
+      i { color: $cwr-blue; }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // About page
 // ---------------------------------------------------------------------------
 // The marquee template stacks the image above everything, which left the mark
