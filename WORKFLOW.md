@@ -9,18 +9,8 @@ How the blog works and how to do everything from writing a post to publishing it
 - **GitHub is the backup and the source.** The repository at https://github.com/gpberber/chartingwaterlooregion holds everything except raw data and background reading. Commit and push often; that is the save button.
 - **GitHub Pages is the host.** `quarto publish gh-pages` copies `_site/` to the `gh-pages` branch, and GitHub serves it at https://chartingwaterlooregion.ca. Nothing runs on a server; rendering always happens on this machine.
 - **The domain is chartingwaterlooregion.ca.** The plain file `CNAME` in the project root holds that one line and is listed under `resources:` in `_quarto.yml`, so every render copies it into `_site/` and every publish puts it back on the `gh-pages` branch. That file is what tells GitHub which domain to answer to; publishing replaces the whole branch, so if the file ever went missing the site would fall back to the github.io address. Never delete it.
-- **Visitors are counted, not tracked.** `_includes/analytics.html` holds a one-line GoatCounter
-  script that `_quarto.yml` pastes into the head of every page. It records page views, where they
-  came from, rough country and browser counts, and one event per Like (see below). It sets no
-  cookies and stores nothing that identifies a person, which is why the site needs no consent
-  banner. Numbers are at <https://chartingwaterlooregion.goatcounter.com>; local previews are
-  ignored, so nothing you do while writing shows up.
-- **Two reader controls, both built by hand and neither loading anything from anyone else.**
-  `_includes/share.html` puts a Share button in the navbar and another in each post's tag row,
-  offering only Copy link and Email. `_includes/like.html` puts a Like button under a post's author
-  row and a second where the analysis ends. A Like sends one GoatCounter event and shows no count -
-  reading counts back would need an API key, and a static site has nowhere to keep one. Both are
-  added by `include-after-body:` rather than the head, because both work on the finished page.
+- **Visitors are counted, not tracked.** `_includes/analytics.html` holds a one-line GoatCounter script that `_quarto.yml` pastes into the head of every page. It records page views, where they came from, rough country and browser counts, and one event per Like (see below). It sets no cookies and stores nothing that identifies a person, which is why the site needs no consent banner. Numbers are at <https://chartingwaterlooregion.goatcounter.com>; local previews are ignored, so nothing you do while writing shows up.
+- **Two reader controls, both built by hand and neither loading anything from anyone else.** `_includes/share.html` puts a Share button in the navbar and another in each post's tag row, offering only Copy link and Email. `_includes/like.html` puts a Like button under a post's author row and a second where the analysis ends. A Like sends one GoatCounter event and shows no count - reading counts back would need an API key, and a static site has nowhere to keep one. Both are added by `include-after-body:` rather than the head, because both work on the finished page.
 - **Drafts never leak.** A post with `draft: true` is left out of the public site entirely. Preview drafts locally with the `draft` profile.
 
 ## 2. Folder map
@@ -37,7 +27,9 @@ chartingwaterlooregion/
   images/                logo, favicons, social card, listing placeholder - all generated (section 8)
   fonts/                 Inter, served by the site itself so readers do not depend on Google
   index.qmd              home page (the post listing)
-  about.qmd  reproduce.qmd  404.qmd
+  about.qmd
+  reproduce.qmd
+  404.qmd
   CLAUDE.md              conventions Claude follows in this project
   WORKFLOW.md            this guide
   LICENSE  LICENSE-CONTENT.md
@@ -138,13 +130,13 @@ What readers get, at publish time (3.7), is `<slug>-data-v<n>.zip` attached to t
 
 The template gives the structure: an opening paragraph with the question and the answer, sections with plain-language headings, one chart or table per section, a Data and methods section, and a collapsed Reproducibility box at the end.
 
-- **Charts.** Ask Claude for the chart you want ("a ranked lollipop of housing starts per 1,000 residents for the Big 12, Waterloo Region bolded"). The `cwr-charts` skill loads automatically: it picks a template from the snippet library, applies the house colours and theme, renders the chart to a PNG, looks at it, and tunes label positions before putting the code in the post. Every chart is built as `p` and handed to `cwr_figure(p, "fig-name", alt = , height = , phone_height = )`, which draws it twice, once at the paragraph width for desktops and once at half that for phones, saves both PNGs in the post's `figures/` folder (committed), and writes the figure so the browser shows the right one. Text stays the same size in both, so phone readers never need to tap to enlarge. The source line inside the chart comes from `cwr_caption("Source name")`, which names whoever published the numbers. It does not add your own name: a chart that plots a publisher's figures as published is their work. When the numbers on the chart were worked out here instead - a rate you calculated, an index you based, several sources combined - pass `credit = TRUE` and the line gains "| Charting Waterloo Region".
+- **Charts.** Ask Claude for the chart you want ("a ranked lollipop of housing starts per 1,000 residents for the Big 12, Waterloo Region bolded"). The `cwr-charts` skill loads automatically: it picks a template from the snippet library, applies the house colours and theme, renders the chart to a PNG, looks at it, and tunes label positions before putting the code in the post. Every chart is built as `p` and handed to `cwr_figure(p, "fig-name", alt = , height = , phone_height = )`, which draws it twice, once at the paragraph width for desktops and once at half that for phones, saves both PNGs in the post's `figures/` folder (committed), and writes the figure so the browser shows the right one. Text stays the same size in both, so phone readers never need to tap to enlarge. The source line inside the chart comes from `cwr_caption("Source name")`, which names whoever published the numbers. It does not add your own name: a chart that plots a publisher's figures as published is their work. When the numbers on the chart were worked out here instead - a rate you calculated, an index you based, several sources combined - pass `credit = TRUE` and the line gains "\| Charting Waterloo Region".
 - **Figure numbers depend on the kind of post, and you do not set them.** A Deep dive gets a plain "Figure 1" under each chart, so a paragraph near the end can point back at a chart near the start; write that reference as `@fig-name` in the text and Quarto fills in the number, which keeps it right when charts move. A Snapshot gets no number at all, because a few charts read in five minutes do not need them and the chart's own title says what it shows. `cwr_figure()` works this out from the first word in the post's `categories`. Captions under charts are optional and usually left off: the source is already printed inside the chart, and the subtitle carries the explanation.
 - **Seeing a chart while you write it.** Run the chunk in RStudio and the chart appears in the Plots pane. It is the finished PNG, not a redraw, so labels sit exactly where they will on the site - the house style pins them to a fixed size, and a redraw at the pane's shape would put them somewhere else. Use the pane's zoom button for full size, and pass `draft_phone = TRUE` to see the narrow version instead. Nothing is written to the post while drafting: the PNGs go to a temporary folder and the post's committed `figures/` are only touched by a real render.
 - **Tables.** `gt` only, one per chunk, with `tab_source_note()`.
 - **Numbers in the prose** should come from the data, not be typed by hand where a chunk can compute them; the review step checks they match.
 - **Thumbnail.** Save the best chart as `images/thumbnail.png` (4:3 works best for the listing).
-- **Setup chunk.** The template already has `here::i_am(...)` and `source(here::here("R", "theme_cwr.R"))`. Add post-specific `library()` calls under it.
+- **Setup chunk.** The template already has `here::i_am(...)`, `source(here::here("R", "theme_cwr.R"))` and `source(here::here("R", "data_bundle.R"))`. Those two lines attach the house stack, so a post never repeats it: **tidyverse** (dplyr, ggplot2, tidyr, readr, purrr, stringr, forcats, lubridate), **scales**, **ggtext**, **patchwork**, **grid**, **gt**, **gtExtras**, **here**, **janitor**, **conflicted** and **arrow**. Sourcing `theme_cwr.R` also sets the conflict preferences, the house colours, `theme_cwr()` as the default theme, and the `cwr_figure()` and `cwr_caption()` helpers. `prismatic` and `systemfonts` are installed but not attached, because that file reaches them with `::`; call them the same way if a post needs them. Anything else - `sf` and `leaflet` for maps, `cansim` for Statistics Canada tables, `readxl`, `pdftools`, modelling packages like `changepoint` or `broom` - gets its own `library()` call in the setup chunk **and** a line in `R/packages.R` (section 3.2, step 5). To check the free list rather than trust memory: `grep -n "^library(" R/theme_cwr.R R/data_bundle.R`. The post's `R/01_get_data.R` and `R/02_clean_data.R` get none of this: they run on their own under `Rscript` and carry their own `library()` calls at the top.
 
 ### 3.5 Preview
 
@@ -195,6 +187,10 @@ Edit `index.qmd`, run `/preview`, then `/publish` with no argument. Quarto adds 
 ```
 
 Claude stages everything, runs the safety check, commits with a clear message, and pushes. Do this at the end of every working session even when nothing is ready to publish; drafts are invisible on the public site but safe on GitHub. By hand: `git add -A`, `git commit -m "message"`, `git push origin master`.
+
+**How often: once per finished thought, not once per save.** A commit is a point worth coming back to, described in one line - "Add a like button to posts", "Correct the navbar's half-pixel in Firefox". Committing every save would fill the history with "wip" and cost you the one thing history is for, which is finding the moment something changed. So commit when a piece of work is done - a section written, a design change working, a script that runs clean - and again before you stop for the day. Until you do, the work exists only in this folder: OneDrive is syncing it, but OneDrive cannot tell you which version was the good one.
+
+**Commit before handing a file to Claude,** even if the work in it is not finished. Two reasons. The first is recovery: if an edit comes back wrong, `git checkout <file>` puts the file back to the last commit - but if your own uncommitted edits are sitting in that same file, the command throws those away too, and the cheap undo is gone. The second applies to every file you have opened in the visual editor, which reflows the whole document on save (section 12). Such a file already carries dozens of changed lines before Claude touches it, so a one-line change arrives buried in them and you cannot see at a glance what moved. Commit the reflow on its own first - "Reflow WORKFLOW.md after opening it in the visual editor" is a perfectly good message - and the next diff shows only the real change.
 
 The safety check (`_dev/check_repo_safety.sh`, also installed as a git pre-commit hook) blocks any commit that includes a file over 25 MB, a `.Renviron` or `.env` file, text that looks like an API key, or a background-reading folder. If it blocks, read its message: the fix is usually `/share-data` for a big file or `git rm --cached` for a file that should be ignored. Never work around it.
 
@@ -274,10 +270,15 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
 ## 8. Changing the look of the site
 
 - Colours and fonts: `custom.scss` (site) and `R/theme_cwr.R` (charts). The two palettes are the same three colours; change both or neither.
+
 - Navbar, footer, licence heading, what gets rendered: `_quarto.yml`.
+
 - About page: `about.qmd`. Reader instructions: `reproduce.qmd`.
+
 - Defaults for every post (author name, figure sizes, licence text): `posts/_metadata.yml`.
+
 - Share and Like buttons: `_includes/share.html` and `_includes/like.html`, styled in `custom.scss`. Both find their place on the finished page rather than in a Quarto template, so neither needs a change to any post.
+
 - **The logo, the favicons and the social card are generated. Never edit them by hand.** `images/logo-mark.svg`, `images/favicon.svg`, `images/apple-touch-icon.png`, `images/social-card.png`, `images/logo.svg` and `favicon.ico` all come out of one script. Change the script and run it again:
 
   ``` bash
@@ -285,7 +286,9 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
   ```
 
   Editing a file in `images/` looks like it worked and is silently undone the next time that script runs. `_dev/make_site_images.R` is separate and now builds only the listing placeholder thumbnail.
+
 - **The site name in the navbar is live text, not part of the logo,** and must stay that way. When it was drawn into the image its baseline was frozen where the drawing put it, while the links beside it took theirs from the browser - so it lined up on one machine and not the next. Do not put the name back into an image.
+
 - **The strapline is written out in five places** and they have to agree: `description` in `_quarto.yml`, `subtitle` in `index.qmd`, `README.md`, two `card_text()` calls in `make_logo.R`, and the hero block at the top of `about.qmd`. Change one, search for the rest, then re-run `make_logo.R` - the card is a picture, so it does not update itself.
 
 After any of these, `quarto render` then `/publish` with no argument.
@@ -310,7 +313,7 @@ A post is reproducible when someone can clone the repo, run `source("R/packages.
 ## 11. Manual command reference
 
 | Task | Command (from the project root) |
-|----|----|
+|------------------------------------|------------------------------------|
 | Render one post, drafts visible | `quarto render posts/<slug> --profile draft` |
 | Live preview with drafts | `quarto preview --profile draft` |
 | Full public render | `quarto render` |
@@ -328,30 +331,42 @@ A post is reproducible when someone can clone the repo, run `source("R/packages.
 ## 12. Troubleshooting
 
 - **Render fails with a missing file.** The post's `data/` is empty on this machine: run its `01_get_data.R` and `02_clean_data.R`, or the dataset's.
+
 - **An edit is committed and pushed but the live site has not changed.** Pushing is not publishing. `master` holds the source; the site is served from the `gh-pages` branch, which only moves when `quarto publish gh-pages` runs. Run `/publish` with no argument, or the manual command in section 11. (GitHub Pages then takes a minute or two, and its cache can serve the old page for a little longer - reload with a `?x=1` on the end of the address to be sure.)
+
 - **A chart looks stale after changing data.** Freeze cached the old result. Touch the post (any edit to `index.qmd`) and render again; or delete `_freeze/posts/<slug>/` to force a full re-run.
+
 - **A download or image link goes nowhere, and nothing reported an error.** RStudio's visual editor rewrites the whole document through pandoc every time it saves, and a link target that is not a valid web address comes back percent-encoded: `` `r cwr_bundle_url(...)` `` turns into literal `%60r%20cwr_bundle_url(...)%60`. Quarto does not complain, because a broken link is still a link. The cure is not to put R inside a link target - have R return the whole link, the way `cwr_bundle_link()` does. `/publish` now refuses to deploy if it finds `%60` in any `href` or `src`. (The visual editor also rewraps paragraphs on save, so a one-word edit can show as many changed lines. That is untidy, not broken.)
+
 - **Git says `fatal: index file corrupt`.** Nothing is lost. `.git/index` is a cache of what is staged, not the repository itself, and it rebuilds from the last commit; the files in the folder are untouched:
 
-    ``` bash
-    rm .git/index
-    git reset
-    ```
+  ``` bash
+  rm .git/index
+  git reset
+  ```
 
-    Then `git status` works again. Anything that was staged but not committed goes back to unstaged, with the edits still in the files.
+  Then `git status` works again. Anything that was staged but not committed goes back to unstaged, with the edits still in the files.
+
 - **Safety check blocks a commit.** Read the line; big file → `/share-data`; wrong folder staged → `git rm --cached <path>` and add it to `.gitignore`.
+
 - **Publish says the gh-pages branch is missing.** It exists; run `git fetch origin` and try again. First-time setup only: Settings → Pages on GitHub must point at the `gh-pages` branch.
+
 - **Push rejected because the remote has changes.** `git pull --rebase origin master`, then push again. Ask Claude if it reports a conflict.
+
 - **Charts render in the wrong font.** Install Inter from https://rsms.me/inter/ once; `theme_cwr()` picks it up automatically and falls back to the default sans font otherwise. This is about charts only - the *pages* get Inter from `fonts/`, which the site serves itself, so a reader sees the right typeface whether or not they have it installed.
+
 - **A folder will not delete.** OneDrive holds a lock briefly after files move out of it; try again later. Git does not track empty folders, so it does no harm.
+
 - **`quarto preview` port already in use.** Another preview is running; stop it, or add `--port 4201`.
+
 - **Token missing when uploading data.** Run the two `usethis` / `gitcreds` lines in section 6.
+
 - **Bundle build stops with "dictionary.csv is missing these columns".** A cleaning script added or renamed a column; add a row for it in `data/dictionary.csv` and run again.
 
 ## 13. Skills at a glance
 
 | Skill | Use it when |
-|----|----|
+|------------------------------------|------------------------------------|
 | `/new-post slug "Title"` | starting a post |
 | `/new-dataset slug "Title"` | a source will feed several posts |
 | `cwr-charts` (automatic) | writing or restyling any chart |
