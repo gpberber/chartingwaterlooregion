@@ -67,14 +67,14 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
+    "text": "ChartingWaterloo Region\n    Charts and analysis about life in Waterloo Region, built from open data."
   },
   {
     "objectID": "about.html#what-this-is",
     "href": "about.html#what-this-is",
     "title": "About",
-    "section": "",
-    "text": "Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
+    "section": "What this is",
+    "text": "What this is\nCharting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
   },
   {
     "objectID": "about.html#two-kinds-of-post",

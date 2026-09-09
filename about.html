@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ce42cbb53038e30c7a60a104d0b8d390.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9fafb6c5c3a9dd38aaacc3f7cf2104bb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -94,13 +94,13 @@ ul.task-list li input[type="checkbox"] {
 
 
 <meta property="og:title" content="About – Charting Waterloo Region">
-<meta property="og:description" content="Charts and plain-language analysis about life in Waterloo Region, built from open data.">
+<meta property="og:description" content="Charts and analysis about life in Waterloo Region, built from open data.">
 <meta property="og:image" content="https://chartingwaterlooregion.ca/images/social-card.png">
 <meta property="og:site_name" content="Charting Waterloo Region">
 <meta property="og:image:height" content="630">
 <meta property="og:image:width" content="1200">
 <meta name="twitter:title" content="About – Charting Waterloo Region">
-<meta name="twitter:description" content="Charts and plain-language analysis about life in Waterloo Region, built from open data.">
+<meta name="twitter:description" content="Charts and analysis about life in Waterloo Region, built from open data.">
 <meta name="twitter:image" content="https://chartingwaterlooregion.ca/images/social-card.png">
 <meta name="twitter:image-height" content="630">
 <meta name="twitter:image-width" content="1200">
@@ -172,6 +172,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <div class="quarto-about-marquee">
   <div class="about-image-container">
+    <img src="images/social-card.png" class="about-image " style="width: 100%;">
   </div>
   <div class="about-contents">
     <header id="title-block-header" class="quarto-title-block default">
@@ -181,6 +182,21 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
   </div>
 </header> <main class="content" id="quarto-document-content">
+<!-- The site card, as live text rather than the picture of it.
+     images/social-card.png says the same thing, but its type is drawn at a fixed
+     1200px wide: on a phone the strapline would land at about seven pixels tall.
+     Set as HTML it reflows, and the wording only has to be kept in step with
+     _quarto.yml's `description` and the card_text() calls in _dev/logo/make_logo.R.
+     custom.scss hides Quarto's own title block here and styles the <h1> below, so
+     that the card sits above the heading instead of underneath it. -->
+<div class="cwr-hero">
+  <div class="cwr-hero-text">
+    <p class="cwr-hero-name">Charting<br>Waterloo Region</p>
+    <p class="cwr-hero-tagline">Charts and analysis about life in Waterloo Region, built from open data.</p>
+  </div>
+  <img class="cwr-hero-mark" src="images/logo-mark.svg" width="256" height="256" alt="The seven municipalities of Waterloo Region, shaded by population.">
+</div>
+<h1 class="title">About</h1>
 <section id="what-this-is" class="level2">
 <h2 data-anchor-id="what-this-is">What this is</h2>
 <p>Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.</p>
