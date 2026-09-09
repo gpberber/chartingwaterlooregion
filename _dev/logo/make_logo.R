@@ -411,6 +411,84 @@ card_text("Waterloo Region, built from open data.", 80, 416, 24, "#4a5457")
 
 invisible(dev.off())
 
-walk(c("logo.svg", "favicon.svg", "logo-mark.svg", "social-card.png"), \(f) {
+# ---- 7. Raster icons -------------------------------------------------------
+# An SVG favicon is not enough on its own. Safari reads it, but Chrome on an iPad
+# ignored it, asked for /favicon.ico, got a 404 and drew a generic globe; Firefox
+# kept showing an icon cached from the previous logo. So the same glyph also goes
+# out as pixels: favicon.ico at the site root, which is the file every browser asks
+# for whether or not a page mentions it, and one PNG for iOS home screens.
+#
+# Drawn here with grid rather than converted from favicon.svg, so the raster and
+# the vector cannot drift apart - they come from the same shapes on the same run.
+
+# `rounded` cuts the tile's corners for the browser tab; iOS masks its own corners
+# and turns transparency black, so the home-screen icon is a full opaque square.
+render_glyph_png <- function(path, px, rounded = TRUE) {
+  ragg::agg_png(
+    path, width = px, height = px, units = "px", res = 72,
+    background = if (rounded) "transparent" else cwr_blue
+  )
+  grid.newpage()
+
+  # The tile in the default 0-1 space, so the corner radius scales with the icon.
+  if (rounded) {
+    grid.roundrect(r = unit(12 / 64, "snpc"), gp = gpar(fill = cwr_blue, col = NA))
+  }
+
+  # The glyph in a space that counts pixels down from the top, as the SVG does.
+  pushViewport(viewport(xscale = c(0, px), yscale = c(px, 0)))
+  tr <- fit_box(region, px, px, pad = px * 5 / 64)
+  draw <- function(shape, fill) {
+    walk(seq_len(nrow(shape)), \(i) {
+      rings <- place_rings(st_geometry(shape)[[i]], tr)
+      xy <- do.call(rbind, rings)
+      grid.path(
+        x = unit(xy[, 1], "native"), y = unit(xy[, 2], "native"),
+        id = rep(seq_along(rings), map_int(rings, nrow)),
+        rule = "evenodd", gp = gpar(fill = fill, col = NA)
+      )
+    })
+  }
+  draw(region, "#FFFFFF")   # same frame for both layers, so the core cannot drift
+  draw(core, cwr_red)
+  invisible(dev.off())
+}
+
+# An .ico is a thin container: a 6-byte header, one 16-byte directory entry per
+# image, then the images themselves. Every browser still in use accepts PNGs
+# inside it, so the entries just point at the PNGs rendered above.
+write_ico <- function(pngs, sizes, out) {
+  blobs <- map(pngs, \(f) readBin(f, "raw", file.size(f)))
+  con <- file(out, "wb")
+  on.exit(close(con))
+
+  writeBin(as.integer(c(0, 1, length(blobs))), con, size = 2, endian = "little")
+
+  offset <- 6L + 16L * length(blobs)
+  walk2(blobs, sizes, \(blob, size) {
+    writeBin(as.integer(c(size, size, 0, 0)), con, size = 1)          # w, h, palette, reserved
+    writeBin(as.integer(c(1, 32)), con, size = 2, endian = "little")  # colour planes, bits per pixel
+    writeBin(as.integer(c(length(blob), offset)), con, size = 4, endian = "little")
+    offset <<- offset + length(blob)
+  })
+
+  walk(blobs, \(blob) writeBin(blob, con))
+}
+
+ico_sizes <- c(16, 32, 48)
+ico_files <- map_chr(ico_sizes, \(px) {
+  f <- tempfile(fileext = ".png")
+  render_glyph_png(f, px)
+  f
+})
+write_ico(ico_files, ico_sizes, here("favicon.ico"))
+unlink(ico_files)
+
+# 180px is what current iPhones and iPads ask for; smaller devices scale it down.
+render_glyph_png(here("images", "apple-touch-icon.png"), 180, rounded = FALSE)
+
+walk(c("logo.svg", "favicon.svg", "logo-mark.svg", "social-card.png",
+       "apple-touch-icon.png"), \(f) {
   message(f, ": ", file.size(here("images", f)), " bytes")
 })
+message("favicon.ico: ", file.size(here("favicon.ico")), " bytes")

@@ -85,38 +85,59 @@ $code-color: #333333;
 // ---------------------------------------------------------------------------
 // Navbar and title banner
 // ---------------------------------------------------------------------------
-.navbar .navbar-brand img { max-height: 32px; }
 .navbar .nav-link { font-weight: 500; }
 
-// Sit the wordmark's baseline on the same line as "Posts" beside it.
+// Quarto renders the brand as two links side by side in a flex container - one
+// holding the mark, one holding the name.
 //
-// The logo is centred in the bar, and inside the logo the name is centred on the
-// glyph (make_logo.R does that, and it is the right place for it - it is a fact
-// about the artwork). What is left over is a placement question, and it belongs
-// here, because the number depends on where the navbar's font puts a baseline
-// inside a 25px line box - a CSS fact, not a drawing one.
-//
-// It is also only worth doing now that the site serves Inter itself. Before that
-// the number moved with whatever font the reader happened to have: Greg's locally
-// installed Inter put the links' baseline at 40.4px and the webfont puts it at
-// 39.4px, and an iPad falling through to -apple-system was somewhere else again.
-// A fixed nudge against a font that varies would have been a fix for one machine.
-//
-// Only where there are links to line up with. Below the breakpoint the navbar
-// collapses and the logo sits alone between the menu button and the search icon,
-// where centred is what looks right.
-@media (min-width: 992px) {
-  .navbar .navbar-brand img { position: relative; top: -1.2px; }
+// The name being live text is the point of the change. It used to be baked into
+// logo.svg, and a picture of text has its baseline frozen wherever the drawing put
+// it, while the links beside it get theirs from the browser out of the font's
+// metrics. Those two only ever matched by coincidence, and the coincidence did not
+// survive a change of browser, of platform, or of which copy of Inter was in use.
+.navbar .navbar-brand-logo {
+  // No padding, and this is load-bearing. With Bootstrap's padding the 32px mark
+  // was the tallest thing in the brand container and so set its height, which meant
+  // the name was centred against the mark while the links were centred against the
+  // bar - two different reference boxes, and baselines 2.2px apart. Without it the
+  // name's own line box is the tallest and it is centred like everything else.
+  // Checked by swapping the mark to 24px and to 40px: the name does not move.
+  padding: 0;
+  margin-right: 0.55rem;
+
+  img { max-height: 32px; }
 }
 
-// The logo is a wordmark, and Bootstrap's .navbar-brand sets overflow: hidden -
-// so anything too wide for the bar loses its right-hand end rather than shrinking.
-// On a phone there is only about 195 px between the menu button and the search
-// icon, which is not enough for "Charting Waterloo Region" at 32 px tall, and the
-// last word was being cut in half. Capping the width lets the whole wordmark
-// scale down to fit instead; height: auto keeps it from being squashed.
+.navbar .navbar-brand:not(.navbar-brand-logo) {
+  // Bigger than the links, because it is the site's name. 1.1rem is also, usefully,
+  // about where the two baselines cross: measured 0.05px apart, against 2.2px
+  // before. Not balanced on a knife edge either - anywhere from the links' own size
+  // up to 1.2rem the gap stays under a pixel, so nudging this later is safe.
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+// A phone leaves only about 195px between the menu button and the search icon, and
+// Bootstrap's .navbar-brand hides its overflow rather than wrapping, so a name too
+// wide for the bar would lose its last word rather than shrink. The mark is a
+// square and costs little width; the type is what gives.
 @media (max-width: 991.98px) {
-  .navbar .navbar-brand img { max-width: 100%; height: auto; }
+  .navbar .navbar-brand:not(.navbar-brand-logo) { font-size: 1rem; }
+  .navbar .navbar-brand-logo { margin-right: 0.4rem; }
+}
+
+// A 375px phone is the tight case, and it needs all three of these together or the
+// name ends up as "Charting Waterl...". Quarto caps the brand at
+// calc(100% - 115px) to keep it off the toggle and the search icon, which on a
+// phone leaves the name 148px when it wants 181px - so the cap comes down to 96px
+// and the right padding goes, which is space that was sitting empty anyway. Even
+// then the name has to be smaller. Measured at 375px: the name fits exactly, with
+// 11px of clear space back to the menu button and 14px on to the search icon.
+@media (max-width: 575.98px) {
+  .navbar .navbar-brand-container { padding-right: 0; max-width: calc(100% - 96px); }
+  .navbar .navbar-brand:not(.navbar-brand-logo) { font-size: 0.75rem; }
+  .navbar .navbar-brand-logo { margin-right: 0.35rem; }
 }
 
 .quarto-title-banner {
@@ -269,54 +290,6 @@ $code-color: #333333;
       background: $cwr-grey-15;
       i { color: $cwr-blue; }
     }
-  }
-}
-
-// ---------------------------------------------------------------------------
-// About page
-// ---------------------------------------------------------------------------
-// The marquee template stacks the image above everything, which left the mark
-// floating on its own over the "About" heading. Taking it out of the flow puts it
-// on the same line, just after the word.
-//
-// Out of the flow, rather than floated: a float would shorten every line beside
-// it, and the whole point of moving this page to marquee was to give the prose
-// the same width as a post. Absolute positioning sets the mark on the heading's
-// line and leaves the text alone.
-//
-// left: 7rem clears "About" at every size the heading is drawn at. The heading
-// scales with the viewport (the word is 84 px wide in an 800 px window, 96 px in
-// a 1400 px one) while this offset is fixed, so the gap after it ranges from about
-// 23 px to 46 px. Fixed is the right trade here: matching the heading exactly
-// would mean restating Bootstrap's responsive font-size calc in a `left`, which
-// would silently break the day Quarto changed it.
-//
-// The size is set in about.qmd (image-width: 2.7em, about 48 px). It is chosen so
-// that the mark reads as centred on the heading while sitting flush with the top
-// of the content: the heading starts at the very top of the column, so a larger
-// mark could only be centred by pushing it up under the navbar.
-.quarto-about-marquee {
-  position: relative;
-
-  .about-image-container {
-    position: absolute;
-    top: 0;
-    left: 7rem;
-    margin: 0;
-  }
-
-  // Centring the mark on the heading needs two values, because the heading is not
-  // in the same place in the two layouts. From 992px up, Quarto gives the title
-  // block extra headroom and the heading's centre falls 33px below the top of the
-  // column; below that breakpoint it falls about 16px below. The mark is pinned to
-  // the top of the column either way, so it needs the difference added back on the
-  // wide layout to line up.
-  //
-  // Only the wide layout gets a correction. Below 992px the mark already sits within
-  // 8-10px of the heading's centre, and closing that gap would need a negative
-  // offset that lifts it behind the navbar.
-  @media (min-width: 992px) {
-    .about-image-container { top: 0.52rem; }
   }
 }
 

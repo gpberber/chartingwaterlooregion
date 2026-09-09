@@ -1,10 +1,12 @@
 ---
 title: "About"
-image: images/logo-mark.svg
+# No `image:` here on purpose. It set the mark beside the heading, but Quarto also
+# uses it as the page's preview picture, so a link to this page arrived in a chat
+# app as a bare SVG that nothing could render. Without it the page falls back to
+# the site card in _quarto.yml, the same as every other page. `marquee` stays -
+# solana and trestle both narrow the prose below a post's width.
 about:
   template: marquee
-  image-shape: rectangle
-  image-width: 2.7em
   links:
     - icon: github
       text: GitHub

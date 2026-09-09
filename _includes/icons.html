@@ -1,0 +1,9 @@
+<!-- Icons Quarto's `favicon:` setting does not emit on its own.
+     `favicon:` gives the SVG, which Safari uses and which stays crisp at any size.
+     These two cover the rest: /favicon.ico is what a browser asks for on its own
+     whether or not a page names it - Chrome on iPadOS ignored the SVG, asked for
+     this, got a 404 and drew a generic globe - and the PNG is what iOS uses when a
+     page is saved to a home screen. Both are built by _dev/logo/make_logo.R.
+     Root-relative because the site is served from the root of its own domain. -->
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">

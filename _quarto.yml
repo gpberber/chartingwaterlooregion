@@ -15,6 +15,7 @@ project:
   resources:
     - images/           # favicon, logo, placeholder thumbnail, social card
     - fonts/            # self-hosted Inter; custom.scss points at these by path
+    - favicon.ico       # browsers request /favicon.ico whether or not a page names it
     - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
                         # <source srcset>, which Quarto does not scan for resources
     - CNAME             # tells GitHub Pages the custom domain; must be republished every
@@ -39,9 +40,23 @@ website:
     location: navbar
     type: overlay
   navbar:
-    logo: images/logo.svg
-    logo-alt: "Charting Waterloo Region"
-    title: false
+    # The full-colour mark, and the site name as ordinary text beside it.
+    #
+    # It used to be images/logo.svg, a single picture holding both the glyph and
+    # the name. That is why the navbar kept coming out misaligned on one device or
+    # another: a picture of text has its baseline frozen where the drawing put it,
+    # while the links beside it get theirs from the browser, out of the font's
+    # metrics. The two only ever agreed by coincidence, and the coincidence did not
+    # survive a change of browser, of platform, or of which copy of Inter was in
+    # use. As real text the name is laid out by the same engine, in the same font,
+    # on the same line as "Posts" - so it lines up by construction rather than by
+    # tuning. images/logo.svg is no longer used by the site; make_logo.R still
+    # builds it for anywhere a lock-up of glyph and name is wanted.
+    #
+    # logo-alt is empty because the logo is now decorative: the name is right
+    # beside it in text, and alt text would have a screen reader say it twice.
+    logo: images/logo-mark.svg
+    logo-alt: ""
     left:
       - text: Posts
         href: index.qmd
@@ -87,6 +102,7 @@ format:
     # Page-view counting (GoatCounter). No cookies, so no consent banner is needed.
     include-in-header:
       - _includes/analytics.html
+      - _includes/icons.html
     # "Share" button in each post's header (copy link, email). Site-wide, but the
     # script only acts on pages that have a category row, which means posts only.
     include-after-body:
