@@ -118,6 +118,27 @@ $code-color: #333333;
   letter-spacing: -0.01em;
 }
 
+// Firefox lands the name half a pixel below the links where Blink lands it on them.
+// Not a bug in either: the two are separately centred boxes, so each baseline sits
+// at its box centre plus an offset that depends on the font's ascent and descent,
+// and Gecko quantises font sizes to 1/16px where Blink does not - 18.7px becomes
+// 18.6875 and 15.6187 becomes 15.625, and the offsets move with them. Measured at
+// +0.5px in Firefox against +0.05px in Chrome and Edge.
+//
+// Half a pixel would not normally be worth a browser-specific rule, except that
+// text rasterising snaps baselines to whole device pixels, so half a pixel of
+// layout can become a whole one on screen - which is what made it visible.
+//
+// -moz-orient is Gecko-only and not aliased anywhere else, so this reaches Firefox
+// and nothing else. If a future Firefox drops the property the rule stops applying
+// and the half pixel comes back, which is the right way for a hack like this to
+// fail. To re-measure, compare the baselines of .navbar-title and a .nav-link.
+@supports (-moz-orient: inline) {
+  @media (min-width: 992px) {
+    .navbar .navbar-brand:not(.navbar-brand-logo) { position: relative; top: -0.5px; }
+  }
+}
+
 // A phone leaves only about 195px between the menu button and the search icon, and
 // Bootstrap's .navbar-brand hides its overflow rather than wrapping, so a name too
 // wide for the bar would lose its last word rather than shrink. The mark is a
