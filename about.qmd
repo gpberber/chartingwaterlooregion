@@ -48,6 +48,12 @@ Posts are written by Greg Berberich.
 - **Nothing is hidden.** The code, the cleaned data, and the rendered results all live in the repository. Large files are attached to GitHub Releases so anyone can download them.
 - **Everything is reusable.** Text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): copy, share, or republish them, including in the news, with credit to Charting Waterloo Region. The code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE). Data stays under the licence of whoever published it.
 
+## How the site is built
+
+The analysis and the charts are [R](https://www.r-project.org): [ggplot2](https://ggplot2.tidyverse.org) for the charts, [gt](https://gt.rstudio.com) for the tables, and [sf](https://r-spatial.github.io/sf/) when there is a map. [Quarto](https://quarto.org) turns that code, and the writing around it, into the pages you are reading.
+
+The pages are built on my own computer rather than by a server, so what reaches you is plain HTML, CSS and images: no database, no code running behind the scenes, nothing to sign in to. GitHub Pages serves them, and both the source and the rendered output live in the [GitHub repository](https://github.com/gpberber/chartingwaterlooregion).
+
 ## Privacy
 
 This site counts page views so I know which posts people find useful. The counter sets no cookies, records nothing that identifies you, and is not run by an advertising company. There is nothing to opt out of and nothing to click away.
