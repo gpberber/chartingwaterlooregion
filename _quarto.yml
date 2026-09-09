@@ -107,6 +107,9 @@ format:
     # script only acts on pages that have a category row, which means posts only.
     include-after-body:
       - _includes/share.html
+      # "Like this post" under a post's author row: one GoatCounter event, no
+      # count shown. Same gate as the share button, so posts only.
+      - _includes/like.html
     df-print: paged
     code-copy: true
     knitr:

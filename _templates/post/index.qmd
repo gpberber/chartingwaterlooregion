@@ -69,7 +69,13 @@ cwr_figure(
 ## Data and methods
 
 <!-- Where the data came from (links), what was excluded and why, any caveats
-     a careful reader should know. Full source table is in README.md. -->
+     a careful reader should know. Full source table is in README.md.
+
+     Keep this heading as it is. _includes/like.html puts the "Like this post"
+     button immediately above it, on the reasoning that the analysis ends here and
+     everything below is reference material. It finds the spot by the id Pandoc
+     builds from the heading text, so rewording the heading does not break the
+     button - it quietly drops it to the foot of the page instead. -->
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download

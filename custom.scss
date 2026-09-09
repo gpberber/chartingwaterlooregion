@@ -364,6 +364,67 @@ $code-color: #333333;
 }
 
 // ---------------------------------------------------------------------------
+// Like buttons
+// ---------------------------------------------------------------------------
+// _includes/like.html puts the same button in two places on a post: under the
+// author/date row, and at the end of the writing. Both sit on the white below
+// the banner, not on the banner itself, so they take the house blue rather than
+// the white the share button needs.
+
+// Under the author. The meta row has no padding of its own; the space beneath it
+// is the bottom margin on its last paragraph, which is enough to sit under
+// without crowding.
+.cwr-like-header {
+  margin: 0 0 1.5rem 0;
+
+  // Once the border goes the padding would leave the text indented against the
+  // author's name above it. The centred copy at the foot does not have that
+  // problem, so the correction belongs here rather than on the button.
+  .cwr-like-button.is-liked { padding-left: 0; }
+}
+
+// Where the analysis stops, just before "Data and methods". Centred between two
+// hairlines, so it reads as the close of the piece and separates the writing from
+// the reference material that follows. The rules are the only thing marking it
+// off; there is no "did you enjoy this?" line, which would be the one piece of
+// salesmanship on the site.
+.cwr-like-end {
+  margin: 2.5rem 0 2.5rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid $cwr-grey-50;
+  border-bottom: 1px solid $cwr-grey-50;
+  text-align: center;
+}
+
+.cwr-like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.3em 0.85em;
+  font-size: 0.85rem;
+  color: $cwr-blue;
+  background: transparent;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    color: $cwr-red;
+    border-color: $cwr-red;
+    background: rgba($cwr-red, 0.06);
+  }
+
+  // Once liked the button stops being a control and becomes a note of thanks:
+  // no border, no pointer, and the heart filled in the house red.
+  &.is-liked {
+    color: $cwr-red;
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Figures and tables
 // ---------------------------------------------------------------------------
 figure figcaption, .figure-caption, .quarto-float-caption {
