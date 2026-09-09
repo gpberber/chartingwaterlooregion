@@ -80,23 +80,24 @@ $code-color: #333333;
 }
 
 // ---------------------------------------------------------------------------
-// Share button (post header)
+// Share controls (navbar and post header)
 // ---------------------------------------------------------------------------
-// _includes/share.html drops this into the banner's category row. margin-left:
-// auto is what right-justifies it: the row is already a flex container, so the
-// automatic margin soaks up all the space left over after the tags.
-//
-// The button copies the tags' shape exactly - same padding, size, radius and
-// uppercase - so it sits on their line rhythm rather than looking bolted on. It
-// is drawn in white where they are muted grey, because it is the one thing in
-// the header a reader can actually press.
+// _includes/share.html builds two of these: a bare icon in the navbar sharing
+// the home page, and an outlined button at the right-hand end of a post's tag
+// row sharing the post. Everything below the two trigger rules is shared.
 .cwr-share {
   position: relative;              // the menu and bubble are positioned against this
   display: flex;
   align-items: center;
-  margin-left: auto;
 }
 
+// The post header's trigger. margin-left: auto is what right-justifies it: the
+// tag row is already a flex container, so the automatic margin soaks up all the
+// space left over after the tags.
+.cwr-share-header { margin-left: auto; }
+
+// It copies the tags' shape exactly - same padding, size, radius and uppercase -
+// so it sits on their line rhythm rather than looking bolted on.
 .cwr-share-button {
   display: inline-flex;
   align-items: center;
@@ -117,9 +118,38 @@ $code-color: #333333;
   }
 }
 
+// The navbar's trigger is a <button> wearing Quarto's .nav-link class, so it
+// inherits the colour, size and padding of the GitHub, RSS and mail icons beside
+// it; all that is left is to strip the chrome a button comes with.
+.cwr-share-nav-button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+// Below the navbar's breakpoint the icons move into the collapsed panel, and
+// Quarto gives that list `overflow-y: auto` so a long menu can scroll. That clips
+// anything positioned outside the list - the popover simply vanished and a
+// scrollbar appeared in its place. So in the collapsed panel the menu stops being
+// a popover and becomes an ordinary block under the icon, which the panel grows
+// to fit. Same two choices, laid out the way a phone menu usually behaves.
+@media (max-width: 991.98px) {
+  .cwr-share-nav {
+    display: block;                // the menu goes under the icon, not beside it
+
+    .cwr-share-menu, .cwr-share-done {
+      position: static;
+      width: max-content;
+      max-width: calc(100% - 1rem);
+      margin: 0 0 0.5rem 0.75rem;
+    }
+  }
+}
+
 // The menu and the "Link copied" bubble hang from the same spot, one at a time.
-// Right-aligned to the button rather than left, so a card wider than the button
-// grows into the banner instead of off the edge of the page.
+// Right-aligned to the trigger rather than left, so a card wider than the trigger
+// grows inwards instead of off the edge of the page - both triggers sit at the
+// right-hand end of their row.
 .cwr-share-menu, .cwr-share-done {
   position: absolute;
   top: calc(100% + 0.4rem);
@@ -146,8 +176,8 @@ $code-color: #333333;
   min-width: 10.5rem;
   padding: 0.3rem;
 
-  // Nested, not written flat: the banner sets `.quarto-title-banner a { color: #fff }`
-  // to keep links legible on the blue, and that beats a bare `.cwr-share-item` on
+  // Nested, not written flat: both the navbar and the banner set their links to
+  // white so they read on the blue, and either beats a bare `.cwr-share-item` on
   // specificity - which left "Email" as white text on the menu's white card.
   .cwr-share-item {
     display: flex;
@@ -251,10 +281,24 @@ $code-color: #333333;
   }
 }
 
+// Listing cards and the home page's category list sit on white, so they stay grey.
 .listing-category, .quarto-category {
   border-color: $cwr-grey-50 !important;
   color: $cwr-grey !important;
   font-size: 0.75rem;
+}
+
+// In a post's banner the same tags sit on the blue, where grey read as washed
+// out - Quarto also puts them at opacity 0.6, which took what contrast was left.
+// Full opacity and the same white as the share button beside them.
+// Every !important here is load-bearing. The colours have to beat the rule above,
+// which needs its own !important to get past Quarto's defaults; the opacity has to
+// beat Quarto's `.quarto-title .quarto-categories .quarto-category`, which is a
+// longer selector than this one.
+.quarto-title-banner .quarto-category {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  opacity: 1 !important;
 }
 
 // ---------------------------------------------------------------------------
