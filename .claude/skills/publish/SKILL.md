@@ -40,6 +40,21 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    Also check that `_includes/analytics.html` no longer contains `YOURCODE`: that is the GoatCounter
    placeholder, and publishing with it means the site counts nothing. If it is still there, stop and
    ask the user for the code from their goatcounter.com dashboard address.
+
+   Then check for links whose target is percent-encoded R code:
+   ```bash
+   grep -rn 'href="[^"]*%60\|src="[^"]*%60' _site --include=*.html
+   ```
+   Nothing found is a pass. A hit means a `` `r ... ` `` expression ended up in a link or image
+   target and pandoc encoded it, so the link points at the literal text of the code and goes
+   nowhere. `%60` is a backtick, which never belongs in a URL. This happens on its own: RStudio's
+   visual editor rewrites the whole document through pandoc every time it saves, and a target
+   that is not a valid URL comes back encoded. It shipped once before anyone noticed, because a
+   broken link still renders as a link and Quarto reports no error.
+   **Do not fix this in the rendered `_site/` copy** - that is a build output and the next render
+   would undo it. Fix the `.qmd`, re-render, and run the check again. The fix is to move the R out
+   of the target so it sits in an ordinary inline span: have R return the finished markdown link,
+   the way `cwr_bundle_link()` in `R/data_bundle.R` does for the data download.
 4. `git add -A` then `bash _dev/check_repo_safety.sh`. Stop on any BLOCKED line and fix it
    (usually: a big file that needs `/share-data`, or a file that belongs in `.gitignore`).
 5. `git status --short`: list what will be committed in plain words (which posts, whether `_freeze`
