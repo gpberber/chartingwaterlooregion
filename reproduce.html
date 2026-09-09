@@ -79,7 +79,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-9fafb6c5c3a9dd38aaacc3f7cf2104bb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-77dd594b91c0b69b119b6af78425f621.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -459,6 +459,128 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       trigger: '<i class="bi bi-share" aria-hidden="true"></i>Share'
     }));
   }
+})();
+</script>
+<!-- ---------------------------------------------------------------------------
+     Like buttons.
+
+     Two on a post, and they are one control in two places: under the author/date
+     row for a reader who already knows the post, and at the end of the analysis
+     for one who has just read it. Clicking either settles both, and only one
+     event is ever sent.
+
+     A tap is recorded as a GoatCounter event. It deliberately shows no count.
+     Reading numbers back out of GoatCounter needs an API key, and this site is
+     static files with no server to keep one in - the key would have to sit in the
+     page source, where it is not a key any more. So the count goes to the
+     dashboard at chartingwaterlooregion.goatcounter.com and the reader gets an
+     acknowledgement. That also avoids a new post advertising that nobody has
+     liked it yet.
+
+     Nothing new is loaded: this rides on the GoatCounter script already in every
+     page (_includes/analytics.html), which sets no cookies and records nothing
+     identifying, so the site still needs no consent banner. See
+     _includes/share.html for why controls like this are built after the page
+     loads rather than in a Quarto template.
+
+     Liking is one way. A GoatCounter event cannot be taken back, so the buttons
+     do not un-like: they disable themselves instead.
+
+     Styling lives in custom.scss under "Like buttons". Pulled in site-wide by
+     `include-after-body` in _quarto.yml.
+--------------------------------------------------------------------------- -->
+<script>
+(() => {
+  // Only a post has a category row in its banner - the same gate the share
+  // button uses to stay off the home page, About, Reproduce and 404.
+  const banner = document.querySelector(".quarto-title-banner .quarto-categories");
+  const meta   = document.querySelector(".quarto-title-meta");
+  const main   = document.querySelector("main.content");
+  if (!banner || !meta || !main) return;
+
+  // The slug names the event in the dashboard: "like-kitchener-phone-wait-times"
+  // reads better in a list than a full path would. Posts live at /posts/<slug>/,
+  // so anything else falls back to the path rather than guessing.
+  const slug = location.pathname.match(/\/posts\/([^/]+)\//)?.[1] || location.pathname;
+  const key  = "cwr-like:" + slug;
+
+  // Private windows and browsers set to block site data throw on access rather
+  // than returning null, so every read and write is wrapped. A reader whose
+  // storage is unavailable can like the post again on their next visit; that is
+  // a better failure than the buttons refusing to work.
+  const remembered = () => { try { return localStorage.getItem(key) === "1"; } catch { return false; } };
+  const remember   = () => { try { localStorage.setItem(key, "1"); } catch {} };
+
+  const THANKS = "Thanks for the like";
+  const buttons = [];
+
+  // Both the already-liked state on load and the just-liked state after a click,
+  // applied to every button at once so the two can never disagree.
+  // aria-disabled rather than disabled: a disabled button drops out of the tab
+  // order, so a reader arriving by keyboard would never hear the thank you.
+  const settleAll = () => {
+    buttons.forEach((b) => {
+      b.querySelector("i").className = "bi bi-heart-fill";
+      b.querySelector(".cwr-like-label").textContent = THANKS;
+      b.classList.add("is-liked");
+      b.setAttribute("aria-disabled", "true");
+    });
+  };
+
+  // count.js is loaded async, so window.goatcounter may not exist yet when a fast
+  // reader clicks - and it is absent for good on localhost, which the script skips
+  // on purpose, and wherever a blocker has stopped it. Wait a short while for it,
+  // then give up. The reader is thanked either way: the button is an
+  // acknowledgement, not a receipt, and it must not sit there looking broken.
+  const sendEvent = (title) => {
+    const deadline = Date.now() + 3000;
+    const attempt = () => {
+      if (window.goatcounter?.count) {
+        return window.goatcounter.count({ path: "like-" + slug, title: "Like: " + title, event: true });
+      }
+      if (Date.now() < deadline) setTimeout(attempt, 150);
+    };
+    attempt();
+  };
+
+  const onClick = () => {
+    if (buttons[0].getAttribute("aria-disabled") === "true") return;
+    const title = (document.querySelector("h1.title")?.textContent || document.title).trim();
+    remember();      // before the send, so a reader who leaves at once is not asked again
+    settleAll();
+    sendEvent(title);
+  };
+
+  const build = (wrapClass) => {
+    const wrap = document.createElement("div");
+    wrap.className = "cwr-like " + wrapClass;
+    wrap.innerHTML = `
+      <button type="button" class="cwr-like-button">
+        <i class="bi bi-heart" aria-hidden="true"></i><span class="cwr-like-label">Like this post</span>
+      </button>`;
+    const button = wrap.querySelector("button");
+    button.addEventListener("click", onClick);
+    buttons.push(button);
+    return wrap;
+  };
+
+  // Under the author and dates at the top.
+  meta.insertAdjacentElement("afterend", build("cwr-like-header"));
+
+  // And where the analysis stops. Every post closes with "Data and methods" and
+  // then a Reproducibility box - house structure, set by _templates/post/index.qmd
+  // and checked by /review-post - and both are reference material rather than part
+  // of the piece. Asking for a like after them means asking at the wrong moment.
+  //
+  // Pandoc builds the id from the heading, so a post that reworded that heading
+  // would not match. Rather than guess at the wording, the button falls back to
+  // the licence appendix and then to the end of the page: still on the post, just
+  // lower down. Renaming the section is the thing that moves it.
+  const end = main.querySelector("#data-and-methods") || main.querySelector("#quarto-appendix");
+  if (end) end.insertAdjacentElement("beforebegin", build("cwr-like-end"));
+  else main.appendChild(build("cwr-like-end"));
+
+  if (remembered()) settleAll();
 })();
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
