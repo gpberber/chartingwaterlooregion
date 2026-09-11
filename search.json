@@ -1,66 +1,24 @@
 [
   {
-    "objectID": "reproduce.html",
-    "href": "reproduce.html",
-    "title": "Reproduce a post",
+    "objectID": "posts/placeholder/index.html",
+    "href": "posts/placeholder/index.html",
+    "title": "A placeholder while the site is being built",
     "section": "",
-    "text": "Every post on this site is a Quarto document with R code that reads data, makes charts, and writes the text you see. You can run it yourself."
+    "text": "This is a temporary placeholder. Charting Waterloo Region is still being built. This post holds one chart so the site has something to show, and it will be replaced by real posts shortly. It is not an example of what the About page describes: there is no analysis here, and no data download.\nBetween 2019 and 2023, the share of weekday calls the City of Kitchener answered within 30 seconds fell from 80% to 69%. The City’s own target is 80%."
   },
   {
-    "objectID": "reproduce.html#install-the-tools",
-    "href": "reproduce.html#install-the-tools",
-    "title": "Reproduce a post",
-    "section": "1. Install the tools",
-    "text": "1. Install the tools\n\nR (version 4.5 or newer)\nRStudio (optional but convenient)\nQuarto (version 1.9 or newer)"
-  },
-  {
-    "objectID": "reproduce.html#get-the-code",
-    "href": "reproduce.html#get-the-code",
-    "title": "Reproduce a post",
-    "section": "2. Get the code",
-    "text": "2. Get the code\nClone the repository, or download it as a zip from GitHub and unzip it.\ngit clone https://github.com/gpberber/chartingwaterlooregion.git\ncd chartingwaterlooregion"
-  },
-  {
-    "objectID": "reproduce.html#install-the-r-packages",
-    "href": "reproduce.html#install-the-r-packages",
-    "title": "Reproduce a post",
-    "section": "3. Install the R packages",
-    "text": "3. Install the R packages\nOpen R in the project folder and run:\nsource(\"R/packages.R\")\ninstall_missing()\nThis installs every package used on the site. The exact versions used to render each post are printed in the collapsed Reproducibility section at the bottom of that post."
-  },
-  {
-    "objectID": "reproduce.html#get-the-data-for-a-post",
-    "href": "reproduce.html#get-the-data-for-a-post",
-    "title": "Reproduce a post",
-    "section": "4. Get the data for a post",
-    "text": "4. Get the data for a post\nEach post folder has a script that fetches its data. Small cleaned files are already in the repository. Larger files are attached to a GitHub Release and the script downloads them for you.\nsource(\"posts/&lt;post-slug&gt;/R/01_get_data.R\")\nReplace &lt;post-slug&gt; with the folder name shown in the URL of the post, for example kitchener-phone-wait-times. The README in each post folder lists the original sources and their licences.\nSome posts draw on a shared dataset in datasets/&lt;name&gt;/ instead of their own data folder. The post README says which. Each dataset has the same two scripts plus a README with its sources:\nsource(\"datasets/&lt;name&gt;/R/01_get_data.R\")\nsource(\"datasets/&lt;name&gt;/R/02_clean_data.R\")"
-  },
-  {
-    "objectID": "reproduce.html#render-the-post",
-    "href": "reproduce.html#render-the-post",
-    "title": "Reproduce a post",
-    "section": "5. Render the post",
-    "text": "5. Render the post\nFrom a terminal in the project folder:\nquarto render posts/&lt;post-slug&gt;\nThe rendered page appears in _site/posts/&lt;post-slug&gt;/index.html. Open it in a browser."
-  },
-  {
-    "objectID": "reproduce.html#just-want-the-data",
-    "href": "reproduce.html#just-want-the-data",
-    "title": "Reproduce a post",
-    "section": "Just want the data?",
-    "text": "Just want the data?\nEvery post ends with a collapsed Reproducibility and data download box. It links to a zip file holding each table the post used as CSV and Parquet files, an Excel workbook, a data dictionary describing every column, and a README with the sources and their licences. No R needed."
-  },
-  {
-    "objectID": "reproduce.html#notes",
-    "href": "reproduce.html#notes",
-    "title": "Reproduce a post",
-    "section": "Notes",
-    "text": "Notes\n\nNo keys required. All data sources are public. If a data-fetching script ever needs a key, its README says so and explains how to get one.\nCached results. The repository includes Quarto’s _freeze cache, so you can render the whole site without re-running any R code: quarto render at the project root.\nHouse chart style. Colours and the ggplot2 theme live in R/theme_cwr.R. Source it in your own scripts to make charts that match.\nQuestions. Email greg@chartingwaterlooregion.ca if something does not work."
+    "objectID": "posts/placeholder/index.html#data-and-methods",
+    "href": "posts/placeholder/index.html#data-and-methods",
+    "title": "A placeholder while the site is being built",
+    "section": "Data and methods",
+    "text": "Data and methods\nThe chart uses daily phone-queue metrics published by the City of Kitchener, covering 1 March 2019 to 30 July 2023. Weekends and statutory holidays are left out, because the contact centre runs a skeleton service on those days. A call that was abandoned while waiting counts as a miss against the 30-second target.\nThe full sources and licences are in this post’s README.md. A fuller treatment of the same data is written up in the kitchener-phone-wait-times post, which is not published yet.\n\n\n\n\n\n\nNoteReproducibility\n\n\n\n\n\nReproduce the post: get the code and data for this post from posts/placeholder/ on GitHub.\nThis placeholder has no data download; real posts have one.\n\n\nR version: R version 4.5.3 (2026-03-11 ucrt)\nOS:        Windows 11 x64 (build 26200)\nRendered:  2026-09-11\nQuarto:    1.9.38\n\n    package version       date         source\n conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)\n      dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)\n    forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)\n    ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)\n     ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)\n         gt   1.3.0 2026-01-22 CRAN (R 4.5.3)\n   gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)\n       here   1.0.2 2025-09-15 CRAN (R 4.5.3)\n    janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)\n  lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)\n  patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)\n      purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)\n      readr   2.2.0 2026-02-19 CRAN (R 4.5.3)\n     scales   1.4.0 2025-04-24 CRAN (R 4.5.3)\n    stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)\n     tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)\n      tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)\n  tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Charting Waterloo Region",
     "section": "",
-    "text": "Kitchener is answering the phone slower than it used to\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\nOpen Data\n\n\n\nIn 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.\n\n\n\n\n\nSep 7, 2026\n\n\n\n\n\nNo matching items"
+    "text": "A placeholder while the site is being built\n\n\n\nSnapshot\n\nCity Services\n\nKitchener\n\n\n\nOne chart from Kitchener’s phone-queue data, standing in until the first real posts are written.\n\n\n\n\n\nSep 11, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -70,87 +28,80 @@
     "text": "ChartingWaterloo Region\n    Charts and analysis about life in Waterloo Region, built from open data."
   },
   {
-    "objectID": "about.html#what-this-is",
-    "href": "about.html#what-this-is",
+    "objectID": "about.html#what-is-it",
+    "href": "about.html#what-is-it",
     "title": "About",
-    "section": "What this is",
-    "text": "What this is\nCharting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.\nEvery chart is built in R and every post can be reproduced from the code and data in the GitHub repository. See Reproduce a post for the steps."
-  },
-  {
-    "objectID": "about.html#two-kinds-of-post",
-    "href": "about.html#two-kinds-of-post",
-    "title": "About",
-    "section": "Two kinds of post",
-    "text": "Two kinds of post\n\nSnapshot. A few charts and some basic analysis, readable in under five minutes.\nDeep dive. Many charts and more detailed analysis, taking a lot more than five minutes.\n\nEvery post is labelled with one or the other, and the categories list on the Posts page filters by kind or by topic."
+    "section": "What is it?",
+    "text": "What is it?\nCharting Waterloo Region (CWR) is a local blog cobbled together to tell stories about life in Waterloo Region using data from (mostly) open sources. In snapshots—posts with a few charts and some basic analysis that can be read in under five minutes—and the occasional deep dive containing more rigorous analysis, CWR will answer questions from the fundamental to the frivolous. Has crime in the Region gotten worse over the past 25 years? CWR will take a stab at answering that. Which fast-food chain incurs more health-code violations, McDonald’s or Tim Hortons? CWR will bite into that one as well. (Thankfully, bad puns will not be a regular CWR feature.) Basically, CWR is one guy’s effort to illustrate facts and features of Waterloo Region using well-designed charts built from open data."
   },
   {
     "objectID": "about.html#who-writes-it",
     "href": "about.html#who-writes-it",
     "title": "About",
-    "section": "Who writes it",
-    "text": "Who writes it\nPosts are written by Greg Berberich."
+    "section": "Who writes it?",
+    "text": "Who writes it?\nThe “one guy” in question is Greg Berberich. I was fortunate to achieve Freedom 55 at the end of 2023, retiring after 30 years as a Chartered Accountant, the last 25 spent in academia teaching and doing institutional research (I no longer hold the CA designation). As my undergrad degree in math, my PhD in accounting, and my decades as a CA indicate, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of my free time in retirement doing. CWR is my first blog and is basically me doing a hobby in public."
   },
   {
-    "objectID": "about.html#how-the-posts-are-made",
-    "href": "about.html#how-the-posts-are-made",
+    "objectID": "about.html#why-does-it-exist",
+    "href": "about.html#why-does-it-exist",
     "title": "About",
-    "section": "How the posts are made",
-    "text": "How the posts are made\n\nSources are public. Statistics Canada tables, municipal open-data portals, published reports. Each post lists its sources, with links and licences, in a data section at the end.\nCharts follow one style. Direct labels instead of legends, no chart junk, the same three colours throughout: blue for Waterloo Region, red for a comparison such as Canada, grey for context.\nNothing is hidden. The code, the cleaned data, and the rendered results all live in the repository. Large files are attached to GitHub Releases so anyone can download them.\nEverything is reusable. Text and charts are published under CC BY 4.0: copy, share, or republish them, including in the news, with credit to Charting Waterloo Region. The code is MIT licensed. Data stays under the licence of whoever published it."
+    "section": "Why does it exist?",
+    "text": "Why does it exist?\nAfter years (no kidding!) of procrastination, I’ve decided to start publishing some of my charts and analysis because I have learned a lot of interesting and sometimes startling things from them, so I figure it’s worth sharing some of what I learn with other Region residents who want to know more about where they live. And to my knowledge, aside from Jeff Outhit, who does some excellent data journalism for The Record, there is no local outlet that regularly visualizes data about the Region. CWR exists to help fill this gap."
   },
   {
-    "objectID": "about.html#how-the-site-is-built",
-    "href": "about.html#how-the-site-is-built",
+    "objectID": "about.html#where-does-its-data-come-from",
+    "href": "about.html#where-does-its-data-come-from",
     "title": "About",
-    "section": "How the site is built",
-    "text": "How the site is built\nThe analysis and the charts are R: ggplot2 for the charts, gt for the tables, and sf when there is a map. Quarto turns that code, and the writing around it, into the pages you are reading.\nThe pages are built on my own computer rather than by a server, so what reaches you is plain HTML, CSS and images: no database, no code running behind the scenes, nothing to sign in to. GitHub Pages serves them, and both the source and the rendered output live in the GitHub repository."
+    "section": "Where does its data come from?",
+    "text": "Where does its data come from?\nCWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other published sources. The README.md file in each post’s GitHub folder lists the post’s sources, with their links and licences."
   },
   {
-    "objectID": "about.html#privacy",
-    "href": "about.html#privacy",
+    "objectID": "about.html#is-it-independent",
+    "href": "about.html#is-it-independent",
     "title": "About",
-    "section": "Privacy",
-    "text": "Privacy\nThis site counts page views so I know which posts people find useful. The counter sets no cookies, records nothing that identifies you, and is not run by an advertising company. There is nothing to opt out of and nothing to click away."
+    "section": "Is it independent?",
+    "text": "Is it independent?\nMy area of expertise as an accountant was in auditing. An auditor’s most-critical asset is their independence because without it, their opinion is worthless. I therefore take my independence very seriously. CWR is not funded by or affiliated with any government, public service body, institution, or any other organization that could compromise my independence. All editorial decisions and opinions are mine alone."
   },
   {
-    "objectID": "about.html#contact-and-corrections",
-    "href": "about.html#contact-and-corrections",
+    "objectID": "about.html#how-is-it-built",
+    "href": "about.html#how-is-it-built",
     "title": "About",
-    "section": "Contact and corrections",
-    "text": "Contact and corrections\nSpotted an error or have a question about the data? Email greg@chartingwaterlooregion.ca. Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post."
+    "section": "How is it built?",
+    "text": "How is it built?\nI use R, a popular language for doing data science, to produce CWR’s charts and tables, and to prepare the data behind them. Quarto combines the R code with my writing and renders it into the HTML, CSS, and images needed to produce the CWR website. These website elements get pushed to a GitHub folder and then served to you via GitHub Pages.\nGoatCounter counts page views and post likes so I know which posts people find interesting. The site sets no cookies and records nothing that identifies you, so there is nothing to opt out of."
   },
   {
-    "objectID": "posts/kitchener-phone-wait-times/index.html",
-    "href": "posts/kitchener-phone-wait-times/index.html",
-    "title": "Kitchener is answering the phone slower than it used to",
-    "section": "",
-    "text": "Call the City of Kitchener on a weekday and the odds of someone picking up within half a minute have fallen from 80% in 2019 to 69% in 2023. The average wait in the queue went from 26 seconds to 58 seconds. Call volumes barely moved over the same period, so the slowdown is not a story about more people phoning in."
+    "objectID": "about.html#does-it-use-ai",
+    "href": "about.html#does-it-use-ai",
+    "title": "About",
+    "section": "Does it use AI?",
+    "text": "Does it use AI?\nYes, I use Claude, an AI model made by Anthropic, primarily as the supplier of the code used to build the site’s infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it’s fun!).\nI make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant.\nI write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post’s text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts’ alt text for screen readers, each post’s README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product."
   },
   {
-    "objectID": "posts/kitchener-phone-wait-times/index.html#the-80-target-held-until-2021-then-slipped",
-    "href": "posts/kitchener-phone-wait-times/index.html#the-80-target-held-until-2021-then-slipped",
-    "title": "Kitchener is answering the phone slower than it used to",
-    "section": "The 80% target held until 2021, then slipped",
-    "text": "The 80% target held until 2021, then slipped\nThe City measures itself against a common contact-centre yardstick: answer 80% of calls within 30 seconds. On weekdays in 2019 it met that target almost exactly. Through the first two pandemic years it stayed close, with the best months of all in the quiet January and February of 2020 and 2021, when more than 90% of calls were answered on time.\nThe break came in 2022. Every month that year was below target, and June 2020 was the low point, with 60% of calls answered within 30 seconds. The first seven months of 2023 look much like 2022."
+    "objectID": "about.html#is-it-reproducible",
+    "href": "about.html#is-it-reproducible",
+    "title": "About",
+    "section": "Is it reproducible?",
+    "text": "Is it reproducible?\nYes, if you are so inclined, you can reproduce every post using the code and data in its associated GitHub folder. If you just want a post’s data, you can download a zip file containing the tables in CSV and Parquet formats, as well as an Excel workbook (when the tables are small enough), and a brief data dictionary describing the fields in each table. The “Reproducibility and data download” section at the end of each post contains links to the post’s GitHub folder and zipped data files."
   },
   {
-    "objectID": "posts/kitchener-phone-wait-times/index.html#the-average-wait-more-than-doubled",
-    "href": "posts/kitchener-phone-wait-times/index.html#the-average-wait-more-than-doubled",
-    "title": "Kitchener is answering the phone slower than it used to",
-    "section": "The average wait more than doubled",
-    "text": "The average wait more than doubled\nAverages hide a lot in a phone queue, since most calls are answered quickly and a few wait a very long time. Even so, the direction is clear. A weekday caller in 2019 waited 26 seconds on average. In 2022 that was 63 seconds, and the first seven months of 2023 averaged 58 seconds.\nVolume does not explain it. The centre handled 329 calls on a typical weekday in 2019 and 351 in 2023, a rise of 7%. The data says nothing about staffing, which is the obvious place to look next."
+    "objectID": "about.html#can-its-content-be-reused",
+    "href": "about.html#can-its-content-be-reused",
+    "title": "About",
+    "section": "Can its content be reused?",
+    "text": "Can its content be reused?\nYes, everything on CWR is reusable. The text and charts are published under CC BY 4.0, so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is MIT licensed, so it can be reused as well. All data stays under the terms set by whoever published it."
   },
   {
-    "objectID": "posts/kitchener-phone-wait-times/index.html#early-summer-is-the-crunch",
-    "href": "posts/kitchener-phone-wait-times/index.html#early-summer-is-the-crunch",
-    "title": "Kitchener is answering the phone slower than it used to",
-    "section": "Early summer is the crunch",
-    "text": "Early summer is the crunch\nWhatever the year, the phones are busiest in June and quietest in December, and the answer rate follows the volume: over the whole period, 69% of June calls were answered on time against 81% in January. Property tax bills, summer recreation registration and moving season all land in the same few weeks. A centre that just meets its target in a quiet month will miss it in a busy one unless staffing moves with the calendar."
+    "objectID": "about.html#could-it-contain-mistakes",
+    "href": "about.html#could-it-contain-mistakes",
+    "title": "About",
+    "section": "Could it contain mistakes?",
+    "text": "Could it contain mistakes?\nYes, I am human and can make mistakes. If you spot an error or have a question about the data, email me with the details. I will correct any post containing verified errors and add a dated note at the top of the post saying what changed."
   },
   {
-    "objectID": "posts/kitchener-phone-wait-times/index.html#data-and-methods",
-    "href": "posts/kitchener-phone-wait-times/index.html#data-and-methods",
-    "title": "Kitchener is answering the phone slower than it used to",
-    "section": "Data and methods",
-    "text": "Data and methods\nThe City of Kitchener publishes daily metrics for its main phone queue on its open data portal. This post uses the export covering 26 February 2019 to 30 July 2023, the full range available when it was downloaded in February 2025. Days with an incomplete or duplicated set of metrics (14 of about 1,600) and the partial first month were dropped.\nAll figures are weekdays excluding Ontario statutory holidays. Weekend and holiday volumes run at roughly 31% of a weekday, on a reduced service, and would flatter every average.\n“Answered within 30 seconds” is the share of all calls presented that an agent picked up inside the target, so a caller who hung up while waiting counts as a miss. The City also reports three gentler versions of the same measure, all included in the download below. Waits are the daily average queue time weighted by the number of calls that day.\n\n\n\n\n\n\nNoteReproducibility and data download\n\n\n\n\n\nCode and data for this post: posts/kitchener-phone-wait-times/ on GitHub. See Reproduce a post for the steps.\nDownload the data: kitchener-phone-wait-times-data-v1.zip holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.\n\n\n\n\n\n\n\n\n\n\n\nColumn\nType\nDescription\nUnits\nValues\n\n\n\n\nqueue_daily\n\n\ndate\ndate\nCalendar date\nYYYY-MM-DD\n2019-03-01 to 2023-07-30\n\n\nyear\nnumber\nCalendar year\n\n2019 to 2023\n\n\nmonth\ntext\nThree-letter month abbreviation (Jan to Dec)\n\nMar; Apr; May; ... (12 distinct values)\n\n\nyear_month\ndate\nFirst day of the month the date falls in\nYYYY-MM-DD\n2019-03-01 to 2023-07-01\n\n\nday_of_week\ntext\nThree-letter day of the week (Mon to Sun)\n\nFri; Sat; Sun; ... (7 distinct values)\n\n\nholiday\ntrue/false\nTRUE if the date is an Ontario statutory holiday\n\nTRUE / FALSE\n\n\nweekend_or_holiday\ntrue/false\nTRUE if the date is a Saturday or Sunday or a statutory holiday\n\nTRUE / FALSE\n\n\ncalls_presented\nnumber\nCalls that entered the queue\ncalls\n24 to 1925\n\n\navg_queue_time\nnumber\nAverage time callers spent waiting in the queue (answered and abandoned calls)\nseconds\n5 to 832\n\n\nmax_queue_time\nnumber\nLongest single wait in the queue that day\nseconds\n10 to 5908\n\n\ncalls_handled\nnumber\nCalls answered by an agent\ncalls\n11 to 1835\n\n\navg_speed_of_answer\nnumber\nAverage time answered calls waited before an agent picked up\nseconds\n4 to 1263\n\n\navg_handle_time\nnumber\nAverage length of an answered call from answer to hang-up including hold time\nseconds\n51 to 231\n\n\nmax_handle_time\nnumber\nLongest single call that day\nseconds\n79 to 5001\n\n\ncalls_abandoned\nnumber\nCalls where the caller hung up while waiting in the queue\ncalls\n0 to 480\n\n\ntarget_seconds\nnumber\nThe service-level target the City measures against (30 on every day)\nseconds\n30 to 30\n\n\nanswered_within_target\nnumber\nCalls answered within the 30-second target\ncalls\n10 to 413\n\n\nabandoned_within_target\nnumber\nCalls abandoned before the 30-second target had elapsed\ncalls\n0 to 322\n\n\npct_handled_within_target\nnumber\nanswered_within_target as a share of calls_handled\npercent (0 to 100)\n14.9 to 100\n\n\npct_within_target_excl_abandoned\nnumber\nanswered_within_target as a share of calls_presented minus calls_abandoned\npercent (0 to 100)\n8.8 to 100\n\n\npct_within_target_abandoned_positive\nnumber\nanswered_within_target plus abandoned_within_target as a share of calls_presented\npercent (0 to 100)\n15.8 to 100\n\n\npct_answered_within_target\nnumber\nanswered_within_target as a share of calls_presented; the measure used in the post, where an abandoned call counts as a miss\npercent (0 to 100)\n8.2 to 100\n\n\npercentage_of_calls_handled\nnumber\ncalls_handled as a share of calls_presented\npercent (0 to 100)\n45.8 to 100\n\n\npercentage_of_calls_abandoned\nnumber\ncalls_abandoned as a share of calls_presented\npercent (0 to 100)\n0 to 54.2\n\n\n\nGenerated from the data with R/data_bundle.R; descriptions from data/dictionary.csv\n\n\n\n\n\n\n\n\n\nTable 1: Data dictionary for the tables used in this post.\n\n\n\n\n\n\nR version: R version 4.5.3 (2026-03-11 ucrt)\nOS:        Windows 11 x64 (build 26200)\nRendered:  2026-09-09\nQuarto:    1.9.38\n\n    package version       date         source\n      arrow  25.0.1 2026-08-23 CRAN (R 4.5.3)\n conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)\n      dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)\n    forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)\n    ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)\n     ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)\n         gt   1.3.0 2026-01-22 CRAN (R 4.5.3)\n   gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)\n       here   1.0.2 2025-09-15 CRAN (R 4.5.3)\n    janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)\n  lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)\n  patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)\n      purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)\n      readr   2.2.0 2026-02-19 CRAN (R 4.5.3)\n     scales   1.4.0 2025-04-24 CRAN (R 4.5.3)\n    stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)\n     tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)\n      tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)\n  tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)"
+    "objectID": "about.html#how-does-it-make-money",
+    "href": "about.html#how-does-it-make-money",
+    "title": "About",
+    "section": "How does it make money?",
+    "text": "How does it make money?\nIt doesn’t. CWR is a non-commercial venture, so it doesn’t have ads and it won’t ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That’s all the reward I need."
   }
 ]

@@ -197,10 +197,6 @@ window.Quarto = {
     <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./reproduce.html"> 
-<span class="menu-text">Reproduce a post</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -247,7 +243,7 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2l0eSUyMFNlcnZpY2Vz">City Services <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2l0Y2hlbmVy">Kitchener <span class="quarto-category-count">(1)</span></div><div class="category" data-category="T3BlbiUyMERhdGE=">Open Data <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U25hcHNob3Q=">Snapshot <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q2l0eSUyMFNlcnZpY2Vz">City Services <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2l0Y2hlbmVy">Kitchener <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U25hcHNob3Q=">Snapshot <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -261,15 +257,15 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="U25hcHNob3QlMkNDaXR5JTIwU2VydmljZXMlMkNLaXRjaGVuZXIlMkNPcGVuJTIwRGF0YQ==" data-listing-date-sort="1788753600000" data-listing-file-modified-sort="1788978067025" data-listing-date-modified-sort="1788978067000" data-listing-reading-time-sort="10" data-listing-word-count-sort="1930">
-<div class="thumbnail"><a href="./posts/kitchener-phone-wait-times/index.html" class="no-external">
+<div class="quarto-post image-right" data-index="0" data-categories="U25hcHNob3QlMkNDaXR5JTIwU2VydmljZXMlMkNLaXRjaGVuZXI=" data-listing-date-sort="1789099200000" data-listing-file-modified-sort="1789168478061" data-listing-date-modified-sort="1789168478000" data-listing-reading-time-sort="4" data-listing-word-count-sort="762">
+<div class="thumbnail"><a href="./posts/placeholder/index.html" class="no-external">
 
-<img loading="lazy" src="./posts/kitchener-phone-wait-times/images/thumbnail.png" class="thumbnail-image">
+<img loading="lazy" src="./posts/placeholder/images/thumbnail.png" class="thumbnail-image">
 
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/kitchener-phone-wait-times/index.html" class="no-external">Kitchener is answering the phone slower than it used to</a>
+<a href="./posts/placeholder/index.html" class="no-external">A placeholder while the site is being built</a>
 </h3>
 <div class="listing-categories">
 
@@ -279,17 +275,15 @@ window.Quarto = {
 
 <div class="listing-category" onclick="window.quartoListingCategory('S2l0Y2hlbmVy'); return false;">Kitchener</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('T3BlbiUyMERhdGE='); return false;">Open Data</div>
-
 </div>
-<div class="delink listing-description"><a href="./posts/kitchener-phone-wait-times/index.html" class="no-external">
-<p>In 2019 the City answered four in five calls within 30 seconds. By 2023 it was fewer than seven in ten, and the average wait had more than doubled.</p>
+<div class="delink listing-description"><a href="./posts/placeholder/index.html" class="no-external">
+<p>One chart from Kitchener’s phone-queue data, standing in until the first real posts are written.</p>
 </a></div>
 </div>
 <div class="metadata">
-<a href="./posts/kitchener-phone-wait-times/index.html" class="no-external">
+<a href="./posts/placeholder/index.html" class="no-external">
 <div class="listing-date">
-Sep 7, 2026
+Sep 11, 2026
 </div>
 </a>
 </div>
@@ -439,7 +433,7 @@ Sep 7, 2026
 
   // ---- the post control ---------------------------------------------------
   // Only a post has a category row inside the banner, which is what keeps this
-  // one off the home page, About, Reproduce and 404.
+  // one off the home page, About and 404.
   const categories = document.querySelector(".quarto-title-banner .quarto-categories");
   if (categories) {
     categories.appendChild(buildControl({
@@ -488,7 +482,7 @@ Sep 7, 2026
 <script>
 (() => {
   // Only a post has a category row in its banner - the same gate the share
-  // button uses to stay off the home page, About, Reproduce and 404.
+  // button uses to stay off the home page, About and 404.
   const banner = document.querySelector(".quarto-title-banner .quarto-categories");
   const meta   = document.querySelector(".quarto-title-meta");
   const main   = document.querySelector("main.content");

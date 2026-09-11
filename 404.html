@@ -137,10 +137,6 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="/about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="/reproduce.html"> 
-<span class="menu-text">Reproduce a post</span></a>
-  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -340,7 +336,7 @@ ul.task-list li input[type="checkbox"] {
 
   // ---- the post control ---------------------------------------------------
   // Only a post has a category row inside the banner, which is what keeps this
-  // one off the home page, About, Reproduce and 404.
+  // one off the home page, About and 404.
   const categories = document.querySelector(".quarto-title-banner .quarto-categories");
   if (categories) {
     categories.appendChild(buildControl({
@@ -389,7 +385,7 @@ ul.task-list li input[type="checkbox"] {
 <script>
 (() => {
   // Only a post has a category row in its banner - the same gate the share
-  // button uses to stay off the home page, About, Reproduce and 404.
+  // button uses to stay off the home page, About and 404.
   const banner = document.querySelector(".quarto-title-banner .quarto-categories");
   const meta   = document.querySelector(".quarto-title-meta");
   const main   = document.querySelector("main.content");
