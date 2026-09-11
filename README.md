@@ -18,7 +18,7 @@ Charts and analysis about life in Waterloo Region, built from open data.
 
 ## Reproduce a post
 
-See https://chartingwaterlooregion.ca/reproduce.html, or in short:
+In short:
 
 ```r
 source("R/packages.R"); install_missing()

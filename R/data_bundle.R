@@ -268,8 +268,7 @@ cwr_data_bundle <- function(slug, version = 1, excel = TRUE, upload = TRUE) {
     "",
     "Reproduce",
     "---------",
-    paste0("Code: https://github.com/", cwr_repo, "/tree/master/posts/", slug),
-    "Steps: https://chartingwaterlooregion.ca/reproduce.html"
+    paste0("Code: https://github.com/", cwr_repo, "/tree/master/posts/", slug)
   )
   write_lines(readme, file.path(bundle_dir, "README.txt"))
 

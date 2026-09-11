@@ -28,7 +28,6 @@ chartingwaterlooregion/
   fonts/                 Inter, served by the site itself so readers do not depend on Google
   index.qmd              home page (the post listing)
   about.qmd
-  reproduce.qmd
   404.qmd
   CLAUDE.md              conventions Claude follows in this project
   WORKFLOW.md            this guide
@@ -180,6 +179,16 @@ quarto publish gh-pages --no-render --no-prompt
 
 Edit `index.qmd`, run `/preview`, then `/publish` with no argument. Quarto adds a "Modified" date automatically. If the data changed, re-run the scripts in `R/` first, bump `data_bundle_version` in the setup chunk so a new zip is built, and mention the refresh date in the post.
 
+**Correcting a published post.** The "Modified" date Quarto adds is automatic: it changes whenever the file is saved, including a visual-editor save that only reflows the text, so it is not a correction notice on its own. When a post goes out with something wrong in it, say so in the post. Put a note directly under the YAML header, above the opening paragraph, and leave it there permanently:
+
+``` markdown
+::: {.callout-warning appearance="simple"}
+**Correction, 11 September 2026.** This post described December as averaging under 267 calls a day. The figure is exactly 267, and the chart's description has been fixed.
+:::
+```
+
+Say what was wrong and what it should have been, not just that something changed. A silent fix is fine for spelling, wording or layout; anything that changes a number, a chart or a conclusion gets a note. The About page promises readers exactly this, so it is not optional.
+
 ## 4. Save work at any time
 
 ```         
@@ -273,7 +282,7 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
 
 - Navbar, footer, licence heading, what gets rendered: `_quarto.yml`.
 
-- About page: `about.qmd`. Reader instructions: `reproduce.qmd`.
+- About page: `about.qmd`.
 
 - Defaults for every post (author name, figure sizes, licence text): `posts/_metadata.yml`.
 

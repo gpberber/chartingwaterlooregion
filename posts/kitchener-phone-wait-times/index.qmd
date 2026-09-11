@@ -4,7 +4,7 @@ description: "In 2019 the City answered four in five calls within 30 seconds. By
 date: "2026-09-07"
 categories: [Snapshot, City Services, Kitchener, Open Data]
 image: images/thumbnail.png
-draft: false
+draft: true
 ---
 
 ```{r}
@@ -287,7 +287,7 @@ All figures are weekdays excluding Ontario statutory holidays. Weekend and holid
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download
 
-Code and data for this post: [`posts/kitchener-phone-wait-times/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-wait-times) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+**Reproduce the post**: get the code and data for this post from [`posts/kitchener-phone-wait-times/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/kitchener-phone-wait-times) on GitHub.
 
 **Download the data:** `r cwr_bundle_link("kitchener-phone-wait-times", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
 

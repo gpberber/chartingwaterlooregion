@@ -1,0 +1,143 @@
+---
+title: "A placeholder while the site is being built"
+description: "One chart from Kitchener's phone-queue data, standing in until the first real posts are written."
+date: "2026-09-11"
+categories: [Snapshot, City Services, Kitchener]
+image: images/thumbnail.png
+draft: false
+---
+
+::: {.callout-note appearance="simple"}
+**This is a temporary placeholder.** Charting Waterloo Region is still being built. This post holds one chart so the site has something to show, and it will be replaced by real posts shortly. It is not an example of what the [About](../../about.qmd) page describes: there is no analysis here, and no data download.
+:::
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/placeholder/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+```
+
+```{r}
+#| label: load-data
+#| include: false
+
+# A copy of the cleaned file from the kitchener-phone-wait-times post, kept here
+# so this placeholder stands on its own and can be deleted in one piece. See README.md.
+queue_daily <- read_csv(
+  here("posts", "placeholder", "data", "queue_daily.csv"),
+  show_col_types = FALSE
+)
+
+# The contact centre runs a skeleton service at weekends and on holidays, so
+# every number below is weekdays only.
+weekday <- queue_daily |>
+  filter(!weekend_or_holiday)
+
+# Share of calls answered inside the City's 30-second target. A call abandoned
+# while waiting counts as a miss, which is the strictest of the versions the
+# City reports.
+pct_within <- function(answered, presented) 100 * sum(answered) / sum(presented)
+
+monthly <- weekday |>
+  summarise(
+    pct_within = pct_within(answered_within_target, calls_presented),
+    .by = year_month
+  )
+
+# The two numbers quoted in the text, taken from the data so they cannot drift
+yearly <- weekday |>
+  summarise(
+    pct_within = pct_within(answered_within_target, calls_presented),
+    .by = year
+  )
+
+first_year <- yearly |> slice_min(year) |> pull(year)
+last_year  <- yearly |> slice_max(year) |> pull(year)
+pct_first  <- yearly |> slice_min(year) |> pull(pct_within)
+pct_last   <- yearly |> slice_max(year) |> pull(pct_within)
+
+pct <- label_number(accuracy = 1, suffix = "%")
+```
+
+Between `r first_year` and `r last_year`, the share of weekday calls the City of Kitchener answered within 30 seconds fell from `r pct(pct_first)` to `r pct(pct_last)`. The City's own target is 80%.
+
+```{r}
+#| label: fig-answered
+#| output: asis
+
+# ggline (single series) with a target line; the target is explained in the
+# subtitle rather than a label so nothing collides on the phone version
+p <- ggplot(monthly, aes(x = year_month, y = pct_within)) +
+
+  # the City's target, drawn first so the data line sits on top of it
+  geom_hline(yintercept = 80, colour = habsred, linetype = "dashed", linewidth = 0.5) +
+
+  geom_line(colour = dodgerblue, linewidth = 0.8) +
+
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y",
+    date_minor_breaks = "3 months",
+    expand = expansion(mult = c(0.02, 0.05))
+  ) +
+
+  scale_y_continuous(
+    limits = c(50, 100),
+    breaks = seq(50, 100, 10),
+    labels = label_number(suffix = "%"),
+    expand = expansion(mult = c(0, 0.05)),
+    position = "right"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -30)
+    )
+  ) +
+
+  labs(
+    title = "Calls answered within 30 seconds fell below target in 2022 and stayed there",
+    subtitle = paste0(
+      "Share of weekday calls answered within 30 seconds, by month. ",
+      "<span style='color:", habsred, "'>Dashed line: the City's 80% target</span><br>"
+    ),
+    caption = cwr_caption("City of Kitchener Open Data", credit = TRUE)
+  )
+
+cwr_figure(
+  p, "fig-answered",
+  alt = "Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022.",
+  height = 5, phone_height = 4.5
+)
+```
+
+## Data and methods
+
+The chart uses daily phone-queue metrics published by the City of Kitchener, covering 1 March 2019 to 30 July 2023. Weekends and statutory holidays are left out, because the contact centre runs a skeleton service on those days. A call that was abandoned while waiting counts as a miss against the 30-second target.
+
+The full sources and licences are in this post's `README.md`. A fuller treatment of the same data is written up in the `kitchener-phone-wait-times` post, which is not published yet.
+
+::: {.callout-note collapse="true"}
+## Reproducibility
+
+**Reproduce the post**: get the code and data for this post from [`posts/placeholder/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/placeholder) on GitHub.
+
+This placeholder has no data download; real posts have one.
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

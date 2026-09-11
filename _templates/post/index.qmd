@@ -80,7 +80,7 @@ cwr_figure(
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download
 
-Code and data for this post: [`posts/{{slug}}/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}) on GitHub. See [Reproduce a post](../../reproduce.qmd) for the steps.
+**Reproduce the post**: get the code and data for this post from [`posts/{{slug}}/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}) on GitHub.
 
 **Download the data:** `r cwr_bundle_link("{{slug}}", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
 

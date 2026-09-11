@@ -44,46 +44,52 @@ toc: false
 <h1 class="title">About</h1>
 ```
 
-## What this is
+## What is it?
 
-Charting Waterloo Region uses open data to answer plain questions about the place we live: how safe is it, how well do city services work, how is the region changing. Each post takes one question, finds the best available public data, and shows what the numbers say in a handful of carefully made charts.
+Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories about life in Waterloo Region using data from (mostly) open sources. In **snapshots**---posts with a few charts and some basic analysis that can be read in under five minutes---and the occasional **deep dive** containing more rigorous analysis, CWR will answer questions from the fundamental to the frivolous. Has crime in the Region gotten worse over the past 25 years? CWR will take a stab at answering that. Which fast-food chain incurs more health-code violations, McDonald's or Tim Hortons? CWR will bite into that one as well. (Thankfully, bad puns will not be a regular CWR feature.) Basically, CWR is one guy's effort to illustrate facts and features of Waterloo Region using well-designed charts built from open data.
 
-Every chart is built in R and every post can be reproduced from the code and data in the [GitHub repository](https://github.com/gpberber/chartingwaterlooregion). See [Reproduce a post](reproduce.qmd) for the steps.
+## Who writes it?
 
-## Two kinds of post
+The "one guy" in question is Greg Berberich. I was fortunate to achieve Freedom 55 at the end of 2023, retiring after 30 years as a Chartered Accountant, the last 25 spent in academia teaching and doing institutional research (I no longer hold the CA designation). As my undergrad degree in math, my PhD in accounting, and my decades as a CA indicate, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of my free time in retirement doing. CWR is my first blog and is basically me doing a hobby in public.
 
-- **Snapshot.** A few charts and some basic analysis, readable in under five minutes.
-- **Deep dive.** Many charts and more detailed analysis, taking a lot more than five minutes.
+## Why does it exist?
 
-Every post is labelled with one or the other, and the categories list on the [Posts](index.qmd) page filters by kind or by topic.
+After years (no kidding!) of procrastination, I've decided to start publishing some of my charts and analysis because I have learned a lot of interesting and sometimes startling things from them, so I figure it's worth sharing some of what I learn with other Region residents who want to know more about where they live. And to my knowledge, aside from [Jeff Outhit](https://www.therecord.com/users/profile/jeff-outhit/), who does some excellent data journalism for The Record, there is no local outlet that regularly visualizes data about the Region. CWR exists to help fill this gap.
 
-## Who writes it
+## Where does its data come from?
 
-Posts are written by Greg Berberich.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other published sources. The README.md file in each post's GitHub folder lists the post's sources, with their links and licences.
 
-```{=html}
-<!-- TODO: add a short bio (background, why this region, why open data). The image
-     at the top is the site mark (images/logo-mark.svg); swap it for a photo if you
-     would rather have one here. -->
-```
+## Is it independent?
 
-## How the posts are made
+My area of expertise as an accountant was in auditing. An auditor's most-critical asset is their [independence](https://pcaobus.org/oversight/standards/archived-standards/pre-reorganized-auditing-standards-interpretations/details/AU220) because without it, their opinion is worthless. I therefore take my independence very seriously. CWR is not funded by or affiliated with any government, public service body, institution, or any other organization that could compromise my independence. All editorial decisions and opinions are mine alone.
 
-- **Sources are public.** Statistics Canada tables, municipal open-data portals, published reports. Each post lists its sources, with links and licences, in a data section at the end.
-- **Charts follow one style.** Direct labels instead of legends, no chart junk, the same three colours throughout: blue for Waterloo Region, red for a comparison such as Canada, grey for context.
-- **Nothing is hidden.** The code, the cleaned data, and the rendered results all live in the repository. Large files are attached to GitHub Releases so anyone can download them.
-- **Everything is reusable.** Text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): copy, share, or republish them, including in the news, with credit to Charting Waterloo Region. The code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE). Data stays under the licence of whoever published it.
+## How is it built?
 
-## How the site is built
+I use [R](https://www.r-project.org), a popular language for doing data science, to produce CWR's charts and tables, and to prepare the data behind them. [Quarto](https://quarto.org) combines the R code with my writing and renders it into the HTML, CSS, and images needed to produce the CWR website. These website elements get pushed to a [GitHub folder](https://github.com/gpberber/chartingwaterlooregion) and then served to you via [GitHub Pages](https://docs.github.com/en/pages).
 
-The analysis and the charts are [R](https://www.r-project.org): [ggplot2](https://ggplot2.tidyverse.org) for the charts, [gt](https://gt.rstudio.com) for the tables, and [sf](https://r-spatial.github.io/sf/) when there is a map. [Quarto](https://quarto.org) turns that code, and the writing around it, into the pages you are reading.
+[GoatCounter](https://www.goatcounter.com/) counts page views and post likes so I know which posts people find interesting. The site sets no cookies and records nothing that identifies you, so there is nothing to opt out of.
 
-The pages are built on my own computer rather than by a server, so what reaches you is plain HTML, CSS and images: no database, no code running behind the scenes, nothing to sign in to. GitHub Pages serves them, and both the source and the rendered output live in the [GitHub repository](https://github.com/gpberber/chartingwaterlooregion).
+## Does it use AI?
 
-## Privacy
+Yes, I use [Claude](https://claude.ai), an AI model made by Anthropic, primarily as the supplier of the code used to build the site's infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it's fun!).
 
-This site counts page views so I know which posts people find useful. The counter sets no cookies, records nothing that identifies you, and is not run by an advertising company. There is nothing to opt out of and nothing to click away.
+I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant.
 
-## Contact and corrections
+I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post's text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts' alt text for screen readers, each post's README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product.
 
-Spotted an error or have a question about the data? Email [greg\@chartingwaterlooregion.ca](mailto:greg@chartingwaterlooregion.ca). Corrections are welcome and are made in public: if a post changes after publication, the change is noted in the post.
+## Is it reproducible?
+
+Yes, if you are so inclined, you can reproduce every post using the code and data in its associated GitHub folder. If you just want a post's data, you can download a zip file containing the tables in CSV and Parquet formats, as well as an Excel workbook (when the tables are small enough), and a brief data dictionary describing the fields in each table. The "Reproducibility and data download" section at the end of each post contains links to the post's GitHub folder and zipped data files.
+
+## Can its content be reused?
+
+Yes, everything on CWR is reusable. The text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE), so it can be reused as well. All data stays under the terms set by whoever published it.
+
+## Could it contain mistakes?
+
+Yes, I am human and can make mistakes. If you spot an error or have a question about the data, [email me](mailto:greg@chartingwaterlooregion.ca) with the details. I will correct any post containing verified errors and add a dated note at the top of the post saying what changed.
+
+## How does it make money?
+
+It doesn't. CWR is a non-commercial venture, so it doesn't have ads and it won't ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That's all the reward I need.

@@ -20,7 +20,7 @@ cwr_packages <- c(
   "quarto", "rmarkdown", "knitr", "sessioninfo", "gh", "httr2",
 
   # Data sources and file formats
-  "cansim", "arrow", "readxl", "openxlsx", "pdftools",
+  "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",
 
   # Spatial and maps
   "sf", "units",

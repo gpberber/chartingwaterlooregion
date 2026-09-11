@@ -62,8 +62,6 @@ website:
         href: index.qmd
       - text: About
         href: about.qmd
-      - text: Reproduce a post
-        href: reproduce.qmd
     right:
       - icon: github
         href: https://github.com/gpberber/chartingwaterlooregion
