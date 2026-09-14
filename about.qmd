@@ -28,14 +28,17 @@ toc: false
 <!-- The site card, as live text rather than the picture of it.
      images/social-card.png says the same thing, but its type is drawn at a fixed
      1200px wide: on a phone the strapline would land at about seven pixels tall.
-     Set as HTML it reflows, and the wording only has to be kept in step with
-     _quarto.yml's `description` and the card_text() calls in _dev/logo/make_logo.R.
+     Set as HTML it reflows. This is the site's visible tagline, and it has to stay
+     in step with index.qmd's subtitle and the card_text() calls in
+     _dev/logo/make_logo.R. _quarto.yml's `description` is deliberately NOT the same
+     sentence: that one is the meta description search engines, link previews and the
+     RSS feed use, so it stays descriptive and names the subject and the open data.
      custom.scss hides Quarto's own title block here and styles the <h1> below, so
      that the card sits above the heading instead of underneath it. -->
 <div class="cwr-hero">
   <div class="cwr-hero-text">
     <p class="cwr-hero-name">Charting<br>Waterloo Region</p>
-    <p class="cwr-hero-tagline">Charts and analysis about life in Waterloo Region, built from open data.</p>
+    <p class="cwr-hero-tagline">Learning about life in Waterloo Region, one chart at a time.</p>
   </div>
   <img class="cwr-hero-mark" src="images/logo-mark.svg" width="256" height="256"
        alt="The seven municipalities of Waterloo Region, shaded by population.">
