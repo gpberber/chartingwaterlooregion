@@ -314,6 +314,15 @@ $code-color: #333333;
   }
 }
 
+// The tagline under the home page title. index.qmd is the only page that sets a
+// `subtitle`, so this rule reaches nowhere else. It fits on one line in a full
+// window, but around 800 to 900px and again near 600px the column is just short
+// enough to push the last word or two on to a line of their own; balance splits
+// the two lines evenly instead. Same treatment as the About hero tagline.
+.quarto-title .subtitle {
+  text-wrap: balance;
+}
+
 // ---------------------------------------------------------------------------
 // Post listing on the home page
 // ---------------------------------------------------------------------------
@@ -514,7 +523,13 @@ blockquote { border-left: 3px solid $cwr-grey-50; color: #444; }
     font-size: clamp(0.95rem, 2.4vw, 1.1rem);
     line-height: 1.35;
     margin: 0;
-    max-width: 26em;
+    // The tagline is 27.7em on one line, and the column beside the mark is wide
+    // enough for it at the full 800px body width, so the cap sits above that and
+    // only the column decides where it wraps. balance splits the two lines evenly
+    // when the window is narrow enough to force a wrap, instead of dropping the
+    // last word on to a line of its own.
+    max-width: 30em;
+    text-wrap: balance;
   }
   .cwr-hero-mark {
     flex: 0 0 auto;
