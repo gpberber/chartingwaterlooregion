@@ -58,7 +58,7 @@ After years (no kidding!) of procrastination, I've decided to start publishing s
 
 ## Where does its data come from?
 
-CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The README.md file in each post's GitHub folder lists the post's sources, with their links and licences, where applicable.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The "Data sources" section at the end of each post lists the sources, with their links and licences, where applicable.
 
 ## Is it independent?
 
@@ -70,7 +70,7 @@ Yes. Because I'm sharing charts and analysis with the public, I believe I have a
 
 1. Charts will be based on reliable data.
 2. Charts will not intentionally mislead and will aim not to mislead by accident.
-2. Charts rarely serve as convincing arguments on their own, so they will be supplemented by honest, insightful analysis.
+3. Charts rarely serve as convincing arguments on their own, so they will be supplemented by honest, insightful analysis.
 4. Charts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.
 5. Charts will enhance our understanding of their subject matter and start conversations, not stop them.
 
@@ -82,11 +82,11 @@ I use [R](https://www.r-project.org), a popular language for doing data science,
 
 ## Does it use AI?
 
-Yes, I use [Claude](https://claude.ai), an AI model made by Anthropic, primarily as the supplier of the code used to build the site's infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it's fun!).
+Yes, I use [Claude](https://claude.ai), an AI model made by Anthropic, primarily as the supplier of the code used to modify the site's infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it's fun!).
 
-I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant.
+I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant. Claude also assists with background research, helping me identify sources, summarize lengthy documents, and synthesize content to provide useful context for my own analysis. I audit what Claude produces to ensure its relevant and reliable.
 
-I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post's text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts' alt text for screen readers, each post's README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product.
+I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post's text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts' alt text for screen readers, each post's README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product and credit all sources used to produce it.
 
 ## Is it reproducible?
 
@@ -110,4 +110,4 @@ If you use an RSS reader, which aggregates articles from sites you like into a h
 
 ## How does it make money?
 
-It doesn't. CWR is a non-commercial venture, so it doesn't have ads and it won't ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That's all the reward I need.
+It doesn't. Like Neil Young, it's [sponsored by nobody](https://www.youtube.com/watch?v=KSSvzCNBvlQ). CWR is a non-commercial venture, so it doesn't have ads and it won't ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That's all the reward I need.

@@ -426,6 +426,43 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 # sessioninfo::session_info() would also print the pandoc and quarto install
 # paths, which expose the local user name and folder layout, so this prints
 # only what a reader needs: R version, OS, date, and attached package versions.
+# ---- The post's data-source table ------------------------------------------
+# Each post's README.md holds one table of its data sources: what each file is,
+# where it came from, its licence, when it was downloaded. That table is what
+# someone browsing the repository sees, and since 2026-09-14 it is also what the
+# post's "Data sources" section shows. This function reads it out of the README
+# rather than keeping a second copy in the post, so the two cannot drift apart.
+#
+# It prints the markdown straight through instead of building a gt table. The
+# cells hold hand-written markdown links ([City of Kitchener](https://...)), and
+# passing them along unchanged is both simpler and guarantees the post says
+# exactly what the README says. Call it from a chunk with `#| output: asis`.
+cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+  if (!file.exists(readme)) {
+    stop("No README.md for post '", slug, "' at ", readme, call. = FALSE)
+  }
+  lines <- read_lines(readme)
+
+  # Everything under the "## Data sources" heading, stopping at the next heading
+  start <- which(str_trim(lines) == "## Data sources")
+  if (length(start) == 0) {
+    stop("README.md for '", slug, "' has no '## Data sources' heading", call. = FALSE)
+  }
+  after <- lines[(start[1] + 1):length(lines)]
+  next_heading <- which(str_starts(str_trim(after), "## "))
+  section <- if (length(next_heading) > 0) after[seq_len(next_heading[1] - 1)] else after
+
+  # The table is the run of pipe-delimited lines in that section
+  table_lines <- section[str_starts(str_trim(section), fixed("|"))]
+  if (length(table_lines) == 0) {
+    stop("No table under '## Data sources' in ", readme, call. = FALSE)
+  }
+
+  cat(table_lines, sep = "\n")
+  cat("\n")
+  invisible(table_lines)
+}
+
 cwr_session_info <- function() {
   platform <- sessioninfo::platform_info()
   cat(

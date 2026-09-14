@@ -124,7 +124,7 @@ get_waterloo_cities <- function(
 # ---------------------------------------------------------------------------
 # WRPS publishes its occurrence dataset for public analysis with this condition
 # attached. Every post that uses wat_region_occurrences must show it, for
-# example in a callout in the Data and methods section:
+# example in a callout in the Data sources section:
 #   ::: {.callout-note}
 #   `r wrps_disclaimer`
 #   :::

@@ -101,7 +101,7 @@ If the post draws on a shared dataset (section 5), say so when asked; Claude wir
     source("posts/housing-starts/R/02_clean_data.R")
     ```
 
-4.  Fill the source table in `README.md`: file, what it is, link, the source's own licence (for example Open Government Licence – Kitchener, Statistics Canada Open Licence), date accessed.
+4.  Fill the source table in `README.md`: file, what it is, link, the source's own licence (for example Open Government Licence – Kitchener, Statistics Canada Open Licence), date accessed. That table is the only copy: the post's Data sources section prints it from the README at render time, so never retype it into `index.qmd`.
 
 5.  Any new package goes into `R/packages.R` as well as the script.
 
@@ -127,7 +127,7 @@ What readers get, at publish time (3.7), is `<slug>-data-v<n>.zip` attached to t
 
 ### 3.4 Write the post
 
-The template gives the structure: an opening paragraph with the question and the answer, sections with plain-language headings, one chart or table per section, a Data and methods section, and a collapsed Reproducibility box at the end.
+The template gives the structure: an opening paragraph with the question and the answer, sections with plain-language headings, one chart or table per section, a Data sources section (which prints the source table straight from the post's README.md), an optional Other sources section for anything cited that is not data, and a collapsed Reproducibility box at the end.
 
 - **Charts.** Ask Claude for the chart you want ("a ranked lollipop of housing starts per 1,000 residents for the Big 12, Waterloo Region bolded"). The `cwr-charts` skill loads automatically: it picks a template from the snippet library, applies the house colours and theme, renders the chart to a PNG, looks at it, and tunes label positions before putting the code in the post. Every chart is built as `p` and handed to `cwr_figure(p, "fig-name", alt = , height = , phone_height = )`, which draws it twice, once at the paragraph width for desktops and once at half that for phones, saves both PNGs in the post's `figures/` folder (committed), and writes the figure so the browser shows the right one. Text stays the same size in both, so phone readers never need to tap to enlarge. The source line inside the chart comes from `cwr_caption("Source name")`, which names whoever published the numbers. It does not add your own name: a chart that plots a publisher's figures as published is their work. When the numbers on the chart were worked out here instead - a rate you calculated, an index you based, several sources combined - pass `credit = TRUE` and the line gains "\| Charting Waterloo Region".
 - **Figure numbers depend on the kind of post, and you do not set them.** A Deep dive gets a plain "Figure 1" under each chart, so a paragraph near the end can point back at a chart near the start; write that reference as `@fig-name` in the text and Quarto fills in the number, which keeps it right when charts move. A Snapshot gets no number at all, because a few charts read in five minutes do not need them and the chart's own title says what it shows. `cwr_figure()` works this out from the first word in the post's `categories`. Captions under charts are optional and usually left off: the source is already printed inside the chart, and the subtitle carries the explanation.
@@ -308,7 +308,7 @@ After any of these, `quarto render` then `/publish` with no argument.
 - Data is never relicensed. Each README names the source's own licence.
 - **Quoting or paraphrasing another source.** A paraphrase in your own words needs nothing but a credit: copyright covers wording, not facts or ideas. A direct quote needs to be short next to the whole work, clearly marked as a quote, and attributed to its author and title - and it stays under its owner's terms, never CC BY. That exception has to appear in all three places that promise reuse, so **change all three or none**: the "Can its content be reused?" answer in `about.qmd`, the third-party bullet in `LICENSE-CONTENT.md`, and the "Reusing this post" text in `posts/_metadata.yml`. The person harmed by a missing carve-out is the reader who reuses someone else's words believing this site's licence covered them.
 - **Images are the trap, not text.** A chart, figure or screenshot taken from a copyrighted report must never go out under CC BY. Rebuild the chart from the underlying data and cite the source instead - better work anyway. Never quote song lyrics or poetry, where a few lines can be most of the work.
-- WRPS occurrence data requires a disclaimer on any publication. Posts that use it include `wrps_disclaimer` (from `datasets/crime/R/helpers.R`) in their Data and methods section; `/review-post` checks for it.
+- WRPS occurrence data requires a disclaimer on any publication. Posts that use it include `wrps_disclaimer` (from `datasets/crime/R/helpers.R`) in their Data sources section; `/review-post` checks for it.
 
 ## 10. Reproducibility checklist (what a reader needs)
 

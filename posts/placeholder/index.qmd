@@ -122,11 +122,19 @@ cwr_figure(
 )
 ```
 
-## Data and methods
+## Data sources
 
 The chart uses daily phone-queue metrics published by the City of Kitchener, covering 1 March 2019 to 30 July 2023. Weekends and statutory holidays are left out, because the contact centre runs a skeleton service on those days. A call that was abandoned while waiting counts as a miss against the 30-second target.
 
-The full sources and licences are in this post's `README.md`. A fuller treatment of the same data is written up in the `kitchener-phone-wait-times` post, which is not published yet.
+A fuller treatment of the same data is written up in the `kitchener-phone-wait-times` post, which is not published yet.
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("placeholder")
+```
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility

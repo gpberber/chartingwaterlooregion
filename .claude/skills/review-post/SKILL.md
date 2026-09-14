@@ -65,8 +65,11 @@ For every `ggplot` chunk:
 - README lists each source with URL, licence, and access date. The licence must be the source's own
   (e.g. Statistics Canada Open Licence, Open Government Licence – Kitchener), never "CC BY" or "MIT";
   files obtained by request rather than from an open-data portal need their terms confirmed.
+- The post has a `## Data sources` section that prints the README's table with
+  `cwr_sources_table("<slug>")` in an `#| output: asis` chunk, rather than a second copy of the table
+  typed into the post; a `## Other sources` section follows it whenever anything non-data is cited.
 - A post that uses WRPS occurrence data (`load_wrps_occurrences()` or `wat_region_occurrences`)
-  shows `wrps_disclaimer` in its Data and methods section; WRPS requires it on any publication.
+  shows `wrps_disclaimer` in its Data sources section; WRPS requires it on any publication.
 - The post does not override `license:` in its YAML (site default is CC BY, set in `posts/_metadata.yml`).
 - The post ends with the "Reproducibility and data download" callout (download link, dictionary
   table, session info) and its setup chunk sources `R/data_bundle.R` and sets `data_bundle_version`.

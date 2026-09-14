@@ -276,13 +276,21 @@ cwr_figure(
 )
 ```
 
-## Data and methods
+## Data sources
 
 The City of Kitchener publishes daily metrics for its main phone queue on its open data portal. This post uses the export covering 26 February 2019 to 30 July 2023, the full range available when it was downloaded in February 2025. Days with an incomplete or duplicated set of metrics (14 of about 1,600) and the partial first month were dropped.
 
 All figures are weekdays excluding Ontario statutory holidays. Weekend and holiday volumes run at roughly `r pct(100 * weekend_share)` of a weekday, on a reduced service, and would flatter every average.
 
 "Answered within 30 seconds" is the share of all calls presented that an agent picked up inside the target, so a caller who hung up while waiting counts as a miss. The City also reports three gentler versions of the same measure, all included in the download below. Waits are the daily average queue time weighted by the number of calls that day.
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("kitchener-phone-wait-times")
+```
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download

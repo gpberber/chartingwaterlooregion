@@ -61,7 +61,7 @@ big_12_financials <- read_crime("big_12_financial_summary.rds")   # Big 12 spend
 # release. The file is 161 MB so it lives in GitHub Release data-dataset-crime-v1
 # rather than in git. It is not loaded here by default; a post that needs it calls:
 #   wat_region_occurrences <- load_wrps_occurrences()
-# and must show `wrps_disclaimer` (defined in helpers.R) in its Data and methods section.
+# and must show `wrps_disclaimer` (defined in helpers.R) in its Data sources section.
 load_wrps_occurrences <- function() {
   path <- file.path(crime_data_dir, "wat_region_occurrences.parquet")
   if (!file.exists(path)) {
