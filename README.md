@@ -1,6 +1,6 @@
 # Charting Waterloo Region
 
-Charts and analysis about life in Waterloo Region, built from open data.
+Learning about life in Waterloo Region, one chart at a time.
 
 **Site:** https://chartingwaterlooregion.ca
 

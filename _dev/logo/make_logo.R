@@ -406,7 +406,15 @@ walk(seq_len(nrow(municipalities)), \(i) {
   )
 })
 
-# The name, set in two lines so it clears the mark, and the strapline under it.
+# The name, set in two lines so it clears the mark.
+#
+# The strapline is deliberately NOT drawn here (removed 2026-09-14). A link preview
+# shows this image and the page description side by side, so a tagline appearing in
+# both read as a duplicate. It now lives only in the page metadata - which also means
+# changing the tagline no longer means regenerating this file.
+#
+# With the strapline gone the two name lines are centred on y = 315, the centre of the
+# mark box (y 95 to 535), so the block balances the mark instead of sitting high.
 card_text <- function(label, x, y, size, colour, face = "plain") {
   grid.text(
     label, x = unit(x, "native"), y = unit(y, "native"),
@@ -415,10 +423,8 @@ card_text <- function(label, x, y, size, colour, face = "plain") {
   )
 }
 
-card_text("Charting", 80, 250, 62, cwr_blue, "bold")
-card_text("Waterloo Region", 80, 318, 62, cwr_blue, "bold")
-card_text("Learning about life in Waterloo Region,", 80, 383, 24, "#4a5457")
-card_text("one chart at a time.", 80, 416, 24, "#4a5457")
+card_text("Charting", 80, 280, 62, cwr_blue, "bold")
+card_text("Waterloo Region", 80, 348, 62, cwr_blue, "bold")
 
 invisible(dev.off())
 
