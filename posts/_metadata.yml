@@ -8,7 +8,7 @@ date-modified: last-modified
 # Adds a "Reusing this post" box at the end of every post (heading set in _quarto.yml).
 # Text and charts are CC BY 4.0; code is MIT (see LICENSE and LICENSE-CONTENT.md).
 license:
-  text: "The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above."
+  text: "The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above. Material quoted from other sources stays under its owner's terms."
   url: https://creativecommons.org/licenses/by/4.0/
 
 # Posts show prose, charts, and tables, not code. Readers who want the code use

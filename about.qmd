@@ -50,7 +50,7 @@ Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories 
 
 ## Who writes it?
 
-The "one guy" in question is Greg Berberich. I was fortunate to achieve Freedom 55 at the end of 2023, retiring after 30 years as a Chartered Accountant, the last 25 spent in academia teaching and doing institutional research (I no longer hold the CA designation). As my undergrad degree in math, my PhD in accounting, and my decades as a CA indicate, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of my free time in retirement doing. CWR is my first blog and is basically me doing a hobby in public.
+The "one guy" in question is Greg Berberich. I'm a retired GenXer who was a Chartered Accountant for 30 years, the last 25 of those spent in academia earning a PhD in accounting, teaching, and doing institutional research (I no longer hold the CA designation). In case it's not obvious, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I've lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.
 
 ## Why does it exist?
 
@@ -58,11 +58,21 @@ After years (no kidding!) of procrastination, I've decided to start publishing s
 
 ## Where does its data come from?
 
-CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other published sources. The README.md file in each post's GitHub folder lists the post's sources, with their links and licences.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The README.md file in each post's GitHub folder lists the post's sources, with their links and licences, where applicable.
 
 ## Is it independent?
 
-My area of expertise as an accountant was in auditing. An auditor's most-critical asset is their [independence](https://pcaobus.org/oversight/standards/archived-standards/pre-reorganized-auditing-standards-interpretations/details/AU220) because without it, their opinion is worthless. I therefore take my independence very seriously. CWR is not funded by or affiliated with any government, public service body, institution, or any other organization that could compromise my independence. All editorial decisions and opinions are mine alone.
+My area of expertise as an accountant was in auditing. An auditor's most-critical asset is their [independence](https://pcaobus.org/oversight/standards/archived-standards/pre-reorganized-auditing-standards-interpretations/details/AU220) because without it, their opinion is worthless. I therefore take CWR's independence very seriously. CWR is not funded by or affiliated with any government, public-service body, institution, or any other organization or person that could compromise its independence. All editorial decisions and opinions are mine alone.
+
+## Does it have guiding principles?
+
+Yes. Because I'm sharing charts and analysis with the public, I believe I have an obligation to earn readers' trust, so CWR operates with a few key principles. I've read a literal shelf-load of books on data visualization. One called *How Charts Lie* by data journalist [Alberto Cairo](https://www.albertocairo.com/) sets out several useful charting principles. I've adapted a few to guide CWR:
+
+1. Charts will be based on reliable data.
+2. Charts will not intentionally mislead and will aim not to mislead by accident.
+2. Charts rarely serve as convincing arguments on their own, so they will be supplemented by honest, insightful analysis.
+4. Charts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.
+5. Charts will enhance our understanding of their subject matter and start conversations, not stop them.
 
 ## How is it built?
 
@@ -84,11 +94,19 @@ Yes, if you are so inclined, you can reproduce every post using the code and dat
 
 ## Can its content be reused?
 
-Yes, everything on CWR is reusable. The text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE), so it can be reused as well. All data stays under the terms set by whoever published it.
+Yes, everything on CWR is reusable, apart from material quoted from other sources, which stays under its owner's terms. The text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE), so it can be reused as well. All data stays under the terms set by whoever published it.
 
 ## Could it contain mistakes?
 
 Yes, I am human and can make mistakes. If you spot an error or have a question about the data, [email me](mailto:greg@chartingwaterlooregion.ca) with the details. I will correct any post containing verified errors and add a dated note at the top of the post saying what changed.
+
+## Why doesn't it have social-platform buttons or comments?
+
+Social-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR's privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it's easy to share CWR content without loading any trackers. Neither I nor CWR has accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog.
+
+## Can I subscribe to it?
+
+If you use an RSS reader, which aggregates articles from sites you like into a handy chronological feed, CWR's feed is at https://chartingwaterlooregion.ca/index.xml. Your reader will also find it if you just give it chartingwaterlooregion.ca. If enough people start reading this blog and indicate they'd like another way to subscribe, I will consider wiring that feature into the site.
 
 ## How does it make money?
 

@@ -21,5 +21,5 @@ please keep it.
 - **Data files** keep the licence of their original source. Each post's README lists every
   source with its licence, for example the Statistics Canada Open Licence or the Open
   Government Licence – Kitchener.
-- **Third-party material** quoted or reproduced in a post (a screenshot of a report, a quoted
-  passage) remains under its owner's terms.
+- **Third-party material** quoted or reproduced anywhere on the site (a screenshot of a report, a
+  quoted passage) remains under its owner's terms.
