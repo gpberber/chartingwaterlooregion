@@ -35,9 +35,9 @@
   const main   = document.querySelector("main.content");
   if (!banner || !meta || !main) return;
 
-  // The slug names the event in the dashboard: "like-kitchener-phone-wait-times"
-  // reads better in a list than a full path would. Posts live at /posts/<slug>/,
-  // so anything else falls back to the path rather than guessing.
+  // The slug names the event in the dashboard: "like-<slug>" reads better in a
+  // list than a full path would. Posts live at /posts/<slug>/, so anything else
+  // falls back to the path rather than guessing.
   const slug = location.pathname.match(/\/posts\/([^/]+)\//)?.[1] || location.pathname;
   const key  = "cwr-like:" + slug;
 
