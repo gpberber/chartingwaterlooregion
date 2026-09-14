@@ -39,7 +39,7 @@
     "href": "about.html#who-writes-it",
     "title": "About",
     "section": "Who writes it?",
-    "text": "Who writes it?\nThe “one guy” in question is Greg Berberich. I was fortunate to achieve Freedom 55 at the end of 2023, retiring after 30 years as a Chartered Accountant, the last 25 spent in academia teaching and doing institutional research (I no longer hold the CA designation). As my undergrad degree in math, my PhD in accounting, and my decades as a CA indicate, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of my free time in retirement doing. CWR is my first blog and is basically me doing a hobby in public."
+    "text": "Who writes it?\nThe “one guy” in question is Greg Berberich. I’m a retired GenXer who was a Chartered Accountant for 30 years, the last 25 of those spent in academia earning a PhD in accounting, teaching, and doing institutional research (I no longer hold the CA designation). In case it’s not obvious, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I’ve lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public."
   },
   {
     "objectID": "about.html#why-does-it-exist",
@@ -53,14 +53,21 @@
     "href": "about.html#where-does-its-data-come-from",
     "title": "About",
     "section": "Where does its data come from?",
-    "text": "Where does its data come from?\nCWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other published sources. The README.md file in each post’s GitHub folder lists the post’s sources, with their links and licences."
+    "text": "Where does its data come from?\nCWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The README.md file in each post’s GitHub folder lists the post’s sources, with their links and licences, where applicable."
   },
   {
     "objectID": "about.html#is-it-independent",
     "href": "about.html#is-it-independent",
     "title": "About",
     "section": "Is it independent?",
-    "text": "Is it independent?\nMy area of expertise as an accountant was in auditing. An auditor’s most-critical asset is their independence because without it, their opinion is worthless. I therefore take my independence very seriously. CWR is not funded by or affiliated with any government, public service body, institution, or any other organization that could compromise my independence. All editorial decisions and opinions are mine alone."
+    "text": "Is it independent?\nMy area of expertise as an accountant was in auditing. An auditor’s most-critical asset is their independence because without it, their opinion is worthless. I therefore take CWR’s independence very seriously. CWR is not funded by or affiliated with any government, public-service body, institution, or any other organization or person that could compromise its independence. All editorial decisions and opinions are mine alone."
+  },
+  {
+    "objectID": "about.html#does-it-have-guiding-principles",
+    "href": "about.html#does-it-have-guiding-principles",
+    "title": "About",
+    "section": "Does it have guiding principles?",
+    "text": "Does it have guiding principles?\nYes. Because I’m sharing charts and analysis with the public, I believe I have an obligation to earn readers’ trust, so CWR operates with a few key principles. I’ve read a literal shelf-load of books on data visualization. One called How Charts Lie by data journalist Alberto Cairo sets out several useful charting principles. I’ve adapted a few to guide CWR:\n\nCharts will be based on reliable data.\nCharts will not intentionally mislead and will aim not to mislead by accident.\nCharts rarely serve as convincing arguments on their own, so they will be supplemented by honest, insightful analysis.\nCharts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.\nCharts will enhance our understanding of their subject matter and start conversations, not stop them."
   },
   {
     "objectID": "about.html#how-is-it-built",
@@ -88,7 +95,7 @@
     "href": "about.html#can-its-content-be-reused",
     "title": "About",
     "section": "Can its content be reused?",
-    "text": "Can its content be reused?\nYes, everything on CWR is reusable. The text and charts are published under CC BY 4.0, so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is MIT licensed, so it can be reused as well. All data stays under the terms set by whoever published it."
+    "text": "Can its content be reused?\nYes, everything on CWR is reusable, apart from material quoted from other sources, which stays under its owner’s terms. The text and charts are published under CC BY 4.0, so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is MIT licensed, so it can be reused as well. All data stays under the terms set by whoever published it."
   },
   {
     "objectID": "about.html#could-it-contain-mistakes",
@@ -96,6 +103,20 @@
     "title": "About",
     "section": "Could it contain mistakes?",
     "text": "Could it contain mistakes?\nYes, I am human and can make mistakes. If you spot an error or have a question about the data, email me with the details. I will correct any post containing verified errors and add a dated note at the top of the post saying what changed."
+  },
+  {
+    "objectID": "about.html#why-doesnt-it-have-social-platform-buttons-or-comments",
+    "href": "about.html#why-doesnt-it-have-social-platform-buttons-or-comments",
+    "title": "About",
+    "section": "Why doesn’t it have social-platform buttons or comments?",
+    "text": "Why doesn’t it have social-platform buttons or comments?\nSocial-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR’s privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it’s easy to share CWR content without loading any trackers. Neither I nor CWR has accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog."
+  },
+  {
+    "objectID": "about.html#can-i-subscribe-to-it",
+    "href": "about.html#can-i-subscribe-to-it",
+    "title": "About",
+    "section": "Can I subscribe to it?",
+    "text": "Can I subscribe to it?\nIf you use an RSS reader, which aggregates articles from sites you like into a handy chronological feed, CWR’s feed is at https://chartingwaterlooregion.ca/index.xml. Your reader will also find it if you just give it chartingwaterlooregion.ca. If enough people start reading this blog and indicate they’d like another way to subscribe, I will consider wiring that feature into the site."
   },
   {
     "objectID": "about.html#how-does-it-make-money",
