@@ -306,6 +306,8 @@ After any of these, `quarto render` then `/publish` with no argument.
 
 - Code is MIT (`LICENSE`); text and charts are CC BY 4.0 (`LICENSE-CONTENT.md`). Every post ends with a "Reusing this post" box saying so; the text lives in `posts/_metadata.yml`.
 - Data is never relicensed. Each README names the source's own licence.
+- **Quoting or paraphrasing another source.** A paraphrase in your own words needs nothing but a credit: copyright covers wording, not facts or ideas. A direct quote needs to be short next to the whole work, clearly marked as a quote, and attributed to its author and title - and it stays under its owner's terms, never CC BY. That exception has to appear in all three places that promise reuse, so **change all three or none**: the "Can its content be reused?" answer in `about.qmd`, the third-party bullet in `LICENSE-CONTENT.md`, and the "Reusing this post" text in `posts/_metadata.yml`. The person harmed by a missing carve-out is the reader who reuses someone else's words believing this site's licence covered them.
+- **Images are the trap, not text.** A chart, figure or screenshot taken from a copyrighted report must never go out under CC BY. Rebuild the chart from the underlying data and cite the source instead - better work anyway. Never quote song lyrics or poetry, where a few lines can be most of the work.
 - WRPS occurrence data requires a disclaimer on any publication. Posts that use it include `wrps_disclaimer` (from `datasets/crime/R/helpers.R`) in their Data and methods section; `/review-post` checks for it.
 
 ## 10. Reproducibility checklist (what a reader needs)
