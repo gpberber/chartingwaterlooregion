@@ -25,7 +25,7 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "ChartingWaterloo Region\n    Charts and analysis about life in Waterloo Region, built from open data."
+    "text": "ChartingWaterloo Region\n    Learning about life in Waterloo Region, one chart at a time."
   },
   {
     "objectID": "about.html#what-is-it",
@@ -39,7 +39,7 @@
     "href": "about.html#who-writes-it",
     "title": "About",
     "section": "Who writes it?",
-    "text": "Who writes it?\nThe “one guy” in question is Greg Berberich. I’m a retired GenXer who was a Chartered Accountant for 30 years, the last 25 of those spent in academia earning a PhD in accounting, teaching, and doing institutional research (I no longer hold the CA designation). In case it’s not obvious, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I’ve lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public."
+    "text": "Who writes it?\nThe “one guy” in question is Greg Berberich. I’m a retired GenXer who was a Chartered Accountant for 30 years (I no longer hold the CA designation), the last 25 of those spent between UW and WLU earning a PhD in accounting, teaching, and doing institutional research. In case it’s not obvious, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I’ve lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public."
   },
   {
     "objectID": "about.html#why-does-it-exist",
@@ -53,7 +53,7 @@
     "href": "about.html#where-does-its-data-come-from",
     "title": "About",
     "section": "Where does its data come from?",
-    "text": "Where does its data come from?\nCWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The “Data sources” section at the end of each post lists the sources, with their links and licences, where applicable."
+    "text": "Where does its data come from?\nCWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The “Data sources” section at the end of each post lists the sources, with their links and licences, where applicable."
   },
   {
     "objectID": "about.html#is-it-independent",

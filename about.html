@@ -181,14 +181,17 @@ ul.task-list li input[type="checkbox"] {
 <!-- The site card, as live text rather than the picture of it.
      images/social-card.png says the same thing, but its type is drawn at a fixed
      1200px wide: on a phone the strapline would land at about seven pixels tall.
-     Set as HTML it reflows, and the wording only has to be kept in step with
-     _quarto.yml's `description` and the card_text() calls in _dev/logo/make_logo.R.
+     Set as HTML it reflows. This is the site's visible tagline, and it has to stay
+     in step with index.qmd's subtitle and the card_text() calls in
+     _dev/logo/make_logo.R. _quarto.yml's `description` is deliberately NOT the same
+     sentence: that one is the meta description search engines, link previews and the
+     RSS feed use, so it stays descriptive and names the subject and the open data.
      custom.scss hides Quarto's own title block here and styles the <h1> below, so
      that the card sits above the heading instead of underneath it. -->
 <div class="cwr-hero">
   <div class="cwr-hero-text">
     <p class="cwr-hero-name">Charting<br>Waterloo Region</p>
-    <p class="cwr-hero-tagline">Charts and analysis about life in Waterloo Region, built from open data.</p>
+    <p class="cwr-hero-tagline">Learning about life in Waterloo Region, one chart at a time.</p>
   </div>
   <img class="cwr-hero-mark" src="images/logo-mark.svg" width="256" height="256" alt="The seven municipalities of Waterloo Region, shaded by population.">
 </div>
@@ -199,7 +202,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="who-writes-it" class="level2">
 <h2 data-anchor-id="who-writes-it">Who writes it?</h2>
-<p>The “one guy” in question is Greg Berberich. I’m a retired GenXer who was a Chartered Accountant for 30 years, the last 25 of those spent in academia earning a PhD in accounting, teaching, and doing institutional research (I no longer hold the CA designation). In case it’s not obvious, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I’ve lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.</p>
+<p>The “one guy” in question is Greg Berberich. I’m a retired GenXer who was a Chartered Accountant for 30 years (I no longer hold the CA designation), the last 25 of those spent between UW and WLU earning a PhD in accounting, teaching, and doing institutional research. In case it’s not obvious, I really like playing with numbers, so as boring as it may sound to most people, that’s what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I’ve lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.</p>
 </section>
 <section id="why-does-it-exist" class="level2">
 <h2 data-anchor-id="why-does-it-exist">Why does it exist?</h2>
@@ -207,7 +210,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="where-does-its-data-come-from" class="level2">
 <h2 data-anchor-id="where-does-its-data-come-from">Where does its data come from?</h2>
-<p>CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The “Data sources” section at the end of each post lists the sources, with their links and licences, where applicable.</p>
+<p>CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The “Data sources” section at the end of each post lists the sources, with their links and licences, where applicable.</p>
 </section>
 <section id="is-it-independent" class="level2">
 <h2 data-anchor-id="is-it-independent">Is it independent?</h2>
