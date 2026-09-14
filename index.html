@@ -257,7 +257,7 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="U25hcHNob3QlMkNDaXR5JTIwU2VydmljZXMlMkNLaXRjaGVuZXI=" data-listing-date-sort="1789099200000" data-listing-file-modified-sort="1789168478061" data-listing-date-modified-sort="1789168478000" data-listing-reading-time-sort="4" data-listing-word-count-sort="762">
+<div class="quarto-post image-right" data-index="0" data-categories="U25hcHNob3QlMkNDaXR5JTIwU2VydmljZXMlMkNLaXRjaGVuZXI=" data-listing-date-sort="1789099200000" data-listing-file-modified-sort="1789409313141" data-listing-date-modified-sort="1789409313000" data-listing-reading-time-sort="4" data-listing-word-count-sort="769">
 <div class="thumbnail"><a href="./posts/placeholder/index.html" class="no-external">
 
 <img loading="lazy" src="./posts/placeholder/images/thumbnail.png" class="thumbnail-image">
@@ -557,16 +557,21 @@ Sep 11, 2026
   // Under the author and dates at the top.
   meta.insertAdjacentElement("afterend", build("cwr-like-header"));
 
-  // And where the analysis stops. Every post closes with "Data and methods" and
-  // then a Reproducibility box - house structure, set by _templates/post/index.qmd
-  // and checked by /review-post - and both are reference material rather than part
-  // of the piece. Asking for a like after them means asking at the wrong moment.
+  // And where the analysis stops. Every post closes with "Data sources", usually
+  // "Other sources", then a Reproducibility box - house structure, set by
+  // _templates/post/index.qmd and checked by /review-post - and all of it is
+  // reference material rather than part of the piece. Asking for a like after
+  // them means asking at the wrong moment.
   //
   // Pandoc builds the id from the heading, so a post that reworded that heading
-  // would not match. Rather than guess at the wording, the button falls back to
-  // the licence appendix and then to the end of the page: still on the post, just
-  // lower down. Renaming the section is the thing that moves it.
-  const end = main.querySelector("#data-and-methods") || main.querySelector("#quarto-appendix");
+  // would not match. "#data-and-methods" is the name that section carried before
+  // 2026-09-14 and is kept so older posts still place the button correctly. After
+  // those, the button falls back to the licence appendix and then to the end of
+  // the page: still on the post, just lower down. Renaming the section is the
+  // thing that moves it.
+  const end = main.querySelector("#data-sources") ||
+              main.querySelector("#data-and-methods") ||
+              main.querySelector("#quarto-appendix");
   if (end) end.insertAdjacentElement("beforebegin", build("cwr-like-end"));
   else main.appendChild(build("cwr-like-end"));
 

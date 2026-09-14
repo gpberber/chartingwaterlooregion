@@ -207,7 +207,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="where-does-its-data-come-from" class="level2">
 <h2 data-anchor-id="where-does-its-data-come-from">Where does its data come from?</h2>
-<p>CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The README.md file in each post’s GitHub folder lists the post’s sources, with their links and licences, where applicable.</p>
+<p>CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The “Data sources” section at the end of each post lists the sources, with their links and licences, where applicable.</p>
 </section>
 <section id="is-it-independent" class="level2">
 <h2 data-anchor-id="is-it-independent">Is it independent?</h2>
@@ -231,9 +231,9 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="does-it-use-ai" class="level2">
 <h2 data-anchor-id="does-it-use-ai">Does it use AI?</h2>
-<p>Yes, I use <a href="https://claude.ai">Claude</a>, an AI model made by Anthropic, primarily as the supplier of the code used to build the site’s infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it’s fun!).</p>
-<p>I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant.</p>
-<p>I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post’s text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts’ alt text for screen readers, each post’s README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product.</p>
+<p>Yes, I use <a href="https://claude.ai">Claude</a>, an AI model made by Anthropic, primarily as the supplier of the code used to modify the site’s infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it’s fun!).</p>
+<p>I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant. Claude also assists with background research, helping me identify sources, summarize lengthy documents, and synthesize content to provide useful context for my own analysis. I audit what Claude produces to ensure its relevant and reliable.</p>
+<p>I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post’s text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts’ alt text for screen readers, each post’s README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product and credit all sources used to produce it.</p>
 </section>
 <section id="is-it-reproducible" class="level2">
 <h2 data-anchor-id="is-it-reproducible">Is it reproducible?</h2>
@@ -257,7 +257,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="how-does-it-make-money" class="level2">
 <h2 data-anchor-id="how-does-it-make-money">How does it make money?</h2>
-<p>It doesn’t. CWR is a non-commercial venture, so it doesn’t have ads and it won’t ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That’s all the reward I need.</p>
+<p>It doesn’t. Like Neil Young, it’s <a href="https://www.youtube.com/watch?v=KSSvzCNBvlQ">sponsored by nobody</a>. CWR is a non-commercial venture, so it doesn’t have ads and it won’t ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That’s all the reward I need.</p>
 
 
 </section>
@@ -546,16 +546,21 @@ ul.task-list li input[type="checkbox"] {
   // Under the author and dates at the top.
   meta.insertAdjacentElement("afterend", build("cwr-like-header"));
 
-  // And where the analysis stops. Every post closes with "Data and methods" and
-  // then a Reproducibility box - house structure, set by _templates/post/index.qmd
-  // and checked by /review-post - and both are reference material rather than part
-  // of the piece. Asking for a like after them means asking at the wrong moment.
+  // And where the analysis stops. Every post closes with "Data sources", usually
+  // "Other sources", then a Reproducibility box - house structure, set by
+  // _templates/post/index.qmd and checked by /review-post - and all of it is
+  // reference material rather than part of the piece. Asking for a like after
+  // them means asking at the wrong moment.
   //
   // Pandoc builds the id from the heading, so a post that reworded that heading
-  // would not match. Rather than guess at the wording, the button falls back to
-  // the licence appendix and then to the end of the page: still on the post, just
-  // lower down. Renaming the section is the thing that moves it.
-  const end = main.querySelector("#data-and-methods") || main.querySelector("#quarto-appendix");
+  // would not match. "#data-and-methods" is the name that section carried before
+  // 2026-09-14 and is kept so older posts still place the button correctly. After
+  // those, the button falls back to the licence appendix and then to the end of
+  // the page: still on the post, just lower down. Renaming the section is the
+  // thing that moves it.
+  const end = main.querySelector("#data-sources") ||
+              main.querySelector("#data-and-methods") ||
+              main.querySelector("#quarto-appendix");
   if (end) end.insertAdjacentElement("beforebegin", build("cwr-like-end"));
   else main.appendChild(build("cwr-like-end"));
 

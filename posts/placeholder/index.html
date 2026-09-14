@@ -206,7 +206,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">September 11, 2026</p>
+        <p class="date-modified">September 14, 2026</p>
       </div>
     </div>
       
@@ -221,7 +221,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul class="collapse">
-  <li><a href="#data-and-methods" id="toc-data-and-methods" class="nav-link active" data-scroll-target="#data-and-methods">Data and methods</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link active" data-scroll-target="#data-sources">Data sources</a></li>
   </ul>
 <div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/gpberber/chartingwaterlooregion/blob/master/posts/placeholder/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li></ul></div></nav>
     </div>
@@ -244,10 +244,30 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>Between 2019 and 2023, the share of weekday calls the City of Kitchener answered within 30 seconds fell from 80% to 69%. The City’s own target is 80%.</p>
 <p><picture> <source media="(max-width: 767px)" srcset="figures/fig-answered-phone.png" width="403" height="432"> <img src="figures/fig-answered.png" alt="Line chart of the monthly share of calls answered within 30 seconds. The line sits near the 80% target through 2019, 2020 and 2021 with a dip in mid-2020, then drops below the target for all of 2022 and 2023, reaching a low near 60% in May 2022." class="img-fluid" width="797" height="480"> </picture></p>
-<section id="data-and-methods" class="level2">
-<h2 class="anchored" data-anchor-id="data-and-methods">Data and methods</h2>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data sources</h2>
 <p>The chart uses daily phone-queue metrics published by the City of Kitchener, covering 1 March 2019 to 30 July 2023. Weekends and statutory holidays are left out, because the contact centre runs a skeleton service on those days. A call that was abandoned while waiting counts as a miss against the 30-second target.</p>
-<p>The full sources and licences are in this post’s <code>README.md</code>. A fuller treatment of the same data is written up in the <code>kitchener-phone-wait-times</code> post, which is not published yet.</p>
+<p>A fuller treatment of the same data is written up in the <code>kitchener-phone-wait-times</code> post, which is not published yet.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>File in <code>data/</code></th>
+<th>What it is</th>
+<th>Source (link)</th>
+<th>Licence</th>
+<th>Accessed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>queue_daily.csv</code></td>
+<td>Daily phone-queue metrics for the City of Kitchener contact centre, 1 March 2019 to 30 July 2023, with calendar and holiday flags</td>
+<td><a href="https://open-kitchenergis.opendata.arcgis.com/documents/KitchenerGIS::phone-queue-metrics/about">City of Kitchener Open Data</a></td>
+<td>Open Government Licence - The Corporation of the City of Kitchener</td>
+<td>Feb 2025</td>
+</tr>
+</tbody>
+</table>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -266,7 +286,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output cell-output-stdout">
 <pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
 OS:        Windows 11 x64 (build 26200)
-Rendered:  2026-09-11
+Rendered:  2026-09-14
 Quarto:    1.9.38
 
     package version       date         source
@@ -564,16 +584,21 @@ Quarto:    1.9.38
   // Under the author and dates at the top.
   meta.insertAdjacentElement("afterend", build("cwr-like-header"));
 
-  // And where the analysis stops. Every post closes with "Data and methods" and
-  // then a Reproducibility box - house structure, set by _templates/post/index.qmd
-  // and checked by /review-post - and both are reference material rather than part
-  // of the piece. Asking for a like after them means asking at the wrong moment.
+  // And where the analysis stops. Every post closes with "Data sources", usually
+  // "Other sources", then a Reproducibility box - house structure, set by
+  // _templates/post/index.qmd and checked by /review-post - and all of it is
+  // reference material rather than part of the piece. Asking for a like after
+  // them means asking at the wrong moment.
   //
   // Pandoc builds the id from the heading, so a post that reworded that heading
-  // would not match. Rather than guess at the wording, the button falls back to
-  // the licence appendix and then to the end of the page: still on the post, just
-  // lower down. Renaming the section is the thing that moves it.
-  const end = main.querySelector("#data-and-methods") || main.querySelector("#quarto-appendix");
+  // would not match. "#data-and-methods" is the name that section carried before
+  // 2026-09-14 and is kept so older posts still place the button correctly. After
+  // those, the button falls back to the licence appendix and then to the end of
+  // the page: still on the post, just lower down. Renaming the section is the
+  // thing that moves it.
+  const end = main.querySelector("#data-sources") ||
+              main.querySelector("#data-and-methods") ||
+              main.querySelector("#quarto-appendix");
   if (end) end.insertAdjacentElement("beforebegin", build("cwr-like-end"));
   else main.appendChild(build("cwr-like-end"));
 
