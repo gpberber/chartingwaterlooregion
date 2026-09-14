@@ -50,7 +50,7 @@ Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories 
 
 ## Who writes it?
 
-The "one guy" in question is Greg Berberich. I'm a retired GenXer who was a Chartered Accountant for 30 years, the last 25 of those spent in academia earning a PhD in accounting, teaching, and doing institutional research (I no longer hold the CA designation). In case it's not obvious, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I've lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.
+The "one guy" in question is Greg Berberich. I'm a retired GenXer who was a Chartered Accountant for 30 years (I no longer hold the CA designation), the last 25 of those spent between UW and WLU earning a PhD in accounting, teaching, and doing institutional research. In case it's not obvious, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I've lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.
 
 ## Why does it exist?
 
@@ -58,7 +58,7 @@ After years (no kidding!) of procrastination, I've decided to start publishing s
 
 ## Where does its data come from?
 
-CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other mostly-published sources. The "Data sources" section at the end of each post lists the sources, with their links and licences, where applicable.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources" section at the end of each post lists the sources, with their links and licences, where applicable.
 
 ## Is it independent?
 
