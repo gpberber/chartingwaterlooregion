@@ -166,3 +166,75 @@ districts |>
   write_csv(file.path(data_dir, "districts.csv"))
 
 message("Wrote ", nrow(districts), " districts to ", data_dir)
+
+# ---- 7. Employment by industry ---------------------------------------------
+# Table 14-10-0468-01 covers 38 census metropolitan areas and every year from
+# 2011, so it is cut to one place and one year while being read.
+employment_raw <- read_csv(
+  file.path(raw_dir, "table_14100468.csv"),
+  col_select = c(REF_DATE, GEO, `Employment characteristics`,
+                 `Hierarchy for Employment characteristics`, VALUE, STATUS),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(geo == "Kitchener-Cambridge-Waterloo, Ontario", ref_date == "2025")
+
+# Everyone working in the CMA, whatever their industry. Kept as the denominator
+# for the share below rather than adding up the industries, because two of them
+# are suppressed (see the filter's comment) and so would not sum to the truth.
+total_employed <- employment_raw |>
+  filter(employment_characteristics == "Total employed") |>
+  pull(value)
+
+# Statistics Canada shortens some of these names beyond what fits on a chart
+# axis, and lengthens others past it. The short forms drop qualifiers that the
+# category name carries anyway; nothing is merged or split, so every short name
+# still means exactly one of the table's categories.
+industry_names <- tribble(
+  ~employment_characteristics,                           ~industry,
+  "Forestry, fishing, mining, quarrying, oil and gas",    "Forestry, mining, oil and gas",
+  "Finance, insurance, real estate, rental and leasing",  "Finance, insurance and real estate",
+  "Professional, scientific and technical services",      "Professional and technical services",
+  "Business, building and other support services",        "Business and building support",
+  "Other services (except public administration)",        "Other services"
+)
+
+employment <- employment_raw |>
+  # The `employment_characteristics` column stacks three separate breakdowns of
+  # the same workers - industry, occupation, and class of worker - so taking it
+  # whole would count everyone three times over. The hierarchy column is how
+  # they are told apart: it numbers each row's place in the tree, and the
+  # industries are the children of "Goods-producing sector" (1.2) and
+  # "Services-producing sector" (1.8). Matching "1.2." or "1.8." therefore
+  # takes the sixteen industries and leaves the sector subtotals, the
+  # occupations, and the total behind.
+  filter(str_detect(hierarchy_for_employment_characteristics, "^1[.](2|8)[.]")) |>
+  left_join(industry_names, join_by(employment_characteristics)) |>
+  mutate(
+    industry = coalesce(industry, employment_characteristics),
+    # STATUS "x" means Statistics Canada suppressed the figure to protect a
+    # respondent's confidentiality - in a place this size that happens to the
+    # smallest industries. Those rows are kept here with an empty value, so the
+    # data file says plainly that the industry exists and its number does not.
+    # (STATUS is empty for every industry that was published, and coalesce()
+    # turns that empty into FALSE rather than leaving a missing value.)
+    suppressed = coalesce(status == "x", FALSE),
+    # The same hierarchy column that picked the industries out also says which
+    # of the two sectors each belongs to: 1.2.x under "Goods-producing",
+    # 1.8.x under "Services-producing". Kept as a column because a chart may
+    # want to colour by it, and deriving it twice invites the two copies to
+    # disagree.
+    sector = if_else(
+      str_detect(hierarchy_for_employment_characteristics, "^1[.]2[.]"),
+      "Goods-producing", "Services-producing"
+    ),
+    # The table is already in thousands of people; the share is a percentage of
+    # everyone employed in the CMA, so the sixteen do not quite add to 100.
+    share_percent = value / total_employed * 100
+  ) |>
+  select(industry, sector, employed_thousands = value, share_percent, suppressed) |>
+  arrange(desc(employed_thousands))
+
+write_csv(employment, file.path(data_dir, "employment.csv"))
+
+message("Wrote ", nrow(employment), " industries to ", data_dir)

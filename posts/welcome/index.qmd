@@ -31,6 +31,15 @@ library(sf)        # spatial data held as a data frame with a geometry column
 
 # Small tidy files produced by R/02_clean_data.R live in data/
 districts <- read_sf(here("posts", "welcome", "data", "districts.geojson"))
+
+# Employment by industry in the Kitchener-Cambridge-Waterloo census
+# metropolitan area, 2025. The CMA is not the Region: Statistics Canada builds
+# it from whole municipalities around an urban core, so the two overlap heavily
+# but are not the same place.
+employment <- read_csv(
+  here("posts", "welcome", "data", "employment.csv"),
+  show_col_types = FALSE
+)
 ```
 
 <!-- Opening paragraph: the question this post asks and the one-line answer. -->
@@ -239,7 +248,8 @@ p <- ggplot(panels, aes(x = value, y = district, fill = district_type)) +
     title = "Title: the finding, in one line",
     subtitle = "Subtitle: what is measured, for whom, and when<br>",
     caption = cwr_caption(
-      "Statistics Canada Table 17-10-0155-01 and the 2021 census boundary files",
+      c("Statistics Canada Table 17-10-0155-01",
+        "the 2021 census boundary files"),
       credit = TRUE
     )
   ) +
@@ -276,6 +286,212 @@ cwr_figure(
   # Three panels side by side on a desktop will not fit across a phone, so the
   # phone version stacks them instead. Adding a facet replaces the one above.
   phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x"))
+)
+```
+
+```{r}
+#| label: groups
+#| output: asis
+
+# The same three measures as the chart above, with the seven municipalities
+# collapsed into the two groups. `measures` and `panel_chars` are the ones
+# defined in the chunk above, so the panel headings, their spoken forms and the
+# label-fitting rule cannot drift between the two charts.
+#
+# Population and land area are sums. Density is not: averaging seven densities
+# would give Wellesley the same weight as Kitchener and come out far too low.
+# It has to be the group's people divided by the group's land, which is why it
+# is worked out after the summarise() rather than carried through it.
+group_totals <- districts |>
+  st_drop_geometry() |>
+  summarise(
+    population = sum(population),
+    area_sq_km = sum(area_sq_km),
+    .by = district_type
+  ) |>
+  mutate(density_per_sq_km = population / area_sq_km)
+
+group_panels <- group_totals |>
+  # The bars are the plural of the type that colours them; fct_reorder() on
+  # population puts the cities on top and holds that order across all three
+  # panels, as in the chart above.
+  mutate(
+    group = fct_reorder(
+      if_else(district_type == "City", "Cities", "Townships"),
+      population
+    )
+  ) |>
+  pivot_longer(
+    c(population, area_sq_km, density_per_sq_km),
+    names_to = "column", values_to = "value"
+  ) |>
+  left_join(measures, join_by(column)) |>
+  mutate(measure = factor(panel, levels = measures$panel)) |>
+  # Same test as the chart above: whether the label's own width fits inside the
+  # bar, asked panel by panel because each panel has its own scale.
+  group_by(measure) |>
+  mutate(
+    label = label_comma(accuracy = 1)(value),
+    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars)
+  ) |>
+  ungroup()
+
+p <- ggplot(group_panels, aes(x = value, y = group, fill = district_type)) +
+  geom_col(width = 0.6) +
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = if_else(inside, "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = habsred),
+    guide = "none"
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  facet_wrap(vars(measure), nrow = 1, scales = "free_x") +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    caption = cwr_caption(
+      c("Statistics Canada Table 17-10-0155-01",
+        "the 2021 census boundary files"),
+      credit = TRUE
+    )
+  ) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed, for the reason given above.
+alt_lines <- group_panels |>
+  summarise(
+    entries = paste(paste0(group, " ", label), collapse = ", "),
+    .by = c(measure, spoken)
+  ) |>
+  mutate(line = paste0(spoken, ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-groups",
+  alt = paste0(
+    "Three panels of horizontal bars comparing the three cities taken ",
+    "together, in blue, with the four townships taken together, in red. ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  height = 3.0, phone_height = 6.0,
+  # Two bars to a panel rather than seven, but three panels still will not fit
+  # across a phone; adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x"))
+)
+```
+
+```{r}
+#| label: industry
+#| output: asis
+
+industries <- employment |>
+  # Statistics Canada suppresses an estimate when publishing it could identify
+  # a respondent, which in a place this size happens to the smallest
+  # industries. There is no number to plot, so the two are left out - the
+  # caption's second note says which, since a reader counting industries would
+  # otherwise wonder where they went.
+  filter(!suppressed) |>
+  # fct_reorder() sorts ascending and a horizontal chart draws the first level
+  # at the bottom, so the largest industry ends up on top.
+  mutate(industry = fct_reorder(industry, share_percent))
+
+p <- ggplot(industries, aes(x = share_percent, y = industry)) +
+  # A lollipop rather than a bar: with fourteen rows the thin stems leave the
+  # industry names room to breathe, and the dot marks the value precisely.
+  # The stem stays neutral so that all the colour in the chart is the dot.
+  geom_segment(
+    aes(x = 0, xend = share_percent, y = industry, yend = industry),
+    colour = "grey50", linewidth = 0.7
+  ) +
+  geom_point(aes(colour = sector), shape = 19, size = 3) +
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  # No legend: the two colours are named in the title or subtitle instead.
+  scale_colour_manual(
+    values = c(`Goods-producing` = habsred, `Services-producing` = dodgerblue),
+    guide = "none"
+  ) +
+  # The numbers are read off the axis, not printed beside each dot. The axis
+  # sits on top, where a reader meets it before the rows.
+  scale_x_continuous(
+    labels = label_number(big.mark = ","),
+    position = "top",
+    expand = expansion(mult = c(0, 0.06))
+  ) +
+  # Industry names are long enough to crowd the stems, so they wrap. 30
+  # characters is the widest that keeps the longest to two lines here; the
+  # phone version below wraps harder still.
+  scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30)) +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    # Two footnotes qualifying the title or subtitle above. cwr_caption()
+    # numbers them in the order given and draws them above the source line;
+    # the matching numeral goes in the subtitle by hand.
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0468-01",
+      credit = TRUE,
+      notes = c(
+        "Waterloo Region excl. Wellesley Township",
+        paste(
+          "Forestry, mining, oil and gas, and utilities suppressed by",
+          "Statistics Canada; shares are of all employment"
+        )
+      )
+    )
+  ) +
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(colour = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  )
+
+# Built from the plotted rows rather than typed, as above.
+alt_entries <- industries |>
+  mutate(entry = paste0(industry, " ", label_number(accuracy = 0.1)(share_percent))) |>
+  pull(entry)
+
+cwr_figure(
+  p, "fig-industry",
+  alt = paste0(
+    "A lollipop chart of the share of all employment in the ",
+    "Kitchener-Cambridge-Waterloo census metropolitan area in 2025, one row ",
+    "per industry, ranked. Goods-producing industries are marked in red and ",
+    "service-producing industries in blue. Per cent of all employment: ",
+    paste(alt_entries, collapse = ", "), "."
+  ),
+  # Taller than fourteen rows would otherwise need: a wrapped label is two
+  # lines deep, so its row has to hold two lines without touching the row above.
+  height = 8.0, phone_height = 7.6,
+  phone = list(
+    # Half the width, so the names wrap at 22 characters instead of 30. Adding
+    # a scale of a type already present replaces it rather than adding to it.
+    scale_y_discrete(labels = cwr_wrap),
+    # cwr_figure() shrinks text drawn by geoms on the phone, but not text drawn
+    # by the theme, and this chart's text is all theme text. At half the width
+    # the industry names would take more of the picture than the data, so they
+    # are set smaller here, as fractions of base_size the way theme_cwr() does.
+    theme(
+      axis.text.y = element_markdown(size = base_size * 0.6),
+      axis.text.x = element_text(size = base_size * 0.55)
+    )
+  )
 )
 ```
 

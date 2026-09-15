@@ -1,0 +1,17 @@
+industry,sector,employed_thousands,share_percent,suppressed
+Manufacturing,Goods-producing,69.3,17.810331534309945,FALSE
+Wholesale and retail trade,Services-producing,51.9,13.338473400154202,FALSE
+Professional and technical services,Services-producing,49.3,12.670264713441274,FALSE
+Health care and social assistance,Services-producing,41.2,10.588537650989464,FALSE
+"Finance, insurance and real estate",Services-producing,31.5,8.095605242868157,FALSE
+Educational services,Services-producing,30.6,7.864302235929068,FALSE
+Construction,Goods-producing,25.2,6.4764841942945255,FALSE
+"Information, culture and recreation",Services-producing,18.7,4.805962477512208,FALSE
+Accommodation and food services,Services-producing,17.7,4.548959136468773,FALSE
+Transportation and warehousing,Services-producing,16.8,4.317656129529683,FALSE
+Other services,Services-producing,12.5,3.212541763042919,FALSE
+Business and building support,Services-producing,10.9,2.8013364173734256,FALSE
+Public administration,Services-producing,9.6,2.467232074016962,FALSE
+Agriculture,Goods-producing,2.9,0.7453096890259573,FALSE
+"Forestry, mining, oil and gas",Goods-producing,NA,NA,TRUE
+Utilities,Goods-producing,NA,NA,TRUE

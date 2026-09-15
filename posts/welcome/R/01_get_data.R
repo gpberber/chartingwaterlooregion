@@ -59,3 +59,19 @@ unzip(boundary_zip, exdir = file.path(raw_dir, "csd_boundaries"))
 # onward) and caches it, so re-running this is cheap.
 get_cansim("17-10-0155-01") |>
   write_csv(file.path(raw_dir, "table_17100155.csv"))
+
+# ---- 3. Employment by industry --------------------------------------------
+# Table 14-10-0468-01, "Employment by industry, annual, census metropolitan
+# areas". These are Labour Force Survey estimates - a monthly household survey,
+# averaged over the year - reported in thousands of people.
+#
+# The geography is the Kitchener-Cambridge-Waterloo census metropolitan area,
+# not Waterloo Region. A CMA is built by Statistics Canada out of whole
+# municipalities around an urban core, so the two are close but not the same
+# thing; a chart drawn from this table is about the CMA and should say so.
+#
+# The table stacks three different cuts of the same people - by industry, by
+# occupation, and by class of worker - in one column, so 02_clean_data.R has
+# to pick out the industries.
+get_cansim("14-10-0468-01") |>
+  write_csv(file.path(raw_dir, "table_14100468.csv"))

@@ -14,6 +14,14 @@ labs() with the standard title / subtitle / Source caption.
 labs(
 	title = "<Title>",
 	subtitle = "<Subtitle>",
+	# One source, or several: cwr_caption(c("A", "B")) prints "Sources: A; B".
+	# Pass them separately rather than writing "A and B" in one string, or the
+	# plural cannot be worked out.
+	#
+	# notes = c("...", "...") adds footnotes above the source line, numbered in
+	# the order given and separated from it by a blank line. Write the note
+	# alone; the key is superscripted for you, and the matching <sup>1</sup>
+	# goes in the title or subtitle by hand.
 	caption = cwr_caption("<Source>")
 ) +
 ```
@@ -307,6 +315,26 @@ Squiggle marker showing the y axis does not start at zero.
 
 # needed if squiggly is clipped at panel edge
 #coord_cartesian(clip = "off") +
+```
+
+## ggwraplabels
+
+cwr_wrap(): break long category labels over two lines, narrower on the phone.
+
+```r
+# Wrap long category names over two lines, so they stop eating the width a
+# horizontal chart needs for its bars. cwr_wrap() breaks on spaces only, so
+# a name is never split mid-word, and it emits <br> rather than a newline
+# because theme_cwr() draws the left axis with ggtext.
+#
+# Width is in characters. 30 suits the desktop; wrap harder for the phone by
+# passing a second scale to cwr_figure()'s `phone` argument, which replaces
+# this one rather than adding to it:
+#   phone = list(scale_y_discrete(labels = cwr_wrap))
+#
+# A wrapped label is two lines deep, so raise `height` and `phone_height`
+# to keep it off the row above.
+scale_y_discrete(labels = \(x) cwr_wrap(x, width = <30>)) +
 ```
 
 ## cwrfigure

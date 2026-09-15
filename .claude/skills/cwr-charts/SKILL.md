@@ -21,10 +21,22 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
-| `cwr_caption("Source text", credit = FALSE)` | builds the caption; `credit = TRUE` adds the CWR byline (rule 6) |
+| `cwr_caption(source, credit = FALSE, notes = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6) |
+| `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_figure(p, "fig-id", alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
+
+Two things `theme_cwr()` now handles that a chart used to have to ask for:
+
+- **The left axis reads markdown.** `axis.text.y.left` is an `element_markdown()`, so
+  `**bold**` (rule 5) and `<br>` (rule 8) work without a per-chart `theme()` line. Several
+  templates still set it explicitly; that line is a harmless no-op, not something to copy
+  into a new chart.
+- **Panel headings sit outside the axis.** `strip.placement = "outside"` puts a facet's
+  heading above the axis labels rather than between them and the panel, which is what a
+  ranked horizontal chart needs since the house style moves its x axis to the top. Do not
+  set `strip.placement` in a post.
 
 ## Choosing a template
 
@@ -55,11 +67,21 @@ is free of them, so this one is a published commitment rather than a preference.
 in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what let them.
 
 1. **Title says the finding, subtitle says the units and scope.** Subtitle ends with `<br>`
-   when the plot needs breathing room under it. Caption is always `cwr_caption("...")`, naming
-   whoever published the numbers and nobody else. It carries no Charting Waterloo Region byline
+   when the plot needs breathing room under it. There are no axis titles in this theme, so a
+   single-panel chart has nowhere but the subtitle to say what its axis measures. Caption is
+   always `cwr_caption("...")`, naming whoever published the numbers and nobody else. It carries no Charting Waterloo Region byline
    by default: plotting a publisher's figures as published is their work, not ours. Pass
    `credit = TRUE` only when the numbers shown were worked out here - a rate calculated, an
    index based, a model fitted, several sources combined.
+1a. **Sources and notes are arguments, not strings you assemble.** Pass several sources as a
+   vector - `cwr_caption(c("Table 17-10-0155-01", "the 2021 census boundary files"))` - and the
+   label becomes "Sources:". Writing "X and Y" into one string leaves it reading "Source:" in
+   front of two of them. Footnotes go in `notes`, a character vector: they are numbered in the
+   order given and drawn above the source line with a blank line between. **Write the note
+   without a key** - the numeral is added for you, superscripted, so a note and its key cannot
+   drift apart - and put the matching `<sup>1</sup>` in the title or subtitle by hand, where
+   ggtext renders it the same way. Numerals, not symbols; and never key a note with a bare `*`,
+   which opens italics in a ggtext caption and swallows the line.
 2. **Colour has meaning.** Blue = Waterloo Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
 3. **Direct labels beat legends.** Label line ends, bar ends, or points; then
@@ -90,10 +112,25 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    chart by `cwr_caption()`. Pass one only for a note that cannot live in the image, such as
    a break in the series. `alt =` is always required: with no caption it is the only
    description a screen reader has, so write what the chart shows, not what it is.
-8. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
+8. **Long category labels wrap; they do not shrink.** On a horizontal chart the
+   category names compete with the bars for width, and on a phone they can take
+   more of the picture than the data. Wrap them with `cwr_wrap()` as a labeller -
+   `scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))` - and wrap harder for
+   the phone by putting a second `scale_y_discrete()` in `phone`, which replaces
+   the first rather than adding to it. Two things follow. A wrapped label is two
+   lines deep, so `height` and `phone_height` both have to grow - **allow about 0.45 in
+   of height per row once labels wrap** - or the second line touches the row above; and the
+   break is emitted as `<br>`, not `"\n"`, because `theme_cwr()` draws the left axis with
+   ggtext. The gap between one label and the next is whatever is left of its row, so
+   `theme_cwr()` sets a wrapped label's own lines solid (`lineheight = 1.0`) to leave as much
+   of it as possible. Do not loosen that to buy breathing room: it spends the very space it is
+   trying to make. Buy the room with `height`. Shortening the names themselves
+   is better still where it can be done without changing their meaning, and belongs
+   in the post's `02_clean_data.R`, not in the chart.
+9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
-9. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
-10. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
+10. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
+11. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
     sizes, so text is twice as large relative to the chart. `cwr_figure()` already wraps
     the title and subtitle, moves right-hand axis labels outside the panel, and scales
     `geom_text`/`geom_label` sizes by 0.8. Anything else the phone version needs goes in

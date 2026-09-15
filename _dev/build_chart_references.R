@@ -89,6 +89,7 @@ catalogue <- tribble(
   "building-blocks", "gggridx",            "Theme block that swaps gridlines to vertical for horizontal charts.",
   "building-blocks", "ggguides",           "Minor ticks on the x axis.",
   "building-blocks", "ggyaxis_break_label","Squiggle marker showing the y axis does not start at zero.",
+  "building-blocks", "ggwraplabels",       "cwr_wrap(): break long category labels over two lines, narrower on the phone.",
   "building-blocks", "cwrfigure",          "cwr_figure(): the call that saves both PNGs and places the chart. Every chart ends with it; never call ggsave() in a post."
 )
 
@@ -201,6 +202,7 @@ picker <- tribble(
   "gggridx",             "block", "Vertical gridlines",                "Swapping gridlines to vertical, which every horizontal chart needs.",
   "ggguides",            "block", "Minor x ticks",                     "Minor ticks on the x axis.",
   "ggyaxis_break_label", "block", "Axis-break marker",                 "A squiggle showing the value axis does not start at zero.",
+  "ggwraplabels",        "block", "Wrapped category labels",           "Long category names on a horizontal chart - industries, offence types - broken over two lines so they stop crowding the bars, and broken harder on the phone.",
   "cwrfigure",           "block", "Save and place the chart",          "The call every chart ends with: writes the desktop and phone PNGs and places the figure."
 )
 

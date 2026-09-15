@@ -127,7 +127,11 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
         hjust = 0,
         vjust = 1,
         margin = margin(t = 10),
-        color = cowboysilver
+        color = cowboysilver,
+        # A caption is more than one line whenever cwr_caption() is given
+        # notes, or whenever a long source line wraps on a phone. gridtext
+        # sets those lines solid, so they need opening up here.
+        lineheight = 1.3
       ),
 
       # Axes: no titles (state units in the subtitle instead), readable text
@@ -140,8 +144,27 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
       axis.text.y = element_markdown(
         size = base_size * 0.8,
         margin = margin(r = base_size * 0.25),
-        hjust = 0
+        hjust = 0,
+        # The two lines of a label that cwr_wrap() has broken sit tight
+        # together on purpose. What separates one label from the next is the
+        # space left over in its row, so the looser these lines are, the less
+        # of that is left - at 1.15 a two-line label filled its row completely
+        # and ran straight into the label below. Set solid, each label reads as
+        # one block with a clear gap after it, which is the way round it should
+        # be. The room this needs comes from `height`, not from here: allow
+        # about 0.45 in of chart height per row when labels wrap.
+        lineheight = 1.0
       ),
+
+      # ggplot2's complete theme defines axis.text.y.left as a plain
+      # element_text, and the more specific element wins: set axis.text.y alone
+      # and the left axis inherits its size and margin but is still drawn as
+      # plain text, so `<br>` and `**bold**` come out literally on the chart.
+      # Naming it here makes the left axis markdown-capable everywhere, which
+      # is what both house tricks need - the bold focus row, and the line
+      # breaks cwr_wrap() puts into long category names. It is deliberately
+      # empty: every property still comes from axis.text.y above.
+      axis.text.y.left = element_markdown(),
 
       # One axis line only, where the data meets the baseline
       axis.line.x = element_line(color = "black", linewidth = 0.5, linetype = "solid"),
@@ -179,6 +202,12 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
         face = "bold"
       ),
       strip.background = element_blank(),
+
+      # Put the panel heading outside the axis rather than between the axis and
+      # the panel. It matters on a ranked horizontal chart, where the house
+      # style moves the x axis to the top: left "inside", the heading would be
+      # read after the numbers it is meant to introduce.
+      strip.placement = "outside",
       panel.spacing.y = unit(1.5, "lines"),
 
       # Whole-plot settings: title and caption align to the plot edge, not the panel.
@@ -212,10 +241,70 @@ base_size <- 15
 # worked out ourselves - a rate per 100,000 we calculated, an index we based, a
 # model we fitted, several sources we combined. There the arithmetic is ours and is
 # worth standing behind. Where the line is a judgement call: say the source alone.
-cwr_caption <- function(source, credit = FALSE) {
-  caption <- paste0("Source: ", source)
+#
+# `source` takes one source or several. Several are joined with semicolons and the
+# label becomes "Sources:", because a line reading "Source:" in front of two of
+# them is simply wrong. Pass them as separate strings rather than writing "X and
+# Y" into one, or the plural cannot be worked out:
+#
+#   cwr_caption(c("Statistics Canada Table 17-10-0155-01",
+#                 "the 2021 census boundary files"))
+#
+# `notes` takes footnotes to qualify something in the title or subtitle. They are
+# numbered here, in the order given, so a note and its key cannot drift apart;
+# write the note alone and put the matching key in the title or subtitle by hand,
+# as `<sup>1</sup>` - the title and subtitle are drawn with ggtext too, so the
+# same markup works there. Numerals rather than symbols: they are easier to type,
+# and they say how many notes there are. Never key a note with a bare `*` - an
+# asterisk opens italics in a ggtext caption and swallows the rest of the line.
+#
+# The notes are drawn above the source line, which is where a reader looks for a
+# qualification and where Datawrapper puts them, with a blank line between the two
+# so the qualifications do not read as part of the source:
+#
+#   cwr_caption(
+#     "Statistics Canada Table 14-10-0468-01",
+#     credit = TRUE,
+#     notes = c("Waterloo Region excl. Wellesley Township",
+#               "Two industries suppressed by Statistics Canada")
+#   )
+cwr_caption <- function(source, credit = FALSE, notes = NULL) {
+  label <- if (length(source) > 1) "Sources: " else "Source: "
+  caption <- paste0(label, paste(source, collapse = "; "))
   if (credit) caption <- paste0(caption, " | *Charting Waterloo Region*")
+
+  if (length(notes) > 0) {
+    # A blank line between the notes and the source line. <br><br> is how a
+    # markdown caption spells one; the caption's lineheight decides how wide it
+    # actually sits.
+    # Superscript, the way a footnote key is set, so the number reads as a
+    # reference rather than as the first word of the note.
+    keyed <- paste0("<sup>", seq_along(notes), "</sup> ", notes)
+    caption <- paste0(paste(keyed, collapse = "<br>"), "<br><br>", caption)
+  }
+
   caption
+}
+
+# Wrap long category labels onto more than one line.
+#
+# A horizontal chart pays for a long category name twice: the name eats the
+# width the bars need, and on a phone, at half the width, it can take more of
+# the picture than the data. Wrapping is the cheap fix - it costs height, which
+# a chart has more of than width.
+#
+# str_wrap() breaks on spaces only, so a name is never split mid-word, and
+# `width` is in characters. 22 suits the phone, which is the harder of the two
+# sizes; pass a larger number for a chart that only ever runs wide.
+#
+# The line break is emitted as `<br>`, not "\n", because the house theme draws
+# the left axis with ggtext (see axis.text.y.left above) and markdown treats a
+# bare newline as a space. Use it as a labeller, which hands it the levels:
+#
+#   scale_y_discrete(labels = cwr_wrap)
+#   scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))
+cwr_wrap <- function(x, width = 22) {
+  str_replace_all(str_wrap(x, width = width), "\n", "<br>")
 }
 
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.
