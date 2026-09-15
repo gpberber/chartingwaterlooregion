@@ -14,14 +14,19 @@ labs() with the standard title / subtitle / Source caption.
 labs(
 	title = "<Title>",
 	subtitle = "<Subtitle>",
-	# One source, or several: cwr_caption(c("A", "B")) prints "Sources: A; B".
+	# One source, or several: cwr_caption(c("A", "B")) prints "Sources: A, B".
 	# Pass them separately rather than writing "A and B" in one string, or the
-	# plural cannot be worked out.
+	# plural cannot be worked out. credit = TRUE counts as a source as well,
+	# so it makes the label plural on its own.
 	#
 	# notes = c("...", "...") adds footnotes above the source line, numbered in
 	# the order given and separated from it by a blank line. Write the note
 	# alone; the key is superscripted for you, and the matching <sup>1</sup>
 	# goes in the title or subtitle by hand.
+	#
+	# cma = TRUE adds the house note explaining the Kitchener census
+	# metropolitan area as note 1. Set it on every chart drawn from CMA
+	# data rather than writing the geography out again.
 	caption = cwr_caption("<Source>")
 ) +
 ```

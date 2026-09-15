@@ -21,7 +21,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
-| `cwr_caption(source, credit = FALSE, notes = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6) |
+| `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_figure(p, "fig-id", alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
@@ -74,14 +74,23 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    `credit = TRUE` only when the numbers shown were worked out here - a rate calculated, an
    index based, a model fitted, several sources combined.
 1a. **Sources and notes are arguments, not strings you assemble.** Pass several sources as a
-   vector - `cwr_caption(c("Table 17-10-0155-01", "the 2021 census boundary files"))` - and the
-   label becomes "Sources:". Writing "X and Y" into one string leaves it reading "Source:" in
-   front of two of them. Footnotes go in `notes`, a character vector: they are numbered in the
+   vector - `cwr_caption(c("Table 17-10-0155-01", "the 2021 census boundary files"))` - and they
+   are joined with commas under the label "Sources:". Writing "X and Y" into one string leaves it
+   reading "Source:" in front of two of them. `credit = TRUE` counts as a source as well, so it
+   turns the label plural on its own. Footnotes go in `notes`, a character vector: they are numbered in the
    order given and drawn above the source line with a blank line between. **Write the note
    without a key** - the numeral is added for you, superscripted, so a note and its key cannot
    drift apart - and put the matching `<sup>1</sup>` in the title or subtitle by hand, where
    ggtext renders it the same way. Numerals, not symbols; and never key a note with a bare `*`,
    which opens italics in a ggtext caption and swallows the line.
+1b. **A chart drawn from CMA data sets `cma = TRUE` and writes nothing.** Several Statistics
+   Canada series are published for the Kitchener census metropolitan area and nothing smaller.
+   The CMA is six of Waterloo Region's seven municipalities - Wellesley Township is the only
+   exclusion and nothing outside the Region is in it - so the figures are a subset of the
+   Region, not a different place, and Greg's prose may simply call it Waterloo Region. The
+   qualification belongs on the chart all the same, because a chart travels without the post:
+   `cma = TRUE` makes it note 1, in wording that is identical across every post and fixable in
+   one place. Never type the geography into `notes` by hand.
 2. **Colour has meaning.** Blue = Waterloo Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
 3. **Direct labels beat legends.** Label line ends, bar ends, or points; then

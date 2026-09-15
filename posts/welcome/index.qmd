@@ -499,13 +499,9 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
     subtitle = "Subtitle: what is measured, for whom, and when<br>",
     # One footnote, keyed to whatever in the title or subtitle needs it.
     caption = cwr_caption(
-      c("Statistics Canada Tables 98-10-0057-01 and 98-10-0070-01",
-        "Table 18-10-0004-01"),
+      c("Statistics Canada Tables 98-10-0057-01, 98-10-0070-01", "and 18-10-0004-01"),
       credit = TRUE,
-      notes = paste(
-        "2020 income, the most recent the census reports, in 2026 dollars:",
-        "adjusted by the Ontario all-items consumer price index"
-      )
+      notes = "adjusted by the Ontario all-items CPI"
     )
   ) +
   # Every bar carries its number, so the value axis and its gridlines are gone.
@@ -574,7 +570,7 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
     aes(x = 0, xend = employed_thousands, y = industry, yend = industry),
     colour = "grey50", linewidth = 0.7
   ) +
-  geom_point(aes(colour = sector), shape = 19, size = 3) +
+  geom_point(colour = dodgerblue, shape = 19, size = 3) +
   geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
   # The second number, boxed in a column of its own rather than plotted: the
   # share is the count divided by a constant, so drawing it would only repeat
@@ -606,11 +602,6 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
     linewidth = 0,
     label.padding = unit(0.3, "lines")
   ) +
-  # No legend: the two colours are named in the title or subtitle instead.
-  scale_colour_manual(
-    values = c(`Goods-producing` = habsred, `Services-producing` = dodgerblue),
-    guide = "none"
-  ) +
   # The numbers are read off the axis, not printed beside each dot. The axis
   # sits on top, where a reader meets it before the rows.
   scale_x_continuous(
@@ -630,16 +621,15 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
     # Two footnotes qualifying the title or subtitle above. cwr_caption()
     # numbers them in the order given, superscripts the keys and draws them
     # above the source line; the matching <sup>1</sup> goes in the subtitle.
+    #
+    # cma = TRUE is the first of them: this table is published for the census
+    # metropolitan area, so the note explaining what that is comes from
+    # theme_cwr.R rather than being written out again here.
     caption = cwr_caption(
       "Statistics Canada Table 14-10-0468-01",
       credit = TRUE,
-      notes = c(
-        "Waterloo Region excl. Wellesley Township",
-        paste(
-          "Forestry, mining, oil and gas, and utilities suppressed by",
-          "Statistics Canada; shares are of all employment"
-        )
-      )
+      cma = TRUE,
+      notes = "Forestry, mining, oil and gas, and Utilities industries were suppressed by Statistics Canada for confidentiality"
     )
   ) +
   # Lets the boxed column heading show above the panel.
@@ -700,6 +690,7 @@ cwr_figure(
 
 ## Data sources
 
+```{=html}
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
      reader should know: write that here, above the table. The table itself is not
      written here - the chunk below prints the "Data sources" table straight out of
@@ -710,6 +701,7 @@ cwr_figure(
      everything below is reference material. It finds the spot by the id Pandoc
      builds from the heading text, so rewording the heading does not break the
      button - it quietly drops it to the foot of the page instead. -->
+```
 
 ```{r}
 #| label: sources
@@ -721,9 +713,11 @@ cwr_sources_table("welcome")
 
 ## Other sources
 
+```{=html}
 <!-- Anything cited that is not data: reports, articles, books, a method borrowed
      from someone else. Quoted material stays under its owner's terms, never this
      site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
+```
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download

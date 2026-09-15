@@ -231,6 +231,25 @@ theme_set(theme_cwr(base_size = 15))
 base_size <- 15
 
 # ---- 5. Helpers ----------------------------------------------------------
+# What a chart is actually showing when its numbers are published for the
+# Kitchener census metropolitan area rather than for the Region itself. The note
+# names the geography and not the CMA: a reader wants to know which places are in
+# the chart, and the acronym is the source line's business, not theirs.
+#
+# Statistics Canada builds a CMA out of whole municipalities around an urban
+# core, and this one is six of Waterloo Region's seven: Kitchener, Cambridge,
+# Waterloo, Woolwich, Wilmot and North Dumfries. Wellesley Township is the only
+# exclusion, and nothing from outside the Region is included - checked against
+# the 2021 census geographic attribute file, not assumed. So a CMA figure is a
+# subset of the Region, never a claim about somewhere else, and Wellesley is
+# about 1.7% of the Region's population, which makes the difference immaterial
+# to everything except land area (it is a fifth of that).
+#
+# Written down once rather than typed per chart so every post says the same
+# thing, and so one edit fixes them all if the boundaries are redrawn - CMA
+# definitions are revisited at every census.
+cwr_cma_note <- "Waterloo Region excluding Wellesley Township"
+
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
 # The caption names whoever published the numbers, and nothing else. A chart that
@@ -242,10 +261,12 @@ base_size <- 15
 # model we fitted, several sources we combined. There the arithmetic is ours and is
 # worth standing behind. Where the line is a judgement call: say the source alone.
 #
-# `source` takes one source or several. Several are joined with semicolons and the
-# label becomes "Sources:", because a line reading "Source:" in front of two of
-# them is simply wrong. Pass them as separate strings rather than writing "X and
-# Y" into one, or the plural cannot be worked out:
+# `source` takes one source or several. Several are joined with commas. The label
+# is "Sources:" whenever the line names more than one, and **the byline counts**:
+# a chart that credits its own arithmetic beside a published table has two sources
+# on it, so `credit = TRUE` makes it plural on its own. Pass sources as separate
+# strings rather than writing "X and Y" into one, or the plural cannot be worked
+# out:
 #
 #   cwr_caption(c("Statistics Canada Table 17-10-0155-01",
 #                 "the 2021 census boundary files"))
@@ -258,6 +279,12 @@ base_size <- 15
 # and they say how many notes there are. Never key a note with a bare `*` - an
 # asterisk opens italics in a ggtext caption and swallows the rest of the line.
 #
+# `cma = TRUE` puts `cwr_cma_note` at the head of the notes, for a chart drawn
+# from CMA data. It is numbered along with the rest, so it needs its key in the
+# subtitle like any other note; first, because the geography qualifies the
+# subject of the chart and that is the earliest thing a subtitle names. Set it
+# rather than typing the note, so that the wording cannot drift from post to post.
+#
 # The notes are drawn above the source line, which is where a reader looks for a
 # qualification and where Datawrapper puts them, with a blank line between the two
 # so the qualifications do not read as part of the source:
@@ -268,9 +295,12 @@ base_size <- 15
 #     notes = c("Waterloo Region excl. Wellesley Township",
 #               "Two industries suppressed by Statistics Canada")
 #   )
-cwr_caption <- function(source, credit = FALSE, notes = NULL) {
-  label <- if (length(source) > 1) "Sources: " else "Source: "
-  caption <- paste0(label, paste(source, collapse = "; "))
+cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE) {
+  if (cma) notes <- c(cwr_cma_note, notes)
+
+  # The byline is a source like any other, so it decides the plural too
+  label <- if (length(source) > 1 || credit) "Sources: " else "Source: "
+  caption <- paste0(label, paste(source, collapse = ", "))
   if (credit) caption <- paste0(caption, " | *Charting Waterloo Region*")
 
   if (length(notes) > 0) {

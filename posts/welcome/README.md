@@ -37,6 +37,12 @@ Then `quarto render posts/welcome` from a terminal.
 - Area is Statistics Canada's published 2021 census land area (the `LANDAREA` field of the
   boundary file), which excludes inland water. Density is that area divided into the 2025
   population estimate, so it is people per square kilometre of land.
+- Employment by industry is published for the **Kitchener census metropolitan area** and nothing
+  smaller. On 2021 boundaries the CMA is six of Waterloo Region's seven municipalities - Kitchener,
+  Cambridge, Waterloo, Woolwich, Wilmot and North Dumfries - with Wellesley Township the only
+  exclusion and nothing from outside the Region included. Wellesley is about 1.7% of the Region's
+  population, so the charts treat the CMA as the Region and say so in a note. CMA boundaries are
+  revisited at every census, so this holds for 2021 and should be rechecked against a later one.
 - The two census income tables and the CPI table are cut down as they are downloaded, unlike the
   other raw files here: to Waterloo Region's eight geographies and to the Ontario all-items index.
   Whole, they run to millions of rows, and nothing outside those rows is used.
