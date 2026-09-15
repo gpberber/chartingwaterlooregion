@@ -400,6 +400,12 @@ cwr_figure(
 #| label: industry
 #| output: asis
 
+# Where the boxed percentages sit, in the axis's own units (thousands of
+# people). Far enough beyond the longest stem - manufacturing, at 69 - that a
+# box cannot touch a dot, and the axis breaks stop short of the column so no
+# gridline runs underneath it. Both numbers were read off a render.
+rect_x <- 95
+
 industries <- employment |>
   # Statistics Canada suppresses an estimate when publishing it could identify
   # a respondent, which in a place this size happens to the smallest
@@ -409,18 +415,48 @@ industries <- employment |>
   filter(!suppressed) |>
   # fct_reorder() sorts ascending and a horizontal chart draws the first level
   # at the bottom, so the largest industry ends up on top.
-  mutate(industry = fct_reorder(industry, share_percent))
+  mutate(industry = fct_reorder(industry, employed_thousands))
 
-p <- ggplot(industries, aes(x = share_percent, y = industry)) +
+p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
   # A lollipop rather than a bar: with fourteen rows the thin stems leave the
   # industry names room to breathe, and the dot marks the value precisely.
   # The stem stays neutral so that all the colour in the chart is the dot.
   geom_segment(
-    aes(x = 0, xend = share_percent, y = industry, yend = industry),
+    aes(x = 0, xend = employed_thousands, y = industry, yend = industry),
     colour = "grey50", linewidth = 0.7
   ) +
   geom_point(aes(colour = sector), shape = 19, size = 3) +
   geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  # The second number, boxed in a column of its own rather than plotted: the
+  # share is the count divided by a constant, so drawing it would only repeat
+  # the shape of the stems. Read as a column it answers a different question -
+  # how much of the whole each industry is - without competing for the eye.
+  geom_label(
+    aes(x = rect_x, label = paste0(label_number(accuracy = 0.1)(share_percent), "%")),
+    hjust = 1,
+    size = label_size * 0.8,
+    fill = "grey90",
+    colour = "black",
+    linewidth = 0,
+    label.padding = unit(0.3, "lines")
+  ) +
+  # The column's heading, sitting above the top row. y = Inf puts it at the top
+  # of the panel and vjust lifts it clear; coord_cartesian(clip = "off") below
+  # is what allows it to be drawn outside the panel at all.
+  annotate(
+    "label",
+    x = rect_x, y = Inf, label = "% of all\nemployment",
+    # hjust sets both where the box sits and how its lines are aligned inside
+    # it, so 1 right-aligns the two lines with each other and with the boxed
+    # figures below. lineheight 1.0 keeps the two lines a single block, the
+    # same reasoning as the wrapped axis labels.
+    hjust = 1, vjust = -0.3, lineheight = 1.0,
+    size = label_size * 0.8,
+    fontface = "plain",
+    fill = "grey90", colour = "grey30",
+    linewidth = 0,
+    label.padding = unit(0.3, "lines")
+  ) +
   # No legend: the two colours are named in the title or subtitle instead.
   scale_colour_manual(
     values = c(`Goods-producing` = habsred, `Services-producing` = dodgerblue),
@@ -429,9 +465,11 @@ p <- ggplot(industries, aes(x = share_percent, y = industry)) +
   # The numbers are read off the axis, not printed beside each dot. The axis
   # sits on top, where a reader meets it before the rows.
   scale_x_continuous(
+    limits = c(0, rect_x),
+    breaks = seq(0, 60, 20),
     labels = label_number(big.mark = ","),
     position = "top",
-    expand = expansion(mult = c(0, 0.06))
+    expand = expansion(mult = c(0.02, 0.02))
   ) +
   # Industry names are long enough to crowd the stems, so they wrap. 30
   # characters is the widest that keeps the longest to two lines here; the
@@ -441,8 +479,8 @@ p <- ggplot(industries, aes(x = share_percent, y = industry)) +
     title = "Title: the finding, in one line",
     subtitle = "Subtitle: what is measured, for whom, and when<br>",
     # Two footnotes qualifying the title or subtitle above. cwr_caption()
-    # numbers them in the order given and draws them above the source line;
-    # the matching numeral goes in the subtitle by hand.
+    # numbers them in the order given, superscripts the keys and draws them
+    # above the source line; the matching <sup>1</sup> goes in the subtitle.
     caption = cwr_caption(
       "Statistics Canada Table 14-10-0468-01",
       credit = TRUE,
@@ -455,6 +493,8 @@ p <- ggplot(industries, aes(x = share_percent, y = industry)) +
       )
     )
   ) +
+  # Lets the boxed column heading show above the panel.
+  coord_cartesian(clip = "off") +
   theme(
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
@@ -464,17 +504,23 @@ p <- ggplot(industries, aes(x = share_percent, y = industry)) +
 
 # Built from the plotted rows rather than typed, as above.
 alt_entries <- industries |>
-  mutate(entry = paste0(industry, " ", label_number(accuracy = 0.1)(share_percent))) |>
+  mutate(
+    entry = paste0(
+      industry, " ", label_number(accuracy = 0.1)(employed_thousands),
+      " thousand, ", label_number(accuracy = 0.1)(share_percent), " per cent"
+    )
+  ) |>
   pull(entry)
 
 cwr_figure(
   p, "fig-industry",
   alt = paste0(
-    "A lollipop chart of the share of all employment in the ",
-    "Kitchener-Cambridge-Waterloo census metropolitan area in 2025, one row ",
-    "per industry, ranked. Goods-producing industries are marked in red and ",
-    "service-producing industries in blue. Per cent of all employment: ",
-    paste(alt_entries, collapse = ", "), "."
+    "A lollipop chart of employment by industry in the ",
+    "Kitchener-Cambridge-Waterloo census metropolitan area in 2025, ranked, ",
+    "with each industry's share of all employment boxed in a column on the ",
+    "right. Goods-producing industries are marked in red and service-producing ",
+    "industries in blue. Thousands employed and share of all employment: ",
+    paste(alt_entries, collapse = "; "), "."
   ),
   # Taller than fourteen rows would otherwise need: a wrapped label is two
   # lines deep, so its row has to hold two lines without touching the row above.
@@ -484,9 +530,10 @@ cwr_figure(
     # a scale of a type already present replaces it rather than adding to it.
     scale_y_discrete(labels = cwr_wrap),
     # cwr_figure() shrinks text drawn by geoms on the phone, but not text drawn
-    # by the theme, and this chart's text is all theme text. At half the width
-    # the industry names would take more of the picture than the data, so they
-    # are set smaller here, as fractions of base_size the way theme_cwr() does.
+    # by the theme, and most of this chart's text is theme text. At half the
+    # width the industry names would take more of the picture than the data, so
+    # they are set smaller here, as fractions of base_size the way theme_cwr()
+    # does.
     theme(
       axis.text.y = element_markdown(size = base_size * 0.6),
       axis.text.x = element_text(size = base_size * 0.55)
