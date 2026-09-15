@@ -105,7 +105,7 @@ Yes, I am human and can make mistakes. If you spot an error or have a question a
 
 ## Why doesn't it have social-platform buttons or comments?
 
-Social-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR's privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it's easy to share CWR content without loading any trackers. Neither I nor CWR has accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog.
+Social-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR's privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it's easy to share CWR content without loading any trackers. CWR has no accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog.
 
 ## Can I subscribe to it?
 
