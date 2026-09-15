@@ -1,6 +1,6 @@
 # Building blocks: scales, labels, legends, annotations
 
-Fragments to add to any template. Each ends with `+` so it can be pasted into a ggplot chain.
+Fragments to add to any template. Most end with `+` so they can be pasted into a ggplot chain; `cwrfigure` is the separate call that follows the finished plot.
 
 All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provides the colours
 (`dodgerblue`, `habsred`, `cowboysilver`, tints, `manual_n_colours`), `theme_cwr()` as the default theme,
@@ -309,17 +309,15 @@ Squiggle marker showing the y axis does not start at zero.
 #coord_cartesian(clip = "off") +
 ```
 
-## ggsave
+## cwrfigure
 
-ggsave() with the standard size and dpi.
+cwr_figure(): the call that saves both PNGs and places the chart. Every chart ends with it; never call ggsave() in a post.
 
 ```r
-ggsave(
-	filename = here("<output>", "<plot_name>.png"),
-	width = <8>, 
-	height = <6>,
-	dpi = 300,
-	bg = "white"
-) +
+cwr_figure(
+	p, "fig-<name>",
+	alt = "<What the chart shows, for screen readers.>",
+	height = <5>, phone_height = <4.5>
+)
 ```
 

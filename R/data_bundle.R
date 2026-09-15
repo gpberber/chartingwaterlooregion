@@ -18,14 +18,23 @@
 # Column types and example values are read from the data itself, so the
 # dictionary only needs the parts a machine cannot know: meaning and units.
 #
+# The finished dictionary appears in exactly two places, and never in the post
+# itself: the "## Data dictionary" section of posts/<slug>/README.md, which is
+# what somebody browsing the repository sees, and data_dictionary.csv inside the
+# zip, which is what somebody who downloads the data gets. Both are generated
+# from the data, so neither can drift from it.
+#
 # Usage (the /publish skill runs this):
 #   source(here::here("R", "data_bundle.R"))
 #   cwr_dictionary_check("kitchener-phone-wait-times")      # every column documented?
 #   cwr_data_bundle("kitchener-phone-wait-times", version = 1)   # build zip and upload
 #
+# cwr_data_bundle() rewrites the README section itself. To refresh it on its own,
+# after changing a cleaning script or a description:
+#   cwr_dictionary_readme("kitchener-phone-wait-times")
+#
 # In a post's Reproducibility box:
-#   cwr_bundle_url("kitchener-phone-wait-times", 1)         # link to the zip
-#   cwr_dictionary_table("kitchener-phone-wait-times")      # dictionary as a gt table
+#   cwr_bundle_link("kitchener-phone-wait-times", 1)        # markdown link to the zip
 # ---------------------------------------------------------------------------
 
 library(here)
@@ -145,19 +154,80 @@ cwr_dictionary <- function(slug) {
     select(table, column, type, description, units, example)
 }
 
-# The dictionary as a gt table for the post's Reproducibility box
-cwr_dictionary_table <- function(slug) {
-  library(gt)
-  cwr_dictionary(slug) |>
-    group_by(table) |>
-    gt() |>
-    cols_label(
-      column = "Column", type = "Type", description = "Description",
-      units = "Units", example = "Values"
-    ) |>
-    tab_style(style = cell_text(weight = "bold"), locations = cells_row_groups()) |>
-    tab_options(table.font.size = px(13), data_row.padding = px(3)) |>
-    tab_source_note("Generated from the data with R/data_bundle.R; descriptions from data/dictionary.csv")
+# ---- The dictionary in the post's README ------------------------------------
+# The dictionary used to be printed in the post as well, in the Reproducibility
+# box. It was dropped from there: six columns describing every field of every
+# table is reference material for somebody about to use the data, and putting it
+# in the middle of a reading page served neither that person (who wants it next
+# to the download) nor the reader (who was not going to read it).
+#
+# So it goes in the README instead, generated rather than hand-written, because
+# the column list has to match the data exactly and a hand-kept copy would drift
+# the first time a cleaning script renamed something.
+
+# The dictionary as markdown table rows
+cwr_dictionary_markdown <- function(dictionary) {
+  # A pipe inside a cell would end the cell early, so escape any that appear
+  escape <- function(x) str_replace_all(replace_na(as.character(x), ""), fixed("|"), "\\|")
+
+  rows <- dictionary |>
+    pmap_chr(\(table, column, type, description, units, example) {
+      cells <- escape(c(table, column, type, description, units, example))
+      paste0("| ", paste(cells, collapse = " | "), " |")
+    })
+
+  c(
+    "| Table | Column | Type | Description | Units | Values |",
+    "|---|---|---|---|---|---|",
+    rows
+  )
+}
+
+# Write (or rewrite) the "## Data dictionary" section of the post's README.md.
+# Everything from that heading to the next `## ` heading is replaced, so the
+# section can sit anywhere in the file and the rest of the README is untouched.
+# If the heading is not there yet, the section is added at the end.
+cwr_dictionary_readme <- function(slug) {
+  path <- here("posts", slug, "README.md")
+  if (!file.exists(path)) {
+    stop("No README.md for post '", slug, "' at ", path, call. = FALSE)
+  }
+
+  dictionary <- cwr_dictionary(slug)
+  section <- c(
+    "## Data dictionary",
+    "",
+    paste0(
+      "Every column of every table in `data/tables.csv`. Types and example values are read from ",
+      "the data itself; descriptions and units come from `data/dictionary.csv`. **This section is ",
+      "generated - edit `data/dictionary.csv`, not the table below**, then run ",
+      "`cwr_dictionary_readme(\"", slug, "\")` from `R/data_bundle.R` (building the download ",
+      "bundle does it too). The same dictionary ships as `data_dictionary.csv` inside the bundle."
+    ),
+    "",
+    cwr_dictionary_markdown(dictionary)
+  )
+
+  lines <- read_lines(path)
+  start <- which(str_trim(lines) == "## Data dictionary")
+
+  if (length(start) == 0) {
+    lines <- c(lines, "", section)
+  } else {
+    start <- start[1]
+    # Where the section ends: the line before the next `## ` heading, or the end
+    # of the file if this is the last section
+    after <- lines[(start + 1):length(lines)]
+    next_heading <- which(str_starts(str_trim(after), "## "))
+    end <- if (length(next_heading) > 0) start + next_heading[1] - 1 else length(lines)
+    tail_lines <- if (end < length(lines)) lines[(end + 1):length(lines)] else NULL
+    lines <- c(lines[seq_len(start - 1)], section, tail_lines)
+  }
+
+  write_lines(lines, path)
+  message("Wrote the data dictionary into posts/", slug, "/README.md (",
+          nrow(dictionary), " columns across ", n_distinct(dictionary$table), " table(s)).")
+  invisible(path)
 }
 
 # ---- Bundle name and URL -------------------------------------------------------
@@ -192,6 +262,11 @@ cwr_bundle_link <- function(slug, version) {
 cwr_data_bundle <- function(slug, version = 1, excel = TRUE, upload = TRUE) {
   tables <- cwr_tables(slug)
   dictionary <- cwr_dictionary(slug)
+
+  # Refresh the README's dictionary section from the same data that is about to
+  # go into the zip, so the two copies are built from one source in one step and
+  # cannot describe different columns.
+  cwr_dictionary_readme(slug)
   meta <- rmarkdown::yaml_front_matter(here("posts", slug, "index.qmd"))
   title <- meta$title
   post_url <- paste0("https://chartingwaterlooregion.ca/posts/", slug, "/")

@@ -1,80 +1,3 @@
-snippet lib
-	library(${1:package})
-
-snippet req
-	require(${1:package})
-
-snippet src
-	source("${1:file.R}")
-
-snippet ret
-	return(${1:code})
-
-snippet if
-	if (${1:condition}) {
-		${0}
-	}
-
-snippet el
-	else {
-		${0}
-	}
-
-snippet ei
-	else if (${1:condition}) {
-		${0}
-	}
-
-snippet fun
-	${1:name} <- function(${2:variables}) {
-		${0}
-	}
-
-snippet for
-	for (${1:variable} in ${2:vector}) {
-		${0}
-	}
-
-snippet while
-	while (${1:condition}) {
-		${0}
-	}
-
-snippet switch
-	switch (${1:object},
-		${2:case} = ${3:action}
-	)
-
-snippet shinyapp
-	library(shiny)
-	
-	ui <- fluidPage(
-	  ${0}
-	)
-	
-	server <- function(input, output, session) {
-	  
-	}
-	
-	shinyApp(ui, server)
-
-snippet shinymod
-	${1:name}UI <- function(id) {
-	  ns <- NS(id)
-	  tagList(
-		${0}
-	  )
-	}
-	
-	${1:name}Server <- function(id) {
-	  moduleServer(
-	    id,
-	    function(input, output, session) {
-	      
-	    }
-	  )
-	}
-
 snippet ggtitles
 	labs(
 		title = "${1:Title}",
@@ -243,14 +166,12 @@ snippet gggridx
 snippet ggguides
 	guides(x = guide_axis(minor.ticks = TRUE)) +
 
-snippet ggsave
-	ggsave(
-		filename = here("${1:output}", "${2:plot_name}.png"),
-		width = ${3:8}, 
-		height = ${4:6},
-		dpi = 300,
-		bg = "white"
-	) +
+snippet cwrfigure
+	cwr_figure(
+		p, "fig-${1:name}",
+		alt = "${2:What the chart shows, for screen readers.}",
+		height = ${3:5}, phone_height = ${4:4.5}
+	)
 
 snippet	ggvertbar_text
 	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning 

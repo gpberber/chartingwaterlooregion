@@ -30,3 +30,34 @@ Then `quarto render posts/kitchener-phone-wait-times` from a terminal.
 - The longer exploration of the same data is a separate R project outside this repository (`../Kitchener Phone Queues/`), moved out of the blog in September 2026.
 - No API keys are needed.
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/kitchener-phone-wait-times/`).
+
+## Data dictionary
+
+Every column of every table in `data/tables.csv`. Types and example values are read from the data itself; descriptions and units come from `data/dictionary.csv`. **This section is generated - edit `data/dictionary.csv`, not the table below**, then run `cwr_dictionary_readme("kitchener-phone-wait-times")` from `R/data_bundle.R` (building the download bundle does it too). The same dictionary ships as `data_dictionary.csv` inside the bundle.
+
+| Table | Column | Type | Description | Units | Values |
+|---|---|---|---|---|---|
+| queue_daily | date | date | Calendar date | YYYY-MM-DD | 2019-03-01 to 2023-07-30 |
+| queue_daily | year | number | Calendar year |  | 2019 to 2023 |
+| queue_daily | month | text | Three-letter month abbreviation (Jan to Dec) |  | Mar; Apr; May; ... (12 distinct values) |
+| queue_daily | year_month | date | First day of the month the date falls in | YYYY-MM-DD | 2019-03-01 to 2023-07-01 |
+| queue_daily | day_of_week | text | Three-letter day of the week (Mon to Sun) |  | Fri; Sat; Sun; ... (7 distinct values) |
+| queue_daily | holiday | true/false | TRUE if the date is an Ontario statutory holiday |  | TRUE / FALSE |
+| queue_daily | weekend_or_holiday | true/false | TRUE if the date is a Saturday or Sunday or a statutory holiday |  | TRUE / FALSE |
+| queue_daily | calls_presented | number | Calls that entered the queue | calls | 24 to 1925 |
+| queue_daily | avg_queue_time | number | Average time callers spent waiting in the queue (answered and abandoned calls) | seconds | 5 to 832 |
+| queue_daily | max_queue_time | number | Longest single wait in the queue that day | seconds | 10 to 5908 |
+| queue_daily | calls_handled | number | Calls answered by an agent | calls | 11 to 1835 |
+| queue_daily | avg_speed_of_answer | number | Average time answered calls waited before an agent picked up | seconds | 4 to 1263 |
+| queue_daily | avg_handle_time | number | Average length of an answered call from answer to hang-up including hold time | seconds | 51 to 231 |
+| queue_daily | max_handle_time | number | Longest single call that day | seconds | 79 to 5001 |
+| queue_daily | calls_abandoned | number | Calls where the caller hung up while waiting in the queue | calls | 0 to 480 |
+| queue_daily | target_seconds | number | The service-level target the City measures against (30 on every day) | seconds | 30 to 30 |
+| queue_daily | answered_within_target | number | Calls answered within the 30-second target | calls | 10 to 413 |
+| queue_daily | abandoned_within_target | number | Calls abandoned before the 30-second target had elapsed | calls | 0 to 322 |
+| queue_daily | pct_handled_within_target | number | answered_within_target as a share of calls_handled | percent (0 to 100) | 14.9 to 100 |
+| queue_daily | pct_within_target_excl_abandoned | number | answered_within_target as a share of calls_presented minus calls_abandoned | percent (0 to 100) | 8.8 to 100 |
+| queue_daily | pct_within_target_abandoned_positive | number | answered_within_target plus abandoned_within_target as a share of calls_presented | percent (0 to 100) | 15.8 to 100 |
+| queue_daily | pct_answered_within_target | number | answered_within_target as a share of calls_presented; the measure used in the post, where an abandoned call counts as a miss | percent (0 to 100) | 8.2 to 100 |
+| queue_daily | percentage_of_calls_handled | number | calls_handled as a share of calls_presented | percent (0 to 100) | 45.8 to 100 |
+| queue_daily | percentage_of_calls_abandoned | number | calls_abandoned as a share of calls_presented | percent (0 to 100) | 0 to 54.2 |

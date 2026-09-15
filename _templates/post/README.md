@@ -11,6 +11,20 @@ Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`.
 
+## Data dictionary
+
+<!-- Generated. Leave this heading in place and do not write the table by hand: running
+     cwr_dictionary_readme("{{slug}}") from R/data_bundle.R replaces everything between this
+     heading and the next one with a table built from the data plus data/dictionary.csv.
+     Building the download bundle does it too, so /publish keeps it current. -->
+
+Not generated yet. Fill in `data/tables.csv` and `data/dictionary.csv`, then run:
+
+```r
+source(here::here("R", "data_bundle.R"))
+cwr_dictionary_readme("{{slug}}")
+```
+
 ## Reproduce
 
 From the project root in R:

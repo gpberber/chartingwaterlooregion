@@ -101,6 +101,23 @@ Read only the reference file you need; each is self-contained.
     both PNGs in `figures/`, the `-phone` one scaled to about 320 px wide, before calling a
     chart done.
 
+## Scope: the chart, and only the chart
+
+A request for a chart is a request for the chart chunk. Do not write an introduction, a heading, a
+finding, or a sentence interpreting it, and do not touch the post's other sections - the template's
+placeholder comments and stock headings stay exactly as they are until Greg writes them himself.
+Yours to write: the `cwr_caption()` source line, the `alt` text, and the code comments.
+
+Not yours: the title and subtitle. Leave them as placeholders for Greg, exactly these lines, so
+they are obvious and unfinished - the house rule they stand for is in style rule 1:
+
+```r
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+```
+
+Keep the trailing `<br>` only where the chart needs room under the subtitle.
+
 ## Iteration loop for label placement
 
 Templates leave label positions (`nudge_x`, `label_data`, legend coordinates) for you to set
@@ -113,6 +130,12 @@ after seeing the chart. Do not guess blind:
    here::i_am("posts/<slug>/index.qmd")
    source(here::here("R", "theme_cwr.R"))
    setwd("<scratchpad>")
+   # cwr_figure() writes to figures/ during a render and to a temporary folder
+   # otherwise, so that a half-finished chart cannot overwrite the post's
+   # committed PNGs. Under Rscript it would take the temporary path; this line
+   # makes it behave like a render, so the PNGs land in <scratchpad>/figures/
+   # where they can be found and Read. Never set this in a post.
+   options(knitr.in.progress = TRUE)
    # load the same data the post loads ...
    p <- <the ggplot code from the chunk>
    cwr_figure(p, "fig-<slug>", alt = "x", height = <h>, phone_height = <ph>)

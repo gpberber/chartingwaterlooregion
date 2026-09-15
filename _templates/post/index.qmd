@@ -48,6 +48,9 @@ data_bundle_version <- 1
 # paragraph width. A Deep dive gets "Figure 1" under the chart and can be
 # referred to as @fig-first; a Snapshot gets no label. That follows the post
 # type in `categories` above, so there is nothing to set here.
+#
+# Running this chunk rather than rendering draws both versions to look at, the
+# desktop one last, and writes nothing to the post.
 p <- ggplot()
 
 cwr_figure(
@@ -98,15 +101,7 @@ cwr_sources_table("{{slug}}")
 
 **Reproduce the post**: get the code and data for this post from [`posts/{{slug}}/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}) on GitHub.
 
-**Download the data:** `r cwr_bundle_link("{{slug}}", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, the data dictionary below, and a README with sources and licences.
-
-```{r}
-#| label: tbl-dictionary
-#| tbl-cap: "Data dictionary for the tables used in this post."
-
-# Driven by data/tables.csv and data/dictionary.csv; /review-post checks they are complete
-cwr_dictionary_table("{{slug}}")
-```
+**Download the data:** `r cwr_bundle_link("{{slug}}", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/{{slug}}#data-dictionary).
 
 ```{r}
 #| label: session-info

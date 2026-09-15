@@ -25,7 +25,9 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    cwr_data_bundle("<slug>", version = <n>)     # zip with CSV, Parquet, Excel, dictionary, README
    ```
    It attaches `<slug>-data-v<n>.zip` to release `data-<slug>-v<n>` and prints the URL the post
-   links to. Requires `data/tables.csv` and `data/dictionary.csv` to be filled in (see
+   links to. It also rewrites the `## Data dictionary` section of `posts/<slug>/README.md` from
+   the same data, so that section shows up as a change to commit in step 6; that is expected.
+   The dictionary is never printed in the post itself - README and zip only. Requires `data/tables.csv` and `data/dictionary.csv` to be filled in (see
    `R/data_bundle.R`); if they are not, stop and ask the user to complete them (Claude can
    draft descriptions from the cleaning script for the user to check).
 3. Stop any running preview server (it renders with the draft profile and writes draft posts,

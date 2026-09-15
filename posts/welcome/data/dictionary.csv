@@ -1,0 +1,10 @@
+table,column,description,units
+districts,csduid,"Statistics Canada census subdivision identifier, seven digits; the first four (3530) are the census division code for Waterloo Region",
+districts,district,Name of the municipality,
+districts,district_type,"City or Township, from the census subdivision type code (CY or TP)",
+districts,population,Estimated resident population on 1 July 2025,people
+districts,area_sq_km,"Area of the municipal boundary polygon, measured on the ellipsoid; includes inland water",square kilometres
+districts,density_per_sq_km,population divided by area_sq_km,people per square kilometre
+districts,label_room_km,"Radius of the largest circle that fits inside the municipality, a measure of how much room a map label has there",kilometres
+districts,label_lon,"Longitude of the centre of that largest inscribed circle, used to place the map label",decimal degrees (EPSG:4326)
+districts,label_lat,"Latitude of the centre of that largest inscribed circle, used to place the map label",decimal degrees (EPSG:4326)

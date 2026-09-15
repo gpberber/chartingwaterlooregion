@@ -14,7 +14,7 @@
 cwr_packages <- c(
   # House stack, loaded by R/theme_cwr.R
   "tidyverse", "scales", "ggtext", "patchwork", "gt", "gtExtras", "here",
-  "janitor", "conflicted", "prismatic", "systemfonts", "ragg",
+  "janitor", "conflicted", "prismatic", "systemfonts", "ragg", "png",
 
   # Rendering and publishing
   "quarto", "rmarkdown", "knitr", "sessioninfo", "gh", "httr2",
@@ -23,7 +23,7 @@ cwr_packages <- c(
   "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",
 
   # Spatial and maps
-  "sf", "units",
+  "sf", "units", "maptiles", "terra", "tidyterra",
 
   # Modelling and time series (phone queues post)
   "changepoint", "segmented", "prophet", "broom", "slider", "tidytext",

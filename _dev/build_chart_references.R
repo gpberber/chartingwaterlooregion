@@ -88,7 +88,7 @@ catalogue <- tribble(
   "building-blocks", "gggridx",            "Theme block that swaps gridlines to vertical for horizontal charts.",
   "building-blocks", "ggguides",           "Minor ticks on the x axis.",
   "building-blocks", "ggyaxis_break_label","Squiggle marker showing the y axis does not start at zero.",
-  "building-blocks", "ggsave",             "ggsave() with the standard size and dpi."
+  "building-blocks", "cwrfigure",          "cwr_figure(): the call that saves both PNGs and places the chart. Every chart ends with it; never call ggsave() in a post."
 )
 
 file_titles <- c(
@@ -110,7 +110,7 @@ file_intros <- c(
   points = "Use when the story is the relationship between two measures. Label points by hand with nudge values after the first render.",
   heatmaps = "Use for a category x time grid where the pattern matters more than exact values (ranks across years, rates across places).",
   multiples = "Use when one chart per group beats one crowded chart. make_multiples_plot() wraps any template; patchwork stacks the results.",
-  `building-blocks` = "Fragments to add to any template. Each ends with `+` so it can be pasted into a ggplot chain."
+  `building-blocks` = "Fragments to add to any template. Most end with `+` so they can be pasted into a ggplot chain; `cwrfigure` is the separate call that follows the finished plot."
 )
 
 missing <- setdiff(catalogue$name, snippets$name)

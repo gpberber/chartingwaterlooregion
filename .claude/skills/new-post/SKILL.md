@@ -28,10 +28,13 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    5 minutes) or a **Deep dive** (longer, more rigorous). That word goes first in `categories`,
    followed by 2 to 3 topic categories (existing ones are listed on the home page; reuse where
    possible). Ask for a one-sentence `description` for the listing card; fill them in.
-9. Report what was created and the next steps: put raw data in `data-raw/` (or write
+9. Do not write any of the post. The scaffold's headings, placeholder comments and stock sections
+   are left exactly as copied; the prose is Greg's. Adding a chart later means adding that chunk
+   alone. Report what was created and the next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it), write `R/02_clean_data.R` to produce small tidy files in `data/`,
    fill `data/tables.csv` and `data/dictionary.csv` for every table the post reads (these drive the
-   reader download bundle and the dictionary shown in the post; Claude can draft the descriptions
+   reader download bundle and the generated `## Data dictionary` section of the post's README, which
+   is where the dictionary appears - never in the post itself; Claude can draft the descriptions
    from the cleaning script), then write the post using the `cwr-charts` skill. Preview with `/preview <slug>`.
 
 ## Rules to remind the user of

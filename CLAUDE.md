@@ -50,8 +50,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every
   column in `data/dictionary.csv`. `R/data_bundle.R` turns those into a zip (CSV, Parquet, Excel,
   dictionary, README) attached to release `data-<slug>-v<n>`; `/publish` builds it and the post's
-  Reproducibility box links to it and shows the dictionary. Bundles are per post only, never for
-  a dataset on its own.
+  Reproducibility box links to it. Bundles are per post only, never for a dataset on its own.
+- The data dictionary never appears in the post. It lives in two generated places only: the
+  `## Data dictionary` section of `posts/<slug>/README.md` and `data_dictionary.csv` in the zip,
+  both written by `cwr_dictionary_readme()` / `cwr_data_bundle()`. Never hand-write either.
 - Secrets: none in the repo. Read keys with `Sys.getenv()` from `~/.Renviron`. The pre-commit hook
   (`_dev/check_repo_safety.sh`) blocks big files and key-like strings; never bypass it.
 - Git: single `master` branch, commit via `/save`, never force-push, never rewrite history.
@@ -61,6 +63,15 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   README must name each source's own licence, and material obtained by request (not from an
   open-data portal) needs its terms checked before it goes into a release. WRPS occurrence data
   carries a required disclaimer: posts using it show `wrps_disclaimer` (datasets/crime/R/helpers.R).
+- The writing is Greg's, not Claude's. "Create a post" means scaffold it and stop: no opening
+  paragraph, no headings of your own, no analysis. "Add a chart" means add the chart chunk and
+  nothing else - no prose around it, and never reword, fill in, or delete the template's stock
+  sections and placeholder comments. A post renders fine with every stock section untouched and
+  `data/tables.csv` and `data/dictionary.csv` still empty, so nothing forces the extras; leave
+  them alone and say in one line what is still outstanding. Write prose only when asked for it.
+  A chart's title and subtitle are prose too: leave them as the template's placeholder lines for
+  Greg to write. The `cwr_caption()` source line, the `alt` text and the code comments are
+  Claude's to fill in - they are machinery and accessibility, not voice.
 - Post types: the first entry in `categories` is `Snapshot` (a few simple charts, read in under
   5 minutes) or `Deep dive` (longer, more rigorous); then 2 to 3 topic categories.
 - Drafts: new posts start `draft: true`; `draft-mode: gone` keeps them off the public site.

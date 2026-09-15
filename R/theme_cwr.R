@@ -271,6 +271,12 @@ label_size <- 4
 # The PNGs live in the post's figures/ folder and are committed with the
 # post, so a full site render never needs to re-run the R code.
 #
+# Running the chunk in RStudio instead of rendering puts both versions in the
+# Plots pane, one page each, so the desktop and the phone chart can be compared
+# with the pane's back and forward arrows. `draft_phone = TRUE` leaves the phone
+# version on top instead of the desktop one. Nothing is written to the post
+# while drafting.
+#
 # Three things are changed automatically for the phone version, because the
 # panel is half as wide: titles wrap; right-hand axis labels move outside the
 # panel (the templates tuck them inside, above the gridlines, which collides
@@ -297,8 +303,21 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   }
 
   # Is this a render, or is somebody running the chunk in RStudio to see how the
-  # chart looks? knitr sets this option while it is knitting and not otherwise.
-  drafting <- !isTRUE(getOption("knitr.in.progress"))
+  # chart looks?
+  #
+  # knitr.in.progress is the usual test: knitr sets it while it is knitting. On
+  # its own it is wrong here, because RStudio runs a notebook chunk through
+  # knitr too and so sets it as well. Testing that alone made running a chunk
+  # look like a render: the chart was never drawn to look at, raw <picture> HTML
+  # was printed instead, and - worse - the post's committed figures/ PNGs were
+  # overwritten by a half-finished chart.
+  #
+  # rstudio.notebook.executing is the option RStudio sets for exactly this
+  # distinction: it is TRUE while RStudio is running a chunk and unset during a
+  # real render. So this is a render only when knitr is running and RStudio is
+  # not the one running it.
+  drafting <- !isTRUE(getOption("knitr.in.progress")) ||
+    isTRUE(getOption("rstudio.notebook.executing"))
 
   # During a render, write next to the post: knitr runs with the post folder as
   # the working directory, and the relative path "figures/..." then works in the
@@ -358,24 +377,38 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
          dpi = dpi, bg = "white", device = ragg::agg_png)
 
   # Drafting, there is no document for the HTML below to go into, so cat()ing it
-  # would print tags to the console and show no chart at all. Draw the PNG into
-  # the graphics device instead and it appears in RStudio's Plots pane.
+  # would print tags to the console and show no chart at all. Draw the PNGs into
+  # the graphics device instead and they appear in RStudio's Plots pane.
   #
   # The finished PNG rather than the plot object on purpose: printing `plot`
   # would redraw it at whatever shape the pane happens to be, and this house
   # style pins label positions to a fixed size, so the pane would show a chart
   # with the labels in the wrong places. grid.raster draws what ragg actually
-  # produced, at the real proportions. Use the Plots pane's zoom button to see it
-  # full size; `phone = TRUE` shows the narrow version instead.
+  # produced, at the real proportions. Use the Plots pane's zoom button to see
+  # either one full size.
+  #
+  # Both versions are drawn, one page each, so running the chunk shows the
+  # desktop chart and the phone chart without setting any argument. RStudio
+  # records each page as its own plot, so the pane's back and forward arrows
+  # move between them. Checking the phone version is not optional - it is the
+  # one most readers see, and it is the one that breaks - so it should not need
+  # asking for.
+  #
+  # Whichever is drawn last is the one left showing. `draft_phone` picks it:
+  # FALSE (the default) leaves the desktop version on top with the phone version
+  # one arrow back, TRUE swaps them.
   if (drafting) {
-    file <- if (isTRUE(draft_phone)) phone_file else desktop_file
     if (requireNamespace("png", quietly = TRUE)) {
-      grid.newpage()
-      grid.raster(png::readPNG(file))
+      order <- if (isTRUE(draft_phone)) c(desktop_file, phone_file) else c(phone_file, desktop_file)
+      walk(order, function(file) {
+        grid.newpage()
+        grid.raster(png::readPNG(file))
+      })
     } else {
-      message('Install the "png" package to see the chart here: install.packages("png")')
+      message('Install the "png" package to see the charts here: install.packages("png")')
     }
-    message("Drafting, so nothing was written to the post.",
+    message("Drafting, so nothing was written to the post. Both versions are in the ",
+            "Plots pane - use its back and forward arrows to move between them.",
             "
   desktop: ", desktop_file,
             "
