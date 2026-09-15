@@ -88,10 +88,23 @@ labels <- districts |>
   )
 
 p <- ggplot() +
-  geom_sf(data = districts_3161, fill = NA, colour = dodgerblue, linewidth = 0.6) +
+  # Filled in the same two colours the bar chart uses, so a reader who has seen
+  # one chart already knows which shapes are cities and which are townships.
+  # The borders are white rather than a darker line: against filled shapes they
+  # separate neighbours without drawing a second thing to look at, and around
+  # the outside they disappear into the page, which leaves the Region as a
+  # silhouette rather than a boxed-in diagram.
+  geom_sf(
+    data = districts_3161, aes(fill = district_type),
+    colour = "white", linewidth = 0.6
+  ) +
   geom_text(
     data = labels, aes(x = x, y = y, label = label),
-    colour = dodgerblue, size = label_size, lineheight = 1.05, fontface = "bold"
+    colour = "white", size = label_size, lineheight = 1.05, fontface = "bold"
+  ) +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = habsred),
+    guide = "none"   # the labels on the shapes say which is which
   ) +
   # datum = NA drops the graticule - the faint grid of latitude and longitude
   # lines coord_sf() draws by default - which this map has no use for.
@@ -143,6 +156,10 @@ cwr_figure(
 # up on top. Because the order is baked into the factor, all three panels keep
 # it, which is the point: the eye can travel across a row and stay on the same
 # place.
+# Roughly how many characters of label fit across one panel. Only used to work
+# out which labels go inside their bars; see the comment where it is applied.
+panel_chars <- 30
+
 panels <- districts |>
   st_drop_geometry() |>
   mutate(district = fct_reorder(district, population)) |>
@@ -157,17 +174,28 @@ panels <- districts |>
     measure = factor(
       measure,
       levels = c("population", "area_sq_km", "density_per_sq_km"),
-      labels = c("Population", "Land area, km\u00b2", "People per km\u00b2")
+      labels = c("Population, 2025", "Land area, km\u00b2", "People per km\u00b2")
     )
   ) |>
   # Each panel has its own scale, so "does this label fit inside its bar" has to
   # be asked panel by panel: a bar of 278 is nearly full width among areas and
-  # invisible among populations. Anything at least a third of the longest bar in
-  # its own panel gets its label inside.
+  # invisible among populations.
+  #
+  # What decides it is the width of the text, not the size of the number. An
+  # earlier version compared the bar against a fixed fraction of the longest bar
+  # in its panel, which put "113" outside a bar with room for twice that, simply
+  # because 113 is a small share of 327.
+  #
+  # So the label's width is estimated in the panel's own units. A panel is about
+  # `panel_chars` characters wide at this font size - measured from a render
+  # rather than derived, since it depends on the font and the panel's width -
+  # and the longest bar covers all but the 20% expansion left for outside
+  # labels. One character is therefore max(value) * 1.2 / panel_chars wide, and
+  # a label needs its own length plus a space or so of padding to sit inside.
   group_by(measure) |>
   mutate(
-    inside = value >= 0.35 * max(value),
-    label = label_comma(accuracy = 1)(value)
+    label = label_comma(accuracy = 1)(value),
+    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars)
   ) |>
   ungroup()
 
