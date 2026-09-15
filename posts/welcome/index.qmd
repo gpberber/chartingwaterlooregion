@@ -169,7 +169,7 @@ measures <- tribble(
   ~column,             ~panel,                ~spoken,
   "population",        "Population, 2025",    "Population in 2025",
   "area_sq_km",        "Land area, km\u00b2",  "Land area in square kilometres",
-  "density_per_sq_km", "People per km\u00b2",  "People per square kilometre"
+  "density_per_sq_km", "People per km\u00b2, 2025",  "People per square kilometre in 2025"
 )
 
 panels <- districts |>

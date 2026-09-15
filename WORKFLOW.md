@@ -245,6 +245,20 @@ Claude stages **everything in the folder**, runs the safety check, commits with 
 
 **Commit before handing a file to Claude,** even if the work in it is not finished. Three reasons. The first is recovery: if an edit comes back wrong, `git checkout <file>` puts the file back to the last commit - but if your own uncommitted edits are sitting in that same file, the command throws those away too, and the cheap undo is gone. The second applies to every file you have opened in the visual editor, which reflows the whole document on save (section 12). Such a file already carries dozens of changed lines before Claude touches it, so a one-line change arrives buried in them and you cannot see at a glance what moved. Commit the reflow on its own first - "Reflow WORKFLOW.md after opening it in the visual editor" is a perfectly good message - and the next diff shows only the real change. The third reason is the one above: whatever you leave uncommitted is swept into Claude's commit, so your own work ends up described by someone else's message. Claude should tell you when that happens - it did on 2026-09-14, when a one-word fix in `about.qmd` went in with a `WORKFLOW.md` commit - but it is easier not to need the warning.
 
+**Saving is the part Claude needs; committing is for the three reasons above.** Claude reads the file
+from disk before editing it, so a change you have saved is a change it sees, committed or not. An
+uncommitted edit is not invisible to it - it is just unprotected, buried in reflow, and liable to be
+swept into someone else's commit. So do not hold up a question waiting to write a commit message: save,
+ask, and commit when the piece of work is actually finished. A typo or a one-word fix is not worth a
+commit of its own either; Claude sees it in `git status` and should name it in the commit message it
+ends up riding in.
+
+**The one case where committing does not help: editing a file while Claude is partway through a turn on
+it.** By then it has already read the file, and its write lands on top of yours - your save is simply
+gone, and the commit you made a moment earlier is the only reason it is recoverable at all. Save and
+commit *before* you send the message, not while the answer is being written. Between turns, edit
+whatever you like; that is safe, and it is what Claude re-checks `git status` for.
+
 The safety check (`_dev/check_repo_safety.sh`, also installed as a git pre-commit hook) blocks any commit that includes a file over 25 MB, a `.Renviron` or `.env` file, text that looks like an API key, or a background-reading folder. If it blocks, read its message: the fix is usually `/share-data` for a big file or `git rm --cached` for a file that should be ignored. Never work around it.
 
 **Before you close a session, say "update memories".** `/save` commits the files; it does not carry forward anything Claude worked out along the way. Claude keeps notes about this project between sessions, and a new session starts by reading their titles - so if something came up that a future post should know, that is the moment to have it written down. Worth doing for a decision and the reason behind it ("the tags are white because grey was unreadable on the banner"), a dead end so it is not tried twice, or a trap that cost an hour to find. Not worth doing for anything the repository already records: the code, this guide, or what a commit message says.
