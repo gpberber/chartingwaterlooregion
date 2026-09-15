@@ -77,6 +77,8 @@ Yes. Because I'm sharing charts and analysis with the public, I believe I have a
 4. Charts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.
 5. Charts will enhance our understanding of their subject matter and start conversations, not stop them.
 
+CWR will also be free of pies and donuts. I love eating them, but they are an unhealthy way to chart.
+
 ## How is it built?
 
 I use [R](https://www.r-project.org), a popular language for doing data science, to produce CWR's charts and tables, and to prepare the data behind them. [Quarto](https://quarto.org) combines the R code with my writing and renders it into the HTML, CSS, and images needed to produce the CWR website. These website elements get pushed to a [GitHub folder](https://github.com/gpberber/chartingwaterlooregion) and then served to you via [GitHub Pages](https://docs.github.com/en/pages).
