@@ -23,7 +23,7 @@ cwr_packages <- c(
   "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",
 
   # Spatial and maps
-  "sf", "units", "maptiles", "terra", "tidyterra",
+  "sf", "units",
 
   # Modelling and time series (phone queues post)
   "changepoint", "segmented", "prophet", "broom", "slider", "tidytext",

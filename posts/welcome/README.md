@@ -8,7 +8,6 @@ Post: https://chartingwaterlooregion.ca/posts/welcome/
 |---|---|---|---|---|
 | `table_17100155.csv` | Table 17-10-0155-01, population estimates on 1 July by census subdivision, 2021 boundaries | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710015501) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-14 |
 | `csd_boundaries/` | 2021 census subdivision cartographic boundary file (`lcsd000b21a_e`), the municipal polygons | [Statistics Canada](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-14 |
-| `tiles/` | OpenStreetMap map tiles used as the street map under the first chart, cached by `maptiles` | [OpenStreetMap](https://www.openstreetmap.org/copyright) | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/); map tiles © OpenStreetMap contributors, [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | 2026-09-14 |
 
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`. Nothing in this post needs one: every
@@ -31,9 +30,6 @@ Then `quarto render posts/welcome` from a terminal.
 
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/welcome/`).
 - No API keys are needed.
-- The map tiles are not redistributed here: `data-raw/tiles/` is gitignored, and the chart that
-  uses them credits OpenStreetMap in its caption. Only the finished PNGs in `figures/` are
-  committed, which is normal use of the tiles rather than republication of the tile set.
 - Area and density are calculated from the boundary polygons, not taken from a published table,
   so they include inland water. Statistics Canada's own `LANDAREA` field excludes it and runs
   about one per cent smaller for most of the Region.
