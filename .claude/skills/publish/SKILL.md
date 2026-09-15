@@ -65,7 +65,8 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
 ## Commit and push
 
 6. Commit with a message like `Publish: <post title>` or `Site: <what changed>`. End the message with
-   `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+   a `Co-Authored-By:` line naming **the model that did the work**, not a fixed name - for example
+   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 7. `git push origin master`. If the push is rejected because the remote has new commits, run
    `git pull --rebase origin master`, then push again. Never force-push.
 

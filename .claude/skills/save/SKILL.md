@@ -18,8 +18,11 @@ no jargon beyond commit and push.
 3. Summarise the staged changes in two or three plain sentences: which posts, whether the design
    or config changed, whether `_freeze` (rendered results) changed. Skip file-by-file lists.
 4. Commit. Message: first line under 70 characters describing the change (use `$ARGUMENTS` if
-   given), a blank line, then one or two lines of detail if useful, then
-   `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+   given), a blank line, then one or two lines of detail if useful, then a
+   `Co-Authored-By:` line naming **the model that did the work**, not a fixed name - for example
+   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`. The point is that the history records
+   which model wrote a commit, so use whichever one is running, and leave the line out entirely if
+   the work was all Greg's.
 5. `git push origin master`. If rejected because the remote moved, `git pull --rebase origin master`
    then push again. If a conflict appears, stop and explain which file conflicts and what the two
    versions are; do not resolve it silently.
