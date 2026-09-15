@@ -31,6 +31,10 @@ For every `ggplot` chunk:
   "Subtitle: what is measured..."), and no stock template text is left unwritten: the opening
   paragraph comment, "First finding as a plain-language heading", "Second finding", and the empty
   `tbl-first` chunk all have to be replaced or removed before a post goes live.
+- No chart is a pie or a donut (`geom_arc_bar`, `coord_polar` on a bar, any package drawing one).
+  The About page promises readers there are none; this is the check that keeps that true.
+- Numbers written into a chart's `alt` text are computed from the data, not typed. Typed figures go
+  stale silently, and only for readers who cannot see the chart to check them.
 - The chart goes through `cwr_figure(p, "fig-<slug>", alt = , height = , phone_height = )`
   in a chunk with `#| output: asis`, and `alt` is filled in with what the chart shows. Flag any
   chart that uses knitr's `fig-cap`/`fig-width` options instead (it would have no phone version).

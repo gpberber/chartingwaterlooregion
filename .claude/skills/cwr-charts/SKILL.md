@@ -50,6 +50,10 @@ Read only the reference file you need; each is self-contained.
 
 ## Style rules (see references/style-rules.md for the reasoning)
 
+**0. Never a pie or a donut**, whatever the data looks like. The About page promises readers the site
+is free of them, so this one is a published commitment rather than a preference. Parts of a whole go
+in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what let them.
+
 1. **Title says the finding, subtitle says the units and scope.** Subtitle ends with `<br>`
    when the plot needs breathing room under it. Caption is always `cwr_caption("...")`, naming
    whoever published the numbers and nobody else. It carries no Charting Waterloo Region byline

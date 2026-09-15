@@ -40,8 +40,9 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 
 ## Rules
 
-- Charts: source `R/theme_cwr.R`, pick a template from the `cwr-charts` skill, one chart or table
-  per chunk. Every chart goes through `cwr_figure()` (desktop and phone PNGs in the post's
+- Charts: never a pie or a donut - the About page makes that a promise to readers, so parts of a
+  whole go in a bar chart. Source `R/theme_cwr.R`, pick a template from the `cwr-charts` skill, one
+  chart or table per chunk. Every chart goes through `cwr_figure()` (desktop and phone PNGs in the post's
   `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. Figure
   numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get
   no label. Captions are optional and usually omitted. Tables are gt only.

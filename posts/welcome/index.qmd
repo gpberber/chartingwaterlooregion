@@ -160,22 +160,31 @@ cwr_figure(
 # out which labels go inside their bars; see the comment where it is applied.
 panel_chars <- 30
 
+# The three measures: the column each comes from, the heading its panel carries,
+# and how that heading should be said aloud. Keeping all three together means
+# the alt text cannot drift from the panels, and lets the two differ where they
+# should - a screen reader announces "km2" for km², so the spoken form spells
+# the unit out.
+measures <- tribble(
+  ~column,             ~panel,                ~spoken,
+  "population",        "Population, 2025",    "Population in 2025",
+  "area_sq_km",        "Land area, km\u00b2",  "Land area in square kilometres",
+  "density_per_sq_km", "People per km\u00b2",  "People per square kilometre"
+)
+
 panels <- districts |>
   st_drop_geometry() |>
   mutate(district = fct_reorder(district, population)) |>
   select(district, district_type, population, area_sq_km, density_per_sq_km) |>
   pivot_longer(
     c(population, area_sq_km, density_per_sq_km),
-    names_to = "measure", values_to = "value"
+    names_to = "column", values_to = "value"
   ) |>
+  left_join(measures, join_by(column)) |>
   mutate(
-    # factor() fixes the panel order too; left as characters the panels would
-    # come out alphabetically
-    measure = factor(
-      measure,
-      levels = c("population", "area_sq_km", "density_per_sq_km"),
-      labels = c("Population, 2025", "Land area, km\u00b2", "People per km\u00b2")
-    )
+    # factor() fixes the panel order; left as characters the panels would come
+    # out alphabetically
+    measure = factor(panel, levels = measures$panel)
   ) |>
   # Each panel has its own scale, so "does this label fit inside its bar" has to
   # be asked panel by panel: a bar of 278 is nearly full width among areas and
@@ -244,17 +253,24 @@ p <- ggplot(panels, aes(x = value, y = district, fill = district_type)) +
     panel.spacing.x = unit(1.4, "lines")
   )
 
+# The figures in the alt text are built from the same rows the bars are drawn
+# from, not typed out. Typed, they would be right today and quietly wrong the
+# first time an estimate is revised - and wrong only for the readers who cannot
+# see the chart to check it against.
+alt_lines <- panels |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = c(measure, spoken)
+  ) |>
+  mutate(line = paste0(spoken, ": ", entries)) |>
+  pull(line)
+
 cwr_figure(
   p, "fig-sizes",
-  alt = paste(
-    "Three panels of horizontal bars, one row per municipality, ordered by population.",
-    "Population: Kitchener 323,917, Cambridge 165,354, Waterloo 142,450, Woolwich 31,382,",
-    "Wilmot 22,890, North Dumfries 13,051, Wellesley 12,413.",
-    "Land area in square kilometres: Kitchener 137, Cambridge 113, Waterloo 64, Woolwich 327,",
-    "Wilmot 264, North Dumfries 188, Wellesley 278.",
-    "People per square kilometre: Kitchener 2,368, Cambridge 1,463, Waterloo 2,224,",
-    "Woolwich 96, Wilmot 87, North Dumfries 69, Wellesley 45.",
-    "The three cities are shown in blue and the four townships in red."
+  alt = paste0(
+    "Three panels of horizontal bars, one row per municipality, ordered by ",
+    "population, with the three cities in blue and the four townships in red. ",
+    paste(alt_lines, collapse = ". "), "."
   ),
   height = 4.6, phone_height = 9.5,
   # Three panels side by side on a desktop will not fit across a phone, so the
