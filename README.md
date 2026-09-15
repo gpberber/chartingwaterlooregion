@@ -7,6 +7,9 @@ Learning about life in Waterloo Region, one chart at a time.
 **How this is built and published:** [WORKFLOW.md](WORKFLOW.md). Section 4 covers saving, committing,
 pushing and publishing - what each one does, and what not to do.
 
+**Choosing a chart:** [CHARTS.md](CHARTS.md) - every chart template, what it is called, and what it is
+good for.
+
 ## What is here
 
 | Path | Contents |
