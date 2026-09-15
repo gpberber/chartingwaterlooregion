@@ -40,6 +40,14 @@ employment <- read_csv(
   here("posts", "welcome", "data", "employment.csv"),
   show_col_types = FALSE
 )
+
+# Median household and median individual income from the 2021 census, which
+# reports income earned in 2020, restated in 2026 dollars by 02_clean_data.R.
+# Eight rows: the seven municipalities and the Region as a whole.
+income <- read_csv(
+  here("posts", "welcome", "data", "income.csv"),
+  show_col_types = FALSE
+)
 ```
 
 <!-- Opening paragraph: the question this post asks and the one-line answer. -->
@@ -393,6 +401,147 @@ cwr_figure(
   # Two bars to a panel rather than seven, but three panels still will not fit
   # across a phone; adding a facet replaces the one above.
   phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x"))
+)
+```
+
+```{r}
+#| label: income
+#| output: asis
+
+# The two measures: the column each comes from and the heading its panel
+# carries. Kept in a table for the same reason as the chart above - the panel
+# headings and the alt text are then built from one list and cannot drift
+# apart. There is no separate spoken form here because both headings read
+# aloud exactly as they are written.
+income_measures <- tribble(
+  ~column,                   ~panel,
+  "household_income_2026",   "Median household income",
+  "individual_income_2026",  "Median individual income"
+)
+
+income_panels <- income |>
+  select(district, district_type, household_income_2026, individual_income_2026) |>
+  pivot_longer(
+    c(household_income_2026, individual_income_2026),
+    names_to = "column", values_to = "value"
+  ) |>
+  left_join(income_measures, join_by(column)) |>
+  mutate(
+    measure = factor(panel, levels = income_measures$panel),
+    # Each panel is ordered by its own figures rather than sharing one order,
+    # so a place can sit seventh for household income and third for individual
+    # income. That disagreement between the two panels is the point of putting
+    # them side by side.
+    #
+    # ggplot2 has one discrete scale for the whole chart, so a factor of place
+    # names can carry only one order. The way round it is to make each bar's
+    # identity the place *and* its panel - "Kitchener|Median individual income"
+    # - and sort that combined key by value. Drawn with a free y scale, each
+    # panel shows only its own eight levels in its own order, and the scale
+    # below strips the panel name off again before the label is drawn.
+    # (tidytext::reorder_within() does exactly this. It is two lines here, so
+    # the package is not worth adding.)
+    #
+    # fct_reorder() sorts ascending and a horizontal bar chart draws the first
+    # level at the bottom, so the highest income ends up on top of its panel.
+    row = fct_reorder(paste(district, measure, sep = "|"), value),
+    # Rounded to the nearest hundred dollars. The census medians themselves are
+    # rounded before publication, and multiplying by an index does not add
+    # precision, so a figure to the dollar would be false exactness.
+    label = label_currency(accuracy = 100, big.mark = ",")(value)
+  )
+
+p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Every label sits inside its bar end. The shortest bar here still holds
+      # its label comfortably, so unlike the chart above there is no test for
+      # which ones have to move outside.
+      #
+      # White on the blue and the red, black on the Region's silver: white on
+      # that grey is a contrast ratio of about three to one, which is too
+      # faint to read at this size.
+      colour = if_else(district_type == "Region", "black", "white")
+    ),
+    hjust = 1.15,
+    size = label_size * 0.8
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = habsred, Region = cowboysilver),
+    guide = "none"   # the colours are explained by the bars themselves
+  ) +
+  # A little air at the bar ends so the longest bar does not touch the panel
+  # edge. No room is needed on the right for outside labels, as there are none.
+  scale_x_continuous(expand = expansion(mult = c(0, 0.02))) +
+  # Everything from the "|" on is the panel name carried by the sort key above,
+  # and is not for reading.
+  scale_y_discrete(labels = \(x) str_split_i(x, fixed("|"), 1)) +
+  # Free on y, fixed on x. Free on y is what lets each panel hold its own
+  # order, and it is why the second panel carries its own row labels: the rows
+  # are no longer the same rows in the same places.
+  #
+  # x stays shared, which is the other point of the chart: a household is more
+  # than one earner, and at one scale the individual bars come out visibly
+  # shorter. Given its own scale - as the charts above do, where the measures
+  # are people, square kilometres and a density - the second panel would look
+  # like the first and that comparison would be lost.
+  facet_wrap(vars(measure), nrow = 1, scales = "free_y") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    # One footnote, keyed to whatever in the title or subtitle needs it.
+    caption = cwr_caption(
+      c("Statistics Canada Tables 98-10-0057-01 and 98-10-0070-01",
+        "Table 18-10-0004-01"),
+      credit = TRUE,
+      notes = paste(
+        "2020 income, the most recent the census reports, in 2026 dollars:",
+        "adjusted by the Ontario all-items consumer price index"
+      )
+    )
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed, for the reason given above.
+alt_lines <- income_panels |>
+  # Each line reads down its own panel, highest first, as the bars are drawn
+  arrange(measure, desc(value)) |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = measure
+  ) |>
+  mutate(line = paste0(measure, ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-income",
+  alt = paste0(
+    "Two panels of horizontal bars, one row per municipality and one for ",
+    "Waterloo Region as a whole, with the three cities in blue, the four ",
+    "townships in red and the Region in grey. Each panel is ordered by its own ",
+    "figures, highest at the top, and both are drawn to the same dollar scale. ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  height = 4.8, phone_height = 6.6,
+  # Two panels side by side will not fit across a phone, so the phone version
+  # stacks them. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_y"))
 )
 ```
 

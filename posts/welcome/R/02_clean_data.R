@@ -238,3 +238,100 @@ employment <- employment_raw |>
 write_csv(employment, file.path(data_dir, "employment.csv"))
 
 message("Wrote ", nrow(employment), " industries to ", data_dir)
+
+# ---- 8. Income, restated in today's dollars --------------------------------
+# The 2021 census reports income earned in 2020. Read in 2026 those figures
+# understate what people have, so they are restated in 2026 dollars: the same
+# income multiplied by what the same basket of goods now costs against what it
+# cost then. That ratio is all a CPI adjustment is.
+#
+# Which years to compare is a judgement call, and this is the one made here.
+# 2020 is a finished calendar year, so its index is the average of its twelve
+# months - the arithmetic Statistics Canada itself uses to publish an annual
+# average. 2026 is not finished, so its index is the average of the months
+# published so far. That is the honest reading of "2026 dollars" in September:
+# the year to date, not a guess at how it ends. Re-running this script after
+# more months are published moves the figures slightly, which is correct.
+income_year <- "2020"   # the year the census asked about
+dollar_year <- "2026"   # the year the post is written for
+
+cpi <- read_csv(
+  file.path(raw_dir, "table_18100004.csv"),
+  col_select = c(REF_DATE, VALUE),
+  col_types = cols(REF_DATE = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  # REF_DATE is "2026-08", so the first four characters are the year
+  mutate(year = str_sub(ref_date, 1, 4)) |>
+  summarise(index = mean(value), months = n(), .by = year)
+
+inflator <- (cpi |> filter(year == dollar_year) |> pull(index)) /
+  (cpi |> filter(year == income_year) |> pull(index))
+
+# Median household total income. The table crosses the income statistics with
+# household size and with household type, so both of those are held at their
+# "Total" line to get the figure for all households rather than for, say,
+# four-person couple families. They are matched on the word "Total" rather than
+# on the full member name because one of the two contains an en dash, a
+# character that is easy to mistype and impossible to see in a script.
+household_income <- read_csv(
+  file.path(raw_dir, "table_98100057.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    str_starts(household_size_7, "Total"),
+    str_starts(household_type_including_census_family_structure_11, "Total"),
+    household_income_statistics_6 ==
+      "Median household total income (2020) (2020 constant dollars)"
+  ) |>
+  select(geo_uid, household_income = value)
+
+# Median total income of a person aged 15 or over who had any income. This
+# table splits income into sources - wages, investments, pensions, transfers -
+# so "Total income" is the line that adds them up, and "Median amount ($)" is
+# the statistic rather than the count of people or the average.
+individual_income <- read_csv(
+  file.path(raw_dir, "table_98100070.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    income_sources_and_taxes_32 == "Total income",
+    income_statistics_8 == "Median amount ($)"
+  ) |>
+  select(geo_uid, individual_income = value)
+
+income <- household_income |>
+  left_join(individual_income, join_by(geo_uid)) |>
+  # Names and city/township come from `districts`, which has already tidied
+  # both, so the two files cannot disagree about what a place is called. The
+  # eighth row has no match there: it is the census division, and Statistics
+  # Canada calls it "Waterloo", the same name as the city inside it. It is
+  # named here so a reader of the chart is never in doubt which is which.
+  left_join(
+    districts |> st_drop_geometry() |> select(csduid, district, district_type),
+    join_by(geo_uid == csduid)
+  ) |>
+  mutate(
+    district = coalesce(district, "Waterloo Region"),
+    district_type = coalesce(district_type, "Region"),
+    # Both years are kept. The 2020 figures are what Statistics Canada
+    # published and are what anyone checking this against the census will see;
+    # the 2026 ones are this script's arithmetic on top of them.
+    household_income_2026 = household_income * inflator,
+    individual_income_2026 = individual_income * inflator
+  ) |>
+  select(
+    district, district_type,
+    household_income_2020 = household_income,
+    individual_income_2020 = individual_income,
+    household_income_2026, individual_income_2026
+  ) |>
+  arrange(desc(household_income_2026))
+
+write_csv(income, file.path(data_dir, "income.csv"))
+
+message("Wrote ", nrow(income), " income rows to ", data_dir,
+        " (", income_year, " dollars x ", round(inflator, 4), " = ",
+        dollar_year, " dollars)")
