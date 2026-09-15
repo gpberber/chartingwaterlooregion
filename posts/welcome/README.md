@@ -30,9 +30,9 @@ Then `quarto render posts/welcome` from a terminal.
 
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/welcome/`).
 - No API keys are needed.
-- Area and density are calculated from the boundary polygons, not taken from a published table,
-  so they include inland water. Statistics Canada's own `LANDAREA` field excludes it and runs
-  about one per cent smaller for most of the Region.
+- Area is Statistics Canada's published 2021 census land area (the `LANDAREA` field of the
+  boundary file), which excludes inland water. Density is that area divided into the 2025
+  population estimate, so it is people per square kilometre of land.
 
 ## Data dictionary
 
@@ -44,8 +44,8 @@ Every column of every table in `data/tables.csv`. Types and example values are r
 | districts | district | text | Name of the municipality |  | Kitchener; Cambridge; Waterloo; ... (7 distinct values) |
 | districts | district_type | text | City or Township, from the census subdivision type code (CY or TP) |  | City; Township |
 | districts | population | number | Estimated resident population on 1 July 2025 | people | 12413 to 323917 |
-| districts | area_sq_km | number | Area of the municipal boundary polygon, measured on the ellipsoid; includes inland water | square kilometres | 65.0145 to 329.4112 |
-| districts | density_per_sq_km | number | population divided by area_sq_km | people per square kilometre | 44.62509 to 2343.715 |
+| districts | area_sq_km | number | Land area published by Statistics Canada in the 2021 census boundary file; excludes inland water | square kilometres | 64.056 to 326.5574 |
+| districts | density_per_sq_km | number | population divided by area_sq_km, so people per square kilometre of land | people per square kilometre | 44.69285 to 2367.556 |
 | districts | label_room_km | number | Radius of the largest circle that fits inside the municipality, a measure of how much room a map label has there | kilometres | 3.088863 to 8.220127 |
 | districts | label_lon | number | Longitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | -80.71725 to -80.33542 |
 | districts | label_lat | number | Latitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | 43.32466 to 43.58204 |

@@ -130,6 +130,112 @@ cwr_figure(
 ## Second finding
 
 ```{r}
+#| label: sizes
+#| output: asis
+
+# One row per municipality per measure. The three measures live in one column
+# so that facet_wrap() can give each its own panel; pivot_longer() is what turns
+# the three separate columns into that shape.
+#
+# The order is set once, on population, before the pivot - while there is still
+# one row per municipality to sort. fct_reorder() sorts ascending and a
+# horizontal bar chart draws the first level at the bottom, so the largest ends
+# up on top. Because the order is baked into the factor, all three panels keep
+# it, which is the point: the eye can travel across a row and stay on the same
+# place.
+panels <- districts |>
+  st_drop_geometry() |>
+  mutate(district = fct_reorder(district, population)) |>
+  select(district, district_type, population, area_sq_km, density_per_sq_km) |>
+  pivot_longer(
+    c(population, area_sq_km, density_per_sq_km),
+    names_to = "measure", values_to = "value"
+  ) |>
+  mutate(
+    # factor() fixes the panel order too; left as characters the panels would
+    # come out alphabetically
+    measure = factor(
+      measure,
+      levels = c("population", "area_sq_km", "density_per_sq_km"),
+      labels = c("Population", "Land area, km\u00b2", "People per km\u00b2")
+    )
+  ) |>
+  # Each panel has its own scale, so "does this label fit inside its bar" has to
+  # be asked panel by panel: a bar of 278 is nearly full width among areas and
+  # invisible among populations. Anything at least a third of the longest bar in
+  # its own panel gets its label inside.
+  group_by(measure) |>
+  mutate(
+    inside = value >= 0.35 * max(value),
+    label = label_comma(accuracy = 1)(value)
+  ) |>
+  ungroup()
+
+p <- ggplot(panels, aes(x = value, y = district, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from. theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = if_else(inside, "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = habsred),
+    guide = "none"   # the colours are explained by the bars themselves
+  ) +
+  # Room on the right for the labels that sit outside their bars
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  facet_wrap(vars(measure), nrow = 1, scales = "free_x") +
+  # Stops a label that overhangs the panel edge from being cut off
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    caption = cwr_caption(
+      "Statistics Canada Table 17-10-0155-01 and the 2021 census boundary files",
+      credit = TRUE
+    )
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+cwr_figure(
+  p, "fig-sizes",
+  alt = paste(
+    "Three panels of horizontal bars, one row per municipality, ordered by population.",
+    "Population: Kitchener 323,917, Cambridge 165,354, Waterloo 142,450, Woolwich 31,382,",
+    "Wilmot 22,890, North Dumfries 13,051, Wellesley 12,413.",
+    "Land area in square kilometres: Kitchener 137, Cambridge 113, Waterloo 64, Woolwich 327,",
+    "Wilmot 264, North Dumfries 188, Wellesley 278.",
+    "People per square kilometre: Kitchener 2,368, Cambridge 1,463, Waterloo 2,224,",
+    "Woolwich 96, Wilmot 87, North Dumfries 69, Wellesley 45.",
+    "The three cities are shown in blue and the four townships in red."
+  ),
+  height = 4.6, phone_height = 9.5,
+  # Three panels side by side on a desktop will not fit across a phone, so the
+  # phone version stacks them instead. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x"))
+)
+```
+
+```{r}
 #| label: tbl-first
 #| tbl-cap: "Caption shown under the table."
 

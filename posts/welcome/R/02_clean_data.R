@@ -49,22 +49,19 @@ districts_raw <- st_read(
 districts <- districts_raw |>
   st_transform(4326)
 
-# ---- 3. Area straight off the polygons -------------------------------------
-# st_area() measures each polygon. Because the data is now in latitude and
-# longitude, sf measures on the curved surface of the earth (through the s2
-# library) instead of on a flat projection, which is the accurate way to do it.
-# The answer comes back in square metres carrying a "units" attribute, so it is
-# converted to square kilometres and then stripped back to a plain number, which
-# is easier to format in a chart label.
+# ---- 3. Area ---------------------------------------------------------------
+# `landarea` arrives with the boundary file: Statistics Canada's own 2021 census
+# land area for each municipality, already in square kilometres.
 #
-# This is the area of the polygon as drawn, which is what the post says it is.
-# It differs a little from the `landarea` column Statistics Canada ships in the
-# same file, because that one excludes inland water - rivers, reservoirs, gravel
-# pits - while the polygon includes everything inside the municipal border.
+# The alternative was to measure the polygons with st_area(), and that is what
+# this script used to do. The published figure is better on both counts that
+# matter. It is the number anyone else quoting a census area will have, so the
+# post agrees with them rather than being a percent or two out for reasons only
+# this script knows about. And it is land area: it excludes inland water -
+# rivers, reservoirs, flooded gravel pits - where measuring the polygon counts
+# everything inside the municipal border, water included.
 districts <- districts |>
-  mutate(
-    area_sq_km = st_area(geometry) |> units::set_units("km^2") |> as.numeric()
-  )
+  rename(area_sq_km = landarea)
 
 # ---- 4. Population --------------------------------------------------------
 # Table 17-10-0155-01 covers every municipality in Canada for every year since
