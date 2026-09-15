@@ -4,6 +4,9 @@ Learning about life in Waterloo Region, one chart at a time.
 
 **Site:** https://chartingwaterlooregion.ca
 
+**How this is built and published:** [WORKFLOW.md](WORKFLOW.md). Section 4 covers saving, committing,
+pushing and publishing - what each one does, and what not to do.
+
 ## What is here
 
 | Path | Contents |

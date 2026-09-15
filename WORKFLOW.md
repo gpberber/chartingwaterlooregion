@@ -1,6 +1,6 @@
 # Charting Waterloo Region: workflow guide
 
-How the blog works and how to do everything from writing a post to publishing it. Written for the author, who is comfortable in R but new to blogging and to git. Claude Code does most of the mechanical steps through the skills listed below; the manual commands are given too so nothing depends on Claude being available.
+How the blog works and how to do everything from writing a post to publishing it. Written for the author, who is comfortable in R but new to blogging and to git. Claude Code does most of the mechanical steps through the skills listed below; the manual commands are given too so nothing depends on Claude being available. **If you are unsure what saving, committing, pushing and publishing each do, or whether it is safe to use RStudio's Git pane, read section 4 first** - it is the one part of this that can lose work or put something on the web before you meant to.
 
 ## 1. How the site works
 
@@ -191,7 +191,49 @@ Edit `index.qmd`, run `/preview`, then `/publish` with no argument. Quarto adds 
 
 Say what was wrong and what it should have been, not just that something changed. A silent fix is fine for spelling, wording or layout; anything that changes a number, a chart or a conclusion gets a note. The About page promises readers exactly this, so it is not optional.
 
-## 4. Save work at any time
+## 4. Saving, committing, pushing, publishing
+
+Four different things, easy to run together in your head. Smallest to largest:
+
+| Word | What it does | Who can see it | Can it be undone? |
+|---|---|---|---|
+| **Save** (Ctrl+S) | Writes the file to disk. OneDrive syncs it. | You | Ctrl+Z, or OneDrive's version history |
+| **Commit** | Records a snapshot of the whole folder, with a message saying what changed | You, on this machine | Yes - that is what committing is for |
+| **Push** | Copies your commits to GitHub | Anyone who looks at the repository | Awkwardly. Treat it as permanent |
+| **Publish** | Renders the site and puts it on chartingwaterlooregion.ca | Everyone | Only by publishing again |
+
+**The one that trips people up: pushing is not publishing.** A push sends the *source* to GitHub - the `.qmd` files, the scripts, the data, the chart PNGs. It does not touch the website. The website only moves when `quarto publish gh-pages` runs, which is what `/publish` does and nothing else does. So you can push a half-written post whenever you like and no reader will see it. A post with `draft: true` is also left out of the built site entirely, so that is two locks, not one.
+
+**What to do, most of the time:**
+
+- While writing: save normally, and commit when a piece of work is finished.
+- Before handing a file to Claude: commit it, even unfinished.
+- End of a session: `/save`, then say **update memories**.
+- When a post is ready for readers: `/review-post <slug>`, then `/publish <slug>`.
+
+### Should I commit and push from RStudio?
+
+**Yes. Both are safe, and committing your own work yourself is better than leaving it for Claude to sweep up.** RStudio's Git pane, the terminal, `/save` - same thing, pick whichever is in front of you.
+
+Two things worth knowing:
+
+- **A push sends every commit on the branch, not just yours.** If Claude committed earlier and had not pushed yet, your push carries those too. Harmless - it was all going to the same place - but it means "not pushed yet" is never a state to rely on. This happened on 2026-09-14.
+- **Say so if you commit while Claude is working,** or expect it to re-check. Claude compares against the last commit to see what changed, so one it does not know about makes the next diff confusing.
+
+**What not to do from RStudio: publish.** There is no button for it, which is correct. Publishing runs a full render and a set of pre-flight checks first - that no draft has leaked into the public site, that the `CNAME` file is still there, that the safety scan passes - and `/publish` is the only thing that does them.
+
+### The four things that could actually cause damage
+
+Everything else in git is recoverable. These are not, or not easily:
+
+- **Force-push** - `git push --force`, or a "Force" checkbox in any GUI. It overwrites the history on GitHub and can destroy commits, including Claude's. Never, for any reason. If a push is rejected, the fix is `git pull --rebase origin master` and push again; ask if that reports a conflict.
+- **`git reset --hard`** - throws away uncommitted work with no undo. RStudio's **Revert** button is the same thing for one file: fine when you mean it, a trap when that file also holds work you wanted to keep. This is the real reason to commit often.
+- **Working around the safety check** - see below. It is the only thing standing between a stray API key and a permanent public record of it.
+- **Editing `_freeze/` by hand** - it is a cache of rendered results. Change it only by rendering.
+
+If something looks broken, stop and ask before running anything else. Almost everything in git is recoverable right up until someone tries to fix it in a hurry.
+
+### /save
 
 ```         
 /save fixed typos in housing starts
