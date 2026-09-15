@@ -77,7 +77,7 @@ Yes. Because I'm sharing charts and analysis with the public, I believe I have a
 4. Charts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.
 5. Charts will enhance our understanding of their subject matter and start conversations, not stop them.
 
-CWR will also be free of pies and donuts. I love eating them, but they are an unhealthy way to chart.
+CWR will also be free of pies and donuts. I love eating them, but they are [bad for your charts](https://scc.ms.unimelb.edu.au/resources/data-visualisation-and-exploration/no_pie-charts).
 
 ## How is it built?
 
