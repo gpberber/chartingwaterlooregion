@@ -48,13 +48,6 @@ language <- read_csv(
   show_col_types = FALSE
 )
 
-# Where the people who live in each municipality go to work, 2021 census. Three
-# rows per municipality, one per destination.
-commuting <- read_csv(
-  here("posts", "welcome", "data", "commuting.csv"),
-  show_col_types = FALSE
-)
-
 # Median household and median individual income from the 2021 census, which
 # reports income earned in 2020, restated in 2026 dollars by 02_clean_data.R.
 # Eight rows: the seven municipalities and the Region as a whole.
@@ -351,7 +344,7 @@ cwr_figure(
     "right. ",
     paste(alt_entries, collapse = "; "), "."
   ),
-  height = 3.8, phone_height = 4.4,
+  # No height given: cwr_figure() sets it from the number of rows.
   # The phone's longer axis, for the reason given at the top of the chunk.
   # Adding a scale of a type already present replaces it.
   phone = list(
@@ -438,16 +431,19 @@ density_comp <- group_panels |>
 # cannot: "3.4" says nothing on its own, "85%" says most of it.
 # Roughly how many characters of label fit across one panel of a two-panel
 # chart at this font size, the way `panel_chars` above does for three panels.
-# Used by this chart and by the mother tongue chart below.
+# Also used by the mother tongue charts below.
 panel_chars_wide <- 45
 
 household_measures <- tribble(
   ~column,                    ~panel,                                   ~accuracy, ~suffix,
-  "average_household_size",   "Average people per household",            0.1,      "",
-  "single_detached_percent",  "Single-detached houses, % of dwellings",  1,        "%"
+  "average_household_size",   "Average private household size, number of persons",            0.1,      "",
+  "single_detached_percent",  "Single-detached houses, % of private dwellings",  1,        "%"
 )
 
 household_panels <- households |>
+  # One order for both panels, set on the first, so a place sits on the same row
+  # in each and can be read straight across.
+  mutate(district = fct_reorder(district, average_household_size)) |>
   pivot_longer(
     c(average_household_size, single_detached_percent),
     names_to = "column", values_to = "value"
@@ -457,12 +453,6 @@ household_panels <- households |>
     measure = factor(panel, levels = household_measures$panel),
     label = label_number(accuracy = accuracy, suffix = suffix)(value)
   ) |>
-  # Each panel is ordered by its own figures. ggplot2 has one discrete scale for
-  # the whole chart, so a factor of place names can carry only one order; the way
-  # round it is to make each bar's identity the place *and* its panel, sort that
-  # combined key by value, and strip the panel off again in the scale below.
-  # Drawn with a free y scale, each panel then shows only its own seven levels.
-  mutate(row = fct_reorder(paste(district, measure, sep = "|"), value)) |>
   # Whether a label fits inside its bar, asked panel by panel because each panel
   # has its own scale. Same test as the population chart above, but a panel here
   # is wider - two panels to the page rather than three - so more characters fit
@@ -472,7 +462,7 @@ household_panels <- households |>
     .by = measure
   )
 
-p <- ggplot(household_panels, aes(x = value, y = row, fill = district_type)) +
+p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)) +
   geom_col(width = 0.7) +
   # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
   # off below, because with labels on the bars there is no axis to carry.
@@ -496,21 +486,18 @@ p <- ggplot(household_panels, aes(x = value, y = row, fill = district_type)) +
   ) +
   # Room on the right for any label that sits outside its bar
   scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
-  # Everything from the "|" on is the panel name carried by the sort key above,
-  # and is not for reading.
-  scale_y_discrete(labels = \(x) str_split_i(x, fixed("|"), 1)) +
-  # Free on both axes: free on x because the two measures share no unit, free on
-  # y because each panel holds its own order and so needs its own row labels.
+  # Free on x only, because the two measures share no unit. The rows are shared,
+  # so only the first panel carries the place names.
   # label_wrap_gen() breaks a heading too wide for its panel onto a second line;
   # panel headings are drawn by the theme as plain text, so cwr_wrap() - which
   # emits <br> - would show its markup instead of acting on it.
-  facet_wrap(vars(measure), nrow = 1, scales = "free",
+  facet_wrap(vars(measure), nrow = 1, scales = "free_x",
              labeller = label_wrap_gen(22)) +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
   labs(
     title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption("Statistics Canada Table 98-10-0041-01", credit = TRUE)
   ) +
   # Every bar carries its number, so the value axis and its gridlines are gone.
@@ -524,9 +511,9 @@ p <- ggplot(household_panels, aes(x = value, y = row, fill = district_type)) +
   )
 
 # Built from the plotted rows rather than typed, as above. Each line reads down
-# its own panel, largest first, the way the bars are drawn.
+# its panel in the order the rows are drawn, top first.
 alt_lines <- household_panels |>
-  arrange(measure, desc(value)) |>
+  arrange(measure, desc(district)) |>
   summarise(
     entries = paste(paste0(district, " ", label), collapse = ", "),
     .by = measure
@@ -537,15 +524,15 @@ alt_lines <- household_panels |>
 cwr_figure(
   p, "fig-households",
   alt = paste0(
-    "Two panels of horizontal bars, one row per municipality, each panel ",
-    "ordered by its own figures, with the three cities in blue and the four ",
+    "Two panels of horizontal bars, one row per municipality, both ordered by ",
+    "average household size, with the three cities in blue and the four ",
     "townships in red. ",
     paste(alt_lines, collapse = ". "), "."
   ),
-  height = 4.0, phone_height = 6.4,
+  # No height given: cwr_figure() sets it from the number of rows.
   # Two panels side by side will not fit across a phone, so the phone version
   # stacks them. Adding a facet replaces the one above.
-  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free",
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
                           labeller = label_wrap_gen(22)))
 )
 ```
@@ -680,218 +667,146 @@ cwr_figure(
     "figures, highest at the top, and both are drawn to the same dollar scale. ",
     paste(alt_lines, collapse = ". "), "."
   ),
-  height = 4.8, phone_height = 6.6,
+  # No height given: cwr_figure() sets it from the number of rows.
   # Two panels side by side will not fit across a phone, so the phone version
   # stacks them. Adding a facet replaces the one above.
   phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_y"))
 )
 ```
 
+::: panel-tabset
+### Mother tongue not English or French
+
 ```{r}
-#| label: language
+#| label: language-other
 #| output: asis
 
-# The second measure is a share of a share - German or Pennsylvania German among
-# those whose mother tongue is neither English nor French - which is why its
-# heading starts "of those". Both are percentages, but of different denominators,
-# so each panel keeps its own scale.
-language_measures <- tribble(
-  ~column,                           ~panel,
-  "non_official_percent",            "Mother tongue not English or French, % of people",
-  "german_percent_of_non_official",  "Of those, % with German or Pennsylvania German"
-)
-
-language_panels <- language |>
-  # One order for both panels, set on the first. That is the whole point of this
-  # chart: read across a row and the second panel disagrees with the first.
+# The two measures, one to a tab. The second is a share of a share - German or
+# Pennsylvania German among those whose mother tongue is neither English nor
+# French. Both are percentages, but of different denominators, so each chart
+# keeps its own scale.
+language_bars_data <- language |>
+  # One order for both tabs, set on the first, so a place stays on the same row
+  # when the reader switches tabs and only its bar changes length.
   mutate(district = fct_reorder(district, non_official_percent)) |>
   pivot_longer(
     c(non_official_percent, german_percent_of_non_official),
-    names_to = "column", values_to = "value"
+    names_to = "measure", values_to = "value"
   ) |>
-  left_join(language_measures, join_by(column)) |>
-  mutate(
-    measure = factor(panel, levels = language_measures$panel),
-    label = label_number(accuracy = 1, suffix = "%")(value)
-  ) |>
-  # Same test as the household chart above, panel by panel.
+  mutate(label = label_number(accuracy = 1, suffix = "%")(value)) |>
+  # Whether a label fits inside its bar, the same test as the population chart,
+  # asked for each measure on its own because each chart has its own scale. The
+  # axis runs to about 1.2 times the longest bar. A single panel across a phone
+  # is about as wide as one panel of a two-panel desktop chart, so
+  # `panel_chars_wide` from the household chart holds here too.
   mutate(
     inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars_wide),
     .by = measure
   )
 
-p <- ggplot(language_panels, aes(x = value, y = district, fill = district_type)) +
-  geom_col(width = 0.7) +
-  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
-  geom_text(
-    aes(
-      label = label,
-      hjust = if_else(inside, 1.15, -0.15),
-      colour = if_else(inside, "white", "black")
-    ),
-    size = label_size * 0.8
-  ) +
-  scale_colour_identity() +
-  scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred),
-    guide = "none"
-  ) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
-  # Free on x only: the two panels share one order, so they share one set of row
-  # labels. Headings wrapped for the same reason as the chart above.
-  facet_wrap(vars(measure), nrow = 1, scales = "free_x",
-             labeller = label_wrap_gen(22)) +
-  coord_cartesian(clip = "off") +
+# Both tabs draw the same chart from a different measure, so it is built once
+# here. Titles, subtitles and captions differ, so each tab adds its own labs().
+language_bars <- function(which) {
+  bars <- language_bars_data |> filter(measure == which)
+
+  ggplot(bars, aes(x = value, y = district, fill = district_type)) +
+    geom_col(width = 0.7) +
+    # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+    # off below, because with labels on the bars there is no axis to carry.
+    geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+    geom_text(
+      aes(
+        label = label,
+        # Inside the bar end, or just past it
+        hjust = if_else(inside, 1.15, -0.15),
+        colour = if_else(inside, "white", "black")
+      ),
+      size = label_size * 0.8
+    ) +
+    scale_colour_identity() +
+    scale_fill_manual(
+      values = c(City = dodgerblue, Township = habsred),
+      guide = "none"
+    ) +
+    # Room on the right for any label that sits outside its bar
+    scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+    coord_cartesian(clip = "off") +
+    # Every bar carries its number, so the value axis and its gridlines are gone.
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank()
+    )
+}
+
+# Alt text read top to bottom, in the order the rows are drawn
+language_alt <- function(which) {
+  language_bars_data |>
+    filter(measure == which) |>
+    arrange(desc(district)) |>
+    summarise(entries = paste(paste0(district, " ", label), collapse = ", ")) |>
+    pull(entries)
+}
+
+# Said once, in both tabs' captions
+mother_tongue_note <- "Mother tongue is the language first learned at home in childhood and still understood"
+
+p <- language_bars("non_official_percent") +
   labs(
     title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0180-01",
       credit = TRUE,
-      notes = c(
-        "Mother tongue is the language first learned at home in childhood and still understood",
-        "German and Pennsylvania German counted together"
-      )
+      notes = mother_tongue_note
     )
-  ) +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.line.x = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.spacing.x = unit(1.4, "lines")
   )
 
-alt_lines <- language_panels |>
-  summarise(
-    entries = paste(paste0(district, " ", label), collapse = ", "),
-    .by = measure
-  ) |>
-  mutate(line = paste0(measure, ": ", entries)) |>
-  pull(line)
-
 cwr_figure(
-  p, "fig-language",
+  p, "fig-language-other",
   alt = paste0(
-    "Two panels of horizontal bars, one row per municipality, both ordered by ",
-    "the share whose mother tongue is neither English nor French, with the ",
-    "three cities in blue and the four townships in red. ",
-    paste(alt_lines, collapse = ". "), "."
-  ),
-  height = 4.0, phone_height = 6.4,
-  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
-                          labeller = label_wrap_gen(22)))
+    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "people whose mother tongue is neither English nor French, highest at the ",
+    "top, with the three cities in blue and the four townships in red. ",
+    language_alt("non_official_percent"), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
 )
 ```
+
+### German or Pennsylvania German
 
 ```{r}
-#| label: commuting
+#| label: language-german
 #| output: asis
 
-# A stacked bar rather than a lollipop, because these three numbers are parts of
-# one whole - every worker who lives in the municipality is in exactly one of
-# them - and a stack shows a share of the row at a glance where three separate
-# dots would not.
-commuting_bars <- commuting |>
-  mutate(
-    # Drawn in order of distance from home, nearest first, so every bar reads
-    # left to right as "how far do people go".
-    destination = factor(
-      destination,
-      levels = c("In their own municipality", "Elsewhere in the Region", "Outside the Region")
-    ),
-    # Ordered on the share who stay put. fct_reorder() sorts ascending and a
-    # horizontal chart draws the first level at the bottom, so the municipality
-    # whose workers are most self-contained ends up on top.
-    district = fct_reorder(
-      district,
-      if_else(destination == "In their own municipality", percent, 0),
-      .fun = max
-    ),
-    label = label_number(accuracy = 1, suffix = "%")(percent),
-    # A segment narrower than about a tenth of the bar cannot hold a two-digit
-    # percentage, so those go unlabelled rather than overhanging into their
-    # neighbour. Read off a render; nothing here is that narrow yet, but the
-    # numbers move when the census does.
-    label = if_else(percent >= 10, label, "")
-  )
-
-p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) +
-  # reverse = TRUE stacks the first level at the left. Left to itself ggplot2
-  # stacks factor levels from the right, which would put the longest journey
-  # nearest the axis and read backwards.
-  geom_col(width = 0.7, position = position_stack(reverse = TRUE)) +
-  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
-  # position_stack() with vjust 0.5 puts each label in the middle of its own
-  # segment rather than at the end of the bar.
-  geom_text(
-    aes(label = label), position = position_stack(vjust = 0.5, reverse = TRUE),
-    colour = "white", size = label_size * 0.8
-  ) +
-  # Dark to light as the distance grows: the eye reads the ramp as distance
-  # without being told. This is the one chart in the post where the colours mean
-  # something other than city and township, which the legend has to carry.
-  scale_fill_manual(
-    values = c(
-      `In their own municipality` = dodgerblue,
-      `Elsewhere in the Region` = dodgerblue50,
-      `Outside the Region` = cowboysilver
-    )
-  ) +
-  # The bars fill the width by construction, so the axis says nothing the
-  # segments do not.
-  scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+p <- language_bars("german_percent_of_non_official") +
   labs(
     title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
-    fill = NULL,
+    subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
-      "Statistics Canada Table 98-10-0462-01",
+      "Statistics Canada Table 98-10-0180-01",
       credit = TRUE,
-      notes = "Workers with a usual place of work; people who work from home are counted in their own municipality"
+      notes = c(mother_tongue_note, "German and Pennsylvania German counted together")
     )
-  ) +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.line.x = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank()
   )
-
-alt_lines <- commuting_bars |>
-  mutate(entry = paste0(destination, " ", label_number(accuracy = 1)(percent), " per cent")) |>
-  summarise(entries = paste(entry, collapse = ", "), .by = district) |>
-  mutate(line = paste0(district, ": ", entries)) |>
-  pull(line)
 
 cwr_figure(
-  p, "fig-commuting",
+  p, "fig-language-german",
   alt = paste0(
-    "One horizontal bar per municipality, each split into three parts: the ",
-    "share of its workers who work in their own municipality, the share who ",
-    "work elsewhere in Waterloo Region, and the share who work outside it. ",
-    paste(alt_lines, collapse = ". "), "."
-  ),
-  height = 4.0, phone_height = 5.8,
-  phone = list(
-    # Three keys will not fit across a phone in one row, so they stack into a
-    # column. That means moving the legend as well as turning it: theme_cwr()
-    # floats it just above the panel, which reserves no height, so a column of
-    # keys would be drawn straight over the first bars. "top" makes the plot
-    # give it room instead.
-    guides(fill = guide_legend(ncol = 1)),
-    theme(
-      legend.position = "top",
-      legend.direction = "vertical",
-      # legend.justification alone does nothing once the legend is in the top
-      # strip; that strip has its own justification setting.
-      legend.justification.top = "left"
-    )
+    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "people with a mother tongue other than English or French whose mother ",
+    "tongue is German or Pennsylvania German. Rows are in the same order as the ",
+    "previous tab, not by these figures. The three cities are in blue and the ",
+    "four townships in red. ",
+    language_alt("german_percent_of_non_official"), "."
   )
+  # No height given: cwr_figure() sets it from the number of rows.
 )
 ```
+:::
 
 ```{r}
 #| label: tbl-first

@@ -337,8 +337,10 @@ cwr_wrap(): break long category labels over two lines, narrower on the phone.
 # this one rather than adding to it:
 #   phone = list(scale_y_discrete(labels = cwr_wrap))
 #
-# A wrapped label is two lines deep, so raise `height` and `phone_height`
-# to keep it off the row above.
+# A wrapped label is two lines deep, so give cwr_figure() deeper rows -
+# row_height = 0.45, phone_row_height = 0.45 - to keep it off the row above,
+# and narrow the bars to geom_col(width = 0.58) so they keep the house
+# thickness.
 scale_y_discrete(labels = \(x) cwr_wrap(x, width = <30>)) +
 ```
 
@@ -349,8 +351,9 @@ cwr_figure(): the call that saves both PNGs and places the chart. Every chart en
 ```r
 cwr_figure(
 	p, "fig-<name>",
-	alt = "<What the chart shows, for screen readers.>",
-	height = <5>, phone_height = <4.5>
+	alt = "<What the chart shows, for screen readers.>"
+	# Categories on the y axis? Leave height out; cwr_figure() sets it from
+	# the rows. Otherwise add: height = 5, phone_height = 4.5
 )
 ```
 

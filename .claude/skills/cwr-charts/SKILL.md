@@ -23,7 +23,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
-| `cwr_figure(p, "fig-id", alt, height, phone_height)` | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
 
@@ -103,13 +103,22 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the
    x axis on top.
 7. **One chart per chunk, through `cwr_figure()`.** Build the plot as `p`, then call
-   `cwr_figure(p, "fig-<slug>", alt = , height = , phone_height = )` in a chunk
+   `cwr_figure(p, "fig-<slug>", alt = )` in a chunk
    with `#| output: asis` (chunk label without the `fig-` prefix; the id passed to the
    function carries it). It saves two PNGs to the post's `figures/` folder: 8.3 in wide for
    desktops (exactly the paragraph width) and 4.2 in wide for phones, and emits a `<picture>`
-   so the browser shows the right one. Width is fixed; vary `height` (4 for a simple bar
-   chart, 5 for a line chart, more for ranked bars or facets) and `phone_height` (a little
-   squarer). Never use knitr's `fig-width`/`fig-cap` chunk options for a chart.
+   so the browser shows the right one. Width is fixed. **Height is set by the rows, not by
+   hand, for every chart whose y axis is categories** (horizontal bars, lollipops, dot plots,
+   stacked bars, facets of them): leave `height` and `phone_height` out, and `cwr_figure()`
+   draws each row `cwr_row_height` (0.37 in) deep on a desktop and `cwr_phone_row_height`
+   (0.30 in) on a phone, so bars are the same thickness in every chart in every post. More
+   rows, stacked phone panels, wrapped headings or a legend just make the chart taller.
+   Room asked for with `scale_y_discrete(expand = )` counts as rows too. Only a chart with
+   no category axis - a line chart, vertical bars, a map - passes `height` (5 for a line
+   chart) and `phone_height` (a little squarer). Never type a height onto a category chart
+   to make it "look right"; if its rows look wrong, the fix is to the constants in
+   `R/theme_cwr.R`, for every chart at once. Never use knitr's `fig-width`/`fig-cap` chunk
+   options for a chart.
 7a. **Labels and captions follow the post type; do not set them by hand.** A **Deep dive**
    gets a plain "Figure 1" under each chart, so prose far below can say "as @fig-<slug>
    showed" - always write the reference as `@fig-<slug>`, never type the number, because
@@ -127,13 +136,15 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    `scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))` - and wrap harder for
    the phone by putting a second `scale_y_discrete()` in `phone`, which replaces
    the first rather than adding to it. Two things follow. A wrapped label is two
-   lines deep, so `height` and `phone_height` both have to grow - **allow about 0.45 in
-   of height per row once labels wrap** - or the second line touches the row above; and the
+   lines deep, so the row has to be deeper - **pass `row_height = 0.45, phone_row_height =
+   0.45` to `cwr_figure()` once labels wrap, and narrow the bars in proportion
+   (`geom_col(width = 0.58)` for 0.37 → 0.45) so they stay the house thickness** - or the
+   second line touches the row above; and the
    break is emitted as `<br>`, not `"\n"`, because `theme_cwr()` draws the left axis with
    ggtext. The gap between one label and the next is whatever is left of its row, so
    `theme_cwr()` sets a wrapped label's own lines solid (`lineheight = 1.0`) to leave as much
    of it as possible. Do not loosen that to buy breathing room: it spends the very space it is
-   trying to make. Buy the room with `height`. Shortening the names themselves
+   trying to make. Buy the room with `row_height`. Shortening the names themselves
    is better still where it can be done without changing their meaning, and belongs
    in the post's `02_clean_data.R`, not in the chart.
 9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
@@ -173,7 +184,8 @@ Keep the trailing `<br>` only where the chart needs room under the subtitle.
 Templates leave label positions (`nudge_x`, `label_data`, legend coordinates) for you to set
 after seeing the chart. Do not guess blind:
 
-1. Write the chunk in the post with `height` and `phone_height` fixed.
+1. Write the chunk in the post. A category chart leaves its height to `cwr_figure()`; any
+   other chart fixes `height` and `phone_height` first, since label positions depend on them.
 2. Render just that chart with a short scratchpad script that `setwd()`s to the scratchpad:
 
    ```r
@@ -188,7 +200,7 @@ after seeing the chart. Do not guess blind:
    options(knitr.in.progress = TRUE)
    # load the same data the post loads ...
    p <- <the ggplot code from the chunk>
-   cwr_figure(p, "fig-<slug>", alt = "x", height = <h>, phone_height = <ph>)
+   cwr_figure(p, "fig-<slug>", alt = "x")   # plus height = , phone_height = if y is not categories
    ```
 
    Run it with `Rscript`, then **Read both PNGs** in `<scratchpad>/figures/` and look at them.

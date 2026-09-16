@@ -13,7 +13,6 @@ Post: https://chartingwaterlooregion.ca/posts/welcome/
 | `table_18100004.csv` | Table 18-10-0004-01, consumer price index, monthly, not seasonally adjusted | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 | `table_98100041.csv` | Table 98-10-0041-01, structural type of dwelling and household size, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810004101) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 | `table_98100180_coords.csv` | Table 98-10-0180-01, mother tongue in detail, 2021 census - thirty-two cells fetched by coordinate rather than the whole table | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810018001) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
-| `table_98100462.csv` | Table 98-10-0462-01, commuting destination by mode, age and gender, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810046201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`. Nothing in this post needs one: every

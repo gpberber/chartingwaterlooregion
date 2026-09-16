@@ -182,8 +182,9 @@ snippet ggguides
 snippet cwrfigure
 	cwr_figure(
 		p, "fig-${1:name}",
-		alt = "${2:What the chart shows, for screen readers.}",
-		height = ${3:5}, phone_height = ${4:4.5}
+		alt = "${2:What the chart shows, for screen readers.}"
+		# Categories on the y axis? Leave height out; cwr_figure() sets it from
+		# the rows. Otherwise add: height = 5, phone_height = 4.5
 	)
 
 snippet	ggvertbar_text
@@ -268,8 +269,10 @@ snippet ggwraplabels
 	# this one rather than adding to it:
 	#   phone = list(scale_y_discrete(labels = cwr_wrap))
 	#
-	# A wrapped label is two lines deep, so raise `height` and `phone_height`
-	# to keep it off the row above.
+	# A wrapped label is two lines deep, so give cwr_figure() deeper rows -
+	# row_height = 0.45, phone_row_height = 0.45 - to keep it off the row above,
+	# and narrow the bars to geom_col(width = 0.58) so they keep the house
+	# thickness.
 	scale_y_discrete(labels = \(x) cwr_wrap(x, width = ${1:30})) +
 	
 snippet ggcolours

@@ -178,18 +178,3 @@ expand_grid(
   mutate(geography = as.integer(str_split_i(COORDINATE, fixed("."), 1))) |>
   left_join(mother_tongue_places, join_by(geography == member)) |>
   write_csv(file.path(raw_dir, "table_98100180_coords.csv"))
-
-# ---- 7. Commuting, 2021 census --------------------------------------------
-# Table 98-10-0462, "Commuting destination by main mode of commuting, age and
-# gender". The dimension that matters is commuting destination, which sorts
-# every worker by how far they go: within their own municipality, to another
-# municipality in the same census division, to another census division in the
-# province, or to another province.
-#
-# Taken whole and cut down here rather than fetched cell by cell as in section
-# 6: at 67 MB zipped it is large but not absurd, and a plain download is easier
-# to check than a list of coordinate numbers. The cell-by-cell route is for the
-# tables where no other option exists.
-get_cansim("98-10-0462") |>
-  filter(str_starts(GeoUID, "3530")) |>
-  write_csv(file.path(raw_dir, "table_98100462.csv"))

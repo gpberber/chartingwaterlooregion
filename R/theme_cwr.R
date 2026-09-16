@@ -343,6 +343,84 @@ cwr_wrap <- function(x, width = 22) {
 label_size <- 4
 
 # ---- 6. Responsive figures ------------------------------------------------
+# How deep one category row is drawn, in inches: the bar plus the gap below it.
+# Taken from the welcome post's income chart, the one that read best: a bar of
+# the standard width = 0.7 is then about a quarter of an inch thick, deep enough
+# to hold a direct label with room around it. The phone value is smaller by the
+# same factor cwr_figure() shrinks label text by there (phone_text_scale), so a
+# label fills its bar the same way on both.
+cwr_row_height <- 0.37
+cwr_phone_row_height <- 0.30
+
+# The height a chart must be drawn at for its category rows to come out
+# `row_height` inches deep, or NULL if its y axis is not categories.
+#
+# Everything in a ggplot except the panels - title, subtitle, panel headings,
+# legend, caption, margins - has a fixed height once the width is known, and
+# the panels share whatever is left. So the chart is drawn once, off screen, at
+# a trial height; the panels are measured; what is not panel is the fixed part.
+# The panels then need, per row of panels, the number of rows their y axis
+# spans - including the expansion above and below the outer bars, so a chart
+# that asks for extra room above its top bar gets it - times `row_height`.
+#
+# Measuring a real drawing, rather than adding up the parts, is on purpose:
+# wrapped titles and captions only know their height once they know their
+# width, and the drawing is the one place that is certain.
+cwr_fit_height <- function(plot, width, row_height, dpi) {
+  built <- ggplot_build(plot)
+  y_scale <- built$layout$panel_scales_y[[1]]
+  if (is.null(y_scale) || !y_scale$is_discrete()) return(NULL)
+
+  # Each panel's y range is in row units: a discrete scale puts its categories
+  # at 1, 2, 3 ..., and the range adds the expansion either side. Panels in the
+  # same row of a facet share a height, so each row of panels needs as much as
+  # its tallest.
+  rows_needed <- tibble(
+    facet_row = built$layout$layout$ROW,
+    span = map_dbl(built$layout$panel_params, \(params) diff(params$y.range))
+  ) |>
+    summarise(span = max(span), .by = facet_row) |>
+    pull(span) |>
+    sum()
+
+  # Draw at a trial height into a throwaway PNG device of the real width and
+  # resolution, so text is measured exactly as ggsave() will measure it.
+  # Closing a device makes R switch to the next one in its list, which need not
+  # be the one that was in use - RStudio's Plots pane while drafting, say - so
+  # the one in use is noted first and switched back to afterwards.
+  trial_height <- 20
+  trial_file <- tempfile(fileext = ".png")
+  previous_device <- dev.cur()
+  ragg::agg_png(trial_file, width = width, height = trial_height,
+                units = "in", res = dpi)
+  on.exit({
+    dev.off()
+    if (previous_device > 1) dev.set(previous_device)
+    unlink(trial_file)
+  }, add = TRUE)
+  table <- ggplotGrob(plot)
+  grid.newpage()
+  grid.draw(table)
+
+  # A ggplot is drawn as a table (a gtable) whose cells are laid out in a
+  # viewport called "layout". Stepping into one panel's row of that table and
+  # asking how tall it is ("1 npc", the full height of where we are) gives the
+  # height the panels in that row were actually drawn at.
+  panel_cells <- table$layout |>
+    filter(str_starts(name, "panel")) |>
+    distinct(t, .keep_all = TRUE)
+  downViewport("layout")
+  panel_height <- map2_dbl(panel_cells$t, panel_cells$l, function(row, col) {
+    pushViewport(viewport(layout.pos.row = row, layout.pos.col = col))
+    on.exit(popViewport())
+    convertHeight(unit(1, "npc"), "in", valueOnly = TRUE)
+  }) |>
+    sum()
+
+  fixed_height <- trial_height - panel_height
+  round(fixed_height + rows_needed * row_height, 2)
+}
+
 # A chart drawn for the desktop column (8.3 in, 797 px) is shrunk to about
 # 40% on a phone, so its text becomes unreadable however large it is drawn.
 # Sites like Datawrapper solve this by redrawing the chart for the phone.
@@ -366,6 +444,15 @@ label_size <- 4
 #     alt = "Line chart showing ...",
 #     height = 5, phone_height = 4.5)
 #   ```
+#
+# Heights. A chart whose y axis is categories - every bar, lollipop and dot
+# chart - leaves `height` and `phone_height` out, and cwr_figure() works them
+# out so that every such chart, in every post, draws its rows at the same
+# depth: `cwr_row_height` inches per row on a desktop, `cwr_phone_row_height`
+# on a phone (see cwr_fit_height() below). A chart with more rows, more panels
+# or more text above and below simply comes out taller. Give a height only to a
+# chart with no category axis (a line chart, a map), or to override the rule
+# for one chart on purpose.
 #
 # Numbering follows the post type, read from the first entry in the post's
 # `categories`, so there is nothing to set by hand:
@@ -406,9 +493,11 @@ label_size <- 4
 #   phone = list(scale_x_date(date_breaks = "2 years", date_labels = "%Y"))
 #   phone = list(theme(legend.position = "none"))
 cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
-                       width = 8.3, height = 5,
-                       phone_width = 4.2, phone_height = height * 0.9,
+                       width = 8.3, height = NULL,
+                       phone_width = 4.2, phone_height = NULL,
                        phone = list(), phone_text_scale = 0.8,
+                       row_height = cwr_row_height,
+                       phone_row_height = cwr_phone_row_height,
                        dpi = 288, draft_phone = FALSE) {
   stopifnot(str_starts(id, "fig-"))
 
@@ -473,6 +562,19 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 
   # Per-chart phone adjustments supplied by the caller
   for (piece in phone) phone_plot <- phone_plot + piece
+
+  # Heights not given are worked out from the rows (see cwr_fit_height() above).
+  # The phone version is measured on its own, after its adjustments, because
+  # they can change its shape - stacking side-by-side panels doubles the rows.
+  # A chart with no category axis and no height given falls back to 5 in, and
+  # 90% of that on a phone.
+  if (is.null(height)) {
+    height <- cwr_fit_height(plot, width, row_height, dpi) %||% 5
+  }
+  if (is.null(phone_height)) {
+    phone_height <- cwr_fit_height(phone_plot, phone_width, phone_row_height, dpi) %||%
+      (height * 0.9)
+  }
 
   ggsave(desktop_file, plot, width = width, height = height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
