@@ -1,0 +1,22 @@
+district,district_type,destination,workers,percent
+Cambridge,City,Elsewhere in the Region,7185,16.215301286391334
+Cambridge,City,In their own municipality,24845,56.07086436470323
+Cambridge,City,Outside the Region,12280,27.713834348905436
+Kitchener,City,Elsewhere in the Region,28015,36.86184210526316
+Kitchener,City,In their own municipality,35770,47.06578947368421
+Kitchener,City,Outside the Region,12215,16.072368421052634
+North Dumfries,Township,Elsewhere in the Region,1890,54.310344827586206
+North Dumfries,Township,In their own municipality,745,21.408045977011493
+North Dumfries,Township,Outside the Region,845,24.281609195402297
+Waterloo,City,Elsewhere in the Region,13045,43.38210841370137
+Waterloo,City,In their own municipality,13560,45.09477884935151
+Waterloo,City,Outside the Region,3465,11.523112736947123
+Wellesley,Township,Elsewhere in the Region,1490,51.114922813036024
+Wellesley,Township,In their own municipality,940,32.24699828473413
+Wellesley,Township,Outside the Region,485,16.638078902229847
+Wilmot,Township,Elsewhere in the Region,3455,53.98437499999999
+Wilmot,Township,In their own municipality,2000,31.25
+Wilmot,Township,Outside the Region,945,14.765624999999998
+Woolwich,Township,Elsewhere in the Region,3605,43.04477611940298
+Woolwich,Township,In their own municipality,3280,39.16417910447761
+Woolwich,Township,Outside the Region,1490,17.791044776119403

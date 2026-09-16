@@ -167,70 +167,7 @@ districts |>
 
 message("Wrote ", nrow(districts), " districts to ", data_dir)
 
-# ---- 7. Employment by industry ---------------------------------------------
-# Table 14-10-0468-01 covers 38 census metropolitan areas and every year from
-# 2011, so it is cut to one place and one year while being read.
-employment_raw <- read_csv(
-  file.path(raw_dir, "table_14100468.csv"),
-  col_select = c(REF_DATE, GEO, `Employment characteristics`,
-                 `Hierarchy for Employment characteristics`, VALUE, STATUS),
-  col_types = cols(.default = col_character(), VALUE = col_double())
-) |>
-  clean_names() |>
-  filter(geo == "Kitchener-Cambridge-Waterloo, Ontario", ref_date == "2025")
-
-# Everyone working in the CMA, whatever their industry. Kept as the denominator
-# for the share below rather than adding up the industries, because two of them
-# are suppressed (see the filter's comment) and so would not sum to the truth.
-total_employed <- employment_raw |>
-  filter(employment_characteristics == "Total employed") |>
-  pull(value)
-
-# Statistics Canada shortens some of these names beyond what fits on a chart
-# axis, and lengthens others past it. The short forms drop qualifiers that the
-# category name carries anyway; nothing is merged or split, so every short name
-# still means exactly one of the table's categories.
-industry_names <- tribble(
-  ~employment_characteristics,                           ~industry,
-  "Forestry, fishing, mining, quarrying, oil and gas",    "Forestry, mining, oil and gas",
-  "Finance, insurance, real estate, rental and leasing",  "Finance, insurance and real estate",
-  "Professional, scientific and technical services",      "Professional and technical services",
-  "Business, building and other support services",        "Business and building support",
-  "Other services (except public administration)",        "Other services"
-)
-
-employment <- employment_raw |>
-  # The `employment_characteristics` column stacks three separate breakdowns of
-  # the same workers - industry, occupation, and class of worker - so taking it
-  # whole would count everyone three times over. The hierarchy column is how
-  # they are told apart: it numbers each row's place in the tree, and the
-  # industries are the children of "Goods-producing sector" (1.2) and
-  # "Services-producing sector" (1.8). Matching "1.2." or "1.8." therefore
-  # takes the sixteen industries and leaves the sector subtotals, the
-  # occupations, and the total behind.
-  filter(str_detect(hierarchy_for_employment_characteristics, "^1[.](2|8)[.]")) |>
-  left_join(industry_names, join_by(employment_characteristics)) |>
-  mutate(
-    industry = coalesce(industry, employment_characteristics),
-    # STATUS "x" means Statistics Canada suppressed the figure to protect a
-    # respondent's confidentiality - in a place this size that happens to the
-    # smallest industries. Those rows are kept here with an empty value, so the
-    # data file says plainly that the industry exists and its number does not.
-    # (STATUS is empty for every industry that was published, and coalesce()
-    # turns that empty into FALSE rather than leaving a missing value.)
-    suppressed = coalesce(status == "x", FALSE),
-    # The table is already in thousands of people; the share is a percentage of
-    # everyone employed in the CMA, so the sixteen do not quite add to 100.
-    share_percent = value / total_employed * 100
-  ) |>
-  select(industry, employed_thousands = value, share_percent, suppressed) |>
-  arrange(desc(employed_thousands))
-
-write_csv(employment, file.path(data_dir, "employment.csv"))
-
-message("Wrote ", nrow(employment), " industries to ", data_dir)
-
-# ---- 8. Income, restated in today's dollars --------------------------------
+# ---- 7. Income, restated in today's dollars --------------------------------
 # The 2021 census reports income earned in 2020. Read in 2026 those figures
 # understate what people have, so they are restated in 2026 dollars: the same
 # income multiplied by what the same basket of goods now costs against what it
@@ -326,3 +263,184 @@ write_csv(income, file.path(data_dir, "income.csv"))
 message("Wrote ", nrow(income), " income rows to ", data_dir,
         " (", income_year, " dollars x ", round(inflator, 4), " = ",
         dollar_year, " dollars)")
+
+# ---- 8. Households and dwellings -------------------------------------------
+# Three figures about how people live, from two tables already in data-raw/.
+household_dwellings <- read_csv(
+  file.path(raw_dir, "table_98100041.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names()
+
+# Statistics Canada publishes the average itself, so it is read rather than
+# worked out here: the size categories stop at "5 or more persons", and an
+# open-ended top band cannot be averaged without inventing a number for it.
+# Held at the total for dwelling type, so it covers every household.
+household_size <- household_dwellings |>
+  filter(
+    str_starts(structural_type_of_dwelling_9, "Total"),
+    household_size_8 == "Average household size"
+  ) |>
+  select(geo_uid, average_household_size = value)
+
+# The dwelling mix, held at the total for household size. A share rather than a
+# count, because the municipalities differ in size by a factor of thirty.
+dwelling_type <- household_dwellings |>
+  filter(str_starts(household_size_8, "Total")) |>
+  summarise(
+    single_detached_percent =
+      value[structural_type_of_dwelling_9 == "Single-detached house"] /
+      value[str_starts(structural_type_of_dwelling_9, "Total")] * 100,
+    .by = geo_uid
+  )
+
+# Couples with children at home, out of all households. The count comes from
+# the income table fetched in section 3: household income is only one of the six
+# statistics it carries, and "Number of households (2021)" is another.
+#
+# Household type is a tree, and a row's name does not say where in the tree it
+# sits, so the two rows are picked by the hierarchy column instead: "1" is every
+# household and "1.2.3.4.6" is one couple, with children, and nobody else in the
+# household. A couple with children who also have a grandparent living with them
+# is counted by the census as an "other census family household", so this is a
+# floor rather than every household containing a couple and their children.
+household_type <- read_csv(
+  file.path(raw_dir, "table_98100057.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    str_starts(household_size_7, "Total"),
+    household_income_statistics_6 == "Number of households (2021)"
+  ) |>
+  summarise(
+    couples_with_children_percent =
+      value[hierarchy_for_household_type_including_census_family_structure_11 == "1.2.3.4.6"] /
+      value[hierarchy_for_household_type_including_census_family_structure_11 == "1"] * 100,
+    .by = geo_uid
+  )
+
+# `districts` has the seven municipalities and nothing else, so joining from it
+# both names them and drops the Region-wide rows the census tables carry.
+households <- districts |>
+  st_drop_geometry() |>
+  select(csduid, district, district_type) |>
+  left_join(household_type, join_by(csduid == geo_uid)) |>
+  left_join(household_size, join_by(csduid == geo_uid)) |>
+  left_join(dwelling_type, join_by(csduid == geo_uid)) |>
+  select(-csduid) |>
+  arrange(desc(couples_with_children_percent))
+
+write_csv(households, file.path(data_dir, "households.csv"))
+
+message("Wrote ", nrow(households), " household rows to ", data_dir)
+
+# ---- 9. Language -----------------------------------------------------------
+# Mother tongue is the language a person first learned at home in childhood and
+# still understands; it is a question about origin. What someone speaks at home
+# now is a different question, and the two are kept apart here because in this
+# region they answer differently.
+mother_tongue <- read_csv(
+  file.path(raw_dir, "table_98100180_coords.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  select(district = place, language = mother_tongue_538, value)
+
+# German and Pennsylvania German are added together: they are one community's
+# languages here, the Old Order Mennonite settlements in the northern and
+# western townships, and the census splits them by dialect.
+#
+# sum() over no rows is zero, which is what makes the missing cells harmless:
+# Pennsylvania German in North Dumfries never came back from Statistics Canada
+# because there was nobody to count, and zero is the right answer.
+language_shares <- mother_tongue |>
+  summarise(
+    total = sum(value[language == "Total - Mother tongue"]),
+    non_official = sum(value[language == "Non-official languages"]),
+    german = sum(value[language %in% c("German", "Pennsylvania German")]),
+    .by = district
+  ) |>
+  mutate(
+    non_official_percent = non_official / total * 100,
+    german_percent_of_non_official = german / non_official * 100
+  )
+
+# The language spoken most often at home, from the broad-category table. Only
+# the single "Non-official language" line is taken: the table also has rows for
+# people who speak English *and* a non-official language, and adding those in
+# would count the same household twice over in a different sense.
+at_home <- read_csv(
+  file.path(raw_dir, "table_98100229.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(str_starts(age_13b, "Total"), statistics_2 == "2021 Counts") |>
+  summarise(
+    non_official_at_home_percent =
+      value[language_spoken_most_often_at_home_8 == "Non-official language"] /
+      value[str_starts(language_spoken_most_often_at_home_8, "Total")] * 100,
+    .by = geo_uid
+  )
+
+language <- districts |>
+  st_drop_geometry() |>
+  select(csduid, district, district_type) |>
+  left_join(language_shares, join_by(district)) |>
+  left_join(at_home, join_by(csduid == geo_uid)) |>
+  select(
+    district, district_type,
+    non_official_percent, german_percent_of_non_official,
+    non_official_at_home_percent
+  ) |>
+  arrange(desc(non_official_percent))
+
+write_csv(language, file.path(data_dir, "language.csv"))
+
+message("Wrote ", nrow(language), " language rows to ", data_dir)
+
+# ---- 10. Commuting ---------------------------------------------------------
+# Where people who live in each municipality go to work. The table crosses this
+# with age, gender and mode of travel, so all three are held at their totals,
+# and only the count is wanted rather than the confidence bounds around it.
+commuting_raw <- read_csv(
+  file.path(raw_dir, "table_98100462.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    str_starts(age_15a, "Total"),
+    str_starts(gender_3, "Total"),
+    str_starts(main_mode_of_commuting_11a, "Total"),
+    statistics_3 == "Count"
+  )
+
+# Statistics Canada measures distance in units of geography rather than in
+# kilometres, so its four categories are re-cut into the three that matter to a
+# reader here: stayed home municipality, crossed into another one inside the
+# Region, or left the Region. Waterloo Region is a census division, which is
+# what makes that middle line drawable at all.
+destinations <- tribble(
+  ~commuting_destination_5,                                                                                             ~destination,
+  "Commute within census subdivision (CSD) of residence",                                                               "In their own municipality",
+  "Commute to a different census subdivision (CSD) within census division (CD) of residence",                           "Elsewhere in the Region",
+  "Commute to a different census subdivision (CSD) and census division (CD) within province or territory of residence",  "Outside the Region",
+  "Commute to a different province or territory",                                                                       "Outside the Region"
+)
+
+commuting <- commuting_raw |>
+  # An inner join drops the table's own "Total - Commuting destination" row,
+  # which would otherwise be double-counted with the parts that make it up.
+  inner_join(destinations, join_by(commuting_destination_5)) |>
+  summarise(workers = sum(value), .by = c(geo_uid, destination)) |>
+  mutate(percent = workers / sum(workers) * 100, .by = geo_uid) |>
+  inner_join(
+    districts |> st_drop_geometry() |> select(csduid, district, district_type),
+    join_by(geo_uid == csduid)
+  ) |>
+  select(district, district_type, destination, workers, percent) |>
+  arrange(district, destination)
+
+write_csv(commuting, file.path(data_dir, "commuting.csv"))
+
+message("Wrote ", nrow(commuting), " commuting rows to ", data_dir)

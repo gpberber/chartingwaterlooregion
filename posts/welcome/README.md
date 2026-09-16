@@ -8,10 +8,13 @@ Post: https://chartingwaterlooregion.ca/posts/welcome/
 |---|---|---|---|---|
 | `table_17100155.csv` | Table 17-10-0155-01, population estimates on 1 July by census subdivision, 2021 boundaries | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710015501) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-14 |
 | `csd_boundaries/` | 2021 census subdivision cartographic boundary file (`lcsd000b21a_e`), the municipal polygons | [Statistics Canada](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-14 |
-| `table_14100468.csv` | Table 14-10-0468-01, employment by industry, annual, census metropolitan areas | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410046801) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 | `table_98100057.csv` | Table 98-10-0057-01, household income statistics by household type, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810005701) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 | `table_98100070.csv` | Table 98-10-0070-01, income statistics for detailed income sources and taxes, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810007001) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 | `table_18100004.csv` | Table 18-10-0004-01, consumer price index, monthly, not seasonally adjusted | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
+| `table_98100041.csv` | Table 98-10-0041-01, structural type of dwelling and household size, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810004101) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
+| `table_98100229.csv` | Table 98-10-0229-01, language spoken most often at home by age, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810022901) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
+| `table_98100180_coords.csv` | Table 98-10-0180-01, mother tongue in detail, 2021 census - thirty-two cells fetched by coordinate rather than the whole table | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810018001) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
+| `table_98100462.csv` | Table 98-10-0462-01, commuting destination by mode, age and gender, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810046201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
 
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`. Nothing in this post needs one: every
@@ -37,15 +40,14 @@ Then `quarto render posts/welcome` from a terminal.
 - Area is Statistics Canada's published 2021 census land area (the `LANDAREA` field of the
   boundary file), which excludes inland water. Density is that area divided into the 2025
   population estimate, so it is people per square kilometre of land.
-- Employment by industry is published for the **Kitchener census metropolitan area** and nothing
-  smaller. On 2021 boundaries the CMA is six of Waterloo Region's seven municipalities - Kitchener,
-  Cambridge, Waterloo, Woolwich, Wilmot and North Dumfries - with Wellesley Township the only
-  exclusion and nothing from outside the Region included. Wellesley is about 1.7% of the Region's
-  population, so the charts treat the CMA as the Region and say so in a note. CMA boundaries are
-  revisited at every census, so this holds for 2021 and should be rechecked against a later one.
-- The two census income tables and the CPI table are cut down as they are downloaded, unlike the
-  other raw files here: to Waterloo Region's eight geographies and to the Ontario all-items index.
-  Whole, they run to millions of rows, and nothing outside those rows is used.
+- Most of the census tables here are cut down as they are downloaded, unlike the other raw files:
+  to Waterloo Region's eight geographies, and for the CPI to the Ontario all-items index. Whole,
+  they run to millions of rows and hundreds of megabytes, and nothing outside those rows is used.
+- Detailed mother tongue (98-10-0180-01) is not downloaded at all. The whole table is 618 MB zipped
+  - every census subdivision in Canada crossed with 538 languages - and this post needs thirty-two
+  numbers from it, so `R/01_get_data.R` fetches them one cell at a time through Statistics Canada's
+  coordinate service. The cell references are written out in that script beside the names Statistics
+  Canada gives them.
 - Income is what the 2021 census reports for 2020, restated in 2026 dollars with the Ontario
   all-items consumer price index: the average of the twelve months of 2020 against the average of
   the 2026 months published so far. The CPI is not published for Kitchener-Cambridge-Waterloo, so

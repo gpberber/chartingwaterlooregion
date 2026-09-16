@@ -60,23 +60,7 @@ unzip(boundary_zip, exdir = file.path(raw_dir, "csd_boundaries"))
 get_cansim("17-10-0155-01") |>
   write_csv(file.path(raw_dir, "table_17100155.csv"))
 
-# ---- 3. Employment by industry --------------------------------------------
-# Table 14-10-0468-01, "Employment by industry, annual, census metropolitan
-# areas". These are Labour Force Survey estimates - a monthly household survey,
-# averaged over the year - reported in thousands of people.
-#
-# The geography is the Kitchener-Cambridge-Waterloo census metropolitan area,
-# not Waterloo Region. A CMA is built by Statistics Canada out of whole
-# municipalities around an urban core, so the two are close but not the same
-# thing; a chart drawn from this table is about the CMA and should say so.
-#
-# The table stacks three different cuts of the same people - by industry, by
-# occupation, and by class of worker - in one column, so 02_clean_data.R has
-# to pick out the industries.
-get_cansim("14-10-0468-01") |>
-  write_csv(file.path(raw_dir, "table_14100468.csv"))
-
-# ---- 4. Income, 2021 census ------------------------------------------------
+# ---- 3. Income, 2021 census ------------------------------------------------
 # Two census tables, both published for census subdivisions:
 #
 #   98-10-0057-01  median household total income
@@ -106,7 +90,7 @@ walk2(
   }
 )
 
-# ---- 5. Consumer Price Index ----------------------------------------------
+# ---- 4. Consumer Price Index ----------------------------------------------
 # Table 18-10-0004-01, the monthly CPI, used to restate those 2020 incomes in
 # today's dollars.
 #
@@ -122,3 +106,98 @@ walk2(
 get_cansim("18-10-0004-01") |>
   filter(GEO == "Ontario", `Products and product groups` == "All-items") |>
   write_csv(file.path(raw_dir, "table_18100004.csv"))
+
+# ---- 5. Households and dwellings, 2021 census ------------------------------
+# Table 98-10-0041, "Structural type of dwelling and household size". One table
+# answers two questions at once: what kind of dwelling people live in, and how
+# many of them live in it. It publishes average household size directly, which
+# is better than working one out here from the size categories - their top band,
+# "5 or more persons", is open-ended and cannot be averaged honestly.
+#
+# Cut to Waterloo Region on the way in, for the reason given in section 3.
+get_cansim("98-10-0041") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_98100041.csv"))
+
+# ---- 6. Language, 2021 census ---------------------------------------------
+# Two sources, because Statistics Canada splits the question in an awkward place.
+#
+# (a) Broad categories - English, French, non-official - for the language people
+# speak at home, from table 98-10-0229. It is published for census subdivisions
+# with 5,000 people or more, which all seven of ours are (North Dumfries, the
+# smallest, is about 10,000). It does not cover census divisions, so there is no
+# Region-wide row in it.
+get_cansim("98-10-0229") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_98100229.csv"))
+
+# (b) Named languages, which only the detailed mother tongue table carries.
+# 98-10-0180 crosses every census subdivision in Canada with 538 languages and
+# is 618 MB zipped; thirty-two numbers from it are wanted. So it is fetched a
+# cell at a time through Statistics Canada's coordinate service instead of being
+# downloaded at all.
+#
+# A coordinate names one cell of the cube: the member number of each dimension
+# in order, which here is geography, age, gender, mother tongue, and single or
+# multiple response. Member 1 is the "Total" of any dimension, so
+# "2445.1.1.256.1" is Wellesley, all ages, all genders, Pennsylvania German,
+# single and multiple responses counted together.
+#
+# The member numbers are the cube's own, read from its metadata (Statistics
+# Canada's getCubeMetadata service, product 98100180) and fixed for the life of
+# the table. They are written out here beside the names the metadata gives them,
+# so that a reader can check them rather than trust them.
+mother_tongue_places <- tribble(
+  ~member, ~place,
+  2439,    "Waterloo Region",   # the census division, not the city of the name
+  2440,    "North Dumfries",
+  2441,    "Cambridge",
+  2442,    "Kitchener",
+  2443,    "Waterloo",
+  2444,    "Wilmot",
+  2445,    "Wellesley",
+  2446,    "Woolwich"
+)
+
+mother_tongue_languages <- tribble(
+  ~member, ~language,
+  1,       "Total - Mother tongue",
+  5,       "Non-official languages",
+  253,     "German",
+  256,     "Pennsylvania German"
+)
+
+# Every place crossed with every language. A cell with nothing in it -
+# Pennsylvania German in North Dumfries - does not come back at all, which
+# 02_clean_data.R reads as a zero.
+expand_grid(
+  geography = mother_tongue_places$member,
+  language = mother_tongue_languages$member
+) |>
+  mutate(
+    cansimTableNumber = "98-10-0180",
+    COORDINATE = paste(geography, 1, 1, language, 1, sep = ".")
+  ) |>
+  select(cansimTableNumber, COORDINATE) |>
+  get_cansim_data_for_table_coord_periods(periods = 1) |>
+  # What comes back names the geography only as "Waterloo (2)" and the like -
+  # the service disambiguates duplicate names with a number rather than a code -
+  # so the place is put back on from the coordinate that asked for it.
+  mutate(geography = as.integer(str_split_i(COORDINATE, fixed("."), 1))) |>
+  left_join(mother_tongue_places, join_by(geography == member)) |>
+  write_csv(file.path(raw_dir, "table_98100180_coords.csv"))
+
+# ---- 7. Commuting, 2021 census --------------------------------------------
+# Table 98-10-0462, "Commuting destination by main mode of commuting, age and
+# gender". The dimension that matters is commuting destination, which sorts
+# every worker by how far they go: within their own municipality, to another
+# municipality in the same census division, to another census division in the
+# province, or to another province.
+#
+# Taken whole and cut down here rather than fetched cell by cell as in section
+# 6: at 67 MB zipped it is large but not absurd, and a plain download is easier
+# to check than a list of coordinate numbers. The cell-by-cell route is for the
+# tables where no other option exists.
+get_cansim("98-10-0462") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_98100462.csv"))
