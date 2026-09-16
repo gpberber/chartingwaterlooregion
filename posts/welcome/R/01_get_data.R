@@ -119,19 +119,11 @@ get_cansim("98-10-0041") |>
   filter(str_starts(GeoUID, "3530")) |>
   write_csv(file.path(raw_dir, "table_98100041.csv"))
 
-# ---- 6. Language, 2021 census ---------------------------------------------
-# Two sources, because Statistics Canada splits the question in an awkward place.
+# ---- 6. Mother tongue, 2021 census ----------------------------------------
+# Named languages, which only the detailed mother tongue table carries. The
+# broad-category tables - English, French, non-official and nothing finer - are
+# no use here, because the whole question is which non-official language.
 #
-# (a) Broad categories - English, French, non-official - for the language people
-# speak at home, from table 98-10-0229. It is published for census subdivisions
-# with 5,000 people or more, which all seven of ours are (North Dumfries, the
-# smallest, is about 10,000). It does not cover census divisions, so there is no
-# Region-wide row in it.
-get_cansim("98-10-0229") |>
-  filter(str_starts(GeoUID, "3530")) |>
-  write_csv(file.path(raw_dir, "table_98100229.csv"))
-
-# (b) Named languages, which only the detailed mother tongue table carries.
 # 98-10-0180 crosses every census subdivision in Canada with 538 languages and
 # is 618 MB zipped; thirty-two numbers from it are wanted. So it is fetched a
 # cell at a time through Statistics Canada's coordinate service instead of being

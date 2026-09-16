@@ -294,52 +294,23 @@ dwelling_type <- household_dwellings |>
     .by = geo_uid
   )
 
-# Couples with children at home, out of all households. The count comes from
-# the income table fetched in section 3: household income is only one of the six
-# statistics it carries, and "Number of households (2021)" is another.
-#
-# Household type is a tree, and a row's name does not say where in the tree it
-# sits, so the two rows are picked by the hierarchy column instead: "1" is every
-# household and "1.2.3.4.6" is one couple, with children, and nobody else in the
-# household. A couple with children who also have a grandparent living with them
-# is counted by the census as an "other census family household", so this is a
-# floor rather than every household containing a couple and their children.
-household_type <- read_csv(
-  file.path(raw_dir, "table_98100057.csv"),
-  col_types = cols(.default = col_character(), VALUE = col_double())
-) |>
-  clean_names() |>
-  filter(
-    str_starts(household_size_7, "Total"),
-    household_income_statistics_6 == "Number of households (2021)"
-  ) |>
-  summarise(
-    couples_with_children_percent =
-      value[hierarchy_for_household_type_including_census_family_structure_11 == "1.2.3.4.6"] /
-      value[hierarchy_for_household_type_including_census_family_structure_11 == "1"] * 100,
-    .by = geo_uid
-  )
-
 # `districts` has the seven municipalities and nothing else, so joining from it
 # both names them and drops the Region-wide rows the census tables carry.
 households <- districts |>
   st_drop_geometry() |>
   select(csduid, district, district_type) |>
-  left_join(household_type, join_by(csduid == geo_uid)) |>
   left_join(household_size, join_by(csduid == geo_uid)) |>
   left_join(dwelling_type, join_by(csduid == geo_uid)) |>
   select(-csduid) |>
-  arrange(desc(couples_with_children_percent))
+  arrange(desc(average_household_size))
 
 write_csv(households, file.path(data_dir, "households.csv"))
 
 message("Wrote ", nrow(households), " household rows to ", data_dir)
 
-# ---- 9. Language -----------------------------------------------------------
+# ---- 9. Mother tongue ------------------------------------------------------
 # Mother tongue is the language a person first learned at home in childhood and
-# still understands; it is a question about origin. What someone speaks at home
-# now is a different question, and the two are kept apart here because in this
-# region they answer differently.
+# still understands: a question about origin rather than about daily use.
 mother_tongue <- read_csv(
   file.path(raw_dir, "table_98100180_coords.csv"),
   col_types = cols(.default = col_character(), VALUE = col_double())
@@ -366,32 +337,13 @@ language_shares <- mother_tongue |>
     german_percent_of_non_official = german / non_official * 100
   )
 
-# The language spoken most often at home, from the broad-category table. Only
-# the single "Non-official language" line is taken: the table also has rows for
-# people who speak English *and* a non-official language, and adding those in
-# would count the same household twice over in a different sense.
-at_home <- read_csv(
-  file.path(raw_dir, "table_98100229.csv"),
-  col_types = cols(.default = col_character(), VALUE = col_double())
-) |>
-  clean_names() |>
-  filter(str_starts(age_13b, "Total"), statistics_2 == "2021 Counts") |>
-  summarise(
-    non_official_at_home_percent =
-      value[language_spoken_most_often_at_home_8 == "Non-official language"] /
-      value[str_starts(language_spoken_most_often_at_home_8, "Total")] * 100,
-    .by = geo_uid
-  )
-
 language <- districts |>
   st_drop_geometry() |>
   select(csduid, district, district_type) |>
   left_join(language_shares, join_by(district)) |>
-  left_join(at_home, join_by(csduid == geo_uid)) |>
   select(
     district, district_type,
-    non_official_percent, german_percent_of_non_official,
-    non_official_at_home_percent
+    non_official_percent, german_percent_of_non_official
   ) |>
   arrange(desc(non_official_percent))
 
