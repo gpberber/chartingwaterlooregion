@@ -580,7 +580,7 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
     aes(x = 0, xend = employed_thousands, y = industry, yend = industry),
     colour = "grey50", linewidth = 0.7
   ) +
-  geom_point(colour = dodgerblue, shape = 19, size = 3) +
+  geom_point(colour = dodgerblue, shape = 19, size = 4) +
   geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
   # The second number, boxed in a column of its own rather than plotted: the
   # share is the count divided by a constant, so drawing it would only repeat

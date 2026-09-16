@@ -219,20 +219,11 @@ employment <- employment_raw |>
     # (STATUS is empty for every industry that was published, and coalesce()
     # turns that empty into FALSE rather than leaving a missing value.)
     suppressed = coalesce(status == "x", FALSE),
-    # The same hierarchy column that picked the industries out also says which
-    # of the two sectors each belongs to: 1.2.x under "Goods-producing",
-    # 1.8.x under "Services-producing". Kept as a column because a chart may
-    # want to colour by it, and deriving it twice invites the two copies to
-    # disagree.
-    sector = if_else(
-      str_detect(hierarchy_for_employment_characteristics, "^1[.]2[.]"),
-      "Goods-producing", "Services-producing"
-    ),
     # The table is already in thousands of people; the share is a percentage of
     # everyone employed in the CMA, so the sixteen do not quite add to 100.
     share_percent = value / total_employed * 100
   ) |>
-  select(industry, sector, employed_thousands = value, share_percent, suppressed) |>
+  select(industry, employed_thousands = value, share_percent, suppressed) |>
   arrange(desc(employed_thousands))
 
 write_csv(employment, file.path(data_dir, "employment.csv"))
