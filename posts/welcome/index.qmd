@@ -5,6 +5,8 @@ date: "2026-09-14"
 categories: [Snapshot, About the site, Waterloo Region, Open Data]
 image: images/thumbnail.png
 draft: true
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r}
@@ -127,8 +129,8 @@ p <- ggplot() +
   # lines coord_sf() draws by default - which this map has no use for.
   coord_sf(datum = NA) +
   labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    title = "The Region's three cities are almost entirely surrounded by the four townships",
+    subtitle = "Waterloo Region, census subdivisions",
     caption = cwr_caption("Statistics Canada, 2021 census boundary files")
   ) +
   # theme_cwr() is built for charts with axes; a map wants none of them. Each
@@ -184,9 +186,9 @@ panel_chars <- 30
 # the unit out.
 measures <- tribble(
   ~column,             ~panel,                ~spoken,
-  "population",        "Population, 2025",    "Population in 2025",
+  "population",        "Population",    "Population",
   "area_sq_km",        "Land area, km\u00b2",  "Land area in square kilometres",
-  "density_per_sq_km", "People per km\u00b2, 2025",  "People per square kilometre in 2025"
+  "density_per_sq_km", "People per km\u00b2",  "People per square kilometre"
 )
 
 panels <- districts |>
@@ -253,8 +255,8 @@ p <- ggplot(panels, aes(x = value, y = district, fill = district_type)) +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
   labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    title = "The townships are very sparsely populated compared to the cities",
+    subtitle = "Population density, 2025",
     caption = cwr_caption(
       c("Statistics Canada Table 17-10-0155-01",
         "the 2021 census boundary files"),
@@ -344,6 +346,14 @@ group_panels <- group_totals |>
   ) |>
   ungroup()
 
+density_comp <- group_panels |> 
+  # Keep only the two density rows
+  filter(column == "density_per_sq_km") |> 
+  # Pick each value by its district_type and divide
+  summarise(ratio = value[district_type == "City"] / value[district_type == "Township"]) |> 
+  # Extract the single number so density_comp is a numeric value, not a tibble
+  pull(ratio)
+
 p <- ggplot(group_panels, aes(x = value, y = group, fill = district_type)) +
   geom_col(width = 0.6) +
   geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
@@ -364,8 +374,8 @@ p <- ggplot(group_panels, aes(x = value, y = group, fill = district_type)) +
   facet_wrap(vars(measure), nrow = 1, scales = "free_x") +
   coord_cartesian(clip = "off") +
   labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    title = str_glue("The Region's cities are {round(density_comp)} times as dense as its townships"),
+    subtitle = "Population density, 2025",
     caption = cwr_caption(
       c("Statistics Canada Table 17-10-0155-01",
         "the 2021 census boundary files"),
@@ -415,8 +425,8 @@ cwr_figure(
 # aloud exactly as they are written.
 income_measures <- tribble(
   ~column,                   ~panel,
-  "household_income_2026",   "Median household income",
-  "individual_income_2026",  "Median individual income"
+  "household_income_2026",   "Household",
+  "individual_income_2026",  "Individual"
 )
 
 income_panels <- income |>
@@ -495,13 +505,13 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
   # like the first and that comparison would be lost.
   facet_wrap(vars(measure), nrow = 1, scales = "free_y") +
   labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    title = "Households and individuals in the townships outearn those in the cities",
+    subtitle = "Median total income in 2020<sup>1</sup> of people living in private dwellings, 2026 dollars<sup>2</sup>",
     # One footnote, keyed to whatever in the title or subtitle needs it.
     caption = cwr_caption(
       c("Statistics Canada Tables 98-10-0057-01, 98-10-0070-01", "and 18-10-0004-01"),
       credit = TRUE,
-      notes = "adjusted by the Ontario all-items CPI"
+      notes = c("latest year available, from 2021 census", "adjusted by the Ontario all-items CPI")
     )
   ) +
   # Every bar carries its number, so the value axis and its gridlines are gone.
@@ -616,8 +626,8 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
   # phone version below wraps harder still.
   scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30)) +
   labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    title = "Manufacturing is still the dominant industry in Waterloo Region",
+    subtitle = "Kitchener CMA<sup>1</sup>, number of people employed by industry<sup>2</sup>, 2025, '000",
     # Two footnotes qualifying the title or subtitle above. cwr_caption()
     # numbers them in the order given, superscripts the keys and draws them
     # above the source line; the matching <sup>1</sup> goes in the subtitle.
@@ -629,7 +639,7 @@ p <- ggplot(industries, aes(x = employed_thousands, y = industry)) +
       "Statistics Canada Table 14-10-0468-01",
       credit = TRUE,
       cma = TRUE,
-      notes = "Forestry, mining, oil and gas, and Utilities industries were suppressed by Statistics Canada for confidentiality"
+      notes = "Negligible figures for the Natural resources and Utilities industries were suppressed by Statistics Canada"
     )
   ) +
   # Lets the boxed column heading show above the panel.
@@ -657,8 +667,7 @@ cwr_figure(
     "A lollipop chart of employment by industry in the ",
     "Kitchener-Cambridge-Waterloo census metropolitan area in 2025, ranked, ",
     "with each industry's share of all employment boxed in a column on the ",
-    "right. Goods-producing industries are marked in red and service-producing ",
-    "industries in blue. Thousands employed and share of all employment: ",
+    "right. Thousands employed and share of all employment: ",
     paste(alt_entries, collapse = "; "), "."
   ),
   # Taller than fourteen rows would otherwise need: a wrapped label is two
