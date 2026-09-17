@@ -304,7 +304,7 @@ The post README notes which dataset it uses and the date or version of the data.
 
 When the source publishes a new year: run `01_get_data.R` and `02_clean_data.R`, add a row to the README version table, bump the release version if any file lives in a release, then re-render and re-publish the posts that use it (their Modified date updates), bumping each post's `data_bundle_version` so readers get a fresh zip.
 
-`datasets/crime/` is the worked example, with eleven Statistics Canada tables, Ontario Financial Information Returns, and the WRPS occurrence data.
+`datasets/crime/` is the worked example, with eleven Statistics Canada tables, Ontario Financial Information Returns, and the WRPS occurrence data. The crime exploration notebooks (`explore.Rmd`, `test.qmd`, `test_snippets.qmd`) moved with it and live in `datasets/crime/R/exploration/`; open them from RStudio's Files pane.
 
 ### 5.4 Promote a post's pipeline to a dataset
 
@@ -362,6 +362,8 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
 
 - **Two of those five places have their wrapping tuned to this exact sentence.** The About hero and the home page title both carry `text-wrap: balance`, so when the window is too narrow for one line they split into two even ones instead of dropping the last word on its own. The hero also has `max-width: 30em`, deliberately *above* the sentence's one-line width of about 27.7em, so only the column decides where it breaks. **Do not put a narrower cap back on it:** the old `26em` was cutting the line about 30px before the space actually ran out, which looks like a wrapping problem and is really a CSS one. If you reword the tagline, check both at several window widths - not just the one you have open. The home page is the awkward one: it wraps around 800-900px and again near 600px, but comes back to a single line at 700px, because that is where Quarto drops the margin sidebar and the text column gets wider.
 
+- **Folders listed under `resources:` in `_quarto.yml` start with a slash** (`/images/`, `/fonts/`). Without it Quarto copies every folder of that name anywhere in the project, and until 2026-09-17 that quietly put a screenshot from the crime exploration notebooks under `datasets/` on the live site. The `!datasets/` line under `render:` does not prevent this: it stops pages being built from that folder, not files being copied out of it. If you add a resource line, start it with `/` unless you mean "every folder with this name".
+
 After any of these, `quarto render` then `/publish` with no argument.
 
 ## 9. Licence and disclaimers
@@ -370,6 +372,7 @@ After any of these, `quarto render` then `/publish` with no argument.
 - Data is never relicensed. Each README names the source's own licence.
 - **Quoting or paraphrasing another source.** A paraphrase in your own words needs nothing but a credit: copyright covers wording, not facts or ideas. A direct quote needs to be short next to the whole work, clearly marked as a quote, and attributed to its author and title - and it stays under its owner's terms, never CC BY. That exception has to appear in all three places that promise reuse, so **change all three or none**: the "Can its content be reused?" answer in `about.qmd`, the third-party bullet in `LICENSE-CONTENT.md`, and the "Reusing this post" text in `posts/_metadata.yml`. The person harmed by a missing carve-out is the reader who reuses someone else's words believing this site's licence covered them.
 - **Images are the trap, not text.** A chart, figure or screenshot taken from a copyrighted report must never go out under CC BY. Rebuild the chart from the underlying data and cite the source instead - better work anyway. Never quote song lyrics or poetry, where a few lines can be most of the work.
+- **"Not on the website" is not "private".** The repository is public, so an exploration notebook under `datasets/<slug>/R/` or `posts/<slug>/R/` is readable on GitHub even though the site never renders it - and so is any image pasted into it. Keep screenshots of other people's reports in `../chartingwaterlooregion-background/<slug>/` beside the PDFs, and describe or link them from the notebook instead. A file removed later stays in the git history, which this project never rewrites, so the time to keep it out is before the first save.
 - WRPS occurrence data requires a disclaimer on any publication. Posts that use it include `wrps_disclaimer` (from `datasets/crime/R/helpers.R`) in their Data sources section; `/review-post` checks for it.
 
 ## 10. Reproducibility checklist (what a reader needs)
