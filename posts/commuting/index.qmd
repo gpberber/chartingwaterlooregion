@@ -447,15 +447,26 @@ metres_per_text_mm <- frame$metres_per_text_mm
 # "Waterloo" over its figure is about as wide as Waterloo itself, so the label
 # sits where the widest gap between borders can hold it. Labels are never
 # tilted, and the same spot is used on every tab.
+#
+# The two lines are measured separately and handed to cwr_label_spot() as two
+# widths: "Waterloo" is half as wide again as "15.8%", and treating the label
+# as one block as wide as the name keeps it higher in a shape that narrows
+# downwards than it needs to be.
+name_size <- text_size_mm(region_shapes$name)
+share_size <- text_size_mm(rep("00.0%", nrow(region_shapes)))
 label_spots <- region_shapes |>
   st_drop_geometry() |>
   bind_cols(text_size_mm(paste0(region_shapes$name, "\n00.0%"))) |>
   mutate(
     w = w_mm * metres_per_text_mm,
     h = h_mm * metres_per_text_mm,
+    name_w = name_size$w_mm * metres_per_text_mm,
+    share_w = share_size$w_mm * metres_per_text_mm,
     spot = pmap(
-      list(st_geometry(region_shapes), w, h),
-      \(shape, w, h) cwr_label_spot(st_sfc(shape, crs = cwr_map_crs), w, h)
+      list(st_geometry(region_shapes), name_w, share_w, h),
+      \(shape, name_w, share_w, h) {
+        cwr_label_spot(st_sfc(shape, crs = cwr_map_crs), c(name_w, share_w), h)
+      }
     )
   ) |>
   unnest(spot)

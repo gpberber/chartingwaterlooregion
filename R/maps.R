@@ -82,10 +82,17 @@ cwr_label_point <- function(shapes, dTolerance = 10) {
 # shape - on a map of the Region with a few lines of caption, "Waterloo" over
 # its figure is about 8 km wide, which is most of the width of Waterloo.
 #
-# `width` and `height` are the label's size in metres (measure the text, do not
-# guess it). The shape is covered in a grid of candidate positions; at each, the
-# label's box is sampled and the distance from every sample to the nearest
-# border measured, counting as negative where the box crosses it. The position
+# `width` is the label's width in metres and `height` its total height (measure
+# the text, do not guess it). **Give `width` one entry per line, top line
+# first**, and each line is treated at its own width: a name over a share is a
+# wide line above a narrow one, not a rectangle as wide as the name, and the
+# corners under the short line are room the label does not need. Modelling it
+# as one rectangle keeps a label higher in a shape that narrows downwards than
+# it has to be.
+#
+# The shape is covered in a grid of candidate positions; at each, the label's
+# lines are sampled and the distance from every sample to the nearest border
+# measured, counting as negative where a sample falls outside. The position
 # whose worst sample is best wins - the widest gap between borders that holds
 # the whole label. A label may still overhang a little where the shape is too
 # narrow to hold it, which reads fine; see rule 12a in the cwr-charts skill.
@@ -97,11 +104,17 @@ cwr_label_spot <- function(shape, width, height, cellsize = 250) {
   candidates <- candidates[sf::st_within(candidates, shape, sparse = FALSE)[, 1]]
   xy <- sf::st_coordinates(candidates)
 
-  # The label's box as a 5 x 3 grid of sample points, relative to its centre
-  offsets <- tidyr::expand_grid(
-    dx = seq(-width / 2, width / 2, length.out = 5),
-    dy = seq(-height / 2, height / 2, length.out = 3)
-  )
+  # Each line as a row of sample points at its own width, stacked from the top
+  # down, relative to the middle of the whole label
+  line_height <- height / length(width)
+  offsets <- purrr::imap(width, \(line_width, line) {
+    middle <- height / 2 - (line - 0.5) * line_height
+    tidyr::expand_grid(
+      dx = seq(-line_width / 2, line_width / 2, length.out = 7),
+      dy = middle + c(-line_height / 2, 0, line_height / 2)
+    )
+  }) |>
+    purrr::list_rbind()
 
   # Every candidate's samples in one table, so sf is asked once rather than
   # once per candidate
