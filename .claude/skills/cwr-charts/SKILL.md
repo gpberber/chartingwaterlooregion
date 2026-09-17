@@ -97,6 +97,17 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    qualification belongs on the chart all the same, because a chart travels without the post:
    `cma = TRUE` makes it note 1, in wording that is identical across every post and fixable in
    one place. Never type the geography into `notes` by hand.
+1c. **Units and scale live in the subtitle, so the axis can carry bare numbers.** A value axis
+   never repeats a unit on every tick. Rescale the numbers instead - `label_number(scale = 1e-3)`
+   with explicit `breaks` for thousands, `1e-6` for millions - and let the subtitle say which
+   scale it is. Four-digit labels do not fit across a 4.2 in phone; three-digit ones do, which
+   is usually enough on its own to save a phone-only replacement scale in `phone = list(...)`,
+   so both versions keep one scale (Greg: "make the x scale in thousands so more labels fit on
+   the phone. I'll note this in the subtitle, which is where units of measure will always be
+   reported"). The subtitle itself is Greg's to write, so rescaling an axis is something to
+   **say in the hand-off line** - "the x scale is in thousands" - not to write into the
+   placeholder. He overrides this where a chart reads better the other way.
+
 2. **Colour has meaning.** Blue = the Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
 2a. **Waterloo Region is "Region" in chart text - always `cwr_region`.** Axis and category

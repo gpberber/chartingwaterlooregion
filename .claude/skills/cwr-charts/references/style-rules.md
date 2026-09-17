@@ -15,6 +15,11 @@ the same call in a situation the templates do not cover.
   Waterloo Region byline by default: plotting a publisher's figures as published is their
   work, not ours. Pass `credit = TRUE` only when the numbers on the chart were worked out
   here - a rate we calculated, an index we based, a model we fitted, several sources combined.
+- **The subtitle carries the scale as well as the unit**, so no tick label has to. An axis in
+  thousands or millions is rescaled (`label_number(scale = 1e-3)` plus explicit `breaks`) and
+  named in the subtitle rather than labelled "4,000" or "4K" at every break: shorter labels are
+  what let a phone show five breaks instead of three, and the desktop and phone versions can then
+  share one scale. Greg writes the subtitle, so flag the rescaling when handing the chart over.
 - No axis titles. Units live in the subtitle. The scatter templates place a y title above
   the axis with `annotation_custom(textGrob(...))` because there the axis meaning is not obvious.
 - Text sizes are multiples of `base_size` (13). Inside geoms use `label_size` (3.2 mm).
