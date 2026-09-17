@@ -352,32 +352,52 @@ cwr_wrap <- function(x, width = 22) {
 # same label twice as wide relative to the chart. This helper takes the
 # height from the data instead. For each group, `at` gives the x where the
 # label is centred - a stretch where that line has clear space - and `side`
-# says whether it sits just above or just below the line there. The label is
-# placed against the highest (above) or lowest (below) point the line
-# reaches across `span` x units around `at`, so a line that slopes under the
-# label does not cut through it. geom_label()'s own padding already leaves a
-# sliver of air, so `gap` (extra space, as a share of the y range) is 0 unless
-# a chart needs more. `span` should be about the label's width on the phone
-# version, which is the wider of the two in x units: 3 suits a short name
-# over 25 to 30 years. Because the label clears the line's extreme across the
-# whole span, choose an `at` where the line is fairly flat: over a steep or
-# jagged stretch the label clears the far end and floats off the near one.
+# says which side of the line it should sit on there, "above" or "below". The
+# label is placed against the highest (above) or lowest (below) point the
+# line reaches across `span` x units around `at`, so a line that slopes under
+# the label does not cut through it. geom_label()'s own padding already leaves
+# a sliver of air, so `gap` (extra space, as a share of the y range) is 0
+# unless a chart needs more. `span` should be about the label's width on the
+# phone version, which is the wider of the two in x units: 3 suits a short
+# name over 25 to 30 years. Because the label clears the line's extreme across
+# the whole span, choose an `at` where the line is fairly flat: over a steep
+# or jagged stretch the label clears the far end and floats off the near one.
 #
-# Returns one row per label with x, y, label, vjust and fontface, for the
-# templates' geom_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
+# `side` is a preference, not an order. A label's white box blots out any
+# gridline it covers, so the helper checks both sides and takes the other one
+# when the preferred side would cover a gridline and the other would not.
+# It never flips onto another line: a side where another group's line runs
+# through the label's box is ruled out first, whatever the gridlines do.
+# When both sides are equally good or bad, the preferred side wins. To make
+# the check, it needs:
+#   `limits`       the y scale's limits, as given to scale_y_continuous()
+#                  (NA for a limit the data set). The gridlines are the
+#                  breaks ggplot2 draws for that range.
+#   `breaks`       the gridlines themselves, if the chart sets its own.
+#   `label_height` the label box's height as a share of the y range. 0.05
+#                  fits the templates' 3.2 mm label on a 5 in line chart,
+#                  desktop and phone alike; raise it for a shorter chart.
+# Set `avoid_gridlines = FALSE` to keep every label on its preferred side.
+#
+# Returns one row per label with x, y, label, vjust, side and fontface, for
+# the templates' geom_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
 # Groups named in `bold` are set in bold (the focus, usually cwr_region).
 # x must be numeric (years); for a date axis pass as.numeric(date) and `at`
-# as numbers too. For a faceted chart, add the facet column to the result
-# with mutate() so each label stays in its panel.
+# as numbers too. For a faceted chart, call it once per panel (the other-line
+# check should only see that panel's lines) and add the facet column to each
+# result with mutate() so each label stays in its panel.
 #
 #   label_data <- cwr_line_labels(
 #     plot_data, x = year, y = csi, group = region,
-#     at = c(Canada = 2004, Ontario = 2014, Region = 2001.5),
+#     at = c(Canada = 2004, Ontario = 2014, Region = 2002),
 #     side = c(Canada = "above", Ontario = "below", Region = "below"),
+#     limits = c(45, NA),
 #     bold = cwr_region
 #   )
 cwr_line_labels <- function(data, x, y, group, at, side = "above",
-                            bold = NULL, span = 3, gap = 0) {
+                            bold = NULL, span = 3, gap = 0,
+                            limits = NULL, breaks = NULL,
+                            label_height = 0.05, avoid_gridlines = TRUE) {
   lines <- data |>
     select(x = {{ x }}, y = {{ y }}, group = {{ group }}) |>
     mutate(x = as.numeric(x), group = as.character(group)) |>
@@ -392,23 +412,69 @@ cwr_line_labels <- function(data, x, y, group, at, side = "above",
     all(side %in% c("above", "below"))
   )
 
-  y_gap <- gap * diff(range(lines$y))
+  # The y range the chart shows: the scale's limits where given, the data's
+  # range where not. Label height and gap are shares of it.
+  y_range <- range(lines$y)
+  if (!is.null(limits)) y_range <- coalesce(as.numeric(limits), y_range)
+  y_span <- diff(y_range)
+  y_gap <- gap * y_span
+  box_height <- label_height * y_span
+
+  # The gridlines: ggplot2's default breaks for that range, unless given
+  if (is.null(breaks)) breaks <- scales::breaks_extended()(y_range)
+  breaks <- breaks[!is.na(breaks) & breaks >= y_range[1] & breaks <= y_range[2]]
+
+  # Where a line runs across the label's width: every point inside the
+  # window, plus where the line crosses the window's two edges.
+  heights_in <- function(line, window) {
+    c(
+      line |> filter(between(x, window[1], window[2])) |> pull(y),
+      approx(line$x, line$y, xout = window, rule = 2)$y
+    )
+  }
 
   map(names(at), function(g) {
     line <- lines |> filter(group == g) |> arrange(x)
     window <- at[[g]] + c(-span, span) / 2
-    # The line's height across the label's width: every point inside the
-    # window, plus where the line crosses its two edges.
-    heights <- c(
-      line |> filter(between(x, window[1], window[2])) |> pull(y),
-      approx(line$x, line$y, xout = window, rule = 2)$y
-    )
-    above <- side[[g]] == "above"
+    own <- heights_in(line, window)
+
+    # The heights every other line reaches under the label, as ranges: a line
+    # crosses the box if its lowest-to-highest stretch there overlaps it.
+    others <- lines |>
+      filter(group != g) |>
+      split(~group) |>
+      map(\(other) range(heights_in(arrange(other, x), window)))
+
+    # Where the label would sit on each side, and what it would cover. The
+    # preference is read out here: inside tibble(), `side` would mean the
+    # column being built, not this function's argument.
+    preferred_side <- side[[g]]
+    candidate <- function(where) {
+      y_pos <- if (where == "above") max(own) + y_gap else min(own) - y_gap
+      box <- if (where == "above") c(y_pos, y_pos + box_height) else c(y_pos - box_height, y_pos)
+      tibble(
+        side = where,
+        y = y_pos,
+        hits_line = any(map_lgl(others, \(r) r[1] <= box[2] && r[2] >= box[1])),
+        hits_grid = any(breaks > box[1] & breaks < box[2]),
+        preferred = where == preferred_side
+      )
+    }
+
+    options <- map(c("above", "below"), candidate) |> list_rbind()
+    if (!avoid_gridlines) options <- options |> mutate(hits_grid = FALSE)
+
+    # Clear of other lines first, then clear of gridlines, then the preferred side
+    pick <- options |>
+      arrange(hits_line, hits_grid, desc(preferred)) |>
+      slice(1)
+
     tibble(
       x = at[[g]],
-      y = if (above) max(heights) + y_gap else min(heights) - y_gap,
+      y = pick$y,
       label = g,
-      vjust = if (above) 0 else 1,
+      vjust = if (pick$side == "above") 0 else 1,
+      side = pick$side,
       fontface = if (g %in% bold) "bold" else "plain"
     )
   }) |>

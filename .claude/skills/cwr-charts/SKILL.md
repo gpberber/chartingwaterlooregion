@@ -24,7 +24,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
-| `cwr_line_labels(data, x, y, group, at, side, bold)` | label positions that sit just above or below each line (rule 3a) |
+| `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 | `cwr_interactive(p, "fig-id", alt, height, phone_height)` | the same for a hover chart (ggiraph); chunk without `output: asis`; numbered in Deep dives like `cwr_figure()` |
 
@@ -110,9 +110,18 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    first globe-csi chart). Give each group an `at` (the x it is centred on, where its line has
    clear space) and a `side` (`"above"`/`"below"`); the helper takes the height from the line
    itself across `span` x units, so the label sits just clear of it at any data revision. Use
-   `aes(vjust = vjust)` and `hjust = 0.5` in the `geom_label()`. Choose `at` so nothing else
-   runs through the label's box - the helper checks only its own line - and check the phone
-   version, where the label covers about twice as many x units.
+   `aes(vjust = vjust)` and `hjust = 0.5` in the `geom_label()`. Check the phone version,
+   where the label covers about twice as many x units.
+3b. **A line label never blots out a gridline when it can avoid it.** The label's white box
+   hides any gridline it covers. `side` is a preference: `cwr_line_labels()` checks both sides
+   and switches when the preferred side would cover a gridline and the other would not. It
+   never switches onto another group's line, which counts for more than a gridline. For the
+   check it needs the y scale's `limits` (pass the same vector as `scale_y_continuous()`,
+   `NA` where the data decide) or explicit `breaks` if the chart sets its own. Its returned
+   `side` column says where each label ended up. If a label still covers a gridline, both
+   sides were blocked: move its `at` rather than accept it. Example: the globe-csi violent CSI
+   chart asks for Canada above its line at 2003, where the box would hide the 100 gridline,
+   so the helper puts it below.
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).

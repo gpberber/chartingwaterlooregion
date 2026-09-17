@@ -87,11 +87,13 @@ x_max <- csi_plot_data |> pull(year) |> max()
 
 # Line-name labels. cwr_line_labels() sets each one's height from its own
 # line: `at` is the year it is centred on, where that line has clear space,
-# and `side` puts it just above or below the line there.
+# and `side` is the preferred side of the line. The helper switches sides if
+# the preferred one would cover a gridline and the other is clear.
 label_data <- cwr_line_labels(
   csi_plot_data, x = year, y = csi, group = region,
   at = set_names(c(2004, 2014, 2002), csi_groups),
   side = set_names(c("above", "below", "below"), csi_groups),
+  limits = c(45, NA),   # the y scale's limits, so gridlines can be avoided
   bold = cwr_region
 )
 
@@ -186,6 +188,7 @@ label_data <- cwr_line_labels(
   csi_plot_data, x = year, y = csi_violent, group = region,
   at = set_names(c(2003, 2001.5, 2002), csi_groups),
   side = set_names(c("above", "above", "below"), csi_groups),
+  limits = c(45, NA),   # the y scale's limits, so gridlines can be avoided
   bold = cwr_region
 )
 

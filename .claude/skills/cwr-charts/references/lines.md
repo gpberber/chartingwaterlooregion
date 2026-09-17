@@ -50,11 +50,14 @@ group_colours <- set_names(manual_5_colours, renamed_groups)  # replace manual_5
 
 # Line-name labels - uncomment once the chart has been drawn and you know where each line has clear space.
 # cwr_line_labels() sets each label's height from its own line, so it always sits just above or below it:
-# `at` = the x each label is centred on, `side` = "above" or "below" the line there.
+# `at` = the x each label is centred on, `side` = the preferred side ("above"/"below"). It switches sides
+# when the preferred one would blot out a gridline and the other is clear (never onto another line);
+# `limits` must match scale_y_continuous()'s limits (NULL if none) so it knows where the gridlines are.
 #label_data <- cwr_line_labels(
 #	plot_data, x = <x_variable>, y = <y_variable>, group = <colour_variable>,
 #	at = set_names(c(x_group1, x_group2, x_group3, x_group4, x_group5), renamed_groups),
 #	side = set_names(c("above", "above", "above", "below", "below"), renamed_groups),
+#	limits = NULL,	# same as scale_y_continuous(limits = ); or breaks = if the chart sets its own
 #	bold = cwr_region	# the focus group: the Region is always labelled cwr_region ("Region")
 #)
 ## 	For a faceted chart, keep each label in its panel by adding the facet column, e.g.
