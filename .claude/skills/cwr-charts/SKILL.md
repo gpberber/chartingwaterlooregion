@@ -26,6 +26,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `cwr_map_crs`, `cwr_label_point()`, `cwr_label_spot()`, `cwr_map_nudges`, `cwr_map_theme()`, `cwr_text_on_fill()` | the house map style, from `R/maps.R` (rule 12) |
 | `cwr_interactive(p, "fig-id", alt, height, phone_height)` | the same for a hover chart (ggiraph); chunk without `output: asis`; numbered in Deep dives like `cwr_figure()` |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
@@ -55,7 +56,9 @@ Two things `theme_cwr()` now handles that a chart used to have to ask for:
 | a range or band over time | min/max per period | `ggribbon` (lines.md) |
 | relationship between two measures | x, y per unit | `ggscatter`, `ggbubble` (points.md) |
 | category x time grid | rank or value per cell | `ggheatrank`, `ggheatraw` (heatmaps.md) |
+| where something is, not how much | one value per municipality | `ggmap`, `ggmapshaded` (maps.md) |
 | one chart per group | any of the above | `ggmultiples`, `ggfacet` (multiples.md) |
+| one chart per group, chosen by the reader | any of the above | a `panel-tabset`, see **Tabs** below |
 | bar thickness carries meaning | value + weight | `ggshadedbars` (bars.md) |
 
 Fragments for scales, legends, annotations, text and labels are in `building-blocks.md`.
@@ -200,6 +203,69 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
     in the subtitle instead), no dense small multiples or twelve-series lines. Always Read
     both PNGs in `figures/`, the `-phone` one scaled to about 320 px wide, before calling a
     chart done.
+
+12. **Maps come from `R/maps.R`; never rebuild one from scratch.** It holds the projection
+    (`cwr_map_crs`, EPSG:3161), `cwr_label_point()` (the roomiest *point* inside a shape - the
+    centre of its largest inscribed circle - which the post's `02_clean_data.R` stores as
+    `lon`/`lat` beside each shape), `cwr_label_spot()` (the roomiest place for a label of a given
+    size), `cwr_map_nudges` (the three district labels the welcome map moves by hand),
+    `cwr_map_theme()` (no axes, ticks or gridlines) and `cwr_text_on_fill()` (white or black label
+    text, read off the fill's own lightness). Start from `ggmap` or `ggmapshaded` in maps.md.
+12a. **Map labels sit inside their shapes, level, in the widest gap that holds them.** Place them
+    with `cwr_label_spot(shape, width, height)`, passing the label's **measured** size in metres -
+    not `cwr_label_point()`, which answers where a point has most room rather than where these
+    words do. The two differ whenever a label is wide next to its shape: "Waterloo" over a figure
+    is about as wide as Waterloo. Never tilt a label and never shrink one to fit. A label that
+    overhangs its border slightly still reads fine (the welcome map's do); when one overhangs
+    badly the fixes in order are **a bigger map** (tighten the frame - on the commuting maps,
+    pulling the outside places in from 8 km to 5 km was what made Waterloo and Cambridge fit),
+    shorter wording, then fewer lines. Borders are `cowboysilver` on an unfilled map and white on
+    a shaded one. A map has no category axis, so it passes `height` and `phone_height` (7.5 and 6
+    suit a map of the Region with a caption of two or three notes).
+12b. **Every version of a map keeps one frame and one scale.** Tabs, years or facets of the same
+    map set `coord_sf(xlim =, ylim =, expand = FALSE)` from the widest version, so switching
+    between them changes the data and never moves the map, and share one `limits =` on the fill
+    scale, so the same colour means the same number throughout.
+
+## Tabs: one chart per tab
+
+When a chart would be made of the same picture several times over - one municipality at a time, one
+measure at a time - put each in a tab of a Quarto `panel-tabset` rather than in a grid of small
+multiples that nothing fits into. The rules, from the welcome post's mother tongue charts and the
+commuting post's flow maps:
+
+- One chunk per tab, tab headings as `###` so they stay out of the two-level table of contents.
+- The first tab's chunk does the shared work - the data, and a function that builds the chart for
+  one group - and each tab then calls that function and adds its own `labs()`. Nothing is computed
+  twice, and the tabs cannot drift apart.
+- Keep the rows, scales and frame identical across tabs, so switching tabs changes one thing only.
+- Each tab is a chart in its own right: its own `cwr_figure()` call, its own `fig-` id
+  (`fig-flows-kitchener`), its own `alt`, built from the same numbers it draws.
+
+```
+::: panel-tabset
+### Kitchener
+
+```{r}
+#| label: flows-kitchener
+#| output: asis
+
+# shared data and flow_map() / flow_caption() / flow_alt() go here, once
+p <- flow_map("Kitchener") + labs(title = ..., subtitle = ..., caption = flow_caption("Kitchener"))
+cwr_figure(p, "fig-flows-kitchener", alt = flow_alt("Kitchener"), height = 7.5, phone_height = 6)
+```
+
+### Waterloo
+
+```{r}
+#| label: flows-waterloo
+#| output: asis
+
+p <- flow_map("Waterloo") + labs(title = ..., subtitle = ..., caption = flow_caption("Waterloo"))
+cwr_figure(p, "fig-flows-waterloo", alt = flow_alt("Waterloo"), height = 7.5, phone_height = 6)
+```
+:::
+```
 
 ## Scope: the chart, and only the chart
 

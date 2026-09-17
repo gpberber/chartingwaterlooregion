@@ -9,6 +9,12 @@ here::i_am("posts/commuting/R/02_clean_data.R")
 library(tidyverse)
 library(janitor)
 library(here)
+library(sf)
+
+# cwr_label_point(): the roomiest point inside a shape, where its map label
+# goes. Cleaning scripts do not load the chart theme, so the map helpers are
+# sourced on their own.
+source(here("R", "maps.R"))
 
 raw_dir <- here("posts", "commuting", "data-raw")
 data_dir <- here("posts", "commuting", "data")
@@ -104,9 +110,95 @@ commuting_mode <- read_csv(
   select(district, district_type, mode = main_mode_of_commuting_11a, workers = value, percent) |>
   arrange(district, mode)
 
+# ---- Commuting flows --------------------------------------------------------
+# Table 98-10-0459, already cut to people who live in the Region. One row per
+# home municipality and place of work, including the thousands of places
+# nobody from here commutes to.
+#
+# The place of work is identified by the second number in `coordinate` (the
+# first is the place of residence). That number is a member id in the table's
+# metadata, which is where the place's census subdivision code is kept - so
+# places are matched on codes, never on names such as "Waterloo".
+members <- read_csv(
+  file.path(raw_dir, "table_98100459_members.csv"),
+  col_types = cols(.default = col_character())
+) |>
+  clean_names() |>
+  # Both dimensions list the same places under the same ids, but only the
+  # place-of-residence dimension (1) carries the code
+  filter(dimension_id == "1") |>
+  # The code is published in square brackets, "[3523008]"; keep the digits
+  mutate(work_csd = str_remove_all(classification_code, "[^0-9]")) |>
+  select(member_id, work_csd, work = member_name)
+
+flows <- read_csv(
+  file.path(raw_dir, "table_98100459_region.csv"),
+  col_types = cols(.default = col_character())
+) |>
+  clean_names() |>
+  mutate(
+    # The last seven digits of DGUID are the home census subdivision code
+    home_csd = str_sub(dguid, -7),
+    member_id = str_extract(coordinate, "[0-9]+$"),
+    workers = as.numeric(gender_3_total_gender_1)
+  ) |>
+  select(home_csd, member_id, workers) |>
+  inner_join(members, join_by(member_id)) |>
+  filter(workers > 0) |>
+  # Each place's share of the home municipality's workers. The table has no
+  # total row, so the denominator is the sum over every place of work. The
+  # census rounds each count to a multiple of 5, so a share of a small place
+  # is approximate.
+  mutate(percent = workers / sum(workers) * 100, .by = home_csd) |>
+  inner_join(municipalities |> select(home_csd = geo_uid, home = district),
+             join_by(home_csd)) |>
+  mutate(in_region = str_starts(work_csd, "3530")) |>
+  # The largest destination outside the Region for each home municipality,
+  # which the map marks. Ties would both be kept; there are none in 2021.
+  mutate(
+    top_outside = !in_region & workers == max(workers[!in_region]),
+    .by = home_csd
+  ) |>
+  select(home_csd, home, work_csd, work, in_region, top_outside, workers, percent) |>
+  arrange(home, desc(workers))
+
+# ---- Map shapes and points ------------------------------------------------
+# The boundary file from 01_get_data.R holds the Region's seven municipalities
+# and every place outside it that anyone from here commutes to.
+boundaries <- st_read(file.path(raw_dir, "csd_boundaries.gpkg"), quiet = TRUE) |>
+  clean_names() |>
+  st_transform(cwr_map_crs)
+
+# Where each place's label or dot goes: the roomiest point inside its shape,
+# worked out by cwr_label_point() in R/maps.R, which every map on the site
+# uses.
+
+# One row per place the map marks: the seven municipalities and the top
+# destination outside the Region for each of them. Stored as longitude and
+# latitude, as spatial data usually is; the post projects them when it draws.
+places <- boundaries |>
+  filter(csduid %in% c(municipalities$geo_uid, flows$work_csd[flows$top_outside])) |>
+  (\(shapes) bind_cols(
+    sf::st_drop_geometry(shapes) |> select(csd = csduid, name = csdname),
+    cwr_label_point(shapes)
+  ))() |>
+  select(csd, name, lon, lat) |>
+  mutate(in_region = str_starts(csd, "3530"))
+
+# The Region's seven outlines, simplified: a 50 m tolerance takes out detail no
+# one can see at the size the map is drawn, and keeps the committed file small.
+region_shapes <- boundaries |>
+  filter(str_starts(csduid, "3530")) |>
+  st_simplify(dTolerance = 50) |>
+  st_transform(4326) |>
+  select(csd = csduid, name = csdname)
+
 # ---- Write -----------------------------------------------------------------
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
+write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
+write_csv(places, file.path(data_dir, "flow_places.csv"))
+write_sf(region_shapes, file.path(data_dir, "region_shapes.geojson"), delete_dsn = TRUE)
 
-message("Wrote ", nrow(commuting), " commuting rows and ", nrow(commuting_mode),
-        " mode rows to ", data_dir)
+message("Wrote ", nrow(commuting), " commuting rows, ", nrow(commuting_mode),
+        " mode rows, ", nrow(flows), " flows and ", nrow(places), " places to ", data_dir)

@@ -28,3 +28,122 @@ dir.create(raw_dir, showWarnings = FALSE)
 get_cansim("98-10-0462") |>
   filter(str_starts(GeoUID, "3530")) |>
   write_csv(file.path(raw_dir, "table_98100462.csv"))
+
+# ---- Commuting flows, 2021 census ------------------------------------------
+# Table 98-10-0459, "Commuting flow from geography of residence to geography of
+# work": for every municipality people live in, how many work in every
+# municipality in Canada. It counts workers with a usual place of work, so
+# people who work from home or have no fixed workplace are not in it.
+#
+# Every place is crossed with every other, so the table is 26 million rows -
+# 292 MB zipped, 2.2 GB unzipped - almost all of them zero. It is downloaded to
+# a folder in the computer's temporary directory rather than to data-raw/,
+# which sits in OneDrive and would otherwise sync a file that is only needed
+# while this script runs, and only the rows for people who live in Waterloo
+# Region are kept. tempdir() is a fresh folder every time R starts, so its
+# parent is used instead: that way a second run finds the file already there.
+download_dir <- file.path(dirname(tempdir()), "cwr_downloads")
+dir.create(download_dir, showWarnings = FALSE)
+flows_zip <- file.path(download_dir, "98100459-eng.zip")
+if (!file.exists(flows_zip)) {
+  # The default 60-second timeout is too short for a file this size
+  options(timeout = 1200)
+  download.file(
+    "https://www150.statcan.gc.ca/n1/tbl/csv/98100459-eng.zip",
+    destfile = flows_zip,
+    mode = "wb"
+  )
+}
+
+# read_csv_chunked() reads the file a million rows at a time and keeps only the
+# rows the callback lets through, so the whole table never has to fit in
+# memory. unz() reads the one file wanted straight out of the zip.
+#
+# Place of residence is in DGUID, the "dissemination geography unique
+# identifier": a prefix saying which geography scheme it is ("2021A0005" means
+# a 2021 census subdivision) followed by the census subdivision code. Waterloo
+# Region's seven all start 3530.
+#
+# Place of work arrives as a name ("Guelph (CY), Ont.") rather than a code. Its
+# code is recovered in 02_clean_data.R from the second number in `Coordinate`,
+# which is the place of work's member id in the metadata file saved below.
+read_csv_chunked(
+  unz(flows_zip, "98100459.csv"),
+  callback = DataFrameCallback$new(
+    \(chunk, pos) filter(chunk, str_starts(DGUID, "2021A00053530"))
+  ),
+  chunk_size = 1e6,
+  col_types = cols(.default = col_character())
+) |>
+  write_csv(file.path(raw_dir, "table_98100459_region.csv"))
+
+# The metadata file, which travels in the same zip, lists every place in both
+# dimensions with a member id and - for places of residence - the census
+# subdivision code. The two dimensions list the same 5,161 places with the same
+# member ids, so this is what turns a place-of-work member id into a code. The
+# file stacks several tables of different widths one after another, separated
+# by blank lines, so the one wanted is cut out as lines before it is parsed.
+metadata_lines <- read_lines(unz(flows_zip, "98100459_MetaData.csv"))
+members_start <- str_which(metadata_lines, "^\"Dimension ID\",\"Member Name\"")
+members_end <- members_start +
+  str_which(metadata_lines[-seq_len(members_start)], "^$")[1] - 1
+
+metadata_lines[members_start:members_end] |>
+  I() |>
+  read_csv(col_types = cols(.default = col_character())) |>
+  write_csv(file.path(raw_dir, "table_98100459_members.csv"))
+
+# ---- Municipal boundaries --------------------------------------------------
+# Statistics Canada's 2021 census subdivision cartographic boundary file, the
+# same one the welcome post uses. It covers every municipality in Canada
+# (about 150 MB), so like the flows it is downloaded to the temporary folder and
+# only the pieces this post draws are kept: the Region's seven municipalities,
+# plus every place outside the Region that its residents commute to, so the
+# map can mark where those places are.
+boundary_zip <- file.path(download_dir, "lcsd000b21a_e.zip")
+if (!file.exists(boundary_zip)) {
+  options(timeout = 1200)
+  download.file(
+    "https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/files-fichiers/lcsd000b21a_e.zip",
+    destfile = boundary_zip,
+    mode = "wb"
+  )
+}
+boundary_dir <- file.path(download_dir, "csd_boundaries")
+unzip(boundary_zip, exdir = boundary_dir)
+
+# Every workplace code that appears in the flows, read back from the two files
+# just written. The member ids of the flows' places of work are matched to
+# codes the same way 02_clean_data.R does it.
+work_codes <- read_csv(
+  file.path(raw_dir, "table_98100459_region.csv"),
+  col_types = cols(.default = col_character())
+) |>
+  # The table lists every place of work, including the thousands nobody from
+  # the Region travels to; only those with at least one worker are wanted
+  filter(`Gender (3):Total - Gender[1]` != "0") |>
+  mutate(member_id = str_extract(Coordinate, "[0-9]+$")) |>
+  distinct(member_id) |>
+  inner_join(
+    read_csv(file.path(raw_dir, "table_98100459_members.csv"),
+             col_types = cols(.default = col_character())) |>
+      filter(`Dimension ID` == "1"),
+    join_by(member_id == `Member ID`)
+  ) |>
+  # The code is published in square brackets, "[3523008]"; keep the digits
+  mutate(code = str_remove_all(`Classification Code`, "[^0-9]")) |>
+  pull(code)
+
+# st_read()'s `query` is passed to GDAL, which filters while it reads, so the
+# other 5,000 polygons are never loaded. A geopackage is a single-file spatial
+# format, which keeps data-raw/ tidy.
+sf::st_read(
+  file.path(boundary_dir, "lcsd000b21a_e.shp"),
+  query = paste0(
+    "SELECT * FROM lcsd000b21a_e WHERE CSDUID IN ('",
+    paste(unique(work_codes), collapse = "','"),
+    "') OR CSDUID LIKE '3530%'"
+  ),
+  quiet = TRUE
+) |>
+  sf::write_sf(file.path(raw_dir, "csd_boundaries.gpkg"), delete_dsn = TRUE)

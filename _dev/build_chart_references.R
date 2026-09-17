@@ -71,6 +71,8 @@ catalogue <- tribble(
   "points",          "ggbubble",           "Bubble chart (size = third variable) with a hand-built size legend.",
   "heatmaps",        "ggheatrank",         "Heatmap of ranks (rows ordered by average rank, best at top), stepped fill legend.",
   "heatmaps",        "ggheatraw",          "Heatmap of raw values (rows ordered by mean), stepped fill legend, optional cell labels.",
+  "maps",            "ggmap",              "Outline map of the Region, one shape per municipality, labelled inside the shapes.",
+  "maps",            "ggmapshaded",        "Choropleth: shapes shaded by a value, each labelled with its name and that value.",
   "multiples",       "ggmultiples",        "Small multiples via a plotting function + patchwork; insert any template inside.",
   "multiples",       "ggfacet",            "Building block: facet_wrap with free y scales.",
   "building-blocks", "ggtitles",           "labs() with the standard title / subtitle / Source caption.",
@@ -100,6 +102,7 @@ file_titles <- c(
   comparisons = "Comparison charts: dumbbells and arrows",
   points = "Scatter and bubble charts",
   heatmaps = "Heatmaps",
+  maps = "Maps of the Region",
   multiples = "Small multiples and facets",
   `building-blocks` = "Building blocks: scales, labels, legends, annotations"
 )
@@ -111,6 +114,7 @@ file_intros <- c(
   comparisons = "Use when the story is the gap or the change between two values per category (before/after, us/them).",
   points = "Use when the story is the relationship between two measures. Label points by hand with nudge values after the first render.",
   heatmaps = "Use for a category x time grid where the pattern matters more than exact values (ranks across years, rates across places).",
+  maps = "Use when the story is about where, not how much - and only then, because a map spends a lot of space on shapes a reader already knows. R/maps.R holds the house map style: cwr_map_crs (the projection), cwr_label_point() (the roomiest point inside a shape, worked out in the cleaning script and stored as lon/lat), cwr_label_spot() (the roomiest place for a label of a given size, which is what a two-line label needs), cwr_map_nudges (the three district labels the welcome map moves by hand), cwr_map_theme() (no axes, no gridlines) and cwr_text_on_fill(). Labels go inside their shapes, level - never tilted, never shrunk to fit; a label that overhangs its border a little is normal. A map passes its own height, since it has no category axis.",
   multiples = "Use when one chart per group beats one crowded chart. make_multiples_plot() wraps any template; patchwork stacks the results.",
   `building-blocks` = "Fragments to add to any template. Most end with `+` so they can be pasted into a ggplot chain; `cwrfigure` is the separate call that follows the finished plot."
 )
@@ -183,6 +187,8 @@ picker <- tribble(
   "ggbubble",            "chart", "Bubble chart",                      "The same relationship, with a third variable sizing each point - usually population, so big places read as big.",
   "ggheatrank",          "chart", "Rank heatmap",                      "Where each place sat in a ranking in every period, and how positions moved.",
   "ggheatraw",           "chart", "Value heatmap",                     "A pattern across a category-by-time grid: calls by month and year, incidents by ward and season.",
+  "ggmap",               "chart", "Map of the Region, labelled",       "Where something is rather than how much of it there is: which municipality, which corner of the Region. Labels sit inside the shapes.",
+  "ggmapshaded",         "chart", "Shaded map (choropleth)",           "One value per municipality shown as shading, so the pattern reads before the numbers do: shares, rates, densities.",
   "ggmultiples",         "chart", "Small multiples",                   "One small chart per group instead of one crowded chart. Any template above can go inside it.",
   "ggvertbar_text",      "block", "Value labels inside bars",          "Printing each number on its bar, so the value axis, ticks and gridlines can come off.",
   "ggfacet",             "block", "Facets with free scales",           "facet_wrap() when each panel needs its own y scale.",

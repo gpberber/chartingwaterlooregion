@@ -24,7 +24,7 @@ cwr_packages <- c(
   "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",
 
   # Spatial and maps
-  "sf", "units",
+  "sf", "units", "farver",   # farver: cwr_text_on_fill() in R/maps.R
 
   # Modelling and time series (phone queues post)
   "changepoint", "segmented", "prophet", "broom", "slider", "tidytext",

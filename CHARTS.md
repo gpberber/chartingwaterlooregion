@@ -76,6 +76,13 @@ words and the template gets chosen for you. This is for when you want to know wh
 | `ggheatrank` | Rank heatmap | Where each place sat in a ranking in every period, and how positions moved. |
 | `ggheatraw` | Value heatmap | A pattern across a category-by-time grid: calls by month and year, incidents by ward and season. |
 
+### Maps of the Region
+
+| Snippet | Chart | Good for |
+|---|---|---|
+| `ggmap` | Map of the Region, labelled | Where something is rather than how much of it there is: which municipality, which corner of the Region. Labels sit inside the shapes. |
+| `ggmapshaded` | Shaded map (choropleth) | One value per municipality shown as shading, so the pattern reads before the numbers do: shares, rates, densities. |
+
 ### Small multiples and facets
 
 | Snippet | Chart | Good for |

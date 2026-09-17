@@ -6,11 +6,12 @@
 #
 #   source(here::here("R", "theme_cwr.R"))
 #
-# It does four things:
+# It does five things:
 #   1. loads the packages every post needs,
 #   2. defines the house colours (the same hex values as custom.scss),
 #   3. defines and sets theme_cwr(), the Tufte-inspired ggplot2 theme,
-#   4. defines small helpers (caption text, font lookup).
+#   4. defines small helpers (caption text, font lookup),
+#   5. sources R/maps.R, the house map style.
 #
 # The chart templates that build on this live in the cwr-charts skill
 # (.claude/skills/cwr-charts/references/). The original RStudio snippets are
@@ -40,6 +41,11 @@ conflicts_prefer(
   dplyr::summarise,
   .quiet = TRUE
 )
+
+# The house map style: the projection, label points and nudges, the map theme.
+# Kept in its own file because cleaning scripts need part of it and do not
+# load the rest of the theme.
+source(here::here("R", "maps.R"))
 
 # Print numbers without a thousands separator by default (scales >= 1.3).
 # Individual scales override this with label_number(big.mark = ",").

@@ -273,6 +273,497 @@ cwr_figure(
 )
 ```
 
+::: panel-tabset
+### Kitchener
+
+```{r}
+#| label: flows-kitchener
+#| output: asis
+
+# Where each municipality's workers go, one map per tab. Every tab draws the
+# same map from a different home municipality: each municipality shaded by the
+# share of the home municipality's workers who work there, labelled with its
+# name and that share, and a red arrow to the most common workplace outside the
+# Region. The map is built once here by flow_map() and each tab adds its own
+# titles.
+library(sf)
+
+# Every commute from a Region municipality, one row per home and place of work
+flows <- read_csv(
+  here("posts", "commuting", "data", "commuting_flows.csv"),
+  col_types = cols(home_csd = col_character(), work_csd = col_character()),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The Region's seven outlines, projected into the house map projection
+# (cwr_map_crs, in R/maps.R). Everything drawn on the map is projected the same
+# way, so coordinates are metres east and north and every distance below is in
+# metres.
+region_shapes <- st_read(
+  here("posts", "commuting", "data", "region_shapes.geojson"),
+  quiet = TRUE
+) |>
+  clean_names() |>
+  st_transform(cwr_map_crs)
+
+# The middle of every place the map marks: the seven municipalities, where
+# their labels go, and the three places outside the Region that are someone's
+# top destination. Projected like the shapes and turned into plain x and y
+# columns, so the arrows can be worked out with ordinary arithmetic.
+map_points <- read_csv(
+  here("posts", "commuting", "data", "flow_places.csv"),
+  col_types = cols(csd = col_character()),
+  show_col_types = FALSE
+) |>
+  clean_names() |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
+  st_transform(cwr_map_crs) |>
+  (\(points) bind_cols(
+    st_drop_geometry(points),
+    st_coordinates(points) |> as_tibble() |> set_names(c("x", "y"))
+  ))()
+
+label_points <- map_points |> filter(in_region)
+outside_places <- map_points |> filter(!in_region)
+
+# The outside places are drawn closer than they are. Brant's middle is 20 km
+# beyond the Region's edge and Stratford's 17, and a frame wide enough to show
+# them at their true distance leaves the Region itself small on the page - small
+# enough that the labels inside Waterloo and Cambridge no longer fit. So each is
+# pulled in towards the middle of the Region until it sits no more than 5 km
+# beyond the edge: in the right direction, at a shortened distance, which the
+# caption says. (Setting `outside_reach` to Inf puts them back.)
+outside_reach <- 5000
+region_outline <- st_union(region_shapes)
+region_middle <- st_coordinates(st_centroid(region_outline))
+outside_places <- outside_places |>
+  mutate(
+    beyond = as.numeric(st_distance(
+      st_as_sf(outside_places, coords = c("x", "y"), crs = cwr_map_crs),
+      region_outline
+    )),
+    pull_in = pmax(beyond - outside_reach, 0),
+    reach = sqrt((x - region_middle[1])^2 + (y - region_middle[2])^2),
+    x = x - pull_in * (x - region_middle[1]) / reach,
+    y = y - pull_in * (y - region_middle[2]) / reach
+  ) |>
+  select(-beyond, -pull_in, -reach)
+
+share_label <- label_number(accuracy = 0.1, suffix = "%")
+
+# ---- How big the labels are -------------------------------------------------
+# Every label has to sit comfortably inside its municipality on both versions
+# of the chart, so its size on the map has to be known in metres. That takes
+# two numbers: how big the text is on the page, and how many metres of map a
+# millimetre of page covers.
+#
+# The first is measured, by asking grid (the drawing system underneath ggplot2)
+# how wide and tall the text comes out in Inter. The measurement needs a
+# graphics device to be open, so one is opened on a throwaway file and closed
+# again - after which R is pointed back at whatever device it was using, since
+# closing one moves R on to the next rather than the one before.
+label_font_mm <- label_size * 0.9   # geom_text() sizes are in millimetres
+text_size_mm <- function(labels, bold = TRUE) {
+  previous <- dev.cur()
+  ragg::agg_png(tempfile(fileext = ".png"))
+  sizes <- map(labels, \(text) {
+    grob <- grid::textGrob(text, gp = grid::gpar(
+      fontfamily = cwr_font(), fontsize = label_font_mm * .pt,
+      fontface = if (bold) 2 else 1, lineheight = 0.95
+    ))
+    tibble(
+      w_mm = grid::convertWidth(grid::grobWidth(grob), "mm", valueOnly = TRUE),
+      h_mm = grid::convertHeight(grid::grobHeight(grob), "mm", valueOnly = TRUE)
+    )
+  }) |>
+    list_rbind()
+  dev.off()
+  if (previous > 1) dev.set(previous)
+  sizes
+}
+
+# The second follows from the frame. The desktop chart is 8.3 inches wide and
+# `flow_height` tall; the phone chart 4.2 inches wide. On a phone the map fills
+# the width, so a millimetre is the frame's width over the 101 mm the panel
+# gets. On a desktop the map is limited by its height instead: the panel gets
+# what is left after the title, subtitle and notes, about 2.1 inches of them.
+# Phone labels are drawn at `flow_phone_text_scale` of their desktop size (the
+# house default is 0.8; a little smaller here, because Waterloo and Cambridge
+# are narrow).
+flow_height <- 7.5
+flow_phone_height <- 6
+flow_phone_text_scale <- 0.72
+phone_panel_mm <- 4.2 * 25.4 - 5.6
+desktop_panel_mm <- c(w = 8.3 * 25.4 - 4.2, h = (flow_height - 2.1) * 25.4)
+
+# Each outside place is labelled above its dot if it lies north of the Region's
+# middle and below it if south, so the label widens the frame by only half its
+# width. The frame is the Region plus those dots and labels, with a margin, and
+# it is the same on every tab so switching tabs never moves the map. The label
+# sizes depend on the frame and the frame on the label sizes, so the two are
+# worked out twice; the second pass changes nothing visible.
+outside_text <- text_size_mm(paste0(outside_places$name, "\n00.0%"))
+outside_places <- bind_cols(outside_places, outside_text) |>
+  mutate(above = y > region_middle[2])
+# Far enough that an arrowhead arriving level with the dot stays clear of it
+label_gap <- 1400
+frame_margin <- 1000
+region_box <- st_bbox(region_shapes)
+frame_for <- function(metres_per_text_mm) {
+  boxes <- outside_places |>
+    mutate(
+      w = w_mm * metres_per_text_mm,
+      h = h_mm * metres_per_text_mm,
+      xmin = x - w / 2, xmax = x + w / 2,
+      ymin = if_else(above, y + label_gap, y - label_gap - h),
+      ymax = if_else(above, y + label_gap + h, y - label_gap)
+    )
+  x <- range(region_box[c("xmin", "xmax")], boxes$xmin, boxes$xmax) + c(-frame_margin, frame_margin)
+  y <- range(region_box[c("ymin", "ymax")], boxes$ymin, boxes$ymax) + c(-frame_margin, frame_margin)
+  list(
+    x = x,
+    y = y,
+    # Metres of map per millimetre of text on each version, allowing for the
+    # text's own shrinking on the phone; labels are sized for the larger
+    metres_per_text_mm = max(
+      diff(x) / phone_panel_mm * flow_phone_text_scale,
+      diff(x) / desktop_panel_mm[["w"]],
+      diff(y) / desktop_panel_mm[["h"]]
+    )
+  )
+}
+# A first guess of 400 m, then once more from the frame that guess gives
+frame <- frame_for(frame_for(400)$metres_per_text_mm)
+frame_x <- frame$x
+frame_y <- frame$y
+metres_per_text_mm <- frame$metres_per_text_mm
+
+# ---- Where the labels go ------------------------------------------------------
+# Each municipality's label - its name over its share - goes where the whole
+# two-line label has the most room inside its borders, found by
+# cwr_label_spot() in R/maps.R. That is not the same as the middle of the
+# shape: on this map, with three places outside the Region to make room for,
+# "Waterloo" over its figure is about as wide as Waterloo itself, so the label
+# sits where the widest gap between borders can hold it. Labels are never
+# tilted, and the same spot is used on every tab.
+label_spots <- region_shapes |>
+  st_drop_geometry() |>
+  bind_cols(text_size_mm(paste0(region_shapes$name, "\n00.0%"))) |>
+  mutate(
+    w = w_mm * metres_per_text_mm,
+    h = h_mm * metres_per_text_mm,
+    spot = pmap(
+      list(st_geometry(region_shapes), w, h),
+      \(shape, w, h) cwr_label_spot(st_sfc(shape, crs = cwr_map_crs), w, h)
+    )
+  ) |>
+  unnest(spot)
+
+# A label's box, used only to keep the arrow below clear of the words
+box_polygon <- function(x, y, w, h) {
+  corners <- rbind(c(-w, -h), c(w, -h), c(w, h), c(-w, h), c(-w, -h)) / 2
+  st_polygon(list(sweep(corners, 2, c(x, y), "+")))
+}
+
+# ---- The arrow out of the Region ---------------------------------------------
+# A gently bowed arrow from the home municipality's label to the outside place,
+# as a run of points: a quadratic Bezier curve from (x0, y0) to (x1, y1),
+# pulled towards a control point set off to the left of the straight line by
+# `bend` times its length (negative bends go right). It starts where it leaves
+# the home label's box, which is padded by 600 m so the line starts clear of
+# the text, and stops 1.5 km short of the dot, clear of the dot's label.
+bowed_arrow <- function(x0, y0, x1, y1, bend, start_box) {
+  cx <- (x0 + x1) / 2 - bend * (y1 - y0)
+  cy <- (y0 + y1) / 2 + bend * (x1 - x0)
+  t <- seq(0, 1, length.out = 120)
+  points <- tibble(
+    x = (1 - t)^2 * x0 + 2 * (1 - t) * t * cx + t^2 * x1,
+    y = (1 - t)^2 * y0 + 2 * (1 - t) * t * cy + t^2 * y1
+  )
+  in_start_box <- st_within(
+    st_as_sf(points, coords = c("x", "y"), crs = cwr_map_crs), start_box, sparse = FALSE
+  )[, 1]
+  points |>
+    filter(!in_start_box, sqrt((x - x1)^2 + (y - y1)^2) >= 1500)
+}
+
+# Of five bends, the arrow takes the one that passes furthest from the other
+# labels - the other municipalities' and the outside place's own - so it does
+# not run through a name.
+outside_arrow <- function(home_name, destination) {
+  home_spot <- label_spots |> filter(name == home_name)
+  label_box <- function(spot, room) {
+    st_sfc(box_polygon(spot$x, spot$y, spot$w + 2 * room, spot$h + 2 * room), crs = cwr_map_crs)
+  }
+  others <- label_spots |>
+    filter(name != home_name) |>
+    (\(spots) map(seq_len(nrow(spots)), \(i) label_box(spots[i, ], 0)))() |>
+    reduce(c) |>
+    c(destination_label_box(destination)) |>
+    st_union()
+  map(c(0.2, 0.1, 0, -0.1, -0.2), \(bend) {
+    path <- bowed_arrow(home_spot$x, home_spot$y, destination$x, destination$y, bend,
+                        label_box(home_spot, 600))
+    line <- st_sfc(st_linestring(as.matrix(path)), crs = cwr_map_crs)
+    list(path = path, clearance = as.numeric(st_distance(line, others)))
+  }) |>
+    (\(options) options[[which.max(map_dbl(options, "clearance"))]]$path)()
+}
+
+# The outside place's label box, where flow_map() draws it: centred over or
+# under the dot, `label_gap` away
+destination_label_box <- function(destination) {
+  w <- destination$w_mm * metres_per_text_mm
+  h <- destination$h_mm * metres_per_text_mm
+  y_middle <- if (destination$above) destination$y + label_gap + h / 2 else destination$y - label_gap - h / 2
+  st_sfc(box_polygon(destination$x, y_middle, w, h), crs = cwr_map_crs)
+}
+
+# ---- The map ------------------------------------------------------------------
+# One shading scale for every tab, so the same blue means the same share
+# wherever it appears. 60% is just above the largest share, Cambridge's
+# workers who work in Cambridge.
+fill_low <- "#EEF3F8"
+fill_limits <- c(0, 60)
+
+# Label text is white on the darker fills and black on the lighter ones;
+# cwr_text_on_fill() reads the fill's own lightness to decide.
+
+flow_map <- function(home_name) {
+  shares <- region_shapes |>
+    left_join(
+      flows |> filter(home == home_name) |> select(csd = work_csd, percent),
+      join_by(csd)
+    ) |>
+    # A municipality nobody from the home one works in has no row: 0%
+    mutate(percent = replace_na(percent, 0))
+
+  labels <- label_spots |>
+    left_join(st_drop_geometry(shares) |> select(csd, percent), join_by(csd)) |>
+    mutate(
+      is_home = name == home_name,
+      text_colour = cwr_text_on_fill(percent, fill_low, dodgerblue, fill_limits)
+    )
+
+  destination <- flows |>
+    filter(home == home_name, top_outside) |>
+    left_join(outside_places |> select(work_csd = csd, x, y, above, w_mm, h_mm), join_by(work_csd))
+
+  ggplot() +
+    # White borders between shaded shapes separate neighbours without drawing
+    # a second thing to look at
+    geom_sf(data = shares, aes(fill = percent), colour = "white", linewidth = 0.6) +
+    scale_fill_gradient(low = fill_low, high = dodgerblue, limits = fill_limits, guide = "none") +
+    # The red arrow first, so the labels are drawn over it if it ever grazes one
+    geom_path(
+      data = outside_arrow(home_name, destination),
+      aes(x, y),
+      colour = habsred, linewidth = 0.9,
+      arrow = arrow(length = unit(0.08, "in"), type = "closed", angle = 25),
+      lineend = "butt", linejoin = "mitre"
+    ) +
+    geom_point(data = destination, aes(x, y), colour = habsred, size = 2) +
+    geom_text(
+      data = destination,
+      aes(x, y, label = paste0(work, "\n", share_label(percent)),
+          vjust = if_else(above, 0, 1)),
+      nudge_y = if_else(destination$above, label_gap, -label_gap),
+      colour = habsred, fontface = "bold", size = label_font_mm, lineheight = 0.95
+    ) +
+    # The municipality's name, bold for the home one, over its share
+    geom_text(
+      data = labels,
+      aes(x, y, label = paste0(name, "\n", share_label(percent)),
+          colour = text_colour),
+      fontface = if_else(labels$is_home, "bold", "plain"),
+      size = label_font_mm, lineheight = 0.95
+    ) +
+    scale_colour_identity() +
+    # The same frame on every tab. datum = NA drops the latitude and longitude
+    # grid.
+    coord_sf(xlim = frame_x, ylim = frame_y, expand = FALSE, datum = NA) +
+    cwr_map_theme()
+}
+
+flow_caption <- function(home_name) {
+  cwr_caption(
+    c("Statistics Canada Table 98-10-0459-01", "the 2021 census boundary files"),
+    credit = TRUE,
+    notes = c(
+      "Share of workers with a usual place of work",
+      paste0("The share on ", home_name, " is of people who both live and work there"),
+      "Red marks the most common workplace outside the Region, in its direction but nearer than it is"
+    )
+  )
+}
+
+# Alt text built from the same numbers the map draws
+flow_alt <- function(home_name) {
+  shares <- region_shapes |>
+    st_drop_geometry() |>
+    left_join(
+      flows |> filter(home == home_name) |> select(csd = work_csd, percent),
+      join_by(csd)
+    ) |>
+    mutate(percent = replace_na(percent, 0))
+  stay <- shares |> filter(name == home_name)
+  elsewhere <- shares |> filter(name != home_name) |> arrange(desc(percent))
+  outside <- flows |> filter(home == home_name, top_outside)
+  paste0(
+    "Map of Waterloo Region's seven municipalities, each shaded darker the ",
+    "larger the share of ", home_name, "'s workers who work there. ",
+    share_label(stay$percent), " of ", home_name, "'s workers work in ",
+    home_name, ". Elsewhere in the Region: ",
+    paste(paste(elsewhere$name, share_label(elsewhere$percent)), collapse = ", "),
+    ". A red arrow points to the most common workplace outside the Region, ",
+    outside$work, ", with ", share_label(outside$percent), "."
+  )
+}
+
+p <- flow_map("Kitchener") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Kitchener")
+  )
+
+cwr_figure(
+  p, "fig-flows-kitchener",
+  alt = flow_alt("Kitchener"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### Waterloo
+
+```{r}
+#| label: flows-waterloo
+#| output: asis
+
+p <- flow_map("Waterloo") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Waterloo")
+  )
+
+cwr_figure(
+  p, "fig-flows-waterloo",
+  alt = flow_alt("Waterloo"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### Cambridge
+
+```{r}
+#| label: flows-cambridge
+#| output: asis
+
+p <- flow_map("Cambridge") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Cambridge")
+  )
+
+cwr_figure(
+  p, "fig-flows-cambridge",
+  alt = flow_alt("Cambridge"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### Woolwich
+
+```{r}
+#| label: flows-woolwich
+#| output: asis
+
+p <- flow_map("Woolwich") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Woolwich")
+  )
+
+cwr_figure(
+  p, "fig-flows-woolwich",
+  alt = flow_alt("Woolwich"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### Wilmot
+
+```{r}
+#| label: flows-wilmot
+#| output: asis
+
+p <- flow_map("Wilmot") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Wilmot")
+  )
+
+cwr_figure(
+  p, "fig-flows-wilmot",
+  alt = flow_alt("Wilmot"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### North Dumfries
+
+```{r}
+#| label: flows-north-dumfries
+#| output: asis
+
+p <- flow_map("North Dumfries") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("North Dumfries")
+  )
+
+cwr_figure(
+  p, "fig-flows-north-dumfries",
+  alt = flow_alt("North Dumfries"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+### Wellesley
+
+```{r}
+#| label: flows-wellesley
+#| output: asis
+
+p <- flow_map("Wellesley") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = flow_caption("Wellesley")
+  )
+
+cwr_figure(
+  p, "fig-flows-wellesley",
+  alt = flow_alt("Wellesley"),
+  height = flow_height, phone_height = flow_phone_height,
+  phone_text_scale = flow_phone_text_scale
+)
+```
+
+:::
+
 ```{r}
 #| label: first
 #| output: asis
