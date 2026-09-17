@@ -2,7 +2,7 @@
 title: "Long-term crime trends in Waterloo Region"
 description: "A long look back at crime in the Region."
 date: "2026-09-17"
-categories: [Snapshot, Crime, Policing]
+categories: [Deep dive, Crime, Policing]
 image: images/thumbnail.png
 draft: true
 ---
@@ -39,15 +39,13 @@ csi_comparison <- read_csv(
   show_col_types = FALSE
 )
 
-# Waterloo Region incident rates per 100,000 people, with each rate indexed to
-# its base year (100 = the base-year rate). One row per offence per year.
-assaults_indexed <- read_csv(
-  here("posts", "globe-csi-comparison", "data", "wrps_assaults_indexed.csv"),
-  show_col_types = FALSE
-)
-sexual_offences_indexed <- read_csv(
-  here("posts", "globe-csi-comparison", "data", "wrps_sexual_offences_indexed.csv"),
-  show_col_types = FALSE
+# Rates per 100,000 people of nine assault and sexual offences for Canada,
+# Ontario and the Region, each also indexed to its base year (100 = the
+# base-year rate). One row per offence per place per year. UCR codes are read
+# as text: they are labels, and "130" and "1310" are different offences.
+crime_rates <- read_csv(
+  here("posts", "globe-csi-comparison", "data", "crime_rates.csv"),
+  col_types = cols(ucr_code = col_character())
 )
 ```
 
@@ -112,14 +110,15 @@ p <- ggplot(csi_plot_data, aes(x = year, y = csi, colour = region)) +
 
   geom_line(linewidth = 0.8) +
 
-  # Hover targets: large invisible squares that catch the mouse anywhere near
-  # a line and carry the tooltip...
+  # Small invisible dots that appear on hover to mark the year...
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+  # ...under large invisible squares that catch the mouse anywhere near a line
+  # and carry the tooltip. The squares go on top: a dot drawn over them would
+  # take the mouse at the very point a reader aims for, and it has no tooltip.
   geom_point_interactive(
     aes(tooltip = csi_tooltip, data_id = hover_id),
     shape = 15, size = 7, alpha = 0
   ) +
-  # ...and small invisible dots that appear on hover to mark the year.
-  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
 
   scale_x_continuous(
     breaks = seq(2000, x_max, 5),
@@ -207,11 +206,11 @@ p <- ggplot(csi_plot_data, aes(x = year, y = csi_violent, colour = region)) +
 
   geom_line(linewidth = 0.8) +
 
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
   geom_point_interactive(
     aes(tooltip = csi_violent_tooltip, data_id = hover_id),
     shape = 15, size = 7, alpha = 0
   ) +
-  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
 
   scale_x_continuous(
     breaks = seq(2000, x_max, 5),
@@ -270,249 +269,333 @@ cwr_interactive(
 ```
 
 ```{r}
-#| label: assaults
+#| label: crime-chart-function
 
-# Replicates the Globe and Mail's third chart (assault rates for Canada,
-# indexed) for Waterloo Region instead. Five offences share one axis because
-# each rate is indexed: 100 is its rate in the base year. Five long offence
-# names would collide as direct labels, so this chart uses a legend above the
-# panel (style rule 3's exception). Hover shows the offence, year, index and
-# the underlying rate.
+# The nine offence charts below replicate the Globe and Mail's last two
+# charts, split into one chart per offence with Canada, Ontario and the Region
+# as the three lines, like the CSI charts above. Each offence has two tabs:
+# the rate per 100,000 people as published ("Incidents") and that rate as an
+# index ("Index", 100 = the base-year rate). Every tab is one chunk calling
+# crime_chart(), so the eighteen charts cannot drift apart in style; it is
+# the ggline template (with the hover layers of the CSI charts) wrapped in a
+# function.
 
-assault_groups <- c(
-  "Assault with a weapon or causing bodily harm",
-  "Assaults against a peace officer",
-  "Aggravated assault",
-  "Assault",
-  "Other assaults"
-)
-# Reds for the two offences that have risen most, blues for the level 1 and
-# 3 assaults, grey for the catch-all.
-assault_colours <- set_names(
-  c(habsred, habsred50, dodgerblue, dodgerblue50, cowboysilver),
-  assault_groups
-)
+# Built on the first call and reused: the offences' names and base years
+crime_info <- crime_rates |>
+  distinct(ucr_code, violation, base_year, first_year = year) |>
+  summarise(first_year = min(first_year), .by = c(ucr_code, violation, base_year))
 
-assault_base_year <- assaults_indexed |> pull(base_year) |> min()
+crime_chart <- function(code, measure = c("incidents", "index")) {
+  measure <- match.arg(measure)
+  info <- crime_info |> filter(ucr_code == code)
 
-assault_plot_data <- assaults_indexed |>
-  mutate(
-    violation = factor(violation, levels = assault_groups),
-    hover_id = str_glue("{ucr_code}-{year}"),
-    tooltip = str_glue(
-      "<b>{violation}</b><br>{year}<br>",
-      "Index: {label_number(accuracy = 1)(index)} ({base_year} = 100)<br>",
-      "Rate: {label_number(accuracy = 0.1)(incidents_per_100k)} per 100,000"
+  plot_data <- crime_rates |>
+    filter(ucr_code == code) |>
+    mutate(
+      region = factor(region, levels = csi_groups),
+      value = if (measure == "incidents") incidents_per_100k else index,
+      hover_id = str_glue("{code}-{measure}-{region}-{year}"),
+      tooltip = if (measure == "incidents") {
+        str_glue(
+          "<b>{region}</b><br>{violation}<br>{year}<br>",
+          "Rate: {label_number(accuracy = 0.01, big.mark = ',')(incidents_per_100k)} per 100,000<br>",
+          "Incidents: {label_number(big.mark = ',')(incidents)}"
+        )
+      } else {
+        str_glue(
+          "<b>{region}</b><br>{violation}<br>{year}<br>",
+          "Index: {label_number(accuracy = 1)(index)} ({base_year} = 100)<br>",
+          "Rate: {label_number(accuracy = 0.01, big.mark = ',')(incidents_per_100k)} per 100,000"
+        )
+      }
     )
-  )
 
-x_min <- assault_plot_data |> pull(year) |> min()
-x_max <- assault_plot_data |> pull(year) |> max()
+  x_min <- plot_data |> pull(year) |> min()
+  x_max <- plot_data |> pull(year) |> max()
+  # Breaks every 5 years (every 10 on a phone) for the long series; the
+  # 2015-on series is short, so it keeps 5 on a phone too
+  x_breaks <- seq(ceiling(x_min / 5) * 5, x_max, 5)
+  phone_breaks <- if (x_max - x_min > 15) seq(2000, x_max, 10) else x_breaks
 
-p <- ggplot(assault_plot_data, aes(x = year, y = index, colour = violation)) +
-
-  # The base line: above it a rate is higher than in the base year.
-  geom_hline(yintercept = 100, colour = "grey30", linewidth = 0.4) +
-
-  geom_line(linewidth = 0.8) +
-
-  geom_point_interactive(
-    aes(tooltip = tooltip, data_id = hover_id),
-    shape = 15, size = 7, alpha = 0
-  ) +
-  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
-
-  scale_x_continuous(
-    breaks = seq(2000, x_max, 5),
-    labels = label_number(big.mark = "", scale = 1, suffix = ""),
-    minor_breaks = seq(x_min, x_max, 1),
-    expand = expansion(mult = c(0.02, 0.05)),
-    position = "bottom"
-  ) +
-
-  scale_y_continuous(
+  # Every label placed automatically (see cwr_line_labels() in theme_cwr.R):
+  # clear of the other lines, the gridlines and each other.
+  label_data <- cwr_line_labels(
+    plot_data, x = year, y = value, group = region,
     limits = c(0, NA),
-    breaks = seq(0, 300, 50),
-    position = "right",
-    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-    expand = expansion(mult = c(0, 0.05))
-  ) +
-
-  # A legend in two columns above the panel; one column on phones (below).
-  # The key is drawn as a thick line so the colour is easy to match.
-  scale_colour_manual(values = assault_colours) +
-  guides(
-    x = guide_axis(minor.ticks = TRUE),
-    colour = guide_legend(ncol = 2, byrow = TRUE, override.aes = list(linewidth = 1.5, alpha = 1, size = 0))
-  ) +
-
-  theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -20)
-    ),
-    # "top" reserves room for the legend; theme_cwr()'s default floats it over
-    # the panel, where two rows of keys would sit on the lines.
-    legend.position = "top",
-    legend.justification = "left",
-    legend.text = element_text(size = base_size * 0.7, margin = margin(r = 10, l = 4)),
-    legend.margin = margin(0, 0, 0, 0)
-  ) +
-
-  labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
-    colour = NULL,
-    caption = cwr_caption("Statistics Canada Table 35-10-0180-01", credit = TRUE)
+    bold = cwr_region
   )
 
-cwr_interactive(
-  p, "fig-assaults",
-  alt = paste0(
-    "Line chart of five kinds of assault in Waterloo Region, ", x_min, " to ",
-    x_max, ", each shown as an index where its ", assault_base_year,
-    " rate per 100,000 people equals 100. Assault with a weapon or causing ",
-    "bodily harm rose the most, to a little over twice its ", assault_base_year,
-    " rate. Assaults against a peace officer swing widely but ended well above ",
-    "theirs. Common assault is close to its ", assault_base_year, " rate, and ",
-    "aggravated assault and other assaults ended below theirs."
-  ),
-  height = 5.5, phone_height = 6,
-  phone = list(
+  # Notes for the two offences whose years or base differ from the rest
+  notes <- c(
+    if (info$first_year > min(crime_rates$year)) {
+      str_glue("Shown from {info$first_year}: Criminal Code changes make earlier years incomparable")
+    },
+    if (measure == "index" && info$base_year != info$first_year) {
+      str_glue(
+        "Indexed to {info$base_year}: the {cwr_region} recorded no incidents in ",
+        "{str_flatten_comma(seq(info$first_year, info$base_year - 1), ' or ')}"
+      )
+    }
+  )
+
+  # Rates are Statistics Canada's own; the index is worked out here
+  caption <- cwr_caption(
+    c("Statistics Canada Table 35-10-0177-01", "Table 35-10-0180-01"),
+    credit = measure == "index",
+    notes = notes
+  )
+
+  p <- ggplot(plot_data, aes(x = year, y = value, colour = region)) +
+
+    geom_label(
+      data = label_data,
+      aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
+      colour = "grey30",
+      fill = "white",
+      linewidth = 0,
+      size = 3.2,
+      hjust = 0.5,
+      inherit.aes = FALSE
+    ) +
+
+    geom_line(linewidth = 0.8) +
+
+    # Hover dots under hover targets, as in the CSI charts
+    geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+    geom_point_interactive(
+      aes(tooltip = tooltip, data_id = hover_id),
+      shape = 15, size = 7, alpha = 0
+    ) +
+
     scale_x_continuous(
-      breaks = seq(2000, x_max, 10),
+      breaks = x_breaks,
+      labels = label_number(big.mark = "", scale = 1, suffix = ""),
+      minor_breaks = seq(x_min, x_max, 1),
+      expand = expansion(mult = c(0.02, 0.05)),
+      position = "bottom"
+    ) +
+
+    scale_y_continuous(
+      limits = c(0, NA),
+      position = "right",
+      labels = label_number(big.mark = ","),
+      expand = expansion(mult = c(0, 0.05))
+    ) +
+
+    scale_colour_manual(
+      values = csi_colours,
+      guide = "none"
+    ) +
+
+    guides(x = guide_axis(minor.ticks = TRUE)) +
+
+    # Right-axis label positioning: sit labels above gridlines
+    theme(
+      axis.text.y.right = element_text(
+        size = rel(1),
+        hjust = 1.0,
+        vjust = -0.5,
+        margin = margin(r = 12, l = -20)
+      )
+    ) +
+
+    # The offence is named in the placeholder so the eighteen charts can be
+    # told apart until the titles are written
+    labs(
+      title = str_glue("Title: {info$violation}"),
+      subtitle = "Subtitle: what is measured, for whom, and when<br>",
+      caption = caption
+    )
+
+  # Alt text built from the data: what is shown, and the first and last values
+  ends <- plot_data |>
+    filter(year %in% c(x_min, x_max)) |>
+    arrange(year, region) |>
+    mutate(entry = paste(region, label_number(accuracy = if (measure == "index") 1 else 0.1, big.mark = ",")(value))) |>
+    summarise(entries = str_flatten_comma(entry), .by = year)
+  what <- if (measure == "incidents") {
+    str_glue("the rate of {str_to_lower(info$violation)} per 100,000 people")
+  } else {
+    str_glue("the rate of {str_to_lower(info$violation)} as an index, {info$base_year} = 100")
+  }
+
+  cwr_interactive(
+    p, str_glue("fig-crime-{code}-{measure}"),
+    alt = str_glue(
+      "Line chart of {what}, for Canada, Ontario and the Region, {x_min} to {x_max}. ",
+      "In {x_min}: {ends$entries[1]}. In {x_max}: {ends$entries[2]}."
+    ),
+    height = 5, phone_height = 4.5,
+    phone = list(scale_x_continuous(
+      breaks = phone_breaks,
       minor_breaks = seq(x_min, x_max, 1),
       expand = expansion(mult = c(0.02, 0.05))
-    ),
-    guides(colour = guide_legend(ncol = 1, override.aes = list(linewidth = 1.5, alpha = 1, size = 0)))
-  )
-)
-```
-
-```{r}
-#| label: sexual-offences
-
-# Replicates the Globe and Mail's fourth chart (sexual offence rates for
-# Canada, indexed) for Waterloo Region instead. As in the Globe's chart,
-# sexual violations against children are indexed to 2015, the others to the
-# first year in the data. Legend and hover as in the assault chart.
-
-sexual_groups <- c(
-  "Sexual violations against children",
-  "Sexual assault with a weapon or causing bodily harm",
-  "Sexual assault",
-  "Aggravated sexual assault"
-)
-sexual_colours <- set_names(manual_4_colours, sexual_groups)
-
-# An offence with no incidents in its base year has no index (the data script
-# leaves it blank), so it cannot be drawn. It is named in a note instead.
-sexual_omitted <- sexual_offences_indexed |>
-  summarise(no_index = all(is.na(index)), base_year = first(base_year), .by = violation) |>
-  filter(no_index)
-
-sexual_notes <- if (nrow(sexual_omitted) > 0) {
-  str_glue(
-    "{str_flatten_comma(sexual_omitted$violation, ' and ')} not shown: ",
-    "the {cwr_region} recorded none in {str_flatten_comma(unique(sexual_omitted$base_year))}, so there is no base to index to"
+    ))
   )
 }
-
-sexual_plot_data <- sexual_offences_indexed |>
-  filter(!is.na(index)) |>
-  mutate(
-    violation = factor(violation, levels = sexual_groups),
-    hover_id = str_glue("{ucr_code}-{year}"),
-    tooltip = str_glue(
-      "<b>{violation}</b><br>{year}<br>",
-      "Index: {label_number(accuracy = 1)(index)} ({base_year} = 100)<br>",
-      "Rate: {label_number(accuracy = 0.01)(incidents_per_100k)} per 100,000<br>",
-      "Incidents: {label_number(big.mark = ',')(incidents)}"
-    )
-  )
-
-x_min <- sexual_plot_data |> pull(year) |> min()
-x_max <- sexual_plot_data |> pull(year) |> max()
-
-p <- ggplot(sexual_plot_data, aes(x = year, y = index, colour = violation)) +
-
-  geom_hline(yintercept = 100, colour = "grey30", linewidth = 0.4) +
-
-  geom_line(linewidth = 0.8) +
-
-  geom_point_interactive(
-    aes(tooltip = tooltip, data_id = hover_id),
-    shape = 15, size = 7, alpha = 0
-  ) +
-  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
-
-  scale_x_continuous(
-    breaks = seq(2000, x_max, 5),
-    labels = label_number(big.mark = "", scale = 1, suffix = ""),
-    minor_breaks = seq(x_min, x_max, 1),
-    expand = expansion(mult = c(0.02, 0.05)),
-    position = "bottom"
-  ) +
-
-  scale_y_continuous(
-    limits = c(0, NA),
-    position = "right",
-    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-    expand = expansion(mult = c(0, 0.05))
-  ) +
-
-  scale_colour_manual(values = sexual_colours) +
-  guides(
-    x = guide_axis(minor.ticks = TRUE),
-    colour = guide_legend(ncol = 2, byrow = TRUE, override.aes = list(linewidth = 1.5, alpha = 1, size = 0))
-  ) +
-
-  theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -20)
-    ),
-    legend.position = "top",
-    legend.justification = "left",
-    legend.text = element_text(size = base_size * 0.7, margin = margin(r = 10, l = 4)),
-    legend.margin = margin(0, 0, 0, 0)
-  ) +
-
-  labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
-    colour = NULL,
-    caption = cwr_caption("Statistics Canada Table 35-10-0180-01", credit = TRUE, notes = sexual_notes)
-  )
-
-cwr_interactive(
-  p, "fig-sexual-offences",
-  alt = paste0(
-    "Line chart of three kinds of sexual offence in Waterloo Region, ", x_min,
-    " to ", x_max, ", each shown as an index where its base-year rate per ",
-    "100,000 people equals 100 (2015 for sexual violations against children, ",
-    x_min, " for the others). Sexual violations against children have about ",
-    "tripled since 2015. Sexual assault with a weapon or causing bodily harm is ",
-    "about six times its ", x_min, " rate, but it is a handful of incidents a ",
-    "year, so the line jumps sharply. Sexual assault is close to its ", x_min,
-    " rate. Aggravated sexual assault is not shown because there were none in ",
-    x_min, "."
-  ),
-  height = 5.5, phone_height = 6,
-  phone = list(
-    scale_x_continuous(
-      breaks = seq(2000, x_max, 10),
-      minor_breaks = seq(x_min, x_max, 1),
-      expand = expansion(mult = c(0.02, 0.05))
-    ),
-    guides(colour = guide_legend(ncol = 1, override.aes = list(linewidth = 1.5, alpha = 1, size = 0)))
-  )
-)
 ```
+
+<!-- Assault with a weapon or causing bodily harm -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1420-incidents
+crime_chart("1420", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1420-index
+crime_chart("1420", "index")
+```
+:::
+
+<!-- Assaults against a peace officer -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-135-incidents
+crime_chart("135", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-135-index
+crime_chart("135", "index")
+```
+:::
+
+<!-- Aggravated assault -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1410-incidents
+crime_chart("1410", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1410-index
+crime_chart("1410", "index")
+```
+:::
+
+<!-- Assault (level 1) -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1430-incidents
+crime_chart("1430", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1430-index
+crime_chart("1430", "index")
+```
+:::
+
+<!-- Other assaults -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-140-incidents
+crime_chart("140", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-140-index
+crime_chart("140", "index")
+```
+:::
+
+<!-- Sexual violations against children (2015 on) -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-130-incidents
+crime_chart("130", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-130-index
+crime_chart("130", "index")
+```
+:::
+
+<!-- Sexual assault with a weapon or causing bodily harm -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1320-incidents
+crime_chart("1320", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1320-index
+crime_chart("1320", "index")
+```
+:::
+
+<!-- Sexual assault (level 1) -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1330-incidents
+crime_chart("1330", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1330-index
+crime_chart("1330", "index")
+```
+:::
+
+<!-- Aggravated sexual assault (index based on 2000) -->
+
+::: panel-tabset
+### Incidents
+
+```{r}
+#| label: crime-1310-incidents
+crime_chart("1310", "incidents")
+```
+
+### Index
+
+```{r}
+#| label: crime-1310-index
+crime_chart("1310", "index")
+```
+:::
 
 ```{r}
 #| label: first

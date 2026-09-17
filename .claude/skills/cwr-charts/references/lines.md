@@ -8,7 +8,7 @@ All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provid
 
 ## ggline
 
-Multi-series line chart, colours by group, line labels placed against each line by cwr_line_labels().
+Multi-series line chart, colours by group, line labels placed automatically against each line by cwr_line_labels().
 
 ```r
 # fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
@@ -48,40 +48,39 @@ x_max = plot_data |> pull(<x_variable>) |> max()
 group_colours <- set_names(manual_5_colours, renamed_groups)  # replace manual_5_colours if need fewer/custom colours
 
 
-# Line-name labels - uncomment once the chart has been drawn and you know where each line has clear space.
-# cwr_line_labels() sets each label's height from its own line, so it always sits just above or below it:
-# `at` = the x each label is centred on, `side` = the preferred side ("above"/"below"). It switches sides
-# when the preferred one would blot out a gridline and the other is clear (never onto another line);
+# Line-name labels. cwr_line_labels() sets each label's height from its own line, so it always sits just
+# above or below it, and by default finds the spot itself: clear of other lines, other labels, the panel
+# edge and gridlines, as close to its own line as possible. `side` is the preferred side ("above"/"below");
 # `limits` must match scale_y_continuous()'s limits (NULL if none) so it knows where the gridlines are.
-#label_data <- cwr_line_labels(
-#	plot_data, x = <x_variable>, y = <y_variable>, group = <colour_variable>,
-#	at = set_names(c(x_group1, x_group2, x_group3, x_group4, x_group5), renamed_groups),
-#	side = set_names(c("above", "above", "above", "below", "below"), renamed_groups),
-#	limits = NULL,	# same as scale_y_continuous(limits = ); or breaks = if the chart sets its own
-#	bold = cwr_region	# the focus group: the Region is always labelled cwr_region ("Region")
-#)
+# To pin a label that reads badly, add `at = c(<group name> = <x to centre it on>)` for that group only.
+label_data <- cwr_line_labels(
+	plot_data, x = <x_variable>, y = <y_variable>, group = <colour_variable>,
+	side = "above",
+	limits = NULL,	# same as scale_y_continuous(limits = ); or breaks = if the chart sets its own
+	bold = cwr_region	# the focus group: the Region is always labelled cwr_region ("Region")
+)
 ## 	For a faceted chart, keep each label in its panel by adding the facet column, e.g.
 ## 	label_data <- label_data |> mutate(facet_var = factor("facet_level", levels = levels(plot_data$facet_var)))
 
 ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_variable>)) +
 
-	# commented out until label placements determined
-	#geom_label(
-	#  data = label_data,
-	#  aes(
-	#    x = x,
-	#    y = y,
-	#    label = label,
-	#    fontface = fontface,
-	#    vjust = vjust    # set by cwr_line_labels(): 0 above the line, 1 below
-	#  ),
-	#  colour = "grey30",
-	#  fill = "white", 
-	#  linewidth = 0,
-	#  size = 3.2,
-	#  hjust = 0.5,     # centred on the x given in `at`
-	#  inherit.aes = FALSE
-	#) +
+	# line-name labels, positioned by cwr_line_labels() above
+	geom_label(
+	  data = label_data,
+	  aes(
+	    x = x,
+	    y = y,
+	    label = label,
+	    fontface = fontface,
+	    vjust = vjust    # set by cwr_line_labels(): 0 above the line, 1 below
+	  ),
+	  colour = "grey30",
+	  fill = "white", 
+	  linewidth = 0,
+	  size = 3.2,
+	  hjust = 0.5,     # centred on the label's x
+	  inherit.aes = FALSE
+	) +
 
 	geom_line(linewidth = 0.8) +
 	

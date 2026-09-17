@@ -59,7 +59,7 @@ catalogue <- tribble(
   "lollipops",       "gglollipop",         "Lollipop (segment + dot) for ranked values with an x axis on top.",
   "lollipops",       "gglollipoplabel",    "Lollipop with direct value labels replacing the x axis entirely.",
   "lollipops",       "gglollipoprect",     "Lollipop plus a boxed value column on the right with a shaded header.",
-  "lines",           "ggline",             "Multi-series line chart, colours by group, line labels placed against each line by cwr_line_labels().",
+  "lines",           "ggline",             "Multi-series line chart, colours by group, line labels placed automatically against each line by cwr_line_labels().",
   "lines",           "ggarea",             "Stacked area chart by group.",
   "lines",           "ggribbon",           "Two lines with a shaded band between them (min/max, range, confidence).",
   "lines",           "ggslope",            "Slope chart: two time points, one line per group, points masked at the ends.",

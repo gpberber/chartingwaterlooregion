@@ -107,11 +107,17 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    `guide = "none"`. Use a legend only when labels would collide.
 3a. **Line labels come from `cwr_line_labels()`, never typed coordinates.** A hand-typed
    (x, y) drifts off its line (Greg caught labels floating well away from their lines in the
-   first globe-csi chart). Give each group an `at` (the x it is centred on, where its line has
-   clear space) and a `side` (`"above"`/`"below"`); the helper takes the height from the line
-   itself across `span` x units, so the label sits just clear of it at any data revision. Use
+   first globe-csi chart). The helper takes the height from the line itself across `span` x
+   units, so the label sits just clear of it at any data revision. Where along the line is
+   either given - `at`, the x each label is centred on - or, for any group left out of `at`
+   (`at = NULL` for all), found automatically: it tries every x on both sides and keeps the
+   spot clear of other lines, of labels already placed, of the panel edge and of gridlines,
+   closest to its own line, placing the `bold` focus first. **Use automatic placement by
+   default**, and always when one function draws many charts (the globe-csi post draws
+   eighteen that way); give `at` only to override a spot that reads badly. Use
    `aes(vjust = vjust)` and `hjust = 0.5` in the `geom_label()`. Check the phone version,
-   where the label covers about twice as many x units.
+   where the label covers about twice as many x units; labels count as overlapping within
+   `span * label_spacing` (1.25) so phone labels do not touch.
 3b. **A line label never blots out a gridline when it can avoid it.** The label's white box
    hides any gridline it covers. `side` is a preference: `cwr_line_labels()` checks both sides
    and switches when the preferred side would cover a gridline and the other would not. It
@@ -122,6 +128,12 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    sides were blocked: move its `at` rather than accept it. Example: the globe-csi violent CSI
    chart asks for Canada above its line at 2003, where the box would hide the 100 gridline,
    so the helper puts it below.
+3c. **Hover layers: dots first, squares on top.** An interactive line chart
+   (`cwr_interactive()`) draws two invisible `geom_point_interactive()` layers sharing a
+   `data_id`: small dots (`size = 2.5`) that appear on hover, then large squares
+   (`shape = 15, size = 7`) carrying the `tooltip`. The order matters: the topmost element
+   under the mouse fires, and a dot drawn over the squares has no tooltip, so pointing
+   straight at a year showed nothing until this was caught.
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).

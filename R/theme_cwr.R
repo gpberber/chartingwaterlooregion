@@ -350,26 +350,41 @@ cwr_wrap <- function(x, width = 22) {
 # A label typed at a hand-picked (x, y) drifts away from its line: the eye
 # guesses the height, the data are revised, and the phone version draws the
 # same label twice as wide relative to the chart. This helper takes the
-# height from the data instead. For each group, `at` gives the x where the
-# label is centred - a stretch where that line has clear space - and `side`
-# says which side of the line it should sit on there, "above" or "below". The
-# label is placed against the highest (above) or lowest (below) point the
-# line reaches across `span` x units around `at`, so a line that slopes under
-# the label does not cut through it. geom_label()'s own padding already leaves
-# a sliver of air, so `gap` (extra space, as a share of the y range) is 0
-# unless a chart needs more. `span` should be about the label's width on the
-# phone version, which is the wider of the two in x units: 3 suits a short
-# name over 25 to 30 years. Because the label clears the line's extreme across
-# the whole span, choose an `at` where the line is fairly flat: over a steep
-# or jagged stretch the label clears the far end and floats off the near one.
+# height from the data instead. A label is placed against the highest (above)
+# or lowest (below) point its line reaches across `span` x units around the x
+# it is centred on, so a line that slopes under the label does not cut
+# through it. geom_label()'s own padding already leaves a sliver of air, so
+# `gap` (extra space, as a share of the y range) is 0 unless a chart needs
+# more. `span` should be about the label's width on the phone version, which
+# is the wider of the two in x units: 3 suits a short name over 25 to 30
+# years.
 #
-# `side` is a preference, not an order. A label's white box blots out any
-# gridline it covers, so the helper checks both sides and takes the other one
-# when the preferred side would cover a gridline and the other would not.
-# It never flips onto another line: a side where another group's line runs
-# through the label's box is ruled out first, whatever the gridlines do.
-# When both sides are equally good or bad, the preferred side wins. To make
-# the check, it needs:
+# Where each label goes along the line:
+#   - `at` names a group and the x to centre its label on - a stretch where
+#     that line has clear space and is fairly flat (over a jagged stretch
+#     the label clears the far peak and floats off the near point).
+#   - A group left out of `at` (or `at = NULL` for all of them) is placed
+#     automatically. Every x along its line is tried, on both sides, and the
+#     best spot wins, judged in this order: no other line runs through the
+#     label; it does not cover a label already placed; it stays inside the
+#     panel; it covers no gridline; it sits as close to its own line as
+#     possible (a flat stretch); then the preferred side. The rightmost
+#     `right_margin` of the x range is skipped, because the templates draw the
+#     value axis's labels inside the panel there. Two labels count as
+#     overlapping when their centres are less than `span * label_spacing`
+#     apart (and their heights overlap): the 25% margin keeps phone labels,
+#     which run a little wider than `span`, from touching. Groups named in `bold` are
+#     placed first, so the focus gets the best spot, then the rest in the
+#     order of `at` and the data.
+#
+# Which side of the line:
+#   `side` ("above"/"below", one for all or one per group) is a preference,
+#   not an order. A label's white box blots out any gridline it covers, so
+#   both sides are checked, and the other side is taken when it is clear and
+#   the preferred side is not. A side where another group's line runs
+#   through the label, or where the label would cover one already placed, is
+#   ruled out first, whatever the gridlines do. Ties go to the preferred
+#   side. For these checks the helper needs:
 #   `limits`       the y scale's limits, as given to scale_y_continuous()
 #                  (NA for a limit the data set). The gridlines are the
 #                  breaks ggplot2 draws for that range.
@@ -377,15 +392,14 @@ cwr_wrap <- function(x, width = 22) {
 #   `label_height` the label box's height as a share of the y range. 0.05
 #                  fits the templates' 3.2 mm label on a 5 in line chart,
 #                  desktop and phone alike; raise it for a shorter chart.
-# Set `avoid_gridlines = FALSE` to keep every label on its preferred side.
+#   Set `avoid_gridlines = FALSE` to ignore gridlines altogether.
 #
 # Returns one row per label with x, y, label, vjust, side and fontface, for
 # the templates' geom_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
-# Groups named in `bold` are set in bold (the focus, usually cwr_region).
 # x must be numeric (years); for a date axis pass as.numeric(date) and `at`
-# as numbers too. For a faceted chart, call it once per panel (the other-line
-# check should only see that panel's lines) and add the facet column to each
-# result with mutate() so each label stays in its panel.
+# as numbers too. For a faceted chart, call it once per panel (the checks
+# should only see that panel's lines) and add the facet column to each result
+# with mutate() so each label stays in its panel.
 #
 #   label_data <- cwr_line_labels(
 #     plot_data, x = year, y = csi, group = region,
@@ -394,35 +408,47 @@ cwr_wrap <- function(x, width = 22) {
 #     limits = c(45, NA),
 #     bold = cwr_region
 #   )
-cwr_line_labels <- function(data, x, y, group, at, side = "above",
+#
+#   # every label placed automatically
+#   label_data <- cwr_line_labels(
+#     plot_data, x = year, y = rate, group = region,
+#     limits = c(0, NA), bold = cwr_region
+#   )
+cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
                             bold = NULL, span = 3, gap = 0,
                             limits = NULL, breaks = NULL,
-                            label_height = 0.05, avoid_gridlines = TRUE) {
+                            label_height = 0.05, avoid_gridlines = TRUE,
+                            right_margin = 0.12, step = 0.5,
+                            label_spacing = 1.25) {
   lines <- data |>
     select(x = {{ x }}, y = {{ y }}, group = {{ group }}) |>
     mutate(x = as.numeric(x), group = as.character(group)) |>
     filter(!is.na(y))
+  groups <- unique(lines$group)
 
-  # One side for every label, or one per group
-  if (is.null(names(side))) side <- set_names(rep(side, length(at)), names(at))
+  # One side for every label, or one per group; "above" where not given
+  if (is.null(names(side))) side <- set_names(rep(side, length(groups)), groups)
+  side <- c(side, set_names(rep("above", length(groups)), groups))[groups]
   stopifnot(
-    !is.null(names(at)),
-    all(names(at) %in% lines$group),
-    all(names(at) %in% names(side)),
+    is.null(at) || !is.null(names(at)),
+    all(names(at) %in% groups),
     all(side %in% c("above", "below"))
   )
 
   # The y range the chart shows: the scale's limits where given, the data's
-  # range where not. Label height and gap are shares of it.
+  # range where not. Label height and gap are shares of it. The panel's top
+  # also has the templates' 5% expansion.
   y_range <- range(lines$y)
   if (!is.null(limits)) y_range <- coalesce(as.numeric(limits), y_range)
   y_span <- diff(y_range)
   y_gap <- gap * y_span
   box_height <- label_height * y_span
+  panel <- c(y_range[1], y_range[2] + 0.05 * y_span)
 
   # The gridlines: ggplot2's default breaks for that range, unless given
   if (is.null(breaks)) breaks <- scales::breaks_extended()(y_range)
   breaks <- breaks[!is.na(breaks) & breaks >= y_range[1] & breaks <= y_range[2]]
+  if (!avoid_gridlines) breaks <- numeric(0)
 
   # Where a line runs across the label's width: every point inside the
   # window, plus where the line crosses the window's two edges.
@@ -432,53 +458,75 @@ cwr_line_labels <- function(data, x, y, group, at, side = "above",
       approx(line$x, line$y, xout = window, rule = 2)$y
     )
   }
+  line_of <- map(set_names(groups), \(g) lines |> filter(group == g) |> arrange(x))
 
-  map(names(at), function(g) {
-    line <- lines |> filter(group == g) |> arrange(x)
-    window <- at[[g]] + c(-span, span) / 2
-    own <- heights_in(line, window)
+  # Candidate x positions for a group placed automatically: its own line's
+  # extent, less half a label at each end and the axis labels' strip.
+  x_range <- range(lines$x)
+  auto_xs <- function(g) {
+    own_x <- range(line_of[[g]]$x)
+    seq(
+      own_x[1] + span / 2,
+      min(own_x[2], x_range[2] - right_margin * diff(x_range)) - span / 2,
+      by = step
+    )
+  }
 
-    # The heights every other line reaches under the label, as ranges: a line
-    # crosses the box if its lowest-to-highest stretch there overlaps it.
-    others <- lines |>
-      filter(group != g) |>
-      split(~group) |>
-      map(\(other) range(heights_in(arrange(other, x), window)))
-
-    # Where the label would sit on each side, and what it would cover. The
-    # preference is read out here: inside tibble(), `side` would mean the
-    # column being built, not this function's argument.
-    preferred_side <- side[[g]]
-    candidate <- function(where) {
-      y_pos <- if (where == "above") max(own) + y_gap else min(own) - y_gap
-      box <- if (where == "above") c(y_pos, y_pos + box_height) else c(y_pos - box_height, y_pos)
-      tibble(
-        side = where,
-        y = y_pos,
-        hits_line = any(map_lgl(others, \(r) r[1] <= box[2] && r[2] >= box[1])),
-        hits_grid = any(breaks > box[1] & breaks < box[2]),
-        preferred = where == preferred_side
-      )
-    }
-
-    options <- map(c("above", "below"), candidate) |> list_rbind()
-    if (!avoid_gridlines) options <- options |> mutate(hits_grid = FALSE)
-
-    # Clear of other lines first, then clear of gridlines, then the preferred side
-    pick <- options |>
-      arrange(hits_line, hits_grid, desc(preferred)) |>
-      slice(1)
-
+  # Everything that decides a spot, for one group at one x on one side.
+  # `placed` holds the boxes of the labels already chosen.
+  placed <- tibble(x = numeric(0), bottom = numeric(0), top = numeric(0))
+  score <- function(g, x_c, where) {
+    window <- x_c + c(-span, span) / 2
+    own <- heights_in(line_of[[g]], window)
+    y_pos <- if (where == "above") max(own) + y_gap else min(own) - y_gap
+    box <- if (where == "above") c(y_pos, y_pos + box_height) else c(y_pos - box_height, y_pos)
+    others <- map(line_of[names(line_of) != g], \(l) range(heights_in(l, window)))
+    centre <- approx(line_of[[g]]$x, line_of[[g]]$y, xout = x_c, rule = 2)$y
     tibble(
-      x = at[[g]],
+      x = x_c,
+      side = where,
+      y = y_pos,
+      bottom = box[1],
+      top = box[2],
+      hits_line = any(map_lgl(others, \(r) r[1] <= box[2] && r[2] >= box[1])),
+      hits_label = any(abs(placed$x - x_c) < span * label_spacing &
+                         placed$bottom < box[2] & placed$top > box[1]),
+      outside = box[1] < panel[1] || box[2] > panel[2],
+      hits_grid = any(breaks > box[1] & breaks < box[2]),
+      float = abs(y_pos - centre),
+      # read out of `side` here: inside tibble(), `side` is the column above
+      preferred = where == preferred_side
+    )
+  }
+
+  # Placement order: the bold (focus) groups first, then `at`, then the rest
+  order <- unique(c(intersect(bold, groups), names(at), groups))
+
+  result <- list()
+  for (g in order) {
+    preferred_side <- side[[g]]
+    fixed <- g %in% names(at)
+    xs <- if (fixed) at[[g]] else auto_xs(g)
+    options <- map(xs, \(x_c) list_rbind(map(c("above", "below"), \(w) score(g, x_c, w)))) |>
+      list_rbind()
+    options <- if (fixed) {
+      arrange(options, hits_line, hits_label, outside, hits_grid, desc(preferred))
+    } else {
+      arrange(options, hits_line, hits_label, outside, hits_grid, float, desc(preferred), x)
+    }
+    pick <- slice(options, 1)
+    placed <- bind_rows(placed, select(pick, x, bottom, top))
+    result[[g]] <- tibble(
+      x = pick$x,
       y = pick$y,
       label = g,
       vjust = if (pick$side == "above") 0 else 1,
       side = pick$side,
       fontface = if (g %in% bold) "bold" else "plain"
     )
-  }) |>
-    list_rbind()
+  }
+
+  list_rbind(result)
 }
 
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.
@@ -847,8 +895,12 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 #   ```{r}
 #   #| label: csi
 #   p <- ggplot(...) + geom_line() +
-#     geom_point_interactive(aes(tooltip = tip, data_id = id), shape = 15, size = 7, alpha = 0) +
-#     geom_point_interactive(aes(data_id = id), size = 2.5, alpha = 0)
+#     geom_point_interactive(aes(data_id = id), size = 2.5, alpha = 0) +
+#     geom_point_interactive(aes(tooltip = tip, data_id = id), shape = 15, size = 7, alpha = 0)
+#
+# Layer order matters: the dots first, the squares over them. The topmost
+# element under the mouse is the one that fires, and a dot on top (it has no
+# tooltip) would swallow the hover at the exact point a reader aims for.
 #   cwr_interactive(p, "fig-csi", alt = "Line chart showing ...",
 #     height = 5, phone_height = 4.5)
 #   ```

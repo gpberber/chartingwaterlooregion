@@ -28,19 +28,24 @@ regions <- c("Canada" = "Canada", "Ontario" = "Ontario", "WRPS" = "Region")
 csi_raw <- read_rds(file.path(crime_dir, "crime_severity_index.rds")) |>
   clean_names()
 
-# Detailed violations (level 1-3 assaults and sexual assaults) are in the
-# incidents file; subtotals (assaults against a peace officer, other assaults,
-# sexual violations against children) are in the totals file. Both hold one
-# row per region x year x violation.
-wrps_incidents_raw <- open_dataset(file.path(crime_dir, "criminal_incidents.parquet")) |>
-  filter(region == "WRPS", ucr_code %in% c("1310", "1320", "1330", "1410", "1420", "1430")) |>
-  select(year, ucr_code, incidents, incidents_per_100k) |>
+# Detailed violations (level 1-3 assaults and sexual assaults) are read from
+# the incidents file; subtotals (assaults against a peace officer, other
+# assaults, sexual violations against children) from the totals file. Both
+# hold one row per region x year x violation. Each code is read from one file
+# only: "assaults against a peace officer" (135) is stored in both, and
+# reading it twice would double its rows.
+incidents_raw <- open_dataset(file.path(crime_dir, "criminal_incidents.parquet")) |>
+  filter(
+    region %in% names(regions),
+    ucr_code %in% c("1310", "1320", "1330", "1410", "1420", "1430")
+  ) |>
+  select(year, region, ucr_code, incidents, incidents_per_100k) |>
   collect() |>
   clean_names()
 
-wrps_totals_raw <- open_dataset(file.path(crime_dir, "criminal_incident_totals.parquet")) |>
-  filter(region == "WRPS", ucr_code %in% c("130", "135", "140")) |>
-  select(year, ucr_code, incidents, incidents_per_100k) |>
+totals_raw <- open_dataset(file.path(crime_dir, "criminal_incident_totals.parquet")) |>
+  filter(region %in% names(regions), ucr_code %in% c("130", "135", "140")) |>
+  select(year, region, ucr_code, incidents, incidents_per_100k) |>
   collect() |>
   clean_names()
 
@@ -53,53 +58,59 @@ csi_comparison <- csi_raw |>
   select(year, region, csi, csi_violent) |>
   arrange(region, year)
 
-# ---- Assaults and sexual offences in Waterloo Region, indexed ---------------
-# Short display names for each UCR code, in the Globe and Mail's wording.
+# ---- Assaults and sexual offences: Canada, Ontario and the Region -----------
+# Short display names for each UCR code, in the Globe and Mail's wording,
+# in the order the post shows them.
 violation_names <- c(
-  "1410" = "Aggravated assault",
   "1420" = "Assault with a weapon or causing bodily harm",
-  "1430" = "Assault",
   "135"  = "Assaults against a peace officer",
+  "1410" = "Aggravated assault",
+  "1430" = "Assault",
   "140"  = "Other assaults",
-  "1310" = "Aggravated sexual assault",
+  "130"  = "Sexual violations against children",
   "1320" = "Sexual assault with a weapon or causing bodily harm",
   "1330" = "Sexual assault",
-  "130"  = "Sexual violations against children"
+  "1310" = "Aggravated sexual assault"
 )
 
-# Each rate is turned into an index: 100 in the base year, so 150 means the
-# rate is half as high again as it was then. That lets offences with very
-# different rates share one axis. The base is the first year in the dataset
-# (1998, as in the Globe's charts) except for sexual violations against
-# children, which the Globe bases on 2015 because Criminal Code changes make
-# earlier years incomparable.
-wrps_indexed <- bind_rows(wrps_incidents_raw, wrps_totals_raw) |>
+# The first year each offence is shown from. Sexual violations against
+# children start in 2015, as in the Globe's chart, because Criminal Code
+# changes make earlier years incomparable. Everything else starts with the
+# data, in 1998.
+first_year <- c("130" = 2015)
+
+# Each rate is also turned into an index: 100 in the base year, so 150 means
+# the rate is half as high again as it was then. That puts places with very
+# different rates on one scale. The base is the first year shown, unless a
+# place recorded no incidents that year: an index of zero is a division by
+# zero. Then the base moves to the first year in which all three places
+# recorded some, for all three places alike so their lines stay comparable.
+# (Aggravated sexual assault is the one case: the Region recorded none in
+# 1998 or 1999, so it is indexed to 2000.)
+crime_rates <- bind_rows(incidents_raw, totals_raw) |>
   mutate(
-    offence_group = if_else(ucr_code %in% c("1310", "1320", "1330", "130"), "Sexual offences", "Assaults"),
+    region = recode(region, !!!regions),
     violation = violation_names[ucr_code],
-    base_year = if_else(ucr_code == "130", 2015, min(year))
+    offence_group = if_else(ucr_code %in% c("1310", "1320", "1330", "130"), "Sexual offences", "Assaults"),
+    start_year = coalesce(first_year[ucr_code], min(year))
   ) |>
-  filter(year >= base_year) |>
+  filter(year >= start_year) |>
   group_by(ucr_code) |>
   mutate(
-    base_rate = incidents_per_100k[year == base_year],
-    # an offence with no incidents in its base year has no index (it would be
-    # a division by zero), so it is left blank and the chart leaves it out
-    index = if_else(base_rate > 0, incidents_per_100k / base_rate * 100, NA_real_)
+    base_year = min(year[year %in% year[incidents_per_100k > 0]
+                         & !year %in% year[incidents_per_100k == 0]])
   ) |>
+  group_by(ucr_code, region) |>
+  mutate(index = incidents_per_100k / incidents_per_100k[year == base_year] * 100) |>
   ungroup() |>
-  select(offence_group, year, ucr_code, violation, base_year, incidents, incidents_per_100k, index) |>
-  arrange(offence_group, ucr_code, year)
-
-assaults_indexed <- wrps_indexed |>
-  filter(offence_group == "Assaults") |>
-  select(-offence_group)
-
-sexual_offences_indexed <- wrps_indexed |>
-  filter(offence_group == "Sexual offences") |>
-  select(-offence_group)
+  mutate(
+    ucr_code = factor(ucr_code, levels = names(violation_names)),
+    region = factor(region, levels = unname(regions))
+  ) |>
+  arrange(ucr_code, region, year) |>
+  mutate(across(c(ucr_code, region), as.character)) |>
+  select(offence_group, ucr_code, violation, region, year, incidents, incidents_per_100k, base_year, index)
 
 # ---- Write -----------------------------------------------------------------
 write_csv(csi_comparison, file.path(data_dir, "csi_comparison.csv"))
-write_csv(assaults_indexed, file.path(data_dir, "wrps_assaults_indexed.csv"))
-write_csv(sexual_offences_indexed, file.path(data_dir, "wrps_sexual_offences_indexed.csv"))
+write_csv(crime_rates, file.path(data_dir, "crime_rates.csv"))
