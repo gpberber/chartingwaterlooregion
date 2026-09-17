@@ -2132,8 +2132,6 @@ plot_data |>
 
 From `r latest_year_financials` WRPS Budget Information Package (Windsor is missing; year not noted, but WRPS number is close to my number calculated for 2022 based on 2022 WRPS Annual Report figures)
 
-![](images/clipboard-60580425.png)
-
 ## Crime Severity and Clearance Rates in Waterloo Region
 
 ```{r plot-csi-clearance-wrps, fig.height=10, fig.width=10}
