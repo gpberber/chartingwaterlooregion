@@ -131,7 +131,10 @@ members <- read_csv(
   mutate(work_csd = str_remove_all(classification_code, "[^0-9]")) |>
   select(member_id, work_csd, work = member_name)
 
-flows <- read_csv(
+# Every commute with one end in the Region: the rows for people who live here
+# and the rows for people who work here. Both are wanted, so the file is read
+# once and split below.
+commutes <- read_csv(
   file.path(raw_dir, "table_98100459_region.csv"),
   col_types = cols(.default = col_character())
 ) |>
@@ -142,9 +145,18 @@ flows <- read_csv(
     member_id = str_extract(coordinate, "[0-9]+$"),
     workers = as.numeric(gender_3_total_gender_1)
   ) |>
-  select(home_csd, member_id, workers) |>
+  select(home_csd, home = geo, member_id, workers) |>
   inner_join(members, join_by(member_id)) |>
   filter(workers > 0) |>
+  mutate(
+    home_in_region = str_starts(home_csd, "3530"),
+    work_in_region = str_starts(work_csd, "3530")
+  )
+
+# ---- Where the Region's own commuters go -----------------------------------
+flows <- commutes |>
+  filter(home_in_region) |>
+  select(home_csd, member_id, work_csd, work, workers) |>
   # Each place's share of the home municipality's workers. The table has no
   # total row, so the denominator is the sum over every place of work. The
   # census rounds each count to a multiple of 5, so a share of a small place
@@ -161,6 +173,23 @@ flows <- read_csv(
   ) |>
   select(home_csd, home, work_csd, work, in_region, top_outside, workers, percent) |>
   arrange(home, desc(workers))
+
+# ---- Where the people who work here come from ------------------------------
+# The other direction: people who live outside the Region and work in one of
+# its seven municipalities. The place they live in is named by the table's own
+# GEO column rather than by the tribble above, which only covers the Region;
+# the census names a municipality without saying what kind it is, so two places
+# in Ontario can share a name, and the code is kept beside the name for anyone
+# who needs to tell them apart.
+inbound <- commutes |>
+  filter(work_in_region, !home_in_region) |>
+  select(home_csd, home, work_csd, workers) |>
+  inner_join(municipalities |> select(work_csd = geo_uid, work = district),
+             join_by(work_csd)) |>
+  # Each place's share of everyone who commutes into the Region
+  mutate(percent = workers / sum(workers) * 100) |>
+  select(home_csd, home, work_csd, work, workers, percent) |>
+  arrange(desc(workers))
 
 # ---- Map shapes and points ------------------------------------------------
 # The boundary file from 01_get_data.R holds the Region's seven municipalities
@@ -197,8 +226,10 @@ region_shapes <- boundaries |>
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
 write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
+write_csv(inbound, file.path(data_dir, "commuting_inbound.csv"))
 write_csv(places, file.path(data_dir, "flow_places.csv"))
 write_sf(region_shapes, file.path(data_dir, "region_shapes.geojson"), delete_dsn = TRUE)
 
 message("Wrote ", nrow(commuting), " commuting rows, ", nrow(commuting_mode),
-        " mode rows, ", nrow(flows), " flows and ", nrow(places), " places to ", data_dir)
+        " mode rows, ", nrow(flows), " flows, ", nrow(inbound),
+        " inbound flows and ", nrow(places), " places to ", data_dir)

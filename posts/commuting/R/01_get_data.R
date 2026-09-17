@@ -39,8 +39,8 @@ get_cansim("98-10-0462") |>
 # 292 MB zipped, 2.2 GB unzipped - almost all of them zero. It is downloaded to
 # a folder in the computer's temporary directory rather than to data-raw/,
 # which sits in OneDrive and would otherwise sync a file that is only needed
-# while this script runs, and only the rows for people who live in Waterloo
-# Region are kept. tempdir() is a fresh folder every time R starts, so its
+# while this script runs, and only the rows with one end of the commute in
+# Waterloo Region are kept. tempdir() is a fresh folder every time R starts, so its
 # parent is used instead: that way a second run finds the file already there.
 download_dir <- file.path(dirname(tempdir()), "cwr_downloads")
 dir.create(download_dir, showWarnings = FALSE)
@@ -55,43 +55,58 @@ if (!file.exists(flows_zip)) {
   )
 }
 
-# read_csv_chunked() reads the file a million rows at a time and keeps only the
-# rows the callback lets through, so the whole table never has to fit in
-# memory. unz() reads the one file wanted straight out of the zip.
-#
-# Place of residence is in DGUID, the "dissemination geography unique
-# identifier": a prefix saying which geography scheme it is ("2021A0005" means
-# a 2021 census subdivision) followed by the census subdivision code. Waterloo
-# Region's seven all start 3530.
-#
-# Place of work arrives as a name ("Guelph (CY), Ont.") rather than a code. Its
-# code is recovered in 02_clean_data.R from the second number in `Coordinate`,
-# which is the place of work's member id in the metadata file saved below.
-read_csv_chunked(
-  unz(flows_zip, "98100459.csv"),
-  callback = DataFrameCallback$new(
-    \(chunk, pos) filter(chunk, str_starts(DGUID, "2021A00053530"))
-  ),
-  chunk_size = 1e6,
-  col_types = cols(.default = col_character())
-) |>
-  write_csv(file.path(raw_dir, "table_98100459_region.csv"))
-
 # The metadata file, which travels in the same zip, lists every place in both
 # dimensions with a member id and - for places of residence - the census
 # subdivision code. The two dimensions list the same 5,161 places with the same
-# member ids, so this is what turns a place-of-work member id into a code. The
-# file stacks several tables of different widths one after another, separated
-# by blank lines, so the one wanted is cut out as lines before it is parsed.
+# member ids, so this is what turns a place-of-work member id into a code, and
+# what says which member ids are the Region's seven municipalities. The file
+# stacks several tables of different widths one after another, separated by
+# blank lines, so the one wanted is cut out as lines before it is parsed.
 metadata_lines <- read_lines(unz(flows_zip, "98100459_MetaData.csv"))
 members_start <- str_which(metadata_lines, "^\"Dimension ID\",\"Member Name\"")
 members_end <- members_start +
   str_which(metadata_lines[-seq_len(members_start)], "^$")[1] - 1
 
-metadata_lines[members_start:members_end] |>
+members <- metadata_lines[members_start:members_end] |>
   I() |>
-  read_csv(col_types = cols(.default = col_character())) |>
-  write_csv(file.path(raw_dir, "table_98100459_members.csv"))
+  read_csv(col_types = cols(.default = col_character()))
+
+write_csv(members, file.path(raw_dir, "table_98100459_members.csv"))
+
+# The seven municipalities' member ids. Every census subdivision code begins
+# with its census division code, and Waterloo Region is division 3530.
+region_members <- members |>
+  filter(`Dimension ID` == "1", str_starts(str_remove_all(`Classification Code`, "[^0-9]"), "3530")) |>
+  pull(`Member ID`)
+
+# read_csv_chunked() reads the file a million rows at a time and keeps only the
+# rows the callback lets through, so the whole table never has to fit in
+# memory. unz() reads the one file wanted straight out of the zip.
+#
+# Both directions are kept: the rows where somebody lives in the Region, and
+# the rows where somebody works in it. The post needs both - where the Region's
+# own commuters go, and where the people who work here come from - and one pass
+# over 26 million rows is enough for both.
+#
+# Place of residence is in DGUID, the "dissemination geography unique
+# identifier": a prefix saying which geography scheme it is ("2021A0005" means
+# a 2021 census subdivision) followed by the census subdivision code.
+#
+# Place of work arrives as a name ("Guelph (CY), Ont.") rather than a code, so
+# it is picked out by member id instead: `Coordinate` is "residence.work", and
+# the number after the dot is the place of work's member id.
+read_csv_chunked(
+  unz(flows_zip, "98100459.csv"),
+  callback = DataFrameCallback$new(\(chunk, pos) {
+    filter(
+      chunk,
+      str_starts(DGUID, "2021A00053530") | str_extract(Coordinate, "[0-9]+$") %in% region_members
+    )
+  }),
+  chunk_size = 1e6,
+  col_types = cols(.default = col_character())
+) |>
+  write_csv(file.path(raw_dir, "table_98100459_region.csv"))
 
 # ---- Municipal boundaries --------------------------------------------------
 # Statistics Canada's 2021 census subdivision cartographic boundary file, the
@@ -112,24 +127,20 @@ if (!file.exists(boundary_zip)) {
 boundary_dir <- file.path(download_dir, "csd_boundaries")
 unzip(boundary_zip, exdir = boundary_dir)
 
-# Every workplace code that appears in the flows, read back from the two files
-# just written. The member ids of the flows' places of work are matched to
-# codes the same way 02_clean_data.R does it.
+# Every place of work the Region's own commuters travel to, read back from the
+# file just written. Its member ids are matched to codes the same way
+# 02_clean_data.R does it.
 work_codes <- read_csv(
   file.path(raw_dir, "table_98100459_region.csv"),
   col_types = cols(.default = col_character())
 ) |>
-  # The table lists every place of work, including the thousands nobody from
-  # the Region travels to; only those with at least one worker are wanted
-  filter(`Gender (3):Total - Gender[1]` != "0") |>
+  # Only the rows for people who live here, and only the places at least one of
+  # them travels to: the table lists every place of work, including thousands
+  # nobody goes to
+  filter(str_starts(DGUID, "2021A00053530"), `Gender (3):Total - Gender[1]` != "0") |>
   mutate(member_id = str_extract(Coordinate, "[0-9]+$")) |>
   distinct(member_id) |>
-  inner_join(
-    read_csv(file.path(raw_dir, "table_98100459_members.csv"),
-             col_types = cols(.default = col_character())) |>
-      filter(`Dimension ID` == "1"),
-    join_by(member_id == `Member ID`)
-  ) |>
+  inner_join(members |> filter(`Dimension ID` == "1"), join_by(member_id == `Member ID`)) |>
   # The code is published in square brackets, "[3523008]"; keep the digits
   mutate(code = str_remove_all(`Classification Code`, "[^0-9]")) |>
   pull(code)
