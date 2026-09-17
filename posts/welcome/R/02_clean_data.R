@@ -236,13 +236,15 @@ income <- household_income |>
   # both, so the two files cannot disagree about what a place is called. The
   # eighth row has no match there: it is the census division, and Statistics
   # Canada calls it "Waterloo", the same name as the city inside it. It is
-  # named here so a reader of the chart is never in doubt which is which.
+  # named "Region", the house label for Waterloo Region in chart text
+  # (cwr_region in R/theme_cwr.R, which this script does not load), so a
+  # reader of the chart is never in doubt which is which.
   left_join(
     districts |> st_drop_geometry() |> select(csduid, district, district_type),
     join_by(geo_uid == csduid)
   ) |>
   mutate(
-    district = coalesce(district, "Waterloo Region"),
+    district = coalesce(district, "Region"),
     district_type = coalesce(district_type, "Region"),
     # Both years are kept. The 2020 figures are what Statistics Canada
     # published and are what anyone checking this against the census will see;

@@ -18,12 +18,15 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `dodgerblue`, `habsred`, `cowboysilver`, `ontgreen` | base colours (focus, contrast, context, Ontario) |
 | `*50` tints, `cowboysilver30`, `cowboysilver_alpha30` | lighter versions for secondary series and backgrounds |
 | `manual_2_colours` ... `manual_5_colours` | ordered palettes; map to groups with `set_names()` |
-| `comp_colours`, `local_colours` | named palettes for recurring comparisons |
+| `cwr_region` (`"Region"`) | the stock label for Waterloo Region in all chart text (rule 2a) |
+| `comp_colours`, `local_colours` | named palettes for recurring comparisons, keyed by `cwr_region` for the Region |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
+| `cwr_line_labels(data, x, y, group, at, side, bold)` | label positions that sit just above or below each line (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `cwr_interactive(p, "fig-id", alt, height, phone_height)` | the same for a hover chart (ggiraph); chunk without `output: asis`; numbered in Deep dives like `cwr_figure()` |
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
 
@@ -91,14 +94,29 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    qualification belongs on the chart all the same, because a chart travels without the post:
    `cma = TRUE` makes it note 1, in wording that is identical across every post and fixable in
    one place. Never type the geography into `notes` by hand.
-2. **Colour has meaning.** Blue = Waterloo Region / the focus. Red = the main comparison
+2. **Colour has meaning.** Blue = the Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
+2a. **Waterloo Region is "Region" in chart text - always `cwr_region`.** Axis and category
+   labels, legend keys, direct labels, tooltips and caption notes all say "Region", never
+   "Waterloo Region" or "Waterloo" (which is also a city). Write `cwr_region` rather than the
+   word, so a chart cannot drift back. A post's cleaning script does not load `theme_cwr.R`, so
+   it types "Region" with a comment pointing at `cwr_region`; a source that says "WRPS",
+   "Waterloo (CD)" or "Kitchener - Cambridge - Waterloo" is recoded to it there. Titles,
+   subtitles and prose are Greg's and may use the full name; alt text may too, for clarity.
 3. **Direct labels beat legends.** Label line ends, bar ends, or points; then
    `guide = "none"`. Use a legend only when labels would collide.
+3a. **Line labels come from `cwr_line_labels()`, never typed coordinates.** A hand-typed
+   (x, y) drifts off its line (Greg caught labels floating well away from their lines in the
+   first globe-csi chart). Give each group an `at` (the x it is centred on, where its line has
+   clear space) and a `side` (`"above"`/`"below"`); the helper takes the height from the line
+   itself across `span` x units, so the label sits just clear of it at any data revision. Use
+   `aes(vjust = vjust)` and `hjust = 0.5` in the `geom_label()`. Choose `at` so nothing else
+   runs through the label's box - the helper checks only its own line - and check the phone
+   version, where the label covers about twice as many x units.
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).
-5. **Bold the focus row** with the `y_label` trick (`**Waterloo Region**` via `element_markdown`).
+5. **Bold the focus row** with the `y_label` trick (`**Region**`, from `cwr_region`, via `element_markdown`).
 6. **Value axis on the right** for vertical charts, labels sitting above gridlines
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the
    x axis on top.

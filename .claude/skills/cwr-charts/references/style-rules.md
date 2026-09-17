@@ -22,7 +22,10 @@ the same call in a situation the templates do not cover.
 
 ## Colour
 
-- `dodgerblue` (#104E8B) = the focus: Waterloo Region, WRPS, Kitchener.
+- `dodgerblue` (#104E8B) = the focus: the Region, WRPS, Kitchener.
+- **The Region's label is `cwr_region` ("Region")** in every piece of chart text - axes,
+  legends, direct labels, tooltips, notes. The whole site is about Waterloo Region, so the
+  long name only costs width, and "Waterloo" alone is ambiguous with the city.
 - `habsred` (#AF1E2D) = the main comparison (Canada) or the single highlighted item.
 - `cowboysilver` (#869397) = context: other cities, "everyone else", background bars.
 - `ontgreen` = Ontario when it needs to be distinct from Canada.

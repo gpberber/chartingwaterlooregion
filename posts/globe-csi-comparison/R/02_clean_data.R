@@ -19,8 +19,10 @@ data_dir <- here("posts", "globe-csi-comparison", "data")
 dir.create(data_dir, showWarnings = FALSE)
 
 # The three places compared. The dataset calls Waterloo Region's police
-# service "WRPS"; the charts call it Waterloo Region.
-regions <- c("Canada" = "Canada", "Ontario" = "Ontario", "WRPS" = "Waterloo Region")
+# service "WRPS"; the charts call it "Region", the house label for Waterloo
+# Region in chart text (cwr_region in R/theme_cwr.R, which this script does
+# not load).
+regions <- c("Canada" = "Canada", "Ontario" = "Ontario", "WRPS" = "Region")
 
 # ---- Read (clean_names() right after every read) ---------------------------
 csi_raw <- read_rds(file.path(crime_dir, "crime_severity_index.rds")) |>

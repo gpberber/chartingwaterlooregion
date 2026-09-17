@@ -48,7 +48,7 @@ number_options(big.mark = "")
 # ---- 2. House colours ----------------------------------------------------
 # Three base colours, each with a 50 % tint (mixed with white). Use them with
 # consistent meaning across posts so readers learn the code:
-#   dodgerblue   = the focus (Waterloo Region, WRPS, Kitchener)
+#   dodgerblue   = the focus (the Region - see cwr_region below - WRPS, Kitchener)
 #   habsred      = the main comparison (Canada) or a highlight
 #   cowboysilver = context (other cities, national averages, background bars)
 #   ontgreen     = Ontario, when it needs its own colour
@@ -70,19 +70,27 @@ manual_4_colours <- c(habsred, habsred50, dodgerblue50, dodgerblue)
 manual_3_colours <- c(habsred, cowboysilver, dodgerblue)
 manual_2_colours <- c(cowboysilver, dodgerblue)
 
-# Named palettes for the comparisons that recur across posts.
-comp_colours <- c(
-  "Waterloo Region" = dodgerblue,
-  "Canada"          = habsred,
-  "Ontario"         = ontgreen,
-  "Other cities"    = cowboysilver50
+# The stock label for Waterloo Region as a whole in chart text: axis and
+# category labels, legend keys, direct labels, tooltips and caption notes. The
+# whole site is about Waterloo Region, so "Region" is enough on a chart and
+# leaves room for the data; the capital R keeps it distinct from the region
+# of an ordinary sentence and from the City of Waterloo. Use the object, not
+# the typed word, so a chart cannot drift back to the long name. Titles and
+# subtitles are the author's prose and are not bound by it. (A post's
+# data-cleaning script, which does not load this file, types "Region" and
+# says why in a comment.)
+cwr_region <- "Region"
+
+# Named palettes for the comparisons that recur across posts. The Region's
+# entry is named by cwr_region, so data labelled with it matches.
+comp_colours <- set_names(
+  c(dodgerblue, habsred, ontgreen, cowboysilver50),
+  c(cwr_region, "Canada", "Ontario", "Other cities")
 )
 
-local_colours <- c(
-  "Waterloo Region" = dodgerblue,
-  "Guelph"          = dodgerblue50,
-  "London"          = cowboysilver,
-  "Hamilton"        = habsred
+local_colours <- set_names(
+  c(dodgerblue, dodgerblue50, cowboysilver, habsred),
+  c(cwr_region, "Guelph", "London", "Hamilton")
 )
 
 # ---- 3. Font -------------------------------------------------------------
@@ -248,7 +256,7 @@ base_size <- 15
 # Written down once rather than typed per chart so every post says the same
 # thing, and so one edit fixes them all if the boundaries are redrawn - CMA
 # definitions are revisited at every census.
-cwr_cma_note <- "Waterloo Region excluding Wellesley Township"
+cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
 
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
@@ -292,7 +300,7 @@ cwr_cma_note <- "Waterloo Region excluding Wellesley Township"
 #   cwr_caption(
 #     "Statistics Canada Table 14-10-0468-01",
 #     credit = TRUE,
-#     notes = c("Waterloo Region excl. Wellesley Township",
+#     notes = c("Figures for 2020 are estimates",
 #               "Two industries suppressed by Statistics Canada")
 #   )
 cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE) {
@@ -335,6 +343,76 @@ cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE) {
 #   scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))
 cwr_wrap <- function(x, width = 22) {
   str_replace_all(str_wrap(x, width = width), "\n", "<br>")
+}
+
+# Place line-chart labels against their own lines.
+#
+# A label typed at a hand-picked (x, y) drifts away from its line: the eye
+# guesses the height, the data are revised, and the phone version draws the
+# same label twice as wide relative to the chart. This helper takes the
+# height from the data instead. For each group, `at` gives the x where the
+# label is centred - a stretch where that line has clear space - and `side`
+# says whether it sits just above or just below the line there. The label is
+# placed against the highest (above) or lowest (below) point the line
+# reaches across `span` x units around `at`, so a line that slopes under the
+# label does not cut through it. geom_label()'s own padding already leaves a
+# sliver of air, so `gap` (extra space, as a share of the y range) is 0 unless
+# a chart needs more. `span` should be about the label's width on the phone
+# version, which is the wider of the two in x units: 3 suits a short name
+# over 25 to 30 years. Because the label clears the line's extreme across the
+# whole span, choose an `at` where the line is fairly flat: over a steep or
+# jagged stretch the label clears the far end and floats off the near one.
+#
+# Returns one row per label with x, y, label, vjust and fontface, for the
+# templates' geom_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
+# Groups named in `bold` are set in bold (the focus, usually cwr_region).
+# x must be numeric (years); for a date axis pass as.numeric(date) and `at`
+# as numbers too. For a faceted chart, add the facet column to the result
+# with mutate() so each label stays in its panel.
+#
+#   label_data <- cwr_line_labels(
+#     plot_data, x = year, y = csi, group = region,
+#     at = c(Canada = 2004, Ontario = 2014, Region = 2001.5),
+#     side = c(Canada = "above", Ontario = "below", Region = "below"),
+#     bold = cwr_region
+#   )
+cwr_line_labels <- function(data, x, y, group, at, side = "above",
+                            bold = NULL, span = 3, gap = 0) {
+  lines <- data |>
+    select(x = {{ x }}, y = {{ y }}, group = {{ group }}) |>
+    mutate(x = as.numeric(x), group = as.character(group)) |>
+    filter(!is.na(y))
+
+  # One side for every label, or one per group
+  if (is.null(names(side))) side <- set_names(rep(side, length(at)), names(at))
+  stopifnot(
+    !is.null(names(at)),
+    all(names(at) %in% lines$group),
+    all(names(at) %in% names(side)),
+    all(side %in% c("above", "below"))
+  )
+
+  y_gap <- gap * diff(range(lines$y))
+
+  map(names(at), function(g) {
+    line <- lines |> filter(group == g) |> arrange(x)
+    window <- at[[g]] + c(-span, span) / 2
+    # The line's height across the label's width: every point inside the
+    # window, plus where the line crosses its two edges.
+    heights <- c(
+      line |> filter(between(x, window[1], window[2])) |> pull(y),
+      approx(line$x, line$y, xout = window, rule = 2)$y
+    )
+    above <- side[[g]] == "above"
+    tibble(
+      x = at[[g]],
+      y = if (above) max(heights) + y_gap else min(heights) - y_gap,
+      label = g,
+      vjust = if (above) 0 else 1,
+      fontface = if (g %in% bold) "bold" else "plain"
+    )
+  }) |>
+    list_rbind()
 }
 
 # ggplot2 text sizes for geom_text/geom_label are in mm, not points.

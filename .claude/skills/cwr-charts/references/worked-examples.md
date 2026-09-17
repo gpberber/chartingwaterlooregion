@@ -4,12 +4,16 @@ Finished charts from the crime post, exactly as written with the templates. Use 
 ground truth for how a template looks once placeholders are filled and positions tuned.
 Data objects (`incident_summary`, `big_12`, `csi`, ...) are that post's cleaned tables.
 
-## Line chart: Waterloo Region vs Canada vs Ontario (ggline + comp_colours)
+## Line chart: the Region vs Canada vs Ontario (ggline + comp_colours)
+
+`comp_colours` is keyed by `cwr_region` ("Region"), so the data's "WRPS" is recoded to it.
+Direct labels would now come from `cwr_line_labels()` (see lines.md) rather than a legend.
 
 ```r
 # ggline
 plot_data <- incident_summary |>
-  filter(str_detect(region, "WRPS|Canada|Ontario"))
+  filter(str_detect(region, "WRPS|Canada|Ontario")) |>
+  mutate(region = if_else(region == "WRPS", cwr_region, region))
 
 # Set x min and max
 x_min <- plot_data |> pull(year) |> min()

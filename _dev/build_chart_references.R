@@ -59,7 +59,7 @@ catalogue <- tribble(
   "lollipops",       "gglollipop",         "Lollipop (segment + dot) for ranked values with an x axis on top.",
   "lollipops",       "gglollipoplabel",    "Lollipop with direct value labels replacing the x axis entirely.",
   "lollipops",       "gglollipoprect",     "Lollipop plus a boxed value column on the right with a shaded header.",
-  "lines",           "ggline",             "Multi-series line chart, colours by group, labels placed manually once positions are known.",
+  "lines",           "ggline",             "Multi-series line chart, colours by group, line labels placed against each line by cwr_line_labels().",
   "lines",           "ggarea",             "Stacked area chart by group.",
   "lines",           "ggribbon",           "Two lines with a shaded band between them (min/max, range, confidence).",
   "lines",           "ggslope",            "Slope chart: two time points, one line per group, points masked at the ends.",
@@ -107,7 +107,7 @@ file_titles <- c(
 file_intros <- c(
   bars = "Use when each category has one value (or two to compare). Horizontal bars when category labels are long or there are more than ~6 categories. Bold the focus row with the y_label trick.",
   lollipops = "Use instead of bars when there are many categories or values are close together; the thin segment is easier to compare. Always ranked (reorder()).",
-  lines = "Use for change over time. Colour by group with manual_n_colours, drop the legend and place labels by hand at the line ends once positions are known.",
+  lines = "Use for change over time. Colour by group with manual_n_colours, drop the legend and label the lines with cwr_line_labels(), which sets each label's height from its own line. The Region is always labelled cwr_region ('Region').",
   comparisons = "Use when the story is the gap or the change between two values per category (before/after, us/them).",
   points = "Use when the story is the relationship between two measures. Label points by hand with nudge values after the first render.",
   heatmaps = "Use for a category x time grid where the pattern matters more than exact values (ranks across years, rates across places).",

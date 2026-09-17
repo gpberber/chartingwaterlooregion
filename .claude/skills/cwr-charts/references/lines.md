@@ -1,6 +1,6 @@
 # Line, area, ribbon and slope charts
 
-Use for change over time. Colour by group with manual_n_colours, drop the legend and place labels by hand at the line ends once positions are known.
+Use for change over time. Colour by group with manual_n_colours, drop the legend and label the lines with cwr_line_labels(), which sets each label's height from its own line. The Region is always labelled cwr_region ('Region').
 
 All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provides the colours
 (`dodgerblue`, `habsred`, `cowboysilver`, tints, `manual_n_colours`), `theme_cwr()` as the default theme,
@@ -8,7 +8,7 @@ All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provid
 
 ## ggline
 
-Multi-series line chart, colours by group, labels placed manually once positions are known.
+Multi-series line chart, colours by group, line labels placed against each line by cwr_line_labels().
 
 ```r
 # fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
@@ -48,16 +48,17 @@ x_max = plot_data |> pull(<x_variable>) |> max()
 group_colours <- set_names(manual_5_colours, renamed_groups)  # replace manual_5_colours if need fewer/custom colours
 
 
-# Create explicit label positions - manually positioned to avoid overlaps - uncomment once values known
-#label_data <- tibble(
-#  	x = c(x_group1, x_group2, x_group3, x_group4, x_group5),
-#  	y = c(y_group1, y_group2, y_group3, y_group4, y_group5),
-#  	label = renamed_groups,
-#		fontface = c("plain", "plain", "plain", "plain", "plain"),	 # set desired to "bold"
-## 	If want label scoped to one facet panel (facet_level), uncomment and edit spec below
-## 	Note facet_var must be a factor with the same levels as in plot_data (need to factor it in plot_data if not already done)
-## 	facet_var = factor("facet_level", levels = levels(<plot_data>$facet_var))
+# Line-name labels - uncomment once the chart has been drawn and you know where each line has clear space.
+# cwr_line_labels() sets each label's height from its own line, so it always sits just above or below it:
+# `at` = the x each label is centred on, `side` = "above" or "below" the line there.
+#label_data <- cwr_line_labels(
+#	plot_data, x = <x_variable>, y = <y_variable>, group = <colour_variable>,
+#	at = set_names(c(x_group1, x_group2, x_group3, x_group4, x_group5), renamed_groups),
+#	side = set_names(c("above", "above", "above", "below", "below"), renamed_groups),
+#	bold = cwr_region	# the focus group: the Region is always labelled cwr_region ("Region")
 #)
+## 	For a faceted chart, keep each label in its panel by adding the facet column, e.g.
+## 	label_data <- label_data |> mutate(facet_var = factor("facet_level", levels = levels(plot_data$facet_var)))
 
 ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_variable>)) +
 
@@ -68,14 +69,14 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_varia
 	#    x = x,
 	#    y = y,
 	#    label = label,
-	#    fontface = fontface
+	#    fontface = fontface,
+	#    vjust = vjust    # set by cwr_line_labels(): 0 above the line, 1 below
 	#  ),
 	#  colour = "grey30",
 	#  fill = "white", 
 	#  linewidth = 0,
 	#  size = 3.2,
-	#  hjust = 0,       # 0 left, 1 right, 0.5 centered
-	#  vjust = 0,	    # 0 bottom, 1 top, 0.5 centered
+	#  hjust = 0.5,     # centred on the x given in `at`
 	#  inherit.aes = FALSE
 	#) +
 

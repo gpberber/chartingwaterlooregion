@@ -33,7 +33,7 @@ library(ggiraph)   # interactive layers (geom_point_interactive) for cwr_interac
 # example <- read_csv(here("posts", "globe-csi-comparison", "data", "example.csv"))
 
 # Crime Severity Index and violent CSI, 1998 on, for Canada, Ontario and
-# Waterloo Region. One row per region per year.
+# Waterloo Region (labelled "Region", cwr_region). One row per place per year.
 csi_comparison <- read_csv(
   here("posts", "globe-csi-comparison", "data", "csi_comparison.csv"),
   show_col_types = FALSE
@@ -65,8 +65,9 @@ sexual_offences_indexed <- read_csv(
 # Interactive: hovering near a line shows the place, year and index value.
 
 # Colours carry the house meanings: Waterloo Region is the focus (blue), Canada
-# the main comparison (red), Ontario context (grey).
-csi_groups <- c("Canada", "Ontario", "Waterloo Region")
+# the main comparison (red), Ontario context (grey). The Region is labelled
+# with the house stock label, cwr_region ("Region").
+csi_groups <- c("Canada", "Ontario", cwr_region)
 csi_colours <- set_names(c(habsred, cowboysilver, dodgerblue), csi_groups)
 
 # The tooltip text is built once per row, here, rather than in the ggplot call.
@@ -84,25 +85,26 @@ csi_plot_data <- csi_comparison |>
 x_min <- csi_plot_data |> pull(year) |> min()
 x_max <- csi_plot_data |> pull(year) |> max()
 
-# Line-name labels, placed by hand where each line has clear space.
-label_data <- tibble(
-  x = c(2003.5, 2019.5, 1998.3),
-  y = c(110, 47.5, 70),
-  label = csi_groups,
-  fontface = c("plain", "plain", "bold")
+# Line-name labels. cwr_line_labels() sets each one's height from its own
+# line: `at` is the year it is centred on, where that line has clear space,
+# and `side` puts it just above or below the line there.
+label_data <- cwr_line_labels(
+  csi_plot_data, x = year, y = csi, group = region,
+  at = set_names(c(2004, 2014, 2002), csi_groups),
+  side = set_names(c("above", "below", "below"), csi_groups),
+  bold = cwr_region
 )
 
 p <- ggplot(csi_plot_data, aes(x = year, y = csi, colour = region)) +
 
   geom_label(
     data = label_data,
-    aes(x = x, y = y, label = label, fontface = fontface),
+    aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
     colour = "grey30",
     fill = "white",
     linewidth = 0,
     size = 3.2,
-    hjust = 0,
-    vjust = 0,
+    hjust = 0.5,     # centred on the year given in `at`
     inherit.aes = FALSE
   ) +
 
@@ -180,24 +182,23 @@ cwr_interactive(
 # Index for Canada) with Ontario and Waterloo Region added. Same data, colours
 # and hover design as the chart above; only the measure changes.
 
-label_data <- tibble(
-  x = c(2012.4, 1999.8, 2000.3),
-  y = c(83.5, 75.5, 46.5),
-  label = csi_groups,
-  fontface = c("plain", "plain", "bold")
+label_data <- cwr_line_labels(
+  csi_plot_data, x = year, y = csi_violent, group = region,
+  at = set_names(c(2003, 2001.5, 2002), csi_groups),
+  side = set_names(c("above", "above", "below"), csi_groups),
+  bold = cwr_region
 )
 
 p <- ggplot(csi_plot_data, aes(x = year, y = csi_violent, colour = region)) +
 
   geom_label(
     data = label_data,
-    aes(x = x, y = y, label = label, fontface = fontface),
+    aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
     colour = "grey30",
     fill = "white",
     linewidth = 0,
     size = 3.2,
-    hjust = 0,
-    vjust = 0,
+    hjust = 0.5,     # centred on the year given in `at`
     inherit.aes = FALSE
   ) +
 
@@ -412,7 +413,7 @@ sexual_omitted <- sexual_offences_indexed |>
 sexual_notes <- if (nrow(sexual_omitted) > 0) {
   str_glue(
     "{str_flatten_comma(sexual_omitted$violation, ' and ')} not shown: ",
-    "Waterloo Region recorded none in {str_flatten_comma(unique(sexual_omitted$base_year))}, so there is no base to index to"
+    "the {cwr_region} recorded none in {str_flatten_comma(unique(sexual_omitted$base_year))}, so there is no base to index to"
   )
 }
 

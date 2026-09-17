@@ -46,6 +46,9 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. Figure
   numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get
   no label. Captions are optional and usually omitted. Tables are gt only.
+- Chart text calls Waterloo Region "Region": use `cwr_region` for every axis, legend, direct
+  label, tooltip and note (cleaning scripts type "Region"). Line labels are positioned with
+  `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every
