@@ -1,6 +1,6 @@
 ---
-title: "Title: to be written"
-description: "One sentence for the listing card: the question and the answer."
+title: "Long-term crime trends in Waterloo Region"
+description: "A long look back at crime in the Region."
 date: "2026-09-17"
 categories: [Snapshot, Crime, Policing]
 image: images/thumbnail.png
