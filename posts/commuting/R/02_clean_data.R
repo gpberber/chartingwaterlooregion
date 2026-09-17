@@ -73,7 +73,40 @@ commuting <- commuting_raw |>
   select(district, district_type, destination, workers, percent) |>
   arrange(district, destination)
 
+# ---- Main mode of commuting ------------------------------------------------
+# The same table, cut the other way: destination held at its total and mode of
+# travel let through. Only three of the modes are kept, the three the chart
+# shows. They are each other's siblings or cousins in Statistics Canada's
+# hierarchy ("Public transit" and "Active transportation" sit under
+# "Sustainable transportation"), so none of the three double-counts another;
+# the "Other method" group is left out, so they do not add to 100.
+modes <- c("Car, truck or van", "Public transit", "Active transportation")
+
+commuting_mode <- read_csv(
+  file.path(raw_dir, "table_98100462.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    str_starts(age_15a, "Total"),
+    str_starts(gender_3, "Total"),
+    str_starts(commuting_destination_5, "Total"),
+    statistics_3 == "Count"
+  ) |>
+  # Each mode's share of all commuters in the municipality. The total row is
+  # picked out as the denominator before the other modes are dropped.
+  mutate(
+    percent = value / value[str_starts(main_mode_of_commuting_11a, "Total")] * 100,
+    .by = geo_uid
+  ) |>
+  filter(main_mode_of_commuting_11a %in% modes) |>
+  inner_join(municipalities, join_by(geo_uid)) |>
+  select(district, district_type, mode = main_mode_of_commuting_11a, workers = value, percent) |>
+  arrange(district, mode)
+
 # ---- Write -----------------------------------------------------------------
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
+write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
 
-message("Wrote ", nrow(commuting), " commuting rows to ", data_dir)
+message("Wrote ", nrow(commuting), " commuting rows and ", nrow(commuting_mode),
+        " mode rows to ", data_dir)

@@ -1,0 +1,22 @@
+district,district_type,mode,workers,percent
+Cambridge,City,Active transportation,1290,2.910978224077626
+Cambridge,City,"Car, truck or van",40780,92.02301703712061
+Cambridge,City,Public transit,1510,3.407424122757531
+Kitchener,City,Active transportation,3230,4.249720413130715
+Kitchener,City,"Car, truck or van",66715,87.77711992632064
+Kitchener,City,Public transit,4535,5.966712716268666
+North Dumfries,Township,Active transportation,155,4.447632711621234
+North Dumfries,Township,"Car, truck or van",3260,93.54375896700144
+North Dumfries,Township,Public transit,15,0.430416068866571
+Waterloo,City,Active transportation,2215,7.366145660126372
+Waterloo,City,"Car, truck or van",25035,83.25573661456602
+Waterloo,City,Public transit,1960,6.518124376454939
+Wellesley,Township,Active transportation,405,13.846153846153847
+Wellesley,Township,"Car, truck or van",2390,81.7094017094017
+Wellesley,Township,Public transit,0,0
+Wilmot,Township,Active transportation,300,4.6875
+Wilmot,Township,"Car, truck or van",5960,93.125
+Wilmot,Township,Public transit,40,0.625
+Woolwich,Township,Active transportation,605,7.223880597014926
+Woolwich,Township,"Car, truck or van",7560,90.26865671641791
+Woolwich,Township,Public transit,30,0.3582089552238806

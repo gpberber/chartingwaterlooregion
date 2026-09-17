@@ -152,6 +152,128 @@ cwr_figure(
 ```
 
 ```{r}
+#| label: commuting-mode
+#| output: asis
+
+# How people get to work, one panel per mode. Each panel has its own x scale,
+# so the transit and active bars stretch to fill their panels and the
+# differences between places are visible, rather than being dwarfed by the car
+# bars. The cost is that bar lengths cannot be compared across panels; the
+# labels carry that. (A shared scale - drop scales = "free_x" - keeps it.)
+commuting_mode <- read_csv(
+  here("posts", "commuting", "data", "commuting_mode.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# Roughly how many characters of label fit across one panel of a three-panel
+# chart at this font size. Read off a render.
+panel_chars_three <- 28
+
+mode_bars <- commuting_mode |>
+  mutate(
+    # The panel headings, in Statistics Canada's wording and in the order the
+    # panels are drawn. "Active transportation" carries the key to note 2. Panel
+    # headings are plain text, not ggtext, so <sup>2</sup> would print as
+    # written; the Unicode superscript character is used instead.
+    mode = factor(
+      mode,
+      levels = c("Car, truck or van", "Public transit", "Active transportation"),
+      labels = c("Car, truck or van", "Public transit", "Active transportation²")
+    ),
+    # One order for all three panels, set on the first, so a place sits on the
+    # same row in each and can be read straight across. fct_reorder() sorts
+    # ascending and the first level is drawn at the bottom, so the most
+    # car-dependent municipality ends up on top.
+    district = fct_reorder(
+      district,
+      if_else(mode == "Car, truck or van", percent, 0),
+      .fun = max
+    ),
+    # One decimal place: the transit and active shares are small enough that
+    # whole numbers would round several of them to the same value, or to 0
+    label = label_number(accuracy = 0.1, suffix = "%")(percent)
+  ) |>
+  # Whether a label fits inside its bar, asked panel by panel because each
+  # panel has its own scale: the longest bar in the panel sets it, and the axis
+  # runs to about 1.2 times that.
+  mutate(
+    inside = percent >= (nchar(label) + 1.5) * (max(percent) * 1.2 / panel_chars_three),
+    .by = mode
+  )
+
+p <- ggplot(mode_bars, aes(x = percent, y = district)) +
+  # One colour for every bar: the panels already say which mode is which, and
+  # the cities and townships are not being compared here.
+  geom_col(width = 0.7, fill = dodgerblue) +
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = if_else(inside, "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  scale_colour_identity() +
+  # Room on the right for any label that sits outside its bar
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  facet_wrap(vars(mode), nrow = 1, scales = "free_x") +
+  # Stops a label that overhangs the panel edge from being cut off
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-10-0462-01",
+      credit = TRUE,
+      notes = c(
+        "Other ways of getting to work are not shown, so the three do not add to 100%",
+        "Active transportation is walking or cycling"
+      )
+    )
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed. Each line reads down its panel
+# in the order the rows are drawn, top first.
+alt_lines <- mode_bars |>
+  arrange(mode, desc(district)) |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = mode
+  ) |>
+  # The superscript key means nothing read aloud, so it is dropped here
+  mutate(line = paste0(str_remove(mode, "²"), ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-commuting-mode",
+  alt = paste0(
+    "Three panels of blue horizontal bars, each on its own scale, one row per ",
+    "municipality, showing the share of commuters who travel to work by car, ",
+    "truck or van, by public transit, and by active transportation (walking ",
+    "or cycling). ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  # No height given: cwr_figure() sets it from the number of rows.
+  # Three panels side by side will not fit across a phone, so the phone version
+  # stacks them. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(mode), ncol = 1, scales = "free_x"))
+)
+```
+
+```{r}
 #| label: first
 #| output: asis
 

@@ -2,7 +2,7 @@
 title: "Welcome to Charting Waterloo Region!"
 description: "An introduction to the municipality that's a little bit country, a little bit rock 'n' roll."
 date: "2026-09-14"
-categories: [Snapshot, About the site, Waterloo Region, Open Data]
+categories: [Snapshot, Demographics, Geography]
 image: images/thumbnail.png
 draft: true
 editor_options: 
@@ -57,14 +57,53 @@ income <- read_csv(
 )
 ```
 
-<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+Waterloo Region, formally known as the Regional Municipality of Waterloo, comprises three cities and four townships. In this introductory post, we'll take a look at a few charts that highlight key differences between the Region's urban and rural constituents, differences that will be explored in more detail in future posts. Readers familiar with the Region's geography and demographics may not be surprised by the findings, but newcomers to the Region or those who haven't explored it much will see some interesting contrasts between the Region's rock 'n' roll heart and its country soul.
 
-## First finding as a plain-language heading
-
-<!-- One or two paragraphs, then one chart. -->
+## An urban core with rural fringes
 
 ```{r}
-#| label: districts
+#| label: district-inline-objects
+#| include: false
+
+# Population, land area and density, with the seven municipalities collapsed
+# into Cities and Townships and into Region overall.
+#
+# Population and land area are sums. Density is not: averaging seven densities
+# would give Wellesley the same weight as Kitchener and come out far too low.
+# It has to be the group's people divided by the group's land, which is why it
+# is worked out after the summarise() rather than carried through it.
+grouped_land_pop_figures <- districts |>
+  st_drop_geometry() |>
+  summarise(
+    city_pop         = sum(population[district_type == "City"]),
+    city_area        = sum(area_sq_km[district_type == "City"]),
+    township_pop     = sum(population[district_type == "Township"]),
+    township_area    = sum(area_sq_km[district_type == "Township"]),
+    region_pop       = sum(population),
+    region_area      = sum(area_sq_km),
+    city_density     = city_pop / city_area,
+    township_density = township_pop / township_area,
+    region_density   = region_pop / region_area,
+    density_ratio    = city_density / township_density,
+    city_pop_share   = city_pop / region_pop,
+    township_pop_share = township_pop / region_pop,
+    township_area_share = township_area / region_area
+  ) |>
+  mutate(
+    across(ends_with("share"), \(x) percent(x, accuracy = 1)),  # 15%
+    across(ends_with("ratio"), \(x) comma(x, accuracy = 0.1)),  # 2.7
+    across(where(is.numeric), \(x) comma(x, accuracy = 1))        # 631,721
+  )
+
+# Turn each column into its own object (city_pop, region_density, etc.)
+list2env(grouped_land_pop_figures, environment()) |> invisible()
+
+```
+
+On the map below, it appears as if the townships are chomping the smaller cities they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km land mass. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city. Judged solely by its area then, the Region is largely rural in character.
+
+```{r}
+#| label: land-mass
 #| output: asis
 
 # The seven municipal polygons, moved into EPSG:3161 - a projection made for
@@ -159,7 +198,7 @@ p <- ggplot() +
   coord_sf(datum = NA) +
   labs(
     title = "The Region's three cities are almost entirely surrounded by the four townships",
-    subtitle = "Waterloo Region, census subdivisions",
+    subtitle = "Cities and townships, land mass",
     caption = cwr_caption("Statistics Canada, 2021 census boundary files")
   ) +
   # theme_cwr() is built for charts with axes; a map wants none of them. Each
@@ -197,7 +236,9 @@ cwr_figure(
 )
 ```
 
-## Second finding
+## More cows than people?!
+
+The latest StatsCan population estimates show that Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop` , making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite covering `r township_area_share` of the Region's land, the townships contain only a sliver of its residents. Having a combined density of only `r township_density` residents per square km, the townships contain one resident for every `r density_ratio` city residents. With all that land and so few people, there's lots of room for cows!
 
 ```{r}
 #| label: sizes
@@ -309,7 +350,7 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
   coord_cartesian(clip = "off") +
   labs(
     title = "The townships are very sparsely populated compared to the cities",
-    subtitle = "Population density, 2025",
+    subtitle = "Cities and townships, population, 2025",
     caption = cwr_caption(
       c("Statistics Canada Table 17-10-0155-01",
         "the 2021 census boundary files"),
@@ -353,189 +394,9 @@ cwr_figure(
 )
 ```
 
-```{r}
-#| label: group-totals
-#| include: false
+## Income
 
-# The chart these built is gone; the numbers are kept because the prose uses
-# them - density_comp is the ratio quoted in the text.
-#
-# `measures` and `panel_chars` used to be defined in the population chart above,
-# which no longer has panels to name; they live here now, with the only code
-# that still reads them.
-panel_chars <- 30
 
-measures <- tribble(
-  ~column,             ~panel,                   ~spoken,
-  "population",        "Population",             "Population",
-  "area_sq_km",        "Land area, km\u00b2",    "Land area in square kilometres",
-  "density_per_sq_km", "People per km\u00b2",    "People per square kilometre"
-)
-
-# Population, land area and density, with the seven municipalities collapsed
-# into the two groups.
-#
-# Population and land area are sums. Density is not: averaging seven densities
-# would give Wellesley the same weight as Kitchener and come out far too low.
-# It has to be the group's people divided by the group's land, which is why it
-# is worked out after the summarise() rather than carried through it.
-group_totals <- districts |>
-  st_drop_geometry() |>
-  summarise(
-    population = sum(population),
-    area_sq_km = sum(area_sq_km),
-    .by = district_type
-  ) |>
-  mutate(density_per_sq_km = population / area_sq_km)
-
-group_panels <- group_totals |>
-  # The bars are the plural of the type that colours them; fct_reorder() on
-  # population puts the cities on top and holds that order across all three
-  # panels, as in the chart above.
-  mutate(
-    group = fct_reorder(
-      if_else(district_type == "City", "Cities", "Townships"),
-      population
-    )
-  ) |>
-  pivot_longer(
-    c(population, area_sq_km, density_per_sq_km),
-    names_to = "column", values_to = "value"
-  ) |>
-  left_join(measures, join_by(column)) |>
-  mutate(measure = factor(panel, levels = measures$panel)) |>
-  # Same test as the chart above: whether the label's own width fits inside the
-  # bar, asked panel by panel because each panel has its own scale.
-  group_by(measure) |>
-  mutate(
-    label = label_comma(accuracy = 1)(value),
-    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars)
-  ) |>
-  ungroup()
-
-density_comp <- group_panels |> 
-  # Keep only the two density rows
-  filter(column == "density_per_sq_km") |> 
-  # Pick each value by its district_type and divide
-  summarise(ratio = value[district_type == "City"] / value[district_type == "Township"]) |> 
-  # Extract the single number so density_comp is a numeric value, not a tibble
-  pull(ratio)
-```
-
-```{r}
-#| label: households
-#| output: asis
-
-# Two measures, each with its own unit, so each panel gets its own scale and its
-# own number format. The panel heading carries the unit wherever the label
-# cannot: "3.4" says nothing on its own, "85%" says most of it.
-# Roughly how many characters of label fit across one panel of a two-panel
-# chart at this font size, the way `panel_chars` above does for three panels.
-# Also used by the mother tongue charts below.
-panel_chars_wide <- 45
-
-household_measures <- tribble(
-  ~column,                    ~panel,                                   ~accuracy, ~suffix,
-  "average_household_size",   "Average private household size, number of persons",            0.1,      "",
-  "single_detached_percent",  "Single-detached houses, % of private dwellings",  1,        "%"
-)
-
-household_panels <- households |>
-  # One order for both panels, set on the first, so a place sits on the same row
-  # in each and can be read straight across.
-  mutate(district = fct_reorder(district, average_household_size)) |>
-  pivot_longer(
-    c(average_household_size, single_detached_percent),
-    names_to = "column", values_to = "value"
-  ) |>
-  left_join(household_measures, join_by(column)) |>
-  mutate(
-    measure = factor(panel, levels = household_measures$panel),
-    label = label_number(accuracy = accuracy, suffix = suffix)(value)
-  ) |>
-  # Whether a label fits inside its bar, asked panel by panel because each panel
-  # has its own scale. Same test as the population chart above, but a panel here
-  # is wider - two panels to the page rather than three - so more characters fit
-  # across it. Read off a render, as the other number was.
-  mutate(
-    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars_wide),
-    .by = measure
-  )
-
-p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)) +
-  geom_col(width = 0.7) +
-  # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
-  # off below, because with labels on the bars there is no axis to carry.
-  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
-  geom_text(
-    aes(
-      label = label,
-      # Inside the bar end, or just past it - hjust flips the text about its
-      # anchor, and the anchor is the end of the bar either way
-      hjust = if_else(inside, 1.15, -0.15),
-      colour = if_else(inside, "white", "black")
-    ),
-    size = label_size * 0.8
-  ) +
-  # The colours above are literal colour names rather than groups to map, which
-  # is what scale_colour_identity() means: use the value, do not look it up
-  scale_colour_identity() +
-  scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred),
-    guide = "none"   # the same two colours as every other chart in the post
-  ) +
-  # Room on the right for any label that sits outside its bar
-  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
-  # Free on x only, because the two measures share no unit. The rows are shared,
-  # so only the first panel carries the place names.
-  # label_wrap_gen() breaks a heading too wide for its panel onto a second line;
-  # panel headings are drawn by the theme as plain text, so cwr_wrap() - which
-  # emits <br> - would show its markup instead of acting on it.
-  facet_wrap(vars(measure), nrow = 1, scales = "free_x",
-             labeller = label_wrap_gen(26)) +
-  # Stops a label that overhangs the panel edge from being cut off
-  coord_cartesian(clip = "off") +
-  labs(
-    title = "Title: the finding, in one line",
-    subtitle = "Subtitle: what is measured, for whom, and when",
-    caption = cwr_caption("Statistics Canada Table 98-10-0041-01", credit = TRUE)
-  ) +
-  # Every bar carries its number, so the value axis and its gridlines are gone.
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.line.x = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.spacing.x = unit(1.4, "lines")
-  )
-
-# Built from the plotted rows rather than typed, as above. Each line reads down
-# its panel in the order the rows are drawn, top first.
-alt_lines <- household_panels |>
-  arrange(measure, desc(district)) |>
-  summarise(
-    entries = paste(paste0(district, " ", label), collapse = ", "),
-    .by = measure
-  ) |>
-  mutate(line = paste0(measure, ": ", entries)) |>
-  pull(line)
-
-cwr_figure(
-  p, "fig-households",
-  alt = paste0(
-    "Two panels of horizontal bars, one row per municipality, both ordered by ",
-    "average household size, with the three cities in blue and the four ",
-    "townships in red. ",
-    paste(alt_lines, collapse = ". "), "."
-  ),
-  # No height given: cwr_figure() sets it from the number of rows.
-  # Two panels side by side will not fit across a phone, so the phone version
-  # stacks them. Adding a facet replaces the one above.
-  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
-                          labeller = label_wrap_gen(26)))
-)
-```
 
 ```{r}
 #| label: income
@@ -674,8 +535,127 @@ cwr_figure(
 )
 ```
 
+## Households
+
+```{r}
+#| label: households
+#| output: asis
+
+# Two measures, each with its own unit, so each panel gets its own scale and its
+# own number format. The panel heading carries the unit wherever the label
+# cannot: "3.4" says nothing on its own, "85%" says most of it.
+# Roughly how many characters of label fit across one panel of a two-panel
+# chart at this font size, the way `panel_chars` above does for three panels.
+# Also used by the mother tongue charts below.
+panel_chars_wide <- 45
+
+household_measures <- tribble(
+  ~column,                    ~panel,                                   ~accuracy, ~suffix,
+  "average_household_size",   "Average private household size, number of persons",            0.1,      "",
+  "single_detached_percent",  "Single-detached houses, as % of private dwellings",  1,        "%"
+)
+
+household_panels <- households |>
+  # One order for both panels, set on the first, so a place sits on the same row
+  # in each and can be read straight across.
+  mutate(district = fct_reorder(district, average_household_size)) |>
+  pivot_longer(
+    c(average_household_size, single_detached_percent),
+    names_to = "column", values_to = "value"
+  ) |>
+  left_join(household_measures, join_by(column)) |>
+  mutate(
+    measure = factor(panel, levels = household_measures$panel),
+    label = label_number(accuracy = accuracy, suffix = suffix)(value)
+  ) |>
+  # Whether a label fits inside its bar, asked panel by panel because each panel
+  # has its own scale. Same test as the population chart above, but a panel here
+  # is wider - two panels to the page rather than three - so more characters fit
+  # across it. Read off a render, as the other number was.
+  mutate(
+    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars_wide),
+    .by = measure
+  )
+
+p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = if_else(inside, "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = habsred),
+    guide = "none"   # the same two colours as every other chart in the post
+  ) +
+  # Room on the right for any label that sits outside its bar
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  # Free on x only, because the two measures share no unit. The rows are shared,
+  # so only the first panel carries the place names.
+  # label_wrap_gen() breaks a heading too wide for its panel onto a second line;
+  # panel headings are drawn by the theme as plain text, so cwr_wrap() - which
+  # emits <br> - would show its markup instead of acting on it.
+  facet_wrap(vars(measure), nrow = 1, scales = "free_x",
+             labeller = label_wrap_gen(26)) +
+  # Stops a label that overhangs the panel edge from being cut off
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption("Statistics Canada Table 98-10-0041-01", credit = TRUE)
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed, as above. Each line reads down
+# its panel in the order the rows are drawn, top first.
+alt_lines <- household_panels |>
+  arrange(measure, desc(district)) |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = measure
+  ) |>
+  mutate(line = paste0(measure, ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-households",
+  alt = paste0(
+    "Two panels of horizontal bars, one row per municipality, both ordered by ",
+    "average household size, with the three cities in blue and the four ",
+    "townships in red. ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  # No height given: cwr_figure() sets it from the number of rows.
+  # Two panels side by side will not fit across a phone, so the phone version
+  # stacks them. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
+                          labeller = label_wrap_gen(26)))
+)
+```
+
+## Language
+
 ::: panel-tabset
-### Mother tongue not English or French
+### Mother tongue is not English or French
 
 ```{r}
 #| label: language-other
@@ -776,7 +756,7 @@ cwr_figure(
 )
 ```
 
-### German or Pennsylvania German
+### Is German or Pennsylvania German
 
 ```{r}
 #| label: language-german
