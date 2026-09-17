@@ -13,8 +13,11 @@ project:
     - "!_templates/"
     - "!datasets/"      # shared data pipelines and exploration notebooks
   resources:
-    - images/           # favicon, logo, placeholder thumbnail, social card
-    - fonts/            # self-hosted Inter; custom.scss points at these by path
+    # A leading slash anchors a pattern to the project root. Without it Quarto
+    # matches the folder name at any depth, so "images/" also copied the
+    # exploration notebooks' screenshots under datasets/ on to the public site.
+    - /images/          # favicon, logo, placeholder thumbnail, social card
+    - /fonts/           # self-hosted Inter; custom.scss points at these by path
     - favicon.ico       # browsers request /favicon.ico whether or not a page names it
     - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
                         # <source srcset>, which Quarto does not scan for resources
