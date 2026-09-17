@@ -448,6 +448,15 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
 }
+// Interactive charts (cwr_interactive() in R/theme_cwr.R) are drawn twice, like
+// cwr_figure()'s two PNGs, and CSS picks one at the same 767px breakpoint the
+// <picture> element uses. A <picture> can only swap images, not widgets.
+.cwr-interactive { margin-bottom: 1rem; }
+.cwr-interactive-phone { display: none; }
+@media (max-width: 767.98px) {
+  .cwr-interactive-desktop { display: none; }
+  .cwr-interactive-phone { display: block; }
+}
 .gt_table { font-family: inherit; }
 .gt_sourcenote, .gt_footnote { color: $cwr-grey; }
 

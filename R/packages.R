@@ -15,6 +15,7 @@ cwr_packages <- c(
   # House stack, loaded by R/theme_cwr.R
   "tidyverse", "scales", "ggtext", "patchwork", "gt", "gtExtras", "here",
   "janitor", "conflicted", "prismatic", "systemfonts", "ragg", "png",
+  "ggiraph", "htmltools",   # interactive charts, cwr_interactive()
 
   # Rendering and publishing
   "quarto", "rmarkdown", "knitr", "sessioninfo", "gh", "httr2",

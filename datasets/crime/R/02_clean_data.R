@@ -163,15 +163,15 @@ incidents_ont_raw <- read_parquet(ont_parquet, col_select = all_of(ont_cols_to_r
 # columns are no longer read, and were dropped by the select() below anyway.
 # VALUE is already double in the parquet, so it never needed converting.
 #
-# The year filter is pulled forward from incidents_prepped so pre-2000 rows are
-# dropped before bind_rows() and pivot_wider(), the two peak-memory steps.
-incidents_ont_clean <- incidents_ont_raw |> 
+# Every year StatCan publishes is kept (1998 on). Pre-2000 rows used to be
+# dropped here to match the personnel data's start year; a post that needs
+# that match filters for it itself.
+incidents_ont_clean <- incidents_ont_raw |>
   mutate(
     ref_date = as.numeric(ref_date),
     geo_uid  = as.numeric(geo_uid),
     geo      = str_remove(geo, " \\[.*\\]")
-  ) |> 
-  filter(ref_date > 1999)   # to match personnel data's start year
+  )
 
 rm(incidents_ont_raw)
 
@@ -179,9 +179,8 @@ rm(incidents_ont_raw)
 incidents_prepped <- incidents_can_raw |> 
   # take the same 8 columns from the Canada file before binding, so bind_rows()
   # is not reconciling 16 Canada-only columns against NA-filled Ontario ones
-  select(all_of(ont_cols_needed)) |> 
-  filter(ref_date > 1999) |> 
-  bind_rows(incidents_ont_clean) |> 
+  select(all_of(ont_cols_needed)) |>
+  bind_rows(incidents_ont_clean) |>
   select(
     year = ref_date,
     region = geo,
@@ -214,7 +213,7 @@ incidents_prepped <- incidents_can_raw |>
     youth_diverted = total_youth_not_charged,
     youth_diverted_per_100k_12_to_17 = rate_youth_not_charged_per_100_000_population_aged_12_to_17_years
   ) |> 
-  filter(!is.na(incidents)) |>   # year filter now applied upstream
+  filter(!is.na(incidents)) |>
   mutate(
     violation = str_replace(violation, "Homicide", "Total homicides"),
     violation = str_replace(violation, "Possession, cannabis", "Cannabis, possession"),
@@ -248,8 +247,11 @@ gc()
   
 
 # Create tibble of incident totals and subtotals by ucr categories
-incident_totals <- incidents_prepped |> 
-  filter(str_detect(violation, "^Total")) |> 
+# totals_to_include have already lost their "Total " prefix (above), so they are
+# kept by code; without them this table and the class column of incidents miss
+# seven subtotals, such as assaults against a peace officer
+incident_totals <- incidents_prepped |>
+  filter(str_detect(violation, "^Total") | ucr_code %in% totals_to_include) |>
   mutate(violation = str_remove(violation, "Total,* ")) |> 
   arrange(region, year)
 
@@ -377,9 +379,10 @@ csi <- csi_can_provs_ont_raw |>
     weighted_clearance_rate_nonviolent = non_violent_weighted_clearance_rate,
     yoy_perc_change_weighted_clearance_rate_nonviolent = percent_change_in_non_violent_weighted_clearance_rate,
   ) |> 
-  mutate(region = as.factor(region)) |> 
-  filter(year > 1999) |>    # to match start year for personnel data
-  group_by(region) |> 
+  mutate(region = as.factor(region)) |>
+  # every year is kept (StatCan's CSI starts in 1998), so the base_* columns
+  # below index to each region's first year, which is 1998 for most regions
+  group_by(region) |>
   mutate(
     base_csi = round(csi / first(csi) * 100, 1),
     base_clearance_rate = round(weighted_clearance_rate / first(weighted_clearance_rate) * 100, 1),

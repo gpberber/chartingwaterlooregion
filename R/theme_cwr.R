@@ -421,6 +421,28 @@ cwr_fit_height <- function(plot, width, row_height, dpi) {
   round(fixed_height + rows_needed * row_height, 2)
 }
 
+# The theme changes every phone version of a chart gets, because its panel is
+# half as wide: titles and the caption wrap, and right-hand axis labels move
+# outside the panel. Shared by cwr_figure() and cwr_interactive().
+cwr_phone_theme <- function() {
+  theme(
+    plot.title = element_textbox_simple(
+      size = base_size * 1.0, face = "bold", lineheight = 1.1,
+      margin = margin(0, 0, 5, 0)
+    ),
+    plot.subtitle = element_textbox_simple(
+      size = base_size * 0.7, face = "bold", lineheight = 1.1,
+      margin = margin(0, 0, 10, 0)
+    ),
+    plot.caption = element_textbox_simple(
+      size = base_size * 0.6, colour = cowboysilver, lineheight = 1.1,
+      margin = margin(t = 10)
+    ),
+    axis.text.y.right = element_text(hjust = 0, margin = margin(l = 6, r = 0)),
+    plot.margin = margin(t = 8, r = 8, b = 8, l = 8)
+  )
+}
+
 # A chart drawn for the desktop column (8.3 in, 797 px) is shrunk to about
 # 40% on a phone, so its text becomes unreadable however large it is drawn.
 # Sites like Datawrapper solve this by redrawing the chart for the phone.
@@ -542,23 +564,7 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # element_textbox_simple() (ggtext) is element_markdown() with word wrap.
   # theme() merges with what the plot already has, so only the named
   # properties change (the right-axis text keeps its size and vjust).
-  phone_plot <- plot +
-    theme(
-      plot.title = element_textbox_simple(
-        size = base_size * 1.0, face = "bold", lineheight = 1.1,
-        margin = margin(0, 0, 5, 0)
-      ),
-      plot.subtitle = element_textbox_simple(
-        size = base_size * 0.7, face = "bold", lineheight = 1.1,
-        margin = margin(0, 0, 10, 0)
-      ),
-      plot.caption = element_textbox_simple(
-        size = base_size * 0.6, colour = cowboysilver, lineheight = 1.1,
-        margin = margin(t = 10)
-      ),
-      axis.text.y.right = element_text(hjust = 0, margin = margin(l = 6, r = 0)),
-      plot.margin = margin(t = 8, r = 8, b = 8, l = 8)
-    )
+  phone_plot <- plot + cwr_phone_theme()
 
   # Per-chart phone adjustments supplied by the caller
   for (piece in phone) phone_plot <- phone_plot + piece
@@ -674,6 +680,157 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   }
 
   invisible(list(desktop = desktop_file, phone = phone_file, numbered = number))
+}
+
+# ---- Interactive charts ------------------------------------------------------
+# cwr_interactive() is cwr_figure() for a chart that shows a tooltip on hover.
+# It uses ggiraph, which draws an ordinary ggplot as an SVG in the page, so the
+# chart keeps theme_cwr() and the house colours; only the layers that should
+# react to the mouse change, from geom_point() to geom_point_interactive() and
+# so on, with a `tooltip` aesthetic holding the text to show. (plotly's
+# ggplotly() was the alternative, but it redraws the chart in its own style and
+# drops ggtext's markdown titles and captions.)
+#
+# Like cwr_figure(), it draws the chart twice - 8.3 in wide for desktops and
+# 4.2 in wide for phones, with cwr_phone_theme() and `phone` added to the
+# second - and custom.scss shows one or the other at the 767px breakpoint.
+# Each SVG then stretches to the width of the column, as the PNGs do.
+#
+# Use it in a chunk WITHOUT `output: asis`: it returns its markdown through
+# knitr::asis_output(), which also hands knitr the widget's JavaScript files
+# so they get into the page.
+#
+#   ```{r}
+#   #| label: csi
+#   p <- ggplot(...) + geom_line() +
+#     geom_point_interactive(aes(tooltip = tip, data_id = id), shape = 15, size = 7, alpha = 0) +
+#     geom_point_interactive(aes(data_id = id), size = 2.5, alpha = 0)
+#   cwr_interactive(p, "fig-csi", alt = "Line chart showing ...",
+#     height = 5, phone_height = 4.5)
+#   ```
+#
+# Drafting (running the chunk in RStudio), it returns the desktop widget, which
+# RStudio shows in the Viewer pane; `draft_phone = TRUE` shows the phone one.
+#
+# Numbering and `caption` work as in cwr_figure(): a Deep dive gets the two
+# widgets inside a Quarto #fig- div, so "Figure 1" appears under the chart and
+# @fig-csi works in the prose; a Snapshot gets them bare. `number = TRUE` or
+# `FALSE` overrides the post type for one chart.
+cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
+                            width = 8.3, height = 5,
+                            phone_width = 4.2, phone_height = height * 0.9,
+                            phone = list(), phone_text_scale = 0.8,
+                            draft_phone = FALSE) {
+  stopifnot(str_starts(id, "fig-"))
+
+  # Snapshot or Deep dive, read from the post's categories (see cwr_figure())
+  if (is.null(number)) {
+    categories <- unlist(rmarkdown::metadata$categories)
+    number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
+  }
+
+  phone_plot <- plot + cwr_phone_theme()
+  for (piece in phone) phone_plot <- phone_plot + piece
+
+  # What every hover does: the tooltip in the house font on a white card, and
+  # round points sharing the hovered data_id made visible. A line chart draws
+  # two invisible layers (alpha = 0) with the same data_id: large squares
+  # (shape 15) that catch the mouse anywhere near the line, and small circles
+  # that mark the year. girafe_css(point = ) styles circles only, so the
+  # squares stay invisible while the circle under them appears.
+  widget_options <- list(
+    ggiraph::opts_tooltip(
+      css = paste0(
+        "font-family: Inter, sans-serif; font-size: 13px; line-height: 1.35;",
+        "background: white; color: #222; padding: 6px 9px;",
+        "border: 1px solid ", cowboysilver50, "; border-radius: 4px;"
+      ),
+      opacity = 1, use_fill = FALSE
+    ),
+    ggiraph::opts_hover(css = ggiraph::girafe_css(
+      css = "", point = "fill-opacity: 1; stroke-opacity: 1;"
+    )),
+    ggiraph::opts_hover_inv(css = ""),
+    ggiraph::opts_sizing(rescale = TRUE, width = 1),
+    ggiraph::opts_toolbar(saveaspng = FALSE, hidden = c("selection", "zoom", "misc")),
+    ggiraph::opts_selection(type = "none")
+  )
+
+  # Fonts. Left to its default, girafe() attaches the three Liberation font
+  # families to the page (18 MB, committed in _freeze/ and published) though
+  # the charts never use them; naming Inter instead attaches the installed
+  # Inter files (38 MB). The site already serves Inter from fonts/, so the
+  # font set names Inter and its attached files are dropped.
+  font_set <- gdtools::font_set(sans = cwr_font())
+  font_set$dependencies <- list()
+
+  make_widget <- function(p, w, h) {
+    ggiraph::girafe(
+      ggobj = p, width_svg = w, height_svg = h,
+      bg = "white", options = widget_options,
+      font_set = font_set
+    )
+  }
+
+  desktop_widget <- make_widget(plot, width, height)
+
+  # geom_text/geom_label sizes are shrunk for the phone exactly as in
+  # cwr_figure(): changed in place, drawn, then put back.
+  text_layers <- keep(phone_plot$layers, function(layer) {
+    (inherits(layer$geom, "GeomText") || inherits(layer$geom, "GeomLabel")) &&
+      !is.null(layer$aes_params$size)
+  })
+  original_sizes <- map(text_layers, \(layer) layer$aes_params$size)
+  walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
+  phone_widget <- make_widget(phone_plot, phone_width, phone_height)
+  walk2(text_layers, original_sizes, \(layer, size) layer$aes_params$size <- size)
+
+  drafting <- !isTRUE(getOption("knitr.in.progress")) ||
+    isTRUE(getOption("rstudio.notebook.executing"))
+  if (drafting) {
+    return(if (isTRUE(draft_phone)) phone_widget else desktop_widget)
+  }
+
+  # role="img" plus aria-label gives screen readers the alt text, as the
+  # PNG's alt attribute does for cwr_figure(). A Snapshot's outer div carries
+  # the id; in a Deep dive the Quarto div below carries it instead, since an
+  # id can appear only once on a page.
+  widgets <- htmltools::div(
+    id = if (number) NULL else id,
+    htmltools::div(
+      class = "cwr-interactive cwr-interactive-desktop",
+      role = "img", `aria-label` = alt, desktop_widget
+    ),
+    htmltools::div(
+      class = "cwr-interactive cwr-interactive-phone",
+      role = "img", `aria-label` = alt, phone_widget
+    )
+  )
+
+  # renderTags() turns the widgets into one HTML string plus the list of
+  # JavaScript files they need. The HTML goes into a ```{=html} block, which
+  # Pandoc passes through untouched (a bare HTML block would end at the first
+  # blank line inside the widget), and the files go to knitr through `meta`.
+  rendered <- htmltools::renderTags(widgets)
+  html <- paste0("```{=html}\n", rendered$html, "\n```\n")
+
+  # The same figure logic as cwr_figure(): a div named #fig-... makes Quarto
+  # number the chart and resolve @fig-... references, and the last paragraph
+  # inside it becomes the caption.
+  markdown <- if (number) {
+    paste0(
+      "::: {#", id, "}\n", html,
+      if (!is.null(caption)) paste0("\n", caption, "\n"),
+      ":::\n"
+    )
+  } else {
+    paste0(
+      html,
+      if (!is.null(caption)) paste0('\n<p class="figure-caption">', caption, "</p>\n")
+    )
+  }
+
+  knitr::asis_output(markdown, meta = rendered$dependencies)
 }
 
 # Session information for the Reproducibility box at the end of each post.

@@ -82,5 +82,6 @@ cwr_data_download("crime", kind = "data-raw", root = "datasets", subdir = "raw_o
 | Date | Release tags | Change |
 |---|---|---|
 | 2026-09-05 | `data-dataset-crime-v1`, `data-raw-dataset-crime-v1` | Statistics Canada tables as downloaded August 2026; Financial Information Returns 2000 to 2025; WRPS occurrences 2014 to 2024 |
+| 2026-09-17 | none (committed files) | `crime_severity_index.rds`, `criminal_incidents.parquet`, `criminal_incident_totals.parquet` and `criminal_incident_summary.rds` keep every year StatCan publishes (1998 on, was 2000 on), with 2000+ values unchanged; their `base_*` columns now index to each region's first year, 1998 for most. `02_clean_data.R` had stopped keeping seven subtotals without four-digit children (UCR 135, 211, 212, 220, 335, 620, 930) in the totals table; fixed, so the rebuilt files match the committed ones |
 
 When the data is refreshed, bump the release version, add a row here, and mention the date in any post that re-renders.

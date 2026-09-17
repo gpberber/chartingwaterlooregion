@@ -1,0 +1,585 @@
+---
+title: "Title: to be written"
+description: "One sentence for the listing card: the question and the answer."
+date: "2026-09-17"
+categories: [Snapshot, Crime, Policing]
+image: images/thumbnail.png
+draft: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/globe-csi-comparison/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
+# Post-specific packages go here, and in R/packages.R
+library(ggiraph)   # interactive layers (geom_point_interactive) for cwr_interactive()
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+# example <- read_csv(here("posts", "globe-csi-comparison", "data", "example.csv"))
+
+# Crime Severity Index and violent CSI, 1998 on, for Canada, Ontario and
+# Waterloo Region. One row per region per year.
+csi_comparison <- read_csv(
+  here("posts", "globe-csi-comparison", "data", "csi_comparison.csv"),
+  show_col_types = FALSE
+)
+
+# Waterloo Region incident rates per 100,000 people, with each rate indexed to
+# its base year (100 = the base-year rate). One row per offence per year.
+assaults_indexed <- read_csv(
+  here("posts", "globe-csi-comparison", "data", "wrps_assaults_indexed.csv"),
+  show_col_types = FALSE
+)
+sexual_offences_indexed <- read_csv(
+  here("posts", "globe-csi-comparison", "data", "wrps_sexual_offences_indexed.csv"),
+  show_col_types = FALSE
+)
+```
+
+<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+
+## First finding as a plain-language heading
+
+<!-- One or two paragraphs, then one chart. -->
+
+```{r}
+#| label: csi
+
+# Replicates the Globe and Mail's first chart (the Crime Severity Index for
+# Canada) and adds Ontario and Waterloo Region. Built from the ggline template.
+# Interactive: hovering near a line shows the place, year and index value.
+
+# Colours carry the house meanings: Waterloo Region is the focus (blue), Canada
+# the main comparison (red), Ontario context (grey).
+csi_groups <- c("Canada", "Ontario", "Waterloo Region")
+csi_colours <- set_names(c(habsred, cowboysilver, dodgerblue), csi_groups)
+
+# The tooltip text is built once per row, here, rather than in the ggplot call.
+# ggiraph shows it as HTML, so <b> and <br> work. hover_id ties the two
+# invisible point layers below together (see cwr_interactive() in theme_cwr.R).
+csi_plot_data <- csi_comparison |>
+  mutate(
+    region = factor(region, levels = csi_groups),
+    hover_id = str_glue("{region}-{year}"),
+    csi_tooltip = str_glue("<b>{region}</b><br>{year}<br>CSI: {label_number(accuracy = 0.1)(csi)}"),
+    csi_violent_tooltip = str_glue("<b>{region}</b><br>{year}<br>Violent CSI: {label_number(accuracy = 0.1)(csi_violent)}")
+  )
+
+# Set x min and max
+x_min <- csi_plot_data |> pull(year) |> min()
+x_max <- csi_plot_data |> pull(year) |> max()
+
+# Line-name labels, placed by hand where each line has clear space.
+label_data <- tibble(
+  x = c(2003.5, 2019.5, 1998.3),
+  y = c(110, 47.5, 70),
+  label = csi_groups,
+  fontface = c("plain", "plain", "bold")
+)
+
+p <- ggplot(csi_plot_data, aes(x = year, y = csi, colour = region)) +
+
+  geom_label(
+    data = label_data,
+    aes(x = x, y = y, label = label, fontface = fontface),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 0,
+    vjust = 0,
+    inherit.aes = FALSE
+  ) +
+
+  geom_line(linewidth = 0.8) +
+
+  # Hover targets: large invisible squares that catch the mouse anywhere near
+  # a line and carry the tooltip...
+  geom_point_interactive(
+    aes(tooltip = csi_tooltip, data_id = hover_id),
+    shape = 15, size = 7, alpha = 0
+  ) +
+  # ...and small invisible dots that appear on hover to mark the year.
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+
+  scale_x_continuous(
+    breaks = seq(2000, x_max, 5),
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    limits = c(45, NA),   # room under the lowest line for a label
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_colour_manual(
+    values = csi_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    caption = cwr_caption(c("Statistics Canada Table 35-10-0026-01", "Table 35-10-0188-01"))
+  )
+
+cwr_interactive(
+  p, "fig-csi",
+  alt = paste(
+    "Line chart of the Crime Severity Index from", x_min, "to", x_max,
+    "for Canada, Ontario and Waterloo Region. All three fell from the late",
+    "1990s to a low around 2014 and have risen part of the way back since.",
+    "Canada is highest throughout, Ontario lowest, and Waterloo Region sits",
+    "between them, closer to Ontario."
+  ),
+  height = 5, phone_height = 4.5,
+  phone = list(scale_x_continuous(
+    breaks = seq(2000, x_max, 10),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05))
+  ))
+)
+```
+
+```{r}
+#| label: csi-violent
+
+# Replicates the Globe and Mail's second chart (the violent Crime Severity
+# Index for Canada) with Ontario and Waterloo Region added. Same data, colours
+# and hover design as the chart above; only the measure changes.
+
+label_data <- tibble(
+  x = c(2012.4, 1999.8, 2000.3),
+  y = c(83.5, 75.5, 46.5),
+  label = csi_groups,
+  fontface = c("plain", "plain", "bold")
+)
+
+p <- ggplot(csi_plot_data, aes(x = year, y = csi_violent, colour = region)) +
+
+  geom_label(
+    data = label_data,
+    aes(x = x, y = y, label = label, fontface = fontface),
+    colour = "grey30",
+    fill = "white",
+    linewidth = 0,
+    size = 3.2,
+    hjust = 0,
+    vjust = 0,
+    inherit.aes = FALSE
+  ) +
+
+  geom_line(linewidth = 0.8) +
+
+  geom_point_interactive(
+    aes(tooltip = csi_violent_tooltip, data_id = hover_id),
+    shape = 15, size = 7, alpha = 0
+  ) +
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+
+  scale_x_continuous(
+    breaks = seq(2000, x_max, 5),
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    limits = c(45, NA),   # room under the lowest line for a label
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_colour_manual(
+    values = csi_colours,
+    guide = "none"
+  ) +
+
+  guides(x = guide_axis(minor.ticks = TRUE)) +
+
+  # Right-axis label positioning: sit labels above gridlines
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    )
+  ) +
+
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    caption = cwr_caption(c("Statistics Canada Table 35-10-0026-01", "Table 35-10-0188-01"))
+  )
+
+cwr_interactive(
+  p, "fig-csi-violent",
+  alt = paste(
+    "Line chart of the violent Crime Severity Index from", x_min, "to", x_max,
+    "for Canada, Ontario and Waterloo Region. Canada's index dipped to a low",
+    "around 2014 and has since climbed back to about its late-1990s level.",
+    "Ontario stays below Canada throughout. Waterloo Region started below",
+    "Ontario and has risen above it in recent years."
+  ),
+  height = 5, phone_height = 4.5,
+  phone = list(scale_x_continuous(
+    breaks = seq(2000, x_max, 10),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05))
+  ))
+)
+```
+
+```{r}
+#| label: assaults
+
+# Replicates the Globe and Mail's third chart (assault rates for Canada,
+# indexed) for Waterloo Region instead. Five offences share one axis because
+# each rate is indexed: 100 is its rate in the base year. Five long offence
+# names would collide as direct labels, so this chart uses a legend above the
+# panel (style rule 3's exception). Hover shows the offence, year, index and
+# the underlying rate.
+
+assault_groups <- c(
+  "Assault with a weapon or causing bodily harm",
+  "Assaults against a peace officer",
+  "Aggravated assault",
+  "Assault",
+  "Other assaults"
+)
+# Reds for the two offences that have risen most, blues for the level 1 and
+# 3 assaults, grey for the catch-all.
+assault_colours <- set_names(
+  c(habsred, habsred50, dodgerblue, dodgerblue50, cowboysilver),
+  assault_groups
+)
+
+assault_base_year <- assaults_indexed |> pull(base_year) |> min()
+
+assault_plot_data <- assaults_indexed |>
+  mutate(
+    violation = factor(violation, levels = assault_groups),
+    hover_id = str_glue("{ucr_code}-{year}"),
+    tooltip = str_glue(
+      "<b>{violation}</b><br>{year}<br>",
+      "Index: {label_number(accuracy = 1)(index)} ({base_year} = 100)<br>",
+      "Rate: {label_number(accuracy = 0.1)(incidents_per_100k)} per 100,000"
+    )
+  )
+
+x_min <- assault_plot_data |> pull(year) |> min()
+x_max <- assault_plot_data |> pull(year) |> max()
+
+p <- ggplot(assault_plot_data, aes(x = year, y = index, colour = violation)) +
+
+  # The base line: above it a rate is higher than in the base year.
+  geom_hline(yintercept = 100, colour = "grey30", linewidth = 0.4) +
+
+  geom_line(linewidth = 0.8) +
+
+  geom_point_interactive(
+    aes(tooltip = tooltip, data_id = hover_id),
+    shape = 15, size = 7, alpha = 0
+  ) +
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+
+  scale_x_continuous(
+    breaks = seq(2000, x_max, 5),
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, NA),
+    breaks = seq(0, 300, 50),
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  # A legend in two columns above the panel; one column on phones (below).
+  # The key is drawn as a thick line so the colour is easy to match.
+  scale_colour_manual(values = assault_colours) +
+  guides(
+    x = guide_axis(minor.ticks = TRUE),
+    colour = guide_legend(ncol = 2, byrow = TRUE, override.aes = list(linewidth = 1.5, alpha = 1, size = 0))
+  ) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    ),
+    # "top" reserves room for the legend; theme_cwr()'s default floats it over
+    # the panel, where two rows of keys would sit on the lines.
+    legend.position = "top",
+    legend.justification = "left",
+    legend.text = element_text(size = base_size * 0.7, margin = margin(r = 10, l = 4)),
+    legend.margin = margin(0, 0, 0, 0)
+  ) +
+
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    colour = NULL,
+    caption = cwr_caption("Statistics Canada Table 35-10-0180-01", credit = TRUE)
+  )
+
+cwr_interactive(
+  p, "fig-assaults",
+  alt = paste0(
+    "Line chart of five kinds of assault in Waterloo Region, ", x_min, " to ",
+    x_max, ", each shown as an index where its ", assault_base_year,
+    " rate per 100,000 people equals 100. Assault with a weapon or causing ",
+    "bodily harm rose the most, to a little over twice its ", assault_base_year,
+    " rate. Assaults against a peace officer swing widely but ended well above ",
+    "theirs. Common assault is close to its ", assault_base_year, " rate, and ",
+    "aggravated assault and other assaults ended below theirs."
+  ),
+  height = 5.5, phone_height = 6,
+  phone = list(
+    scale_x_continuous(
+      breaks = seq(2000, x_max, 10),
+      minor_breaks = seq(x_min, x_max, 1),
+      expand = expansion(mult = c(0.02, 0.05))
+    ),
+    guides(colour = guide_legend(ncol = 1, override.aes = list(linewidth = 1.5, alpha = 1, size = 0)))
+  )
+)
+```
+
+```{r}
+#| label: sexual-offences
+
+# Replicates the Globe and Mail's fourth chart (sexual offence rates for
+# Canada, indexed) for Waterloo Region instead. As in the Globe's chart,
+# sexual violations against children are indexed to 2015, the others to the
+# first year in the data. Legend and hover as in the assault chart.
+
+sexual_groups <- c(
+  "Sexual violations against children",
+  "Sexual assault with a weapon or causing bodily harm",
+  "Sexual assault",
+  "Aggravated sexual assault"
+)
+sexual_colours <- set_names(manual_4_colours, sexual_groups)
+
+# An offence with no incidents in its base year has no index (the data script
+# leaves it blank), so it cannot be drawn. It is named in a note instead.
+sexual_omitted <- sexual_offences_indexed |>
+  summarise(no_index = all(is.na(index)), base_year = first(base_year), .by = violation) |>
+  filter(no_index)
+
+sexual_notes <- if (nrow(sexual_omitted) > 0) {
+  str_glue(
+    "{str_flatten_comma(sexual_omitted$violation, ' and ')} not shown: ",
+    "Waterloo Region recorded none in {str_flatten_comma(unique(sexual_omitted$base_year))}, so there is no base to index to"
+  )
+}
+
+sexual_plot_data <- sexual_offences_indexed |>
+  filter(!is.na(index)) |>
+  mutate(
+    violation = factor(violation, levels = sexual_groups),
+    hover_id = str_glue("{ucr_code}-{year}"),
+    tooltip = str_glue(
+      "<b>{violation}</b><br>{year}<br>",
+      "Index: {label_number(accuracy = 1)(index)} ({base_year} = 100)<br>",
+      "Rate: {label_number(accuracy = 0.01)(incidents_per_100k)} per 100,000<br>",
+      "Incidents: {label_number(big.mark = ',')(incidents)}"
+    )
+  )
+
+x_min <- sexual_plot_data |> pull(year) |> min()
+x_max <- sexual_plot_data |> pull(year) |> max()
+
+p <- ggplot(sexual_plot_data, aes(x = year, y = index, colour = violation)) +
+
+  geom_hline(yintercept = 100, colour = "grey30", linewidth = 0.4) +
+
+  geom_line(linewidth = 0.8) +
+
+  geom_point_interactive(
+    aes(tooltip = tooltip, data_id = hover_id),
+    shape = 15, size = 7, alpha = 0
+  ) +
+  geom_point_interactive(aes(data_id = hover_id), size = 2.5, alpha = 0) +
+
+  scale_x_continuous(
+    breaks = seq(2000, x_max, 5),
+    labels = label_number(big.mark = "", scale = 1, suffix = ""),
+    minor_breaks = seq(x_min, x_max, 1),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "bottom"
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, NA),
+    position = "right",
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+
+  scale_colour_manual(values = sexual_colours) +
+  guides(
+    x = guide_axis(minor.ticks = TRUE),
+    colour = guide_legend(ncol = 2, byrow = TRUE, override.aes = list(linewidth = 1.5, alpha = 1, size = 0))
+  ) +
+
+  theme(
+    axis.text.y.right = element_text(
+      size = rel(1),
+      hjust = 1.0,
+      vjust = -0.5,
+      margin = margin(r = 12, l = -20)
+    ),
+    legend.position = "top",
+    legend.justification = "left",
+    legend.text = element_text(size = base_size * 0.7, margin = margin(r = 10, l = 4)),
+    legend.margin = margin(0, 0, 0, 0)
+  ) +
+
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    colour = NULL,
+    caption = cwr_caption("Statistics Canada Table 35-10-0180-01", credit = TRUE, notes = sexual_notes)
+  )
+
+cwr_interactive(
+  p, "fig-sexual-offences",
+  alt = paste0(
+    "Line chart of three kinds of sexual offence in Waterloo Region, ", x_min,
+    " to ", x_max, ", each shown as an index where its base-year rate per ",
+    "100,000 people equals 100 (2015 for sexual violations against children, ",
+    x_min, " for the others). Sexual violations against children have about ",
+    "tripled since 2015. Sexual assault with a weapon or causing bodily harm is ",
+    "about six times its ", x_min, " rate, but it is a handful of incidents a ",
+    "year, so the line jumps sharply. Sexual assault is close to its ", x_min,
+    " rate. Aggravated sexual assault is not shown because there were none in ",
+    x_min, "."
+  ),
+  height = 5.5, phone_height = 6,
+  phone = list(
+    scale_x_continuous(
+      breaks = seq(2000, x_max, 10),
+      minor_breaks = seq(x_min, x_max, 1),
+      expand = expansion(mult = c(0.02, 0.05))
+    ),
+    guides(colour = guide_legend(ncol = 1, override.aes = list(linewidth = 1.5, alpha = 1, size = 0)))
+  )
+)
+```
+
+```{r}
+#| label: first
+#| output: asis
+
+# Pick a template from the cwr-charts skill and build the chart as `p`, then hand
+# it to cwr_figure(): it saves a desktop and a phone version of the chart to
+# figures/ and writes the figure. Width is fixed at the paragraph width. A
+# chart with categories on its y axis (bars, lollipops) needs no height: it is
+# worked out so every row is drawn the same depth in every post. Any other chart
+# (a line chart, a map) adds `height = 5, phone_height = 4.5` or whatever suits
+# it. A Deep dive gets "Figure 1" under the chart and can be
+# referred to as @fig-first; a Snapshot gets no label. That follows the post
+# type in `categories` above, so there is nothing to set here.
+#
+# Running this chunk rather than rendering draws both versions to look at, the
+# desktop one last, and writes nothing to the post.
+p <- ggplot()
+
+cwr_figure(
+  p, "fig-first",
+  alt = "What the chart shows, for screen readers."
+)
+```
+
+## Second finding
+
+```{r}
+#| label: tbl-first
+#| tbl-cap: "Caption shown under the table."
+
+# gt table here (one table per chunk).
+```
+
+## Data sources
+
+<!-- Where the data came from, what was excluded and why, and any caveat a careful
+     reader should know: write that here, above the table. The table itself is not
+     written here - the chunk below prints the "Data sources" table straight out of
+     this post's README.md, so there is only ever one copy of it.
+
+     Keep this heading as it is. _includes/like.html puts the "Like this post"
+     button immediately above it, on the reasoning that the analysis ends here and
+     everything below is reference material. It finds the spot by the id Pandoc
+     builds from the heading text, so rewording the heading does not break the
+     button - it quietly drops it to the foot of the page instead. -->
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("globe-csi-comparison")
+```
+
+## Other sources
+
+<!-- Anything cited that is not data: reports, articles, books, a method borrowed
+     from someone else. Quoted material stays under its owner's terms, never this
+     site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+**Reproduce the post**: get the code and data for this post from [`posts/globe-csi-comparison/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/globe-csi-comparison) on GitHub.
+
+**Download the data:** `r cwr_bundle_link("globe-csi-comparison", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/globe-csi-comparison#data-dictionary).
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::
