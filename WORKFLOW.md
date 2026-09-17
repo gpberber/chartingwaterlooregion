@@ -107,6 +107,30 @@ If the post draws on a shared dataset (section 5), say so when asked; Claude wir
 
 Claude can write both scripts if you describe the source; it follows the same conventions.
 
+#### Ready-made data: Ontario municipal populations in `gt::towny`
+
+The `gt` package, already installed and attached by `theme_cwr.R`, ships a dataset called `towny`: one row for each of Ontario's 414 local municipalities (every lower-tier and single-tier municipality), with the census population for 1996, 2001, 2006, 2011, 2016 and 2021, the density for each of those years, the change between each pair of censuses, the 2021 land area, the census subdivision type (city, town, township, village, municipality), the census division it sits in, a latitude and longitude, and the municipality's website. All seven of Waterloo Region's municipalities are there, under `census_div == "Waterloo"`, and they add up to the Region's published 2021 census count of 587,165. For "how does Waterloo Region compare with the rest of Ontario" or "how has each township grown since 1996", it saves writing a download script at all.
+
+Use it the same way as any other source, so the post stays reproducible and the version is on record:
+
+``` r
+# In R/01_get_data.R
+gt::towny |> write_csv(file.path(raw_dir, "towny.csv"))
+```
+
+In the README source table, give the file as `towny.csv`, describe it as "`towny` dataset from the gt package (give the version `packageVersion("gt")` reports), Statistics Canada census populations", link to <https://gt.rstudio.com/reference/towny.html>, and give both licences: gt is MIT, and the numbers are Statistics Canada's, under the Statistics Canada Open Licence. Credit Statistics Canada in the chart's `cwr_caption()`.
+
+Things to know before charting it:
+
+- **Census counts, not estimates.** These are what each census counted. The yearly population estimates in Statistics Canada table 17-10-0155 are higher (they correct for people the census missed) and more recent: Kitchener is 256,885 here for 2021 and 323,917 in the 2025 estimate the welcome post uses. Say which one a chart shows, and do not put the two on one axis.
+- **It stops at 2021**, and it changes only when a new version of gt is released. The 2026 census counts are not in it.
+- **No upper tiers.** The Region of Waterloo, counties and other upper-tier municipalities are not rows. Add up the lower tiers by `census_div` to get them. A single-tier city such as Toronto or Hamilton is its own census division.
+- **No census codes.** Match to Statistics Canada tables by `name` together with `census_div`, never by name alone: there are two Hamiltons (the city and a township in Northumberland), and "Waterloo" is both a city and the name of the Region's census division.
+- **Change columns are proportions**, despite ending in `_pct`: `0.1015` means 10.15%. Format them with `label_percent()`.
+- **Every density uses the 2021 land area**, and each population is as counted within that census's boundaries. Three municipalities (Callander, Northeastern Manitoulin and the Islands, Temiskaming Shores) have no 1996 or 2001 figures.
+- **The location is a single point**, and a coarse one for some places. It will do for a dot on a map; it is not a boundary and is too rough for placing labels. Polygons still come from the census boundary files, as in the welcome post.
+- `csd_type` and `status` are lower case (`"city"`, `"lower-tier"`); capitalise them for display.
+
 ### 3.3 Describe the tables so readers can download them
 
 Every post offers its data as a zip for readers who just want the numbers. Two small CSV files in `data/` drive that, and they are the only part a machine cannot generate:

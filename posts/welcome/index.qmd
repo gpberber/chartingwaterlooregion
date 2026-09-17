@@ -492,7 +492,7 @@ p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)
   # panel headings are drawn by the theme as plain text, so cwr_wrap() - which
   # emits <br> - would show its markup instead of acting on it.
   facet_wrap(vars(measure), nrow = 1, scales = "free_x",
-             labeller = label_wrap_gen(22)) +
+             labeller = label_wrap_gen(26)) +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
   labs(
@@ -533,7 +533,7 @@ cwr_figure(
   # Two panels side by side will not fit across a phone, so the phone version
   # stacks them. Adding a facet replaces the one above.
   phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
-                          labeller = label_wrap_gen(22)))
+                          labeller = label_wrap_gen(26)))
 )
 ```
 
