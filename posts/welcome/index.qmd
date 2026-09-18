@@ -159,7 +159,10 @@ labels <- districts |>
     ),
     # Land area, on its own line under the name. Whole square kilometres: the
     # boundary file gives four decimal places, which no one reading a map needs.
-    area_label = paste0(label_comma(accuracy = 1)(area_sq_km), " km\u00b2")
+    area_label = paste0(label_comma(accuracy = 1)(area_sq_km), " km\u00b2"),
+    # White on the dark city blue, black on the light township blue, where
+    # white would be too faint to read
+    text_colour = if_else(district_type == "City", "white", "black")
   )
 
 p <- ggplot() +
@@ -179,22 +182,24 @@ p <- ggplot() +
   # open a small gap between the two, in metres, because that is the unit of
   # the map's projection.
   geom_text(
-    data = labels, aes(x = x, y = y, label = label),
-    colour = "white", size = label_size, lineheight = 1.05, fontface = "bold",
+    data = labels, aes(x = x, y = y, label = label, colour = text_colour),
+    size = label_size, lineheight = 1.05, fontface = "bold",
     vjust = 0, nudge_y = 250
   ) +
   # Plain rather than bold, and a little smaller, so the name still reads first
-  # and the figure reads as a note on it. No box behind it: white on the fill
-  # is already legible, and a box would cover the shape it describes.
+  # and the figure reads as a note on it. No box behind it: the text colour is
+  # already chosen to read on its fill, and a box would cover the shape.
   geom_text(
-    data = labels, aes(x = x, y = y, label = area_label),
-    colour = "white", size = label_size * 0.85,
+    data = labels, aes(x = x, y = y, label = area_label, colour = text_colour),
+    size = label_size * 0.85,
     vjust = 1, nudge_y = -250
   ) +
   scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred),
+    values = c(City = dodgerblue, Township = dodgerblue50),
     guide = "none"   # the labels on the shapes say which is which
   ) +
+  # text_colour holds literal colour names: use them as they are
+  scale_colour_identity() +
   # datum = NA drops the graticule - the faint grid of latitude and longitude
   # lines coord_sf() draws by default - which this map has no use for.
   coord_sf(datum = NA) +
@@ -301,7 +306,9 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
       # Inside the bar end, or just past it - hjust flips the text about its
       # anchor, and the anchor is the end of the bar either way
       hjust = if_else(inside, 1.15, -0.15),
-      colour = if_else(inside, "white", "black")
+      # White inside the dark city bars only; inside the light township
+      # bars, and outside any bar, black reads better
+      colour = if_else(inside & district_type == "City", "white", "black")
     ),
     size = label_size * 0.8
   ) +
@@ -340,7 +347,7 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
   # is what scale_colour_identity() means: use the value, do not look it up
   scale_colour_identity() +
   scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred),
+    values = c(City = dodgerblue, Township = dodgerblue50),
     guide = "none"   # the colours are explained by the bars themselves
   ) +
   # The axis runs out to the box column and no further
@@ -382,7 +389,7 @@ cwr_figure(
   p, "fig-sizes",
   alt = paste0(
     "Horizontal bars of population, one per municipality, largest first, with ",
-    "the three cities in blue and the four townships in red, and each ",
+    "the three cities in dark blue and the four townships in light blue, and each ",
     "municipality's residents per square kilometre boxed in a column on the ",
     "right. ",
     paste(alt_entries, collapse = "; "), "."
@@ -459,10 +466,10 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
       # its label comfortably, so unlike the chart above there is no test for
       # which ones have to move outside.
       #
-      # White on the blue and the red, black on the Region's silver: white on
-      # that grey is a contrast ratio of about three to one, which is too
-      # faint to read at this size.
-      colour = if_else(district_type == "Region", "black", "white")
+      # White on the dark city blue only. On the light township blue and the
+      # Region's silver, white is a contrast ratio of under three to one, which
+      # is too faint to read at this size, so those labels are black.
+      colour = if_else(district_type == "City", "white", "black")
     ),
     hjust = 1.15,
     size = label_size * 0.8
@@ -471,7 +478,7 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
   # is what scale_colour_identity() means: use the value, do not look it up
   scale_colour_identity() +
   scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred, Region = cowboysilver),
+    values = c(City = dodgerblue, Township = dodgerblue50, Region = cowboysilver),
     guide = "none"   # the colours are explained by the bars themselves
   ) +
   # A little air at the bar ends so the longest bar does not touch the panel
@@ -527,8 +534,8 @@ cwr_figure(
   p, "fig-income",
   alt = paste0(
     "Two panels of horizontal bars, one row per municipality and one for ",
-    "Waterloo Region as a whole, with the three cities in blue, the four ",
-    "townships in red and the Region in grey. Each panel is ordered by its own ",
+    "Waterloo Region as a whole, with the three cities in dark blue, the four ",
+    "townships in light blue and the Region in grey. Each panel is ordered by its own ",
     "figures, highest at the top, and both are drawn to the same dollar scale. ",
     paste(alt_lines, collapse = ". "), "."
   ),
@@ -592,7 +599,9 @@ p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)
       # Inside the bar end, or just past it - hjust flips the text about its
       # anchor, and the anchor is the end of the bar either way
       hjust = if_else(inside, 1.15, -0.15),
-      colour = if_else(inside, "white", "black")
+      # White inside the dark city bars only; inside the light township
+      # bars, and outside any bar, black reads better
+      colour = if_else(inside & district_type == "City", "white", "black")
     ),
     size = label_size * 0.8
   ) +
@@ -600,7 +609,7 @@ p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)
   # is what scale_colour_identity() means: use the value, do not look it up
   scale_colour_identity() +
   scale_fill_manual(
-    values = c(City = dodgerblue, Township = habsred),
+    values = c(City = dodgerblue, Township = dodgerblue50),
     guide = "none"   # the same two colours as every other chart in the post
   ) +
   # Room on the right for any label that sits outside its bar
@@ -646,8 +655,8 @@ cwr_figure(
   p, "fig-households",
   alt = paste0(
     "Two panels of horizontal bars, one row per municipality, both ordered by ",
-    "average household size, with the three cities in blue and the four ",
-    "townships in red. ",
+    "average household size, with the three cities in dark blue and the four ",
+    "townships in light blue. ",
     paste(alt_lines, collapse = ". "), "."
   ),
   # No height given: cwr_figure() sets it from the number of rows.
@@ -705,13 +714,15 @@ language_bars <- function(which) {
         label = label,
         # Inside the bar end, or just past it
         hjust = if_else(inside, 1.15, -0.15),
-        colour = if_else(inside, "white", "black")
+        # White inside the dark city bars only; inside the light township
+        # bars, and outside any bar, black reads better
+        colour = if_else(inside & district_type == "City", "white", "black")
       ),
       size = label_size * 0.8
     ) +
     scale_colour_identity() +
     scale_fill_manual(
-      values = c(City = dodgerblue, Township = habsred),
+      values = c(City = dodgerblue, Township = dodgerblue50),
       guide = "none"
     ) +
     # Room on the right for any label that sits outside its bar
@@ -757,7 +768,7 @@ cwr_figure(
   alt = paste0(
     "Horizontal bars, one row per municipality, showing the percentage of ",
     "people whose mother tongue is neither English nor French, highest at the ",
-    "top, with the three cities in blue and the four townships in red. ",
+    "top, with the three cities in dark blue and the four townships in light blue. ",
     language_alt("non_official_percent"), "."
   )
   # No height given: cwr_figure() sets it from the number of rows.
@@ -787,8 +798,8 @@ cwr_figure(
     "Horizontal bars, one row per municipality, showing the percentage of ",
     "people with a mother tongue other than English or French whose mother ",
     "tongue is German or Pennsylvania German. Rows are in the same order as the ",
-    "previous tab, not by these figures. The three cities are in blue and the ",
-    "four townships in red. ",
+    "previous tab, not by these figures. The three cities are in dark blue and the ",
+    "four townships in light blue. ",
     language_alt("german_percent_of_non_official"), "."
   )
   # No height given: cwr_figure() sets it from the number of rows.
