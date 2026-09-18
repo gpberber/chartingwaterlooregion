@@ -49,8 +49,8 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Chart text calls Waterloo Region "Region": use `cwr_region` for every axis, legend, direct
   label, tooltip and note (cleaning scripts type "Region"). Line labels are positioned with
   `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
-- Census: long-form variables (commuting, labour, income, education, housing, immigration and
-  more) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If
+- Census: long-form variables (commuting, labour, education, housing, immigration and more, plus
+  average and aggregate income; median income is 100% data) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If
   Greg asks for counts from one, flag it before building. Any chart from sample data (census long
   form, surveys) carries the stock note from `cwr_caption(sample = )`, with confidence intervals
   drawn or stated when the source publishes them - rule 9b. The sample is also recorded in the

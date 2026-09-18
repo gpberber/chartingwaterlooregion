@@ -210,12 +210,18 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    and keep counts out of labels, axes and alt text; they may still be summed in code as a
    denominator. **If Greg asks for counts from a long-form table, say so before building it** - he
    asked for this check "so I don't make this mistake again". Long-form: commuting, place of work,
-   labour, income, education, housing costs and condition, immigration and citizenship,
-   ethnocultural and religious origin, Indigenous identity, language of work, mobility. Short form
-   (a full count, counts are fine): population, age, gender, marital status, households and
-   families, dwelling type, and the language questions other than language of work. Statistics
-   Canada tables say which in their notes ("25% sample data" or "long-form"). The commuting post's
-   last three charts were rebuilt from counts to shares for this reason (2026-09-18).
+   labour, education, housing costs and condition, immigration and citizenship, ethnocultural and
+   religious origin, Indigenous identity, language of work, mobility. Short form (a full count,
+   counts are fine): population, age, gender, marital status, households and families, dwelling
+   type, and the language questions other than language of work. **Income is split, so check the
+   statistic, not the topic:** since 2016 census income comes from tax and benefit records linked to
+   every respondent, and **medians are published for 100% of the population**, while averages and
+   aggregates come only from the 25% sample (the 2021 Income Reference Guide says so). The welcome
+   post's median incomes are therefore a full count and need no sampling note - a note put on them
+   in error was taken off again the same day. Tables mark it in the member names of a statistics
+   dimension ("... - 100% data", "... - 25% sample data"); where a statistic is unlabelled, look it up
+   in the census reference guide for the topic rather than guessing. The commuting post's last three
+   charts were rebuilt from counts to shares for this reason (2026-09-18).
 9b. **A chart drawn from sample data says so in a note, and reports the uncertainty where it can.**
    This covers every sample, not only the census long form: the Labour Force Survey, the Canadian
    Community Health Survey, the General Social Survey, any poll. Greg wants the reader told every

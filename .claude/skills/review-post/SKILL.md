@@ -33,8 +33,9 @@ For every `ggplot` chunk:
   or rewrite as a finding (style rule 1); and no stock template text is left unwritten: the opening
   paragraph comment, "First finding as a plain-language heading", "Second finding", and the empty
   `tbl-first` chunk all have to be replaced or removed before a post goes live.
-- No chart shows counts from long-form census data (style rule 9a): commuting, labour, income,
-  education, housing, immigration and the other long-form topics are a 25% sample, so labels, axes
+- No chart shows counts from long-form census data (style rule 9a): commuting, labour,
+  education, housing, immigration, average or aggregate income and the other long-form topics are
+  a 25% sample (median income is 100% data), so labels, axes
   and alt text show shares or rates. Check every census table the post reads, and flag any count
   that comes from one.
 - Every chart drawn from sample data (census long form, LFS, CCHS, any survey) has a note saying so
