@@ -264,6 +264,20 @@ base_size <- 15
 # definitions are revisited at every census.
 cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
 
+# The stock notes for charts drawn from sample data, one per sample, picked by
+# name with cwr_caption(sample = ). A reader is told every time a chart's numbers
+# are estimates from a sample rather than a full count, in the same words every
+# time, so the note is recognised at a glance and one edit fixes every chart.
+#
+# The census long form goes to one household in four; the short form (age,
+# gender, households, dwellings, most language questions) is a full count and
+# needs no note. Add a survey the first time a post uses it, with the sample
+# size taken from the survey's own documentation.
+cwr_sample_notes <- c(
+  census_2021 = "Estimates from the 2021 census long-form questionnaire, a 25% sample of households",
+  census_2016 = "Estimates from the 2016 census long-form questionnaire, a 25% sample of households"
+)
+
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
 # The caption names whoever published the numbers, and nothing else. A chart that
@@ -299,6 +313,12 @@ cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
 # subject of the chart and that is the earliest thing a subtitle names. Set it
 # rather than typing the note, so that the wording cannot drift from post to post.
 #
+# `sample` names the sample a chart's numbers come from - one of the names in
+# `cwr_sample_notes`, such as "census_2021" - and puts its stock note at the end
+# of the notes, directly above the source line, since it is a note about the
+# source. Numbered with the rest, so it too needs its key in the subtitle. Any
+# confidence interval the chart draws or states goes in `notes` as usual.
+#
 # The notes are drawn above the source line, which is where a reader looks for a
 # qualification and where Datawrapper puts them, with a blank line between the two
 # so the qualifications do not read as part of the source:
@@ -309,8 +329,15 @@ cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
 #     notes = c("Figures for 2020 are estimates",
 #               "Two industries suppressed by Statistics Canada")
 #   )
-cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE) {
+cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE, sample = NULL) {
   if (cma) notes <- c(cwr_cma_note, notes)
+  if (!is.null(sample)) {
+    if (!sample %in% names(cwr_sample_notes)) {
+      stop("No stock note for sample '", sample, "'. Add it to cwr_sample_notes in R/theme_cwr.R.",
+           call. = FALSE)
+    }
+    notes <- c(notes, cwr_sample_notes[[sample]])
+  }
 
   # The byline is a source like any other, so it decides the plural too
   label <- if (length(source) > 1 || credit) "Sources: " else "Source: "

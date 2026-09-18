@@ -34,7 +34,8 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    `R/01_get_data.R` to fetch it - for Ontario municipal census populations 1996-2021, `gt::towny` is
    already installed; see `WORKFLOW.md` section 3.2 for how to use it and its traps), write
    `R/02_clean_data.R` to produce small tidy files in `data/`,
-   fill `data/tables.csv` and `data/dictionary.csv` for every table the post reads (these drive the
+   fill `data/tables.csv` (including its `sample` column: the sample, or "None (full count)") and
+   `data/dictionary.csv` for every table the post reads (these drive the
    reader download bundle and the generated `## Data dictionary` section of the post's README, which
    is where the dictionary appears - never in the post itself; Claude can draft the descriptions
    from the cleaning script), then write the post using the `cwr-charts` skill. Preview with `/preview <slug>`.

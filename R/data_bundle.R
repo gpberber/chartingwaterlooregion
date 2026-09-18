@@ -9,11 +9,19 @@
 # Two small CSV files in posts/<slug>/data/ drive everything:
 #
 #   tables.csv      one row per table the post uses
-#                   columns: table, file, description, source, licence, notes
+#                   columns: table, file, description, source, licence, sample, notes
 #                   `file` is a path from the project root, so a table can live
 #                   in the post's own data/ or in datasets/<name>/data/
+#                   `sample` says whether the figures are estimates from a
+#                   sample - "Census long form, 25% sample of households", a
+#                   survey and its size - or "None (full count)"; it goes into
+#                   the bundle's README beside the source, so somebody who only
+#                   downloads the numbers is told too. Older files without the
+#                   column still work.
 #   dictionary.csv  one row per column of every table
 #                   columns: table, column, description, units
+#                   A confidence bound is described as one: "Lower bound of the
+#                   95% confidence interval for `workers`", in the same units.
 #
 # Column types and example values are read from the data itself, so the
 # dictionary only needs the parts a machine cannot know: meaning and units.
@@ -47,7 +55,10 @@ source(here("R", "data_helpers.R"))   # cwr_repo, cwr_data_tag(), cwr_release_up
 cwr_tables <- function(slug) {
   path <- here("posts", slug, "data", "tables.csv")
   if (!file.exists(path)) stop("No tables.csv in posts/", slug, "/data/. See R/data_bundle.R for the format.")
-  read_csv(path, col_types = cols(.default = col_character())) |>
+  tables <- read_csv(path, col_types = cols(.default = col_character()))
+  # A tables.csv written before the `sample` column existed gets an empty one,
+  # so the README below can always ask for it
+  bind_rows(tibble(sample = character()), tables) |>
     mutate(across(everything(), \(x) replace_na(x, "")))
 }
 
@@ -305,8 +316,9 @@ cwr_data_bundle <- function(slug, version = 1, excel = TRUE, upload = TRUE) {
       )
     })
   source_lines <- tables |>
-    pmap_chr(\(table, source, licence, notes, ...) {
+    pmap_chr(\(table, source, licence, sample, notes, ...) {
       line <- paste0(table, ": ", source, "\n    Licence: ", licence)
+      if (sample != "") line <- paste0(line, "\n    Sample: ", sample)
       if (notes != "") line <- paste0(line, "\n    ", notes)
       line
     })

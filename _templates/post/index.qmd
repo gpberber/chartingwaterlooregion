@@ -74,7 +74,9 @@ cwr_figure(
 ## Data sources
 
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
-     reader should know: write that here, above the table. The table itself is not
+     reader should know: write that here, above the table. If any of it is sample data
+     (the census long form, a survey), say so here, how big the sample is, and whether
+     the charts show confidence intervals. The table itself is not
      written here - the chunk below prints the "Data sources" table straight out of
      this post's README.md, so there is only ever one copy of it.
 

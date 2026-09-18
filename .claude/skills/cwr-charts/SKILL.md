@@ -22,7 +22,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons, keyed by `cwr_region` for the Region |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
-| `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note |
+| `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE, sample = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note; `sample = "census_2021"` adds the stock sampling note (rule 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
@@ -202,6 +202,53 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    in the post's `02_clean_data.R`, not in the chart.
 9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
+9a. **Long-form census data is charted as shares or rates, never as counts.** Before drafting any
+   chart from a census table, check which questionnaire the variable comes from. The 2021 long form
+   went to one household in four, so its counts are estimates scaled up from a 25% sample, not
+   headcounts, and a bar labelled "16,515 commuters" claims a precision the data does not have.
+   Chart the share, rate or median instead (a share of the same sample is what it estimates well),
+   and keep counts out of labels, axes and alt text; they may still be summed in code as a
+   denominator. **If Greg asks for counts from a long-form table, say so before building it** - he
+   asked for this check "so I don't make this mistake again". Long-form: commuting, place of work,
+   labour, income, education, housing costs and condition, immigration and citizenship,
+   ethnocultural and religious origin, Indigenous identity, language of work, mobility. Short form
+   (a full count, counts are fine): population, age, gender, marital status, households and
+   families, dwelling type, and the language questions other than language of work. Statistics
+   Canada tables say which in their notes ("25% sample data" or "long-form"). The commuting post's
+   last three charts were rebuilt from counts to shares for this reason (2026-09-18).
+9b. **A chart drawn from sample data says so in a note, and reports the uncertainty where it can.**
+   This covers every sample, not only the census long form: the Labour Force Survey, the Canadian
+   Community Health Survey, the General Social Survey, any poll. Greg wants the reader told every
+   time (2026-09-18).
+   - **The note is always there, and never typed.** Pass `cwr_caption(sample = "census_2021")`,
+     which adds the stock note from `cwr_sample_notes` in `R/theme_cwr.R` ("Estimates from the 2021
+     census long-form questionnaire, a 25% sample of households") as the last note, directly above
+     the source line; like the CMA note it needs its key in the subtitle, which is Greg's, so say so
+     at hand-off. A sample with no entry yet - a survey used for the first time - gets one added to
+     `cwr_sample_notes` ("Estimates from the Labour Force Survey, a monthly sample of about N
+     households", the size from the survey's own documentation, not from memory), so the wording is
+     identical on every chart that uses it.
+   - **Confidence intervals, when the source publishes them.** Census tables often carry a
+     `Statistics` dimension - "Count", "95% confidence interval lower bound, Count", "... upper bound"
+     (98-10-0462 does) - and surveys publish CIs or coefficients of variation. Do not filter them away
+     in `02_clean_data.R`: keep `lower` and `upper` beside the estimate. Then, in order of preference:
+     **draw them** when a reader will compare values close enough that the intervals change what the
+     chart says (whiskers with `geom_linerange()` or `geom_errorbar(orientation = "y")` on a bar or
+     dot, a `geom_ribbon()` around a line, in `cowboysilver`, and a note saying "Lines show 95%
+     confidence intervals"); otherwise **state them in the note** ("95% confidence intervals are
+     within about ±2 percentage points" - a range across the bars, measured, not guessed).
+   - **A share worked out here has no published interval.** When the chart divides one sampled count
+     by another, the source's count intervals do not give the share's. Do not invent one or improvise
+     a formula: the note says the figures are sample estimates, and whether to model an interval is a
+     question for Greg.
+   - **Flag it at hand-off** when a source publishes intervals that the chart does not draw, so Greg
+     can decide whether they belong on the chart.
+   - **The chart is one of five places the sample is recorded.** The others, all set up in the post
+     template: the **Sample** column of the README's Data sources table (printed in the post's Data
+     sources section), the README's **Sampling** note (what the intervals are and whether the charts
+     use them), the `sample` column of `data/tables.csv` (printed in the download bundle's README),
+     and `data/dictionary.csv`, which describes any kept confidence bound as one. Fill in the README
+     and the table when adding a sampled source; the Data sources prose above the table is Greg's.
 10. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
 11. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
     sizes, so text is twice as large relative to the chart. `cwr_figure()` already wraps
@@ -283,17 +330,29 @@ cwr_figure(p, "fig-flows-waterloo", alt = flow_alt("Waterloo"), height = 7.5, ph
 A request for a chart is a request for the chart chunk. Do not write an introduction, a heading, a
 finding, or a sentence interpreting it, and do not touch the post's other sections - the template's
 placeholder comments and stock headings stay exactly as they are until Greg writes them himself.
-Yours to write: the `cwr_caption()` source line, the `alt` text, and the code comments.
+Yours to write: the `cwr_caption()` source line, the `alt` text, the code comments, and a
+**working title**.
 
-Not yours: the title and subtitle. Leave them as placeholders for Greg, exactly these lines, so
-they are obvious and unfinished - the house rule they stand for is in style rule 1:
+**The working title is brief and purely descriptive: it names the data shown and nothing else.**
+Every chart Claude drafts gets one in place of the template's "Title: the finding, in one line",
+so Greg can tell the charts apart while he works (his request, 2026-09-18, after a post of twelve
+charts all titled the same placeholder). Say what is plotted, for which places, split which way -
+"Where commuters from Kitchener work", "How commuters get to work, by municipality", "The ten
+places sending the most commuters into the Region". Never a finding, a comparison, an adjective
+that judges ("most", "only", "rising" are fine when they describe the selection, not the result),
+or a number from the data. The finding title that replaces it is Greg's, per style rule 1. Tabs
+built by one function get one title each, naming the tab's own group.
+
+Not yours: the subtitle. Leave it as the placeholder, exactly this line, so it is obvious and
+unfinished:
 
 ```r
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Kitchener work",                   # working title, descriptive only
     subtitle = "Subtitle: what is measured, for whom, and when<br>",
 ```
 
-Keep the trailing `<br>` only where the chart needs room under the subtitle.
+Keep the trailing `<br>` only where the chart needs room under the subtitle. When an axis is
+rescaled (style rule 1c), say so in the hand-off line, since the subtitle is where it will go.
 
 ## Iteration loop for label placement
 

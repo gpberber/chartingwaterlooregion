@@ -135,8 +135,8 @@ Things to know before charting it:
 
 Every post offers its data as a zip for readers who just want the numbers. Two small CSV files in `data/` drive that, and they are the only part a machine cannot generate:
 
-- `data/tables.csv`: one row per table the post reads. Columns: `table` (a short name), `file` (path from the project root, so it can point into the post's `data/` or into `datasets/<name>/data/`), `description`, `source`, `licence`, `notes` (for example a required disclaimer).
-- `data/dictionary.csv`: one row per column of every table. Columns: `table`, `column`, `description`, `units`. Types and example values are read from the data automatically.
+- `data/tables.csv`: one row per table the post reads. Columns: `table` (a short name), `file` (path from the project root, so it can point into the post's `data/` or into `datasets/<name>/data/`), `description`, `source`, `licence`, `sample` (whether the figures are estimates from a sample: "Census long form, 25% sample of households", a survey and its size, or "None (full count)"; it is printed beside the source in the bundle's README), `notes` (for example a required disclaimer).
+- `data/dictionary.csv`: one row per column of every table. Columns: `table`, `column`, `description`, `units`. Types and example values are read from the data automatically. A column holding a confidence bound says so: "Lower bound of the 95% confidence interval for `workers`", in the same units as the estimate.
 
 Claude drafts both from the cleaning script when asked; check the wording. A helper refuses to build the bundle if any column is undocumented, so the dictionary cannot drift:
 

@@ -495,7 +495,9 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
     caption = cwr_caption(
       c("Statistics Canada Tables 98-10-0057-01, 98-10-0070-01", "and 18-10-0004-01"),
       credit = TRUE,
-      notes = c("latest year available, from 2021 census", "adjusted by the Ontario all-items CPI")
+      notes = c("latest year available, from 2021 census", "adjusted by the Ontario all-items CPI"),
+      # Census income comes from the long-form questionnaire, a sample
+      sample = "census_2021"
     )
   ) +
   # Every bar carries its number, so the value axis and its gridlines are gone.

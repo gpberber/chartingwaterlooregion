@@ -49,6 +49,12 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Chart text calls Waterloo Region "Region": use `cwr_region` for every axis, legend, direct
   label, tooltip and note (cleaning scripts type "Region"). Line labels are positioned with
   `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
+- Census: long-form variables (commuting, labour, income, education, housing, immigration and
+  more) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If
+  Greg asks for counts from one, flag it before building. Any chart from sample data (census long
+  form, surveys) carries the stock note from `cwr_caption(sample = )`, with confidence intervals
+  drawn or stated when the source publishes them - rule 9b. The sample is also recorded in the
+  README's Data sources table (Sample column) and Notes, and in `data/tables.csv` (`sample`).
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every
@@ -73,8 +79,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   sections and placeholder comments. A post renders fine with every stock section untouched and
   `data/tables.csv` and `data/dictionary.csv` still empty, so nothing forces the extras; leave
   them alone and say in one line what is still outstanding. Write prose only when asked for it.
-  A chart's title and subtitle are prose too: leave them as the template's placeholder lines for
-  Greg to write. The `cwr_caption()` source line, the `alt` text and the code comments are
+  A chart's finding title and subtitle are prose too, and Greg's: when drafting a chart, give it a
+  brief, purely descriptive working title of the data shown ("Where commuters from Kitchener
+  work") - no finding, no claim - so he can tell the charts apart, and leave the subtitle as the
+  template's placeholder line. He replaces the working title with the finding. The `cwr_caption()` source line, the `alt` text and the code comments are
   Claude's to fill in - they are machinery and accessibility, not voice.
 - Post types: the first entry in `categories` is `Snapshot` (a few simple charts, read in under
   5 minutes) or `Deep dive` (longer, more rigorous); then 2 to 3 topic categories.

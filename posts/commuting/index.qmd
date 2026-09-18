@@ -101,12 +101,13 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
   # segments do not.
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where each municipality's commuters work",
     subtitle = "Subtitle: what is measured, for whom, and when<br>",
     fill = NULL,
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
+      sample = "census_2021",
       notes = "Workers with a usual place of work; people who work from home are counted in their own municipality"
     )
   ) +
@@ -224,11 +225,12 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "How commuters get to work, by municipality",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
+      sample = "census_2021",
       notes = c(
         "Other ways of getting to work are not shown, so the three do not add to 100%",
         "Active transportation is walking or cycling"
@@ -601,6 +603,7 @@ flow_caption <- function(home_name) {
   cwr_caption(
     c("Statistics Canada Table 98-10-0459-01", "the 2021 census boundary files"),
     credit = TRUE,
+    sample = "census_2021",
     notes = c(
       "Share of workers with a usual place of work",
       paste0("The share on ", home_name, " is of people who both live and work there"),
@@ -634,7 +637,7 @@ flow_alt <- function(home_name) {
 
 p <- flow_map("Kitchener") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Kitchener work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Kitchener")
   )
@@ -655,7 +658,7 @@ cwr_figure(
 
 p <- flow_map("Waterloo") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Waterloo work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Waterloo")
   )
@@ -676,7 +679,7 @@ cwr_figure(
 
 p <- flow_map("Cambridge") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Cambridge work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Cambridge")
   )
@@ -697,7 +700,7 @@ cwr_figure(
 
 p <- flow_map("Woolwich") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Woolwich work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Woolwich")
   )
@@ -718,7 +721,7 @@ cwr_figure(
 
 p <- flow_map("Wilmot") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Wilmot work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Wilmot")
   )
@@ -739,7 +742,7 @@ cwr_figure(
 
 p <- flow_map("North Dumfries") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from North Dumfries work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("North Dumfries")
   )
@@ -760,7 +763,7 @@ cwr_figure(
 
 p <- flow_map("Wellesley") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Where commuters from Wellesley work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = flow_caption("Wellesley")
   )
@@ -789,64 +792,45 @@ between <- flows |>
   summarise(workers = sum(workers), .by = work) |>
   rename(district = work)
 
-# Roughly how many characters fit across the bars' half of the panel at this
-# font size - the boxed column takes the rest - read off a render.
-panel_chars <- 30
+# Roughly how many characters fit across the panel at this font size, read off
+# a render; it decides whether a bar is long enough to hold its own label.
+panel_chars <- 40
 
 # Both this chart and the one below rank the seven municipalities the same way:
-# a bar for the number of people, a boxed column for its share of them. So the
-# chart is built once here and each chunk adds its own titles. `ranked` needs a
-# district and a count; the share is worked out from the counts, which is what
-# makes the column add to 100.
+# a plain bar for each one's share, labelled. Shares, not numbers of people:
+# commuting is asked on the census long-form questionnaire, which goes to one
+# household in four, so a count here is an estimate scaled up from a sample
+# rather than a headcount. A share of the same sample is what it measures well.
+# The chart is built once here and each chunk adds its own titles. `ranked`
+# needs a district and a count; the share is worked out from the counts, which
+# is what makes the bars add to 100.
 rank_chart <- function(ranked) {
   ranked <- ranked |>
     mutate(
       percent = workers / sum(workers) * 100,
-      district = fct_reorder(district, workers),
-      count_label = label_number(big.mark = ",")(workers),
+      district = fct_reorder(district, percent),
       share_label = label_number(accuracy = 0.1, suffix = "%")(percent),
-      # Whether a bar can hold its own number
-      inside = workers >= (nchar(count_label) + 1.5) * (max(workers) * 1.05 / panel_chars)
+      # Whether a bar can hold its own label
+      inside = percent >= (nchar(share_label) + 1.5) * (max(percent) * 1.05 / panel_chars)
     )
 
-  ggplot(ranked, aes(x = workers, y = district)) +
+  ggplot(ranked, aes(x = percent, y = district)) +
     geom_col(width = 0.7, fill = dodgerblue) +
-    # The baseline the bars grow from. Drawn as a segment rather than a vline so
-    # it stops just past the end bars instead of running the full panel height,
-    # which the room made for the column heading below would make obvious.
+    # The baseline the bars grow from, stopping just past the end bars
     annotate("segment", x = 0, xend = 0, y = 0.5, yend = nrow(ranked) + 0.5,
              colour = "black", linewidth = 0.5) +
+    # White inside a bar that can hold its label, black just past one that cannot
     geom_text(
       aes(
-        label = count_label,
+        label = share_label,
         hjust = if_else(inside, 1.15, -0.15),
         colour = if_else(inside, "white", "black")
       ),
       size = label_size * 0.8
     ) +
     scale_colour_identity() +
-    # The share column, hanging from the right-hand edge of the panel so it sits
-    # the same distance in on the desktop and the phone, whatever range each
-    # ends up with
-    geom_label(
-      aes(x = Inf, label = share_label),
-      hjust = 1, size = label_size * 0.8,
-      fill = cowboysilver30, colour = "grey30",
-      linewidth = 0, label.padding = unit(0.3, "lines")
-    ) +
-    # Its heading, hanging from the top of the panel. scale_y_discrete()
-    # reserves the row it needs: `add` is in rows on a discrete scale, and with
-    # no axis above the panel there is nowhere else for the heading to go.
-    annotate(
-      "label", x = Inf, y = Inf, label = "Share", hjust = 1, vjust = 1,
-      size = label_size * 0.8, fill = cowboysilver30, colour = "grey30",
-      linewidth = 0, label.padding = unit(0.3, "lines")
-    ) +
-    scale_y_discrete(expand = expansion(add = c(0.6, 1.6))) +
-    # Room on the right for the column, and for any number that sits outside its
-    # bar. Read off a render: the column hangs from the panel edge, so this gap
-    # is what separates it from the longest bar.
-    scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+    # Room on the right for a label that sits outside its bar
+    scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
     coord_cartesian(clip = "off") +
     # Every bar carries its number, so the value axis and its gridlines are gone.
     theme(
@@ -862,21 +846,19 @@ rank_chart <- function(ranked) {
 rank_lines <- function(ranked) {
   ranked |>
     mutate(percent = workers / sum(workers) * 100) |>
-    arrange(desc(workers)) |>
-    mutate(line = paste0(
-      district, " ", label_number(big.mark = ",")(workers), ", ",
-      label_number(accuracy = 0.1, suffix = "%")(percent)
-    )) |>
+    arrange(desc(percent)) |>
+    mutate(line = paste0(district, " ", label_number(accuracy = 0.1, suffix = "%")(percent))) |>
     pull(line)
 }
 
 p <- rank_chart(between) +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Commuters from elsewhere in the Region, by the municipality they work in",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
+      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
         "Only commutes that cross a municipal border inside the Region are counted"
@@ -887,9 +869,9 @@ p <- rank_chart(between) +
 cwr_figure(
   p, "fig-destinations",
   alt = paste0(
-    "Horizontal bars ranking the seven municipalities by the number of the ",
-    "Region's commuters who travel to them from another municipality in the ",
-    "Region, with each one's share of those commutes beside it. ",
+    "Horizontal bars ranking the seven municipalities by their share of the ",
+    "Region's commuters who travel to work in another municipality in the ",
+    "Region. ",
     paste(rank_lines(between), collapse = ". "), "."
   )
   # No height given: cwr_figure() sets it from the number of rows.
@@ -912,19 +894,20 @@ inbound <- read_csv(
 ) |>
   clean_names()
 
-# This tab: which municipality they work in. rank_chart() is the bar-and-box
-# chart built above, so the two look the same and are read the same way.
+# This tab: which municipality they work in. rank_chart() is the bar chart
+# built above, so the two look the same and are read the same way.
 inbound_districts <- inbound |>
   summarise(workers = sum(workers), .by = work) |>
   rename(district = work)
 
 p <- rank_chart(inbound_districts) +
   labs(
-    title = "Title: the finding, in one line",
+    title = "Commuters from outside the Region, by the municipality they work in",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
+      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
         "Only commutes into the Region from a home outside it are counted"
@@ -935,9 +918,8 @@ p <- rank_chart(inbound_districts) +
 cwr_figure(
   p, "fig-inbound-districts",
   alt = paste0(
-    "Horizontal bars ranking the seven municipalities by the number of people ",
-    "who commute into them from outside Waterloo Region, with each one's ",
-    "share of those commutes beside it. ",
+    "Horizontal bars ranking the seven municipalities by their share of the ",
+    "people who commute into Waterloo Region from outside it. ",
     paste(rank_lines(inbound_districts), collapse = ". "), "."
   )
 )
@@ -950,7 +932,10 @@ cwr_figure(
 #| output: asis
 
 # This tab: the ten municipalities that send the most commuters into the
-# Region. A lollipop rather than bars, because the ten values are close
+# Region, as each one's share of everyone who commutes in - a share, not a
+# count, for the same long-form sampling reason as the bars above. The share
+# is taken before the top ten are picked, so its denominator is every inbound
+# commuter, not just these ten. A lollipop rather than bars, because the ten values are close
 # together in the middle of the ranking and a thin segment with a dot at its
 # end is easier to compare there than ten filled bars.
 feeders <- inbound |>
@@ -961,11 +946,11 @@ feeders <- inbound |>
   mutate(home = if_else(home_csd %in% c("3529005", "3529006"), "Brantford/Brant", home)) |>
   summarise(workers = sum(workers), .by = home) |>
   mutate(percent = workers / sum(workers) * 100) |>
-  slice_max(workers, n = 10) |>
-  mutate(home = fct_reorder(home, workers))
+  slice_max(percent, n = 10) |>
+  mutate(home = fct_reorder(home, percent))
 
-p <- ggplot(feeders, aes(x = workers, y = home)) +
-  geom_segment(aes(x = 0, xend = workers, y = home, yend = home),
+p <- ggplot(feeders, aes(x = percent, y = home)) +
+  geom_segment(aes(x = 0, xend = percent, y = home, yend = home),
                colour = cowboysilver, linewidth = 0.7) +
   geom_point(shape = 19, size = 3.5, colour = dodgerblue) +
   # The baseline the segments grow from, stopping just past the end rows
@@ -973,22 +958,22 @@ p <- ggplot(feeders, aes(x = workers, y = home)) +
            colour = "black", linewidth = 0.5) +
   # The dots carry no numbers, so the chart keeps an axis. It goes on top, as
   # every ranked horizontal chart here does: a reader meets the scale before
-  # the rows rather than after them. Counted in thousands, so the numbers are
-  # one character wide and every break fits on a phone; the subtitle says so,
-  # which is where a unit of measure is always reported.
+  # the rows rather than after them. Bare numbers, no % on every break: the
+  # subtitle says they are percentages, which is where a unit of measure is
+  # always reported.
   scale_x_continuous(
-    labels = label_number(scale = 1e-3),
-    breaks = seq(0, 4000, by = 1000),
+    breaks = seq(0, 15, by = 5),
     expand = expansion(mult = c(0, 0.05)),
     position = "top"
   ) +
   coord_cartesian(clip = "off") +
   labs(
-    title = "Title: the finding, in one line",
+    title = "The ten places sending the most commuters into the Region",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
+      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
         "The ten municipalities sending the most commuters into the Region"
@@ -1008,13 +993,12 @@ cwr_figure(
   p, "fig-inbound-feeders",
   alt = paste0(
     "A lollipop chart of the ten municipalities that send the most commuters ",
-    "into Waterloo Region, ranked, against an axis along the top counted in ",
-    "thousands. ",
+    "into Waterloo Region, ranked by each one's share of everyone who commutes ",
+    "in, against an axis along the top in percent. ",
     paste(
       feeders |>
-        arrange(desc(workers)) |>
-        mutate(line = paste0(home, " ", label_number(big.mark = ",")(workers), ", ",
-                             label_number(accuracy = 0.1, suffix = "%")(percent))) |>
+        arrange(desc(percent)) |>
+        mutate(line = paste0(home, " ", label_number(accuracy = 0.1, suffix = "%")(percent))) |>
         pull(line),
       collapse = ". "
     ), "."

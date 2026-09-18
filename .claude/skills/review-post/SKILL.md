@@ -28,9 +28,19 @@ decides. Then offer to apply the fixes.
 
 For every `ggplot` chunk:
 - No chart still carries a placeholder title or subtitle ("Title: the finding, in one line",
-  "Subtitle: what is measured..."), and no stock template text is left unwritten: the opening
+  "Subtitle: what is measured..."); any title that still only describes the data - a working
+  title Claude drafted, such as "Where commuters from Kitchener work" - is flagged for Greg to keep
+  or rewrite as a finding (style rule 1); and no stock template text is left unwritten: the opening
   paragraph comment, "First finding as a plain-language heading", "Second finding", and the empty
   `tbl-first` chunk all have to be replaced or removed before a post goes live.
+- No chart shows counts from long-form census data (style rule 9a): commuting, labour, income,
+  education, housing, immigration and the other long-form topics are a 25% sample, so labels, axes
+  and alt text show shares or rates. Check every census table the post reads, and flag any count
+  that comes from one.
+- Every chart drawn from sample data (census long form, LFS, CCHS, any survey) has a note saying so
+  and naming the sample, through `cwr_caption(sample = )` rather than typed (style rule 9b); where the source publishes confidence intervals, they are
+  drawn or stated in that note - flag any that were dropped. The post's Data sources prose says the
+  data are a sample too.
 - No chart is a pie or a donut (`geom_arc_bar`, `coord_polar` on a bar, any package drawing one).
   The About page promises readers there are none; this is the check that keeps that true.
 - Numbers written into a chart's `alt` text are computed from the data, not typed. Typed figures go
@@ -86,7 +96,9 @@ For every `ggplot` chunk:
   must NOT print the data dictionary: it belongs in the post's README and the download zip only.
   Flag any `cwr_dictionary_table()` call or `tbl-dictionary` chunk left in a post.
 - `data/tables.csv` lists every table the post reads (including any from `datasets/`), with
-  description, source and licence filled in; `data/dictionary.csv` describes every column.
+  description, source, licence and `sample` filled in; `data/dictionary.csv` describes every column,
+  and names any confidence bound as one. The README's Data sources table has its Sample column filled
+  for every row, and a sampled source has a Sampling note in the README's Notes.
   Run `Rscript -e 'source(here::here("R","data_bundle.R")); cwr_dictionary_check("<slug>")'`
   and report the result. The post's README has a generated `## Data dictionary` section matching
   the current data; refresh it with `cwr_dictionary_readme("<slug>")` if it is missing or stale. If the data changed since the last bundle, `data_bundle_version` must be bumped.

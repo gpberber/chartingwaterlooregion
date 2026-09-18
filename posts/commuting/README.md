@@ -4,9 +4,11 @@ Post: https://chartingwaterlooregion.ca/posts/commuting/
 
 ## Data sources
 
-| File in `data-raw/` | What it is | Source (link) | Licence | Accessed |
-|---|---|---|---|---|
-| `table_98100462.csv` | Table 98-10-0462-01, commuting destination by mode, age and gender, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810046201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | 2026-09-15 |
+| File in `data-raw/` | What it is | Source (link) | Licence | Sample | Accessed |
+|---|---|---|---|---|---|
+| `table_98100462.csv` | Table 98-10-0462-01, commuting destination by mode, age and gender, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810046201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | Census long form, 25% sample of households | 2026-09-15 |
+| `table_98100459_region.csv`, `table_98100459_members.csv` | Table 98-10-0459-01, commuting flow from place of residence to place of work, 2021 census, cut to commutes with one end in the Region; the members file is the table's own list of places and codes | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810045901) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | Census long form, 25% sample of households | 2026-09-17 |
+| `csd_boundaries.gpkg` | 2021 census subdivision cartographic boundary file (`lcsd000b21a_e`), cut to the Region and the places its residents commute to | [Statistics Canada](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | None (boundaries) | 2026-09-17 |
 
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`.
@@ -41,6 +43,13 @@ Then `quarto render posts/commuting` from a terminal.
 
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/commuting/`).
 - No API keys are needed. <!-- If one is, say which and how to get it. -->
+- Sampling: both commuting tables come from the 2021 census long-form questionnaire, which went to
+  a 25% sample of households, so every figure is an estimate and the charts show shares rather than
+  counts. Every chart says so in a note. Table 98-10-0462 publishes a 95% confidence interval for
+  each count (its `Statistics` dimension); the cleaning script keeps only the count, and no chart
+  draws an interval, because the charts show shares worked out here, and Statistics Canada publishes
+  no interval for those. Table 98-10-0459 publishes no intervals. Counts are also randomly rounded
+  to a multiple of 5.
 - The commuting table is cut down as it is downloaded, to Waterloo Region and its seven
   municipalities. Whole, it covers every census subdivision in Canada and runs to hundreds of
   megabytes, and nothing outside those rows is used.
