@@ -43,6 +43,13 @@ households <- read_csv(
 )
 
 # Mother tongue and the language spoken at home, 2021 census.
+# Cattle and people in each of the four townships on 11 May 2021, from the
+# Census of Agriculture and the census population count. Four rows.
+cattle <- read_csv(
+  here("posts", "welcome", "data", "cattle.csv"),
+  show_col_types = FALSE
+)
+
 language <- read_csv(
   here("posts", "welcome", "data", "language.csv"),
   show_col_types = FALSE
@@ -404,6 +411,91 @@ cwr_figure(
 ```
 
 When I first drafted the preceding analysis, my cow references were made in jest, as indicated by the heading's [interrobang](https://en.wikipedia.org/wiki/Interrobang).
+
+```{r}
+#| label: cattle
+#| output: asis
+
+# The four townships added together: all cattle and every resident, counted on
+# the same day - 11 May 2021, census day for both the Census of Agriculture and
+# the Census of Population. sum() is used without na.rm = TRUE on purpose: if
+# the quality check in 02_clean_data.R had blanked a township's figure, the
+# total would come out missing rather than quietly short.
+cattle_people <- cattle |>
+  summarise(Cattle = sum(cattle), People = sum(population)) |>
+  pivot_longer(everything(), names_to = "what", values_to = "count") |>
+  mutate(
+    # A horizontal chart draws the first level at the bottom, so the order is
+    # reversed to put cattle on top
+    what = fct_rev(fct_inorder(what)),
+    label = label_comma(accuracy = 1)(count),
+    # Whether a label fits inside its bar, the same test as the other bar
+    # charts: the axis runs to about 1.2 times the longest bar, and roughly 45
+    # characters of label fit across it on a phone.
+    inside = count >= (nchar(label) + 1.5) * (max(count) * 1.2 / 45)
+  )
+
+p <- ggplot(cattle_people, aes(x = count, y = what, fill = what)) +
+  geom_col(width = 0.7) +
+  # The baseline, as a segment that stops just past the two bars rather than a
+  # line the full height of the panel (see the population chart above)
+  annotate(
+    "segment",
+    x = 0, xend = 0, y = 0.5, yend = nrow(cattle_people) + 0.5,
+    colour = "black", linewidth = 0.5
+  ) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it
+      hjust = if_else(inside, 1.15, -0.15),
+      # White on the dark blue only; on the silver, and outside a bar, black
+      # reads better
+      colour = if_else(inside & what == "Cattle", "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(Cattle = dodgerblue, People = cowboysilver),
+    guide = "none"   # each bar is named on the axis
+  ) +
+  # Room on the right for a label that sits outside its bar
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Cattle and people in the four townships, 2021",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
+      credit = TRUE
+    )
+  ) +
+  # Both bars carry their number, so the value axis and its gridlines are gone
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+# Built from the plotted figures, like every alt text in the post
+alt_figures <- cattle_people |>
+  arrange(desc(what)) |>
+  mutate(entry = paste0(str_to_lower(what), " ", label)) |>
+  pull(entry)
+
+cwr_figure(
+  p, "fig-cattle",
+  alt = paste0(
+    "Two horizontal bars for North Dumfries, Wellesley, Wilmot and Woolwich ",
+    "townships together on 11 May 2021: cattle in blue and people in grey. ",
+    str_to_sentence(paste(alt_figures, collapse = "; ")), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
 
 ## Income
 

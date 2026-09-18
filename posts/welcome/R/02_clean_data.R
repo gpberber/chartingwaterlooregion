@@ -409,3 +409,58 @@ language <- districts |>
 write_csv(language, file.path(data_dir, "language.csv"))
 
 message("Wrote ", nrow(language), " language rows to ", data_dir)
+
+# ---- 10. Cattle and people in the townships -------------------------------
+# The four townships, by their census subdivision codes rather than by name.
+# In the cattle table a township's census consolidated subdivision carries the
+# same code as the township itself (see 01_get_data.R, section 7).
+townships <- districts |>
+  st_drop_geometry() |>
+  filter(district_type == "Township") |>
+  select(csduid, district)
+
+# All cattle on census day, 11 May 2021: the table's "Total cattle", which is
+# calves, steers, heifers, cows and bulls together.
+cattle_kept <- read_csv(
+  file.path(raw_dir, "table_32100370.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    geo_uid %in% townships$csduid,
+    cattle == "Total cattle",
+    unit_of_measure == "Number of animals"
+  )
+
+# Every figure in this table carries a quality grade, A (excellent) to D
+# (acceptable), or E, F or x; the check reports them and blanks any this site
+# never uses.
+cattle_kept <- cattle_kept |>
+  cwr_quality_flags("32-10-0370-01", notes = table_notes("table_32100370"), log = quality_log)
+
+# People on the same day, from the 2021 census count
+census_population_kept <- read_csv(
+  file.path(raw_dir, "table_98100002.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(
+    geo_uid %in% townships$csduid,
+    population_and_dwelling_counts_13 == "Population, 2021"
+  )
+
+census_population_kept <- census_population_kept |>
+  cwr_quality_flags("98-10-0002-01", notes = table_notes("table_98100002"), log = quality_log)
+
+# One row per township. The chart adds them up; the file keeps them apart so a
+# reader downloading the data can see each township's figures.
+cattle <- townships |>
+  left_join(cattle_kept |> select(csduid = geo_uid, cattle = value), join_by(csduid)) |>
+  left_join(census_population_kept |> select(csduid = geo_uid, population = value),
+            join_by(csduid)) |>
+  select(district, cattle, population) |>
+  arrange(district)
+
+write_csv(cattle, file.path(data_dir, "cattle.csv"))
+
+message("Wrote ", nrow(cattle), " township rows of cattle and people to ", data_dir)

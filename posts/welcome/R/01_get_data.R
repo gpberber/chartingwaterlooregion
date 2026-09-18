@@ -179,14 +179,40 @@ expand_grid(
   left_join(mother_tongue_places, join_by(geography == member)) |>
   write_csv(file.path(raw_dir, "table_98100180_coords.csv"))
 
-# ---- 7. Footnotes ----------------------------------------------------------
+# ---- 7. Cattle, 2021 Census of Agriculture --------------------------------
+# Table 32-10-0370-01, "Cattle inventory on farms, Census of Agriculture, 2021":
+# head of cattle on census day, 11 May 2021, by type of animal. The whole table
+# is small (46,000 figures), so it is downloaded in full and cut to Waterloo
+# Region: the census division (GeoUID 3530) and its places (3530xxx).
+#
+# Its smallest geography is the census consolidated subdivision (CCS), a group
+# of neighbouring municipalities, not the municipality itself. Checked against
+# the 2021 geographic attribute file (Statistics Canada 92-151): each of the
+# four townships is a CCS on its own, under its own municipal code, while the
+# City of Waterloo is folded into the Kitchener CCS. So the township rows are
+# the townships exactly; the city rows would not be the cities.
+get_cansim("32-10-0370") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_32100370.csv"))
+
+# ---- 8. Population, 2021 census --------------------------------------------
+# Table 98-10-0002-01, "Population and dwelling counts: Canada and census
+# subdivisions (municipalities)": the 2021 census count, taken on the same day
+# as the Census of Agriculture. A count rather than the yearly estimates in
+# section 2, so that the people and the cattle are counted on the same day by
+# the same census.
+get_cansim("98-10-0002") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_98100002.csv"))
+
+# ---- 9. Footnotes ----------------------------------------------------------
 # Each Statistics Canada table carries footnotes, some of them about the
 # quality or comparability of the figures. They are saved beside the tables so
 # that 02_clean_data.R can report the ones that apply to the rows this post
 # keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
 # The file names match the tables': table_17100155_notes.csv and so on.
 c("17-10-0155-01", "98-10-0057-01", "98-10-0070-01", "18-10-0004-01",
-  "98-10-0041", "98-10-0180") |>
+  "98-10-0041", "98-10-0180", "32-10-0370-01", "98-10-0002-01") |>
   walk(\(table_number) {
     get_cansim_table_notes(table_number) |>
       write_csv(file.path(
