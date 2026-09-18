@@ -30,6 +30,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Preview server for the Browser pane: `preview_start` with `quarto-preview` (port 4200)
 - Full public render: `quarto render`
 - Publish: `quarto publish gh-pages --no-render --no-prompt` (only via `/publish`)
+- Snippets: `_dev/r.snippets` is the only copy anyone edits. After every change to it run
+  `Rscript _dev/build_chart_references.R`, which regenerates the skill's templates and CHARTS.md
+  and merges the snippets into RStudio's own copy (keeping any snippet only RStudio has, with a
+  dated backup). Never edit RStudio's copy or the generated files by hand.
 - Run R: `Rscript path/to/script.R` (never RStudio addins). Long R snippets go in a scratchpad
   script, not `-e`.
 

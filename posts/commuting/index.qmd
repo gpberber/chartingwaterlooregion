@@ -102,7 +102,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
   labs(
     title = "Where each municipality's commuters work",
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    subtitle = "Subtitle: what is measured, for whom, and when",
     fill = NULL,
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
@@ -116,7 +116,20 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
     panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank()
+    panel.grid.major.y = element_blank(),
+    # theme_cwr() floats the legend just above the panel, which reserves no
+    # height, so it needs a <br> at the end of the subtitle to clear the bars.
+    # "top" makes the plot give the legend its own row instead, so the gap under
+    # the subtitle is exactly the legend's height, whatever the subtitle says.
+    legend.position = "top",
+    # legend.justification alone does nothing once the legend is in the top
+    # strip; that strip has its own justification setting.
+    legend.justification.top = "left",
+    # Line the keys up with the title's left edge rather than the bars', and
+    # drop the legend's own padding: the subtitle already leaves a margin under
+    # itself, and the two together read as a gap.
+    legend.location = "plot",
+    legend.margin = margin(0, 0, 0, 0)
   )
 
 alt_lines <- commuting_bars |>
@@ -136,18 +149,9 @@ cwr_figure(
   # No height given: cwr_figure() sets it from the number of rows.
   phone = list(
     # Three keys will not fit across a phone in one row, so they stack into a
-    # column. That means moving the legend as well as turning it: theme_cwr()
-    # floats it just above the panel, which reserves no height, so a column of
-    # keys would be drawn straight over the first bars. "top" makes the plot
-    # give it room instead.
+    # column, still in the top strip the desktop version puts them in.
     guides(fill = guide_legend(ncol = 1)),
-    theme(
-      legend.position = "top",
-      legend.direction = "vertical",
-      # legend.justification alone does nothing once the legend is in the top
-      # strip; that strip has its own justification setting.
-      legend.justification.top = "left"
-    )
+    theme(legend.direction = "vertical")
   )
 )
 ```

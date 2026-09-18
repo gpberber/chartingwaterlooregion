@@ -119,7 +119,7 @@ plot_data |>
   labs(
     x = "<x_title>",
     title = "Title",
-    subtitle = "Subtitle<br>",
+    subtitle = "Subtitle",
     caption = cwr_caption("Source")
   )
 ```
@@ -295,7 +295,7 @@ plot_data |>
   labs(
     x = "<x_title>",
     title = "Title",
-    subtitle = "Subtitle<br>",
+    subtitle = "Subtitle",
     caption = cwr_caption("Source")
   )
 ```

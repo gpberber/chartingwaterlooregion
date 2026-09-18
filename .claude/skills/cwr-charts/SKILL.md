@@ -72,8 +72,10 @@ Read only the reference file you need; each is self-contained.
 is free of them, so this one is a published commitment rather than a preference. Parts of a whole go
 in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what let them.
 
-1. **Title says the finding, subtitle says the units and scope.** Subtitle ends with `<br>`
-   when the plot needs breathing room under it. There are no axis titles in this theme, so a
+1. **Title says the finding, subtitle says the units and scope.** A subtitle can end with `<br>`
+   when the plot needs breathing room under it, added by hand where needed - never by default, and
+   not in the placeholder. A legend that needs the room is moved to its own row instead
+   (`legend.position = "top"`), since theme_cwr() floats it above the panel reserving no height. There are no axis titles in this theme, so a
    single-panel chart has nowhere but the subtitle to say what its axis measures. Caption is
    always `cwr_caption("...")`, naming whoever published the numbers and nobody else. It carries no Charting Waterloo Region byline
    by default: plotting a publisher's figures as published is their work, not ours. Pass
@@ -354,10 +356,24 @@ unfinished:
 
 ```r
     title = "Where commuters from Kitchener work",                   # working title, descriptive only
-    subtitle = "Subtitle: what is measured, for whom, and when<br>",
+    subtitle = "Subtitle: what is measured, for whom, and when",
 ```
 
-Keep the trailing `<br>` only where the chart needs room under the subtitle. When an axis is
+The placeholder never ends with `<br>`: Greg adds one by hand where a chart needs room under the
+subtitle (2026-09-18). A chart with a legend gets that room by giving the legend its own row
+instead, with no gap above it and its keys under the title's left edge:
+
+```r
+  theme(
+    legend.position = "top",
+    legend.justification.top = "left",
+    legend.location = "plot",
+    legend.margin = margin(0, 0, 0, 0)
+  )
+```
+
+The commuting post's first chart is the worked case; on the phone it adds only
+`guides(fill = guide_legend(ncol = 1))` and `theme(legend.direction = "vertical")`. When an axis is
 rescaled (style rule 1c), say so in the hand-off line, since the subtitle is where it will go.
 
 ## Iteration loop for label placement

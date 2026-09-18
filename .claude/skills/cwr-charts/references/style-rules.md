@@ -8,8 +8,9 @@ the same call in a situation the templates do not cover.
 
 - **Title = the finding**, written as a sentence a reader could repeat ("Violent crime in
   Waterloo Region rose faster than in Canada after 2014"), not a variable name.
-- **Subtitle = units and scope** ("Incidents per 100,000 people, 2004 to 2024"). It ends with
-  `<br>` when the top of the panel needs space (line charts with labels near the top).
+- **Subtitle = units and scope** ("Incidents per 100,000 people, 2004 to 2024"). A `<br>` is
+  added at its end by hand when the top of the panel needs space (line charts with labels near the
+  top); the templates leave it out.
 - **Caption = source**, always through `cwr_caption()`, naming whoever published the numbers.
   Cite the table number for Statistics Canada. The caption does **not** carry a Charting
   Waterloo Region byline by default: plotting a publisher's figures as published is their

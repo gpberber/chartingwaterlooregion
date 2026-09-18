@@ -1,11 +1,13 @@
 # build_chart_references.R
 # ---------------------------------------------------------------------------
-# Converts the RStudio snippet file (_dev/r.snippets) into two things:
+# Converts the RStudio snippet file (_dev/r.snippets) into three things:
 #   .claude/skills/cwr-charts/references/*.md   the code templates Claude reads
 #   CHARTS.md                                   the pick-a-chart table for the author
-# Both are generated, so neither can drift from the snippets. Never edit either by hand.
+#   RStudio's own r.snippets                    what Shift+Tab fills in (section 4)
+# All are generated, so none can drift from the snippets. Never edit the first two
+# by hand, and edit snippets in _dev/r.snippets rather than in RStudio's copy.
 #
-# Re-run this after editing r.snippets:  Rscript _dev/build_chart_references.R
+# Re-run this after every edit to r.snippets:  Rscript _dev/build_chart_references.R
 #
 # Snippet syntax -> template syntax:
 #   ${1:placeholder}  ->  <placeholder>
@@ -298,3 +300,71 @@ write_chart_picker <- function() {
 }
 
 write_chart_picker()
+
+# ---- 4. Install the snippets into RStudio -----------------------------------
+# RStudio does not read _dev/r.snippets: it reads its own copy, in the user's
+# RStudio settings folder, which is what fills in a snippet when you type its
+# name and press Shift+Tab. Left alone, that copy drifts from the repo's (it
+# was a month behind when this step was added), so every run of this script
+# brings it up to date.
+#
+# It is a merge, not a copy. RStudio's file also holds snippets that are not in
+# the repo - RStudio's own built-ins (lib, fun, if, for ...) and any written
+# straight into RStudio - and a plain copy would delete them. So:
+#   - every snippet in the repo replaces the one of the same name, or is added;
+#   - every snippet only RStudio has is kept, after the repo's.
+# The file it replaces is kept beside it as r.snippets.bak-<date>-<time>.
+sync_rstudio_snippets <- function(repo_lines = snippet_lines) {
+  # Windows keeps RStudio's settings under %APPDATA%; macOS and Linux under
+  # ~/.config/rstudio
+  settings_dir <- if (nzchar(Sys.getenv("APPDATA"))) {
+    file.path(Sys.getenv("APPDATA"), "RStudio")
+  } else {
+    file.path("~", ".config", "rstudio")
+  }
+  rstudio_file <- file.path(settings_dir, "snippets", "r.snippets")
+  dir.create(dirname(rstudio_file), recursive = TRUE, showWarnings = FALSE)
+
+  # Split a snippet file into one block of lines per snippet, named by the
+  # snippet. A block runs from its `snippet` line to the line before the next
+  # one. The name may follow `snippet` after a space or a tab.
+  snippet_blocks <- function(lines) {
+    starts <- str_which(lines, "^snippet\\s+\\S+")
+    if (length(starts) == 0) return(list())
+    ends <- c(starts[-1] - 1, length(lines))
+    map2(starts, ends, \(s, e) lines[s:e]) |>
+      set_names(str_match(lines[starts], "^snippet\\s+(\\S+)")[, 2])
+  }
+
+  installed <- if (file.exists(rstudio_file)) read_lines(rstudio_file) else character()
+  only_rstudio <- snippet_blocks(installed)
+  only_rstudio <- only_rstudio[!names(only_rstudio) %in% names(snippet_blocks(repo_lines))]
+
+  merged <- c(
+    repo_lines,
+    # A blank line before each kept block, so it cannot run on from the last
+    # line of the snippet above it, and the block's own trailing blank lines
+    # dropped, so running this again adds nothing
+    flatten_chr(map(only_rstudio, \(block) {
+      block <- str_trim(block, side = "right")
+      c("", block[seq_len(max(which(block != "")))])
+    }))
+  )
+
+  if (identical(merged, installed)) {
+    message("RStudio snippets already match the repo (", rstudio_file, ")")
+    return(invisible(rstudio_file))
+  }
+  # Dated, so a later run never overwrites an earlier backup. One appears only
+  # when the file actually changes, which is whenever the repo's snippets do.
+  if (file.exists(rstudio_file)) {
+    file.copy(rstudio_file, paste0(rstudio_file, ".bak-", format(Sys.time(), "%Y%m%d-%H%M%S")))
+  }
+  write_lines(merged, rstudio_file)
+  message("installed the repo's snippets into RStudio (", rstudio_file, "), keeping ",
+          length(only_rstudio), " that only RStudio had: ",
+          paste(names(only_rstudio), collapse = ", "))
+  invisible(rstudio_file)
+}
+
+sync_rstudio_snippets()
