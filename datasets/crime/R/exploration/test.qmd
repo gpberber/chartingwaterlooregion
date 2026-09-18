@@ -57,8 +57,6 @@ hate_crimes <- read_rds(here("datasets", "crime", "data", "hate_crimes.rds"))
 
 cyber_crimes <- read_rds(here("datasets", "crime", "data", "cyber_crimes.rds"))
 
-ipv_victims <- read_rds(here("datasets", "crime", "data", "family_ipv_victims.rds"))
-
 personnel<- read_rds(here("datasets", "crime", "data", "personnel.rds"))
 
 big_12_financials <- read_rds(here("datasets", "crime", "data", "big_12_financial_summary.rds"))

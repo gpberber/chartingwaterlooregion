@@ -16,6 +16,29 @@ Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`.
 
+## Reliability
+
+| Issue | Left out of the post because |
+|---|---|
+
+<!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
+     in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
+     caveat another source's own documentation gives. Closely related flags share a row - one
+     table graded acceptable for one municipality and good for another is one issue. Say which
+     figures it touches and what it means for them, in a sentence or two, and end with the
+     table number in brackets.
+
+     Then end the Issue cell with a hidden code for every flag the row covers, for example
+       ... (table 18-10-0004-01) <!-- flags: 18-10-0004-01:note36 -->
+     A symbol is table:symbol (17-10-0155-01:E), a footnote is table:note plus its number
+     (98-10-0459:note1), several are comma-separated. Readers never see the code. The post
+     will not render while any flag in data/quality_flags.csv lacks a row with its code, and a
+     row left out of the post with a reason still counts.
+
+     The post's "Reliability" table prints every row whose second column is empty. Never
+     delete a row: to leave an issue out of the post, write why in the second column. An empty
+     table prints "No data-reliability issues to note for this post." -->
+
 ## Data dictionary
 
 <!-- Generated. Leave this heading in place and do not write the table by hand: running

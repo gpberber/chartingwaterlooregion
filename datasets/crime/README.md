@@ -18,6 +18,7 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | `R/01_get_data.R` | Downloads Statistics Canada tables (via `cansim`) and Ontario Financial Information Returns into `data-raw/`; reads the WRPS occurrence exports | Once a year, after the annual data release (usually summer) |
 | `R/01b_get_ucr_codes.R` | Builds the UCR violation-code lookup from the two Statistics Canada reference PDFs in `data-raw/ucr_codes/` | When the UCR code manual changes |
 | `R/02_clean_data.R` | Turns everything in `data-raw/` into the tidy files in `data/` | After `01_get_data.R` |
+| `R/03_quality_flags.R` | Lists every Statistics Canada figure carrying a quality flag (`..`, `x`, `0s`, E, F, A to D, p, r, t) in `data/quality_flags.parquet`, with the keys posts filter on (year, `geo_uid`, `ucr_code`, statistic), and copies every table's footnotes to `data/quality_notes.csv`. The tables in `data/` are pivoted wide by statistic, so a flag cannot stay beside its figure there; a post filters these two files to its own rows and passes them to `cwr_quality_flags()` (`R/data_quality.R`) | Sourced at the end of `02_clean_data.R` |
 | `R/helpers.R` | Functions and definitions shared by the pipeline and by posts (date parsing, Waterloo Region geographies) | sourced by the others |
 | `R/load.R` | Reads `data/` into named objects for a post | in every crime post |
 | `R/exploration/` | Working notebooks used while developing posts; not rendered on the site | as needed |
@@ -33,8 +34,6 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | Hate crimes | Statistics Canada | 35-10-0191-01 | Statistics Canada Open Licence |
 | Cybercrime | Statistics Canada | 35-10-0002-01 | Statistics Canada Open Licence |
 | Homicide victims | Statistics Canada | 35-10-0071-01, 35-10-0068-01 | Statistics Canada Open Licence |
-| Victims of violent crime by age and gender | Statistics Canada | 35-10-0049-01, 35-10-0050-01 | Statistics Canada Open Licence |
-| Family and intimate-partner violence victims | Statistics Canada | 35-10-0200-01, 35-10-0202-01 | Statistics Canada Open Licence |
 | Police personnel | Statistics Canada | 35-10-0077-01, 35-10-0076-01 | Statistics Canada Open Licence |
 | UCR violation codes | Statistics Canada, CCJCSS reference PDFs | `data-raw/ucr_codes/` | Statistics Canada Open Licence |
 | Municipal Financial Information Returns, 2000 to 2025 | Ontario Ministry of Municipal Affairs and Housing | https://efis.fma.csc.gov.on.ca/fir/ | Open Government Licence – Ontario |
@@ -48,7 +47,7 @@ source(here::here("datasets", "crime", "R", "load.R"))
 | `criminal_incident_totals.parquet` | Totals by region x year x violation category | Yes |
 | `criminal_incident_summary.rds` | Region x year headline rates | Yes |
 | `crime_severity_index.rds` | CSI by region x year | Yes |
-| `homicide_victims.rds`, `violent_victims.rds`, `family_ipv_victims.rds` | Victim counts | Yes |
+| `homicide_victims.rds` | Homicide victim counts | Yes |
 | `hate_crimes.rds`, `cyber_crimes.rds` | Offence-type counts | Yes |
 | `personnel.rds` | Officers and civilians by service x year | Yes |
 | `police_fir.rds`, `big_12_financial_summary.rds` | Policing lines from municipal financial returns | Yes |
@@ -62,7 +61,7 @@ From the project root in R:
 ```r
 source("R/packages.R"); install_missing()                       # once
 source("datasets/crime/R/01_get_data.R")                        # downloads raw data (several GB, slow)
-source("datasets/crime/R/02_clean_data.R")                      # rebuilds data/
+source("datasets/crime/R/02_clean_data.R")                      # rebuilds data/, then runs 03_quality_flags.R
 ```
 
 Every cleaned file except the WRPS occurrences table is committed, so most crime posts render
@@ -83,5 +82,7 @@ cwr_data_download("crime", kind = "data-raw", root = "datasets", subdir = "raw_o
 |---|---|---|
 | 2026-09-05 | `data-dataset-crime-v1`, `data-raw-dataset-crime-v1` | Statistics Canada tables as downloaded August 2026; Financial Information Returns 2000 to 2025; WRPS occurrences 2014 to 2024 |
 | 2026-09-17 | none (committed files) | `crime_severity_index.rds`, `criminal_incidents.parquet`, `criminal_incident_totals.parquet` and `criminal_incident_summary.rds` keep every year StatCan publishes (1998 on, was 2000 on), with 2000+ values unchanged; their `base_*` columns now index to each region's first year, 1998 for most. `02_clean_data.R` had stopped keeping seven subtotals without four-digit children (UCR 135, 211, 212, 220, 335, 620, 930) in the totals table; fixed, so the rebuilt files match the committed ones |
+
+| 2026-09-18 | none (committed files) | Added `quality_flags.parquet` and `quality_notes.csv` (`R/03_quality_flags.R`); `01_get_data.R` now also saves every table's footnotes to `data-raw/table_notes.csv`. Removed `violent_victims.rds` and `family_ipv_victims.rds` and all code for their four tables (35-10-0049-01, 35-10-0050-01, 35-10-0200-01, 35-10-0202-01): Statistics Canada has withdrawn them. Both files remain in the git history. No other file changed |
 
 When the data is refreshed, bump the release version, add a row here, and mention the date in any post that re-renders.

@@ -21,6 +21,14 @@ dir.create(data_dir, showWarnings = FALSE)
 # raw <- read_csv(file.path(raw_dir, "file.csv")) |> clean_names()
 
 # ---- Tidy ----------------------------------------------------------------
+# Carry the quality flags through. A post filters the dataset to its own rows
+# and runs cwr_quality_flags() on them; it can only do that if each figure's
+# flag and each table's footnotes are in data/:
+#   - a long table (one row per figure) keeps its status and symbol columns
+#   - a table pivoted wide by statistic cannot, so write every flagged figure
+#     to a separate long file instead - datasets/crime/R/03_quality_flags.R
+#     is the worked example
+# file.copy(file.path(raw_dir, "table_notes.csv"), data_dir, overwrite = TRUE)
 # clean <- raw |> ...
 
 # ---- Write ---------------------------------------------------------------

@@ -88,27 +88,6 @@ homicide_victims <- bind_rows(homicide_victims_cmas, homicide_victims_provinces)
 
 write_csv(homicide_victims, here("datasets", "crime", "data-raw", "homicide_victims.csv"))
 
-# age of victims of violent crimes
-violent_crime_victims_age <- get_cansim("35-10-0049-01")
-
-# gender of victims of violent crimes
-violent_crime_victims_gender <- get_cansim("35-10-0050-01")
-
-# combine and save
-violent_crime_victims <- bind_rows(violent_crime_victims_age, violent_crime_victims_gender)
-
-write_csv(violent_crime_victims, here("datasets", "crime", "data-raw", "violent_crime_victims.csv"))
-
-# family and IPV victims
-family_victims <- get_cansim("35-10-0200-01")
-ipv_victims <- get_cansim("35-10-0202-01")
-
-# combine and save
-family_ipv_victims <- bind_rows(family_victims, ipv_victims)
-
-write_csv(family_ipv_victims, here("datasets", "crime", "data-raw", "family_ipv_victims.csv"))
-
-
 # get Stats Can police personnel data for Ontario municipalities
 # No 2020 due to COVID
 # As of 2023, the Police Administration Survey is conducted biennially. As such, data were not collected for 2024. 
@@ -121,6 +100,32 @@ police_personnel_ont_can <- get_cansim("35-10-0076-01") |>
 
 write_csv(police_personnel_munic, here("datasets", "crime", "data-raw", "police_personnel_munic.csv"))
 write_csv(police_personnel_ont_can, here("datasets", "crime", "data-raw", "police_personnel_ont_can.csv"))
+
+# Footnotes for every Statistics Canada table above. Some are about the quality
+# or comparability of the figures ("use caution when comparing with prior
+# years"); 03_quality_flags.R copies them into data/ so a post can report the
+# ones that apply to the rows it uses (cwr_quality_flags() in R/data_quality.R).
+crime_tables <- c(
+  "35-10-0177-01", "35-10-0180-01", "35-10-0026-01", "35-10-0188-01",
+  "35-10-0191-01", "35-10-0002-01", "35-10-0071-01", "35-10-0068-01",
+  "35-10-0077-01", "35-10-0076-01"
+)
+
+# A table Statistics Canada has since withdrawn has no footnotes to fetch: it is
+# skipped with a warning rather than stopping the script.
+crime_tables |>
+  map(\(table_number) {
+    tryCatch(
+      get_cansim_table_notes(table_number) |>
+        mutate(table = table_number, .before = 1),
+      error = \(e) {
+        warning("No footnotes for ", table_number, ": ", conditionMessage(e), call. = FALSE)
+        NULL
+      }
+    )
+  }) |>
+  list_rbind() |>
+  write_csv(here("datasets", "crime", "data-raw", "table_notes.csv"))
 
 # WRPS occurrence data
 # Define new column names based on existing names that vary in format across files

@@ -39,5 +39,29 @@ When a post's `R/` scripts should become shared:
   only the columns and rows they need with `open_dataset()`.
 - Release tags: `data-raw-dataset-<slug>-v<n>` and `data-dataset-<slug>-v<n>`. Bump the version
   when the data changes; note it in the README version table. Posts record which version they used.
+- **Carry the quality flags through to `data/`.** The dataset keeps every row, so it cannot say
+  which flags matter; a post filters to its own rows and runs `cwr_quality_flags()`
+  (`R/data_quality.R`) on them, and that needs each figure's flag and each table's footnotes.
+  - Footnotes: `01_get_data.R` saves every table's `get_cansim_table_notes()` to `data-raw/`
+    (wrapped in `tryCatch()`, so a table Statistics Canada has withdrawn warns instead of
+    stopping the run), and the build copies them into `data/`.
+  - Flags, in one of two ways. **Long tables** (one row per figure) keep the `status` and `symbol`
+    columns. **Tables pivoted wide by statistic** cannot: a flag belongs to one figure, and the
+    pivot puts several figures on a row. Those write every flagged figure to a separate long file
+    instead, keyed the way posts filter the dataset. `datasets/crime/R/03_quality_flags.R` is the
+    worked example: it reads only the flagged rows of each raw file, writes
+    `data/quality_flags.parquet` and `data/quality_notes.csv`, and is sourced at the end of
+    `02_clean_data.R`.
+  - `load.R` does not load them (a post's cleaning script reads them, not its charts); say where
+    they are in a comment there and in the README's script and file tables.
+  - A post using a pivoted dataset joins the flags onto the rows it keeps (by the dataset's keys)
+    and passes them to `cwr_quality_flags(value_cols = )`, so figures flagged E are blanked like
+    any others. Greg never uses a figure flagged E.
+- **When Statistics Canada withdraws a table**, remove it everywhere: its download in
+  `01_get_data.R`, its read and cleaning in `02_clean_data.R`, its entry in the quality-flags
+  sources and footnote list, its line in `load.R`, its output in `data/` (`git rm`, so it stays in
+  the history), any notebook line that reads that output, and its rows in the README's Sources and
+  Files tables, with a line in the Versions table saying so. Leave the local raw copy in
+  `data-raw/` alone: it is not in git and may be the only copy left.
 - Nothing obtained by request rather than from an open-data portal goes into a release until its
   terms are confirmed; keep it local and say so in the README.

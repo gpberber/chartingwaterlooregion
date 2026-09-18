@@ -13,6 +13,22 @@ A Snapshot post: how quickly the City of Kitchener's contact centre answers the 
 
 The raw metrics file is attached to GitHub Release `data-raw-kitchener-phone-wait-times-v1`; the holidays file is downloaded directly. Both are fetched by `R/01_get_data.R`.
 
+## Reliability
+
+| Issue | Left out of the post because |
+|---|---|
+
+<!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
+     in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
+     caveat another source's own documentation gives. Closely related flags share a row - one
+     table graded acceptable for one municipality and good for another is one issue. Say which
+     figures it touches and what it means for them, in a sentence or two, and end with the
+     table number in brackets.
+
+     The post's "Reliability" table prints every row whose second column is empty. Never
+     delete a row: to leave an issue out of the post, write why in the second column. An empty
+     table prints "No data-reliability issues to note for this post." -->
+
 ## Reproduce
 
 From the project root in R:

@@ -33,7 +33,10 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    alone. Report what was created and the next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it - for Ontario municipal census populations 1996-2021, `gt::towny` is
    already installed; see `WORKFLOW.md` section 3.2 for how to use it and its traps), write
-   `R/02_clean_data.R` to produce small tidy files in `data/`,
+   `R/02_clean_data.R` to produce small tidy files in `data/`, running `cwr_quality_flags()` on the
+   rows it keeps from each source (see the template; `01_get_data.R` saves each Statistics Canada
+   table's footnotes for it) and telling Greg about every flag and footnote it reports before any
+   chart uses that data,
    fill `data/tables.csv` (including its `sample` column: the sample, or "None (full count)") and
    `data/dictionary.csv` for every table the post reads (these drive the
    reader download bundle and the generated `## Data dictionary` section of the post's README, which

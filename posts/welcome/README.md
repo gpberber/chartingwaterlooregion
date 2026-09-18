@@ -19,6 +19,27 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 raw input above is downloaded by `R/01_get_data.R`. The boundary file is about 150 MB, so it is
 fetched once and left in `data-raw/`, which git ignores.
 
+## Reliability
+
+| Issue | Left out of the post because |
+|---|---|
+| **Population, 2025:** the 2025 estimates are preliminary, and Statistics Canada will revise them. Every population and density figure in this post is for 2025. (table 17-10-0155-01) <!-- flags: 17-10-0155-01:note4 --> | |
+| **Incomes restated in today's dollars:** from April 2020, Statistics Canada estimated some parts of the Consumer Price Index by special methods, among them child care, air travel and travel tours. The all-items index used to restate 2020 incomes includes those parts. (table 18-10-0004-01) <!-- flags: 18-10-0004-01:note36 --> | |
+| **How population estimates are made:** they start from the census count, adjusted for people the census missed, and add the growth since from births, deaths and migration. (table 17-10-0155-01) <!-- flags: 17-10-0155-01:note3 --> | Describes the method behind every population estimate, not a weakness in these figures. |
+| **Men+ and Women+:** because the non-binary population is small, non-binary people are counted in the Men+ and Women+ categories. (table 98-10-0180) <!-- flags: 98-10-0180:note3 --> | Does not apply: every chart uses the total for all genders, so the Men+ and Women+ split is not used. |
+| **Language data:** Statistics Canada's Languages Reference Guide covers the quality of the language questions and how they compare with other sources. (table 98-10-0180) <!-- flags: 98-10-0180:note7 --> | A pointer to the guide, not an issue in itself. |
+
+<!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
+     in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
+     caveat another source's own documentation gives. Closely related flags share a row - one
+     table graded acceptable for one municipality and good for another is one issue. Say which
+     figures it touches and what it means for them, in a sentence or two, and end with the
+     table number in brackets.
+
+     The post's "Reliability" table prints every row whose second column is empty. Never
+     delete a row: to leave an issue out of the post, write why in the second column. An empty
+     table prints "No data-reliability issues to note for this post." -->
+
 ## Reproduce
 
 From the project root in R:

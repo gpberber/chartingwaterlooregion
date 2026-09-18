@@ -279,6 +279,33 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      use them), the `sample` column of `data/tables.csv` (printed in the download bundle's README),
      and `data/dictionary.csv`, which describes any kept confidence bound as one. Fill in the README
      and the table when adding a sampled source; the Data sources prose above the table is Greg's.
+9c. **Data-quality flags reach the chart only as a decision Greg has made.** Greg's principle is
+   reliable data, and he asked to be told about every quality flag that applies to data he plans
+   to use (2026-09-18). `cwr_quality_flags()` (`R/data_quality.R`) finds them - Statistics Canada's
+   cell symbols and the table footnotes about quality - on the rows the cleaning script keeps and
+   writes them to `data/quality_flags.csv`. Before drafting a chart from a source, read that file
+   and **tell Greg every flag that reaches the chart**: the symbol, what it means, which bars or
+   points, and the options. Do not settle it silently in either direction.
+   - **unusable** (F too unreliable, x suppressed, `..` not available, **and E use with caution**):
+     never charted. F, x and `..` have no figure; E has one, but **Greg never uses a figure flagged
+     E** (2026-09-18) - not with a note, not in a lighter colour, not in a total or a share.
+     `cwr_quality_flags()` blanks all of them to NA and returns the data, so the cleaning script
+     must carry on with what it returns (`kept <- kept |> cwr_quality_flags(...)`). Never draw a
+     blanked figure as zero, never let a line run through the gap as if a value were there, never
+     fill it in or add it back. Leave the gap or the missing bar and say why in a note ("2019 not
+     shown: Statistics Canada rates it too unreliable" or "... flags it for use with caution"). If
+     a blanked figure leaves a chart unable to make its point, say so at hand-off rather than
+     working around it.
+   - **caution** (D acceptable, any symbol not in the standard legend): the figure exists but is
+     weak. The usual answer is a note naming which values carry it ("Figures for 2020 and 2021:
+     acceptable quality (Statistics Canada)"); a lighter or hollow mark on those values as well, if
+     Greg wants it. If the finding rests on a flagged value, say so at hand-off.
+   - **note** (A to C grades, p preliminary, r revised, `...`, `0s`, quality footnotes): mention at
+     hand-off; preliminary figures that the chart's story depends on also get a note.
+   - Every issue also gets a row in the README's `## Reliability` table, which the post prints under
+     "Data sources and reliability" (`cwr_reliability_table()`); closely related flags share a row.
+     One Greg decides not to disclose keeps its row, with his reason in the second column, so the
+     record and the chart agree.
 10. Tidyverse throughout, `|>` never `%>%`, `linewidth` not `size` for lines.
 11. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
     sizes, so text is twice as large relative to the chart. `cwr_figure()` already wraps

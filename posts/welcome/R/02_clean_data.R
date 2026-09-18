@@ -15,6 +15,24 @@ raw_dir  <- here("posts", "welcome", "data-raw")
 data_dir <- here("posts", "welcome", "data")
 dir.create(data_dir, showWarnings = FALSE)
 
+# ---- Data-quality flags ----------------------------------------------------
+# cwr_quality_flags() reports the quality symbols (E use with caution, F too
+# unreliable, x suppressed...) and quality footnotes on the rows each section
+# below keeps, and records them in data/quality_flags.csv. It is called once
+# per table, on every row the post uses from that table. It also hands back
+# those rows with every figure this site never uses (E, F, x, ..) blanked to
+# NA, so each section carries on with what it returns. The log is started
+# afresh so a table this script stops using does not linger in it.
+source(here("R", "data_quality.R"))
+quality_log <- file.path(data_dir, "quality_flags.csv")
+unlink(quality_log)
+
+# The footnotes 01_get_data.R saved beside each table
+table_notes <- function(file_stem) {
+  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
+           col_types = cols(.default = col_character()))
+}
+
 # ---- 1. The seven municipal polygons ---------------------------------------
 # The shapefile holds every census subdivision in Canada, about 5,000 polygons
 # and 300 MB of geometry, so it is filtered while it is being read rather than
@@ -77,13 +95,18 @@ districts <- districts |>
 # would see seven digits and make it a number, which would not join to the
 # character codes in the boundary file (and would drop any leading zero in a
 # province whose codes have one).
-population <- read_csv(file.path(raw_dir, "table_17100155.csv"),
-                       col_select = c(REF_DATE, GeoUID, VALUE),
-                       col_types = cols(GeoUID = col_character(),
-                                        REF_DATE = col_character(),
-                                        VALUE = col_double())) |>
+# GEO and the two flag columns are read as well, for the quality check.
+population_kept <- read_csv(file.path(raw_dir, "table_17100155.csv"),
+                            col_select = c(REF_DATE, GEO, GeoUID, VALUE, STATUS, SYMBOL),
+                            col_types = cols(.default = col_character(),
+                                             VALUE = col_double())) |>
   clean_names() |>
-  filter(ref_date == "2025") |>
+  filter(ref_date == "2025", geo_uid %in% districts$csduid)
+
+population_kept <- cwr_quality_flags(population_kept, "17-10-0155-01",
+                                     notes = table_notes("table_17100155"), log = quality_log)
+
+population <- population_kept |>
   select(csduid = geo_uid, population = value)
 
 districts <- districts |>
@@ -183,14 +206,21 @@ message("Wrote ", nrow(districts), " districts to ", data_dir)
 income_year <- "2020"   # the year the census asked about
 dollar_year <- "2026"   # the year the post is written for
 
-cpi <- read_csv(
+cpi_monthly <- read_csv(
   file.path(raw_dir, "table_18100004.csv"),
-  col_select = c(REF_DATE, VALUE),
-  col_types = cols(REF_DATE = col_character(), VALUE = col_double())
+  col_select = c(REF_DATE, GEO, `Products and product groups`, VALUE, STATUS, SYMBOL),
+  col_types = cols(.default = col_character(), VALUE = col_double())
 ) |>
   clean_names() |>
   # REF_DATE is "2026-08", so the first four characters are the year
-  mutate(year = str_sub(ref_date, 1, 4)) |>
+  mutate(year = str_sub(ref_date, 1, 4))
+
+# Only the months of the two years compared feed the figures
+cpi_monthly <- cpi_monthly |>
+  filter(year %in% c(income_year, dollar_year)) |>
+  cwr_quality_flags("18-10-0004-01", notes = table_notes("table_18100004"), log = quality_log)
+
+cpi <- cpi_monthly |>
   summarise(index = mean(value), months = n(), .by = year)
 
 inflator <- (cpi |> filter(year == dollar_year) |> pull(index)) /
@@ -212,7 +242,12 @@ household_income <- read_csv(
     str_starts(household_type_including_census_family_structure_11, "Total"),
     household_income_statistics_6 ==
       "Median household total income (2020) (2020 constant dollars)"
-  ) |>
+  )
+
+household_income <- cwr_quality_flags(household_income, "98-10-0057-01",
+                                      notes = table_notes("table_98100057"), log = quality_log)
+
+household_income <- household_income |>
   select(geo_uid, household_income = value)
 
 # Median total income of a person aged 15 or over who had any income. This
@@ -227,7 +262,12 @@ individual_income <- read_csv(
   filter(
     income_sources_and_taxes_32 == "Total income",
     income_statistics_8 == "Median amount ($)"
-  ) |>
+  )
+
+individual_income <- cwr_quality_flags(individual_income, "98-10-0070-01",
+                                       notes = table_notes("table_98100070"), log = quality_log)
+
+individual_income <- individual_income |>
   select(geo_uid, individual_income = value)
 
 income <- household_income |>
@@ -268,11 +308,22 @@ message("Wrote ", nrow(income), " income rows to ", data_dir,
 
 # ---- 8. Households and dwellings -------------------------------------------
 # Three figures about how people live, from two tables already in data-raw/.
+# Cut to the rows the two figures below use, for the seven municipalities only
+# (the join further down drops the Region-wide rows), and checked as one table.
 household_dwellings <- read_csv(
   file.path(raw_dir, "table_98100041.csv"),
   col_types = cols(.default = col_character(), VALUE = col_double())
 ) |>
-  clean_names()
+  clean_names() |>
+  filter(
+    geo_uid %in% districts$csduid,
+    (str_starts(structural_type_of_dwelling_9, "Total") &
+       household_size_8 == "Average household size") |
+      (str_starts(household_size_8, "Total") &
+         (structural_type_of_dwelling_9 == "Single-detached house" |
+            str_starts(structural_type_of_dwelling_9, "Total")))
+  ) |>
+  cwr_quality_flags("98-10-0041", notes = table_notes("table_98100041"), log = quality_log)
 
 # Statistics Canada publishes the average itself, so it is read rather than
 # worked out here: the size categories stop at "5 or more persons", and an
@@ -317,7 +368,13 @@ mother_tongue <- read_csv(
   file.path(raw_dir, "table_98100180_coords.csv"),
   col_types = cols(.default = col_character(), VALUE = col_double())
 ) |>
-  clean_names() |>
+  clean_names()
+
+# Every cell fetched is used, so the whole file is checked
+mother_tongue <- cwr_quality_flags(mother_tongue, "98-10-0180",
+                                   notes = table_notes("table_98100180"), log = quality_log)
+
+mother_tongue <- mother_tongue |>
   select(district = place, language = mother_tongue_538, value)
 
 # German and Pennsylvania German are added together: they are one community's

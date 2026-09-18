@@ -1187,16 +1187,18 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
 # cells hold hand-written markdown links ([City of Kitchener](https://...)), and
 # passing them along unchanged is both simpler and guarantees the post says
 # exactly what the README says. Call it from a chunk with `#| output: asis`.
-cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+# The run of table lines under one "## " heading of a post's README. Shared by
+# the two tables the post prints from its README: sources and reliability.
+cwr_readme_table <- function(slug, heading, readme = here::here("posts", slug, "README.md")) {
   if (!file.exists(readme)) {
     stop("No README.md for post '", slug, "' at ", readme, call. = FALSE)
   }
   lines <- read_lines(readme)
 
-  # Everything under the "## Data sources" heading, stopping at the next heading
-  start <- which(str_trim(lines) == "## Data sources")
+  # Everything under the heading, stopping at the next heading
+  start <- which(str_trim(lines) == str_c("## ", heading))
   if (length(start) == 0) {
-    stop("README.md for '", slug, "' has no '## Data sources' heading", call. = FALSE)
+    stop("README.md for '", slug, "' has no '## ", heading, "' heading", call. = FALSE)
   }
   after <- lines[(start[1] + 1):length(lines)]
   next_heading <- which(str_starts(str_trim(after), "## "))
@@ -1205,12 +1207,108 @@ cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.m
   # The table is the run of pipe-delimited lines in that section
   table_lines <- section[str_starts(str_trim(section), fixed("|"))]
   if (length(table_lines) == 0) {
-    stop("No table under '## Data sources' in ", readme, call. = FALSE)
+    stop("No table under '## ", heading, "' in ", readme, call. = FALSE)
   }
+  table_lines
+}
 
+cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+  table_lines <- cwr_readme_table(slug, "Data sources", readme)
   cat(table_lines, sep = "\n")
   cat("\n")
   invisible(table_lines)
+}
+
+# ---- The post's reliability table --------------------------------------------
+# The README's "## Reliability" table lists every data-quality issue found in
+# the data the post uses - Statistics Canada's quality flags and footnotes
+# (cwr_quality_flags(), R/data_quality.R), and any caveat another source's
+# documentation gives. It has two columns: the issue, and "Left out of the post
+# because". The post prints the issues whose second column is empty.
+#
+# That second column is how an issue comes out of the post. The row is never
+# deleted: Greg decides an issue is not worth disclosing, writes why in that
+# column, and the issue drops out of the post while the README keeps it and the
+# reason. So the record of what was checked stays complete, and a later reader
+# of the repository can see what was set aside and on what grounds.
+#
+# Printed as a one-column markdown table, like the sources table, so the post
+# says exactly what the README says. Call it from a chunk with `#| output: asis`.
+#
+# Each row ends with a hidden code naming the flags it covers, which a reader
+# of the post never sees:
+#   ... (table 18-10-0004-01) <!-- flags: 18-10-0004-01:note36 -->
+# A symbol is "table:symbol" (17-10-0155-01:E); a footnote is "table:note" and
+# its number (98-10-0459:note1); one row can list several, comma-separated.
+# The render stops if any flag in the post's data/quality_flags.csv (written
+# by cwr_quality_flags() in R/02_clean_data.R) has no row carrying its code,
+# so a flag cannot reach the published post without being dealt with. A row
+# left out of the post with a reason still counts: the flag was considered.
+cwr_reliability_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+  table_lines <- cwr_readme_table(slug, "Reliability", readme)
+
+  # ---- Every recorded flag has a row -----------------------------------------
+  flags_file <- file.path(dirname(readme), "data", "quality_flags.csv")
+  covered <- table_lines |>
+    str_match_all(r"(<!--\s*flags:(.*?)-->)") |>
+    map(\(m) m[, 2]) |>
+    unlist() |>
+    str_split(",") |>
+    unlist() |>
+    str_trim() |>
+    purrr::discard(\(code) code == "")   # scales has a discard() too
+
+  if (file.exists(flags_file)) {
+    required <- read_csv(flags_file, col_types = cols(.default = col_character())) |>
+      mutate(code = if_else(kind == "footnote", str_c(table, ":note", flag), str_c(table, ":", flag))) |>
+      pull(code) |>
+      unique()
+
+    missing <- setdiff(required, covered)
+    if (length(missing) > 0) {
+      stop(
+        "Post '", slug, "': these data-quality flags have no row in the README's Reliability table: ",
+        str_c(missing, collapse = ", "), ". Give each a row (or add its code to the row that ",
+        "covers it) ending <!-- flags: ", missing[1], " -->. A flag that should not be shown ",
+        "still needs a row, with the reason in 'Left out of the post because'.",
+        call. = FALSE
+      )
+    }
+
+    # Codes for flags the data no longer has: the row may be out of date
+    stale <- setdiff(covered, required)
+    if (length(stale) > 0) {
+      warning(
+        "Post '", slug, "': the Reliability table covers flags that data/quality_flags.csv no ",
+        "longer lists: ", str_c(stale, collapse = ", "), ". Check whether those rows still apply.",
+        call. = FALSE
+      )
+    }
+  }
+
+  # Split each row into its cells. The first two lines are the header and the
+  # |---|---| separator; every line after them is an issue.
+  rows <- table_lines[-(1:2)] |>
+    map(\(line) {
+      cells <- str_split_1(str_trim(line), fixed("|"))
+      # A line "| a | b |" splits to "", " a ", " b ", "": the cells are 2 and 3
+      # The hidden flag codes are for the check above, not for readers
+      tibble(
+        issue = str_trim(str_remove_all(cells[2], r"(\s*<!--.*?-->)")),
+        left_out = str_trim(coalesce(cells[3], ""))
+      )
+    }) |>
+    list_rbind()
+
+  shown <- if (nrow(rows) == 0) character() else rows |> filter(issue != "", left_out == "") |> pull(issue)
+
+  if (length(shown) == 0) {
+    cat("No data-reliability issues to note for this post.\n")
+  } else {
+    cat(c("| Issue |", "|---|", str_c("| ", shown, " |")), sep = "\n")
+    cat("\n")
+  }
+  invisible(shown)
 }
 
 cwr_session_info <- function() {

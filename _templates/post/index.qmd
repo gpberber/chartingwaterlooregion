@@ -71,14 +71,14 @@ cwr_figure(
 # gt table here (one table per chunk).
 ```
 
-## Data sources
+## Data sources and reliability
 
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
-     reader should know: write that here, above the table. If any of it is sample data
+     reader should know: write that here, above the tables. If any of it is sample data
      (the census long form, a survey), say so here, how big the sample is, and whether
-     the charts show confidence intervals. The table itself is not
-     written here - the chunk below prints the "Data sources" table straight out of
-     this post's README.md, so there is only ever one copy of it.
+     the charts show confidence intervals. Neither table is written here - the chunks
+     below print both straight out of this post's README.md, so there is only ever one
+     copy of each.
 
      Keep this heading as it is. _includes/like.html puts the "Like this post"
      button immediately above it, on the reasoning that the analysis ends here and
@@ -86,12 +86,27 @@ cwr_figure(
      builds from the heading text, so rewording the heading does not break the
      button - it quietly drops it to the foot of the page instead. -->
 
+### Sources
+
 ```{r}
 #| label: sources
 #| output: asis
 
 # Prints the source table from this post's README.md - edit it there, not here
 cwr_sources_table("{{slug}}")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this post's
+# README.md - edit them there, not here. To leave an issue out of the post, do
+# not delete its row: write why in its "Left out of the post because" column,
+# and it drops out of the post while the README keeps the record.
+cwr_reliability_table("{{slug}}")
 ```
 
 ## Other sources

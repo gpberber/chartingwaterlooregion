@@ -158,3 +158,17 @@ sf::st_read(
   quiet = TRUE
 ) |>
   sf::write_sf(file.path(raw_dir, "csd_boundaries.gpkg"), delete_dsn = TRUE)
+
+# ---- Footnotes -------------------------------------------------------------
+# Each Statistics Canada table carries footnotes, some of them about the
+# quality or comparability of the figures. They are saved beside the tables so
+# that 02_clean_data.R can report the ones that apply to the rows this post
+# keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
+c("98-10-0462", "98-10-0459") |>
+  walk(\(table_number) {
+    get_cansim_table_notes(table_number) |>
+      write_csv(file.path(
+        raw_dir,
+        str_c("table_", str_remove_all(table_number, "-"), "_notes.csv")
+      ))
+  })

@@ -19,6 +19,9 @@ dir.create(raw_dir, showWarnings = FALSE)
 # ---- Option B: Statistics Canada tables via cansim ------------------------
 # library(cansim)
 # get_cansim("35-10-0177-01") |> write_csv(file.path(raw_dir, "table_35100177.csv"))
+# Save the table's footnotes beside it. 02_clean_data.R reads them to report the
+# ones about data quality that apply to the rows the post keeps.
+# get_cansim_table_notes("35-10-0177-01") |> write_csv(file.path(raw_dir, "table_35100177_notes.csv"))
 
 # ---- Option C: files that cannot be re-downloaded (manual exports) --------
 # They are attached to a GitHub Release by the /share-data skill:

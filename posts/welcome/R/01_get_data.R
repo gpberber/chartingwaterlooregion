@@ -178,3 +178,19 @@ expand_grid(
   mutate(geography = as.integer(str_split_i(COORDINATE, fixed("."), 1))) |>
   left_join(mother_tongue_places, join_by(geography == member)) |>
   write_csv(file.path(raw_dir, "table_98100180_coords.csv"))
+
+# ---- 7. Footnotes ----------------------------------------------------------
+# Each Statistics Canada table carries footnotes, some of them about the
+# quality or comparability of the figures. They are saved beside the tables so
+# that 02_clean_data.R can report the ones that apply to the rows this post
+# keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
+# The file names match the tables': table_17100155_notes.csv and so on.
+c("17-10-0155-01", "98-10-0057-01", "98-10-0070-01", "18-10-0004-01",
+  "98-10-0041", "98-10-0180") |>
+  walk(\(table_number) {
+    get_cansim_table_notes(table_number) |>
+      write_csv(file.path(
+        raw_dir,
+        str_c("table_", str_sub(str_remove_all(table_number, "-"), 1, 8), "_notes.csv")
+      ))
+  })

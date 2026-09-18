@@ -61,6 +61,22 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   form, surveys) carries the stock note from `cwr_caption(sample = )`, with confidence intervals
   drawn or stated when the source publishes them - rule 9b. The sample is also recorded in the
   README's Data sources table (Sample column) and Notes, and in `data/tables.csv` (`sample`).
+- Data quality: every source table goes through `cwr_quality_flags()` (`R/data_quality.R`) in
+  `02_clean_data.R`, on the rows the post keeps, with the table's footnotes saved by
+  `01_get_data.R`; it writes `data/quality_flags.csv`. Tell Greg every flag and quality footnote it
+  reports before charting that data - he asked to hear about each one that applies, and only
+  those. **Figures flagged E ("use with caution") are never used**, like F, x and `..`:
+  `cwr_quality_flags()` blanks all four to NA and returns the data, so every call is assigned
+  (`kept <- kept |> cwr_quality_flags(...)`) and the script carries on with what it returns.
+  Never add a blanked figure back, chart it as zero or bridge the gap. Other flags are his call -
+  `cwr-charts` rule 9c. Every issue found gets a row in the README's `## Reliability` table
+  (closely related flags share one), which the post's "Data sources and reliability" section
+  prints with `cwr_reliability_table()`. A row is never deleted: an issue Greg decides not to
+  disclose stays in the README with his reason in the "Left out of the post because" column,
+  which is what takes it out of the post. If he deletes a row, or empties that column, remind him
+  to put the row back with a note saying why it was left out. Each row ends with a hidden code for
+  the flags it covers (`<!-- flags: 18-10-0004-01:note36 -->`); the post will not render while any
+  flag in `data/quality_flags.csv` lacks a row carrying its code.
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every

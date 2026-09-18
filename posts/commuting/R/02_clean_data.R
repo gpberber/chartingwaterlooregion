@@ -20,6 +20,24 @@ raw_dir <- here("posts", "commuting", "data-raw")
 data_dir <- here("posts", "commuting", "data")
 dir.create(data_dir, showWarnings = FALSE)
 
+# ---- Data-quality flags ----------------------------------------------------
+# cwr_quality_flags() reports the quality symbols (E use with caution, F too
+# unreliable, x suppressed...) and quality footnotes on the rows this script
+# keeps, and records them in data/quality_flags.csv. It is called once per
+# table, on every row the post uses from that table. It also hands back those
+# rows with every figure this site never uses (E, F, x, ..) blanked to NA, so
+# the script carries on with what it returns. The log is started afresh so a
+# table this script stops using does not linger in it.
+source(here("R", "data_quality.R"))
+quality_log <- file.path(data_dir, "quality_flags.csv")
+unlink(quality_log)
+
+# The footnotes 01_get_data.R saved beside each table
+table_notes <- function(file_stem) {
+  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
+           col_types = cols(.default = col_character()))
+}
+
 # ---- The seven municipalities ----------------------------------------------
 # The census table names each place but not what kind of place it is, and
 # names two of them "Waterloo" - the city and the Region. So the seven are
@@ -37,22 +55,37 @@ municipalities <- tribble(
 )
 
 # ---- Read ------------------------------------------------------------------
-# Where people who live in each municipality go to work. The table crosses this
-# with age, gender and mode of travel, so all three are held at their totals,
-# and only the count is wanted rather than the confidence bounds around it.
-# Every column is read as text except the value, so codes keep their leading
-# digits exactly as published.
-commuting_raw <- read_csv(
+# Table 98-10-0462 crosses where people who live in each municipality go to
+# work with age, gender and mode of travel. Age and gender are held at their
+# totals, and only the count is wanted rather than the confidence bounds around
+# it. Two cuts of it are used: every destination at total mode (just below) and
+# three modes at total destination ("Main mode of commuting" further down), so
+# it is read once, cut to those rows for the seven municipalities, and checked
+# as one table. Every column is read as text except the value, so codes keep
+# their leading digits exactly as published.
+#
+# The three modes the mode chart shows; why these three is explained with the
+# chart's data below.
+modes <- c("Car, truck or van", "Public transit", "Active transportation")
+
+commuting_462 <- read_csv(
   file.path(raw_dir, "table_98100462.csv"),
   col_types = cols(.default = col_character(), VALUE = col_double())
 ) |>
   clean_names() |>
   filter(
+    geo_uid %in% municipalities$geo_uid,
     str_starts(age_15a, "Total"),
     str_starts(gender_3, "Total"),
-    str_starts(main_mode_of_commuting_11a, "Total"),
-    statistics_3 == "Count"
-  )
+    statistics_3 == "Count",
+    str_starts(main_mode_of_commuting_11a, "Total") |
+      (str_starts(commuting_destination_5, "Total") & main_mode_of_commuting_11a %in% modes)
+  ) |>
+  cwr_quality_flags("98-10-0462", notes = table_notes("table_98100462"), log = quality_log)
+
+# Where people go to work: every destination, at total mode
+commuting_raw <- commuting_462 |>
+  filter(str_starts(main_mode_of_commuting_11a, "Total"))
 
 # ---- Tidy ------------------------------------------------------------------
 # Statistics Canada measures distance in units of geography rather than in
@@ -86,19 +119,9 @@ commuting <- commuting_raw |>
 # hierarchy ("Public transit" and "Active transportation" sit under
 # "Sustainable transportation"), so none of the three double-counts another;
 # the "Other method" group is left out, so they do not add to 100.
-modes <- c("Car, truck or van", "Public transit", "Active transportation")
-
-commuting_mode <- read_csv(
-  file.path(raw_dir, "table_98100462.csv"),
-  col_types = cols(.default = col_character(), VALUE = col_double())
-) |>
-  clean_names() |>
-  filter(
-    str_starts(age_15a, "Total"),
-    str_starts(gender_3, "Total"),
-    str_starts(commuting_destination_5, "Total"),
-    statistics_3 == "Count"
-  ) |>
+# (`modes` itself is set in the Read section, where the table is cut.)
+commuting_mode <- commuting_462 |>
+  filter(str_starts(commuting_destination_5, "Total")) |>
   # Each mode's share of all commuters in the municipality. The total row is
   # picked out as the denominator before the other modes are dropped.
   mutate(
@@ -134,11 +157,21 @@ members <- read_csv(
 # Every commute with one end in the Region: the rows for people who live here
 # and the rows for people who work here. Both are wanted, so the file is read
 # once and split below.
-commutes <- read_csv(
+commutes_raw <- read_csv(
   file.path(raw_dir, "table_98100459_region.csv"),
   col_types = cols(.default = col_character())
 ) |>
-  clean_names() |>
+  clean_names()
+
+# The table is wide: one column per gender, each followed by its own symbol
+# column. Only the total is used, so `values` limits the check to that column's
+# symbols, and only rows with a commute in them feed the post.
+commutes_raw <- commutes_raw |>
+  filter(as.numeric(gender_3_total_gender_1) > 0) |>
+  cwr_quality_flags("98-10-0459", values = "gender_3_total_gender_1",
+                    notes = table_notes("table_98100459"), log = quality_log)
+
+commutes <- commutes_raw |>
   mutate(
     # The last seven digits of DGUID are the home census subdivision code
     home_csd = str_sub(dguid, -7),

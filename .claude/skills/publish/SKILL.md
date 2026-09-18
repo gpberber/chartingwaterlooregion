@@ -31,8 +31,16 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    `R/data_bundle.R`); if they are not, stop and ask the user to complete them (Claude can
    draft descriptions from the cleaning script for the user to check).
 3. Stop any running preview server (it renders with the draft profile and writes draft posts,
-   and a listing that includes them, into `_site/`), then `quarto render` (no profile) from
-   the project root. It must finish without errors. Check that `_site/posts/<slug>/index.html`
+   and a listing that includes them, into `_site/`). **First render each post going live on its
+   own** - `quarto render posts/<slug>` - and likewise any live post whose `README.md` changed since
+   it was last rendered (`git diff --name-only` since the last publish). A full render reuses each
+   post's saved results in `_freeze/`, which only refresh when the `.qmd` changes, so without this a
+   README edit would never reach the post: its Sources and Reliability tables would go out stale,
+   and the check that every data-quality flag has a Reliability row would never run. Rendering a
+   single post always re-runs its code, so both are current. It must finish without errors; a
+   stop from `cwr_reliability_table()` means a flag in `data/quality_flags.csv` has no row, and
+   is fixed in the README, never worked around. Then `quarto render` (no profile) from the project
+   root. It must finish without errors. Check that `_site/posts/<slug>/index.html`
    exists, that `_site/index.html` does not mention any draft slug, and that no draft post
    appears in `_site/posts/`; a public render does not delete a draft's folder left behind by
    an earlier draft render, so `rm -rf _site/posts/<draft-slug>` for any that remain. Never

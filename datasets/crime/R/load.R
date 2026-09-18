@@ -44,8 +44,6 @@ csi <- read_crime("crime_severity_index.rds")
 
 # ---- Victims ----------------------------------------------------------------
 homicide_victims <- read_crime("homicide_victims.rds")
-violent_victims  <- read_crime("violent_victims.rds")
-ipv_victims      <- read_crime("family_ipv_victims.rds")
 
 # ---- Specific offence types -------------------------------------------------
 hate_crimes  <- read_crime("hate_crimes.rds")
@@ -70,6 +68,15 @@ load_wrps_occurrences <- function() {
   }
   read_parquet(path)
 }
+
+# ---- Data-quality flags and footnotes -----------------------------------------
+# Not loaded here: they are for a post's R/02_clean_data.R, not its charts, and
+# the flags file lists about two million figures. A post filters them to the
+# rows it uses and passes them to cwr_quality_flags() (R/data_quality.R):
+#   data/quality_flags.parquet  every flagged figure, keyed by year, geo_uid,
+#                               ucr_code and statistic (read with open_dataset())
+#   data/quality_notes.csv      every footnote of every table
+# Built by 03_quality_flags.R; see datasets/crime/README.md.
 
 # ---- Shared definitions used across crime posts ------------------------------
 source(here("datasets", "crime", "R", "helpers.R"))

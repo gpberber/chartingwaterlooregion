@@ -31,12 +31,6 @@ hate_crimes_raw <- read_csv(here("datasets", "crime", "data-raw", "hate_crimes.c
 cyber_crimes_raw <- read_csv(here("datasets", "crime", "data-raw", "cyber_crimes.csv")) |> 
   clean_names()
 
-violent_crime_victims_raw <- read_csv(here("datasets", "crime", "data-raw", "violent_crime_victims.csv")) |> 
-  clean_names()
-
-family_ipv_victims_raw <- read_csv(here("datasets", "crime", "data-raw", "family_ipv_victims.csv")) |> 
-  clean_names()
-
 personnel_munic_raw <- read_csv(here("datasets", "crime", "data-raw", "police_personnel_munic.csv")) |> 
   clean_names()
 
@@ -970,137 +964,6 @@ cyber_crimes_clean <- cyber_crimes_transform |>
 
 write_rds(cyber_crimes_clean, here("datasets", "crime", "data", "cyber_crimes.rds"))
 
-# clean victims data
-
-# violent crime victims
-# Create tibble with category and violation columns
-crime_categories <- tibble(
-  category = c(
-    "Homicide, other violations causing death and attempted murder",
-    "Homicide, other violations causing death and attempted murder", 
-    "Sexual assaults",
-    "Sexual assaults",
-    "Sexual assaults",
-    "Assaults",
-    "Assaults", 
-    "Assaults",
-    "Assaults",
-    "Criminal Code traffic violations causing death or bodily harm",
-    "Criminal Code traffic violations causing death or bodily harm",
-    "Other violent violations",
-    "Other violent violations",
-    "Other violent violations", 
-    "Other violent violations",
-    "Other violent violations",
-    "Other violent violations",
-    "Other violent violations",
-    "Sexual violations against children"
-  ),
-  violation = c(
-    "Homicide and other offences causing death",
-    "Attempted murder",
-    "Sexual assault, level 3, aggravated",
-    "Sexual assault, level 2, weapon or bodily harm", 
-    "Sexual assault, level 1",
-    "Assault, level 3, aggravated",
-    "Assault, level 2, weapon or bodily harm",
-    "Assault, level 1", 
-    "Other assaults",
-    "Impaired driving and other Criminal Code traffic violations causing death",
-    "Impaired driving and other Criminal Code traffic violations causing bodily harm",
-    "Robbery",
-    "Criminal harassment",
-    "Indecent or harassing communications",
-    "Uttering threats", 
-    "Kidnapping, forcible confinement, abduction or hostage taking",
-    "Trafficking in persons or prostitution",
-    "Other violations",
-    "Sexual violations against children"
-  )
-)
-
-violent_victims_clean <- violent_crime_victims_raw |> 
-  filter(str_detect(geo, "Ontario|Canada")) |> 
-  select(
-    year = ref_date,
-    region = geo,
-    violation = violations,
-    age = age_of_victim,
-    gender = gender_of_victim,
-    statistics,
-    value
-  ) |> 
-  mutate(
-    region = str_remove_all(region, "-Gatineau|–Gatineau|,.*"),
-    region = str_replace(region, "Kitchener.*", "Waterloo Region"),
-    demographic = if_else(is.na(age), gender, age),
-    demo_category = if_else(is.na(age), "Gender", "Age")
-  ) |> 
-  select(-age, -gender) |> 
-  pivot_wider(names_from = statistics, values_from = value) |> 
-  clean_names() |> 
-  rename(num_victims = number_of_victims, victims_per_100k = rate_per_100_000_population) |> 
-  filter(
-    str_detect(demographic, "Total|12 to 17 years|17 years and younger|18 years and older|25 years and older|65 years and older", negate = TRUE),
-    !(is.na(num_victims) & is.na(victims_per_100k))
-  ) |>     
-  inner_join(crime_categories, join_by(violation)) |> 
-  relocate(category, violation, demo_category, .after = region) |> 
-  group_by(year, region, violation, demo_category) |> 
-  mutate(perc_victims_for_violation = round(num_victims / sum(num_victims) * 100, 1)) |> 
-  ungroup() |> 
-  group_by(region, violation, demo_category, demographic) |> 
-  arrange(year) |> 
-  mutate(
-    base_rate_victims_per_100k = round(victims_per_100k / first(victims_per_100k, na_rm = TRUE) * 100, 1),
-    perc_change_victims_per_100k = round(victims_per_100k / lag(victims_per_100k) * 100, 1)
-  ) |> 
-  ungroup()
-
-write_rds(violent_victims_clean, here("datasets", "crime", "data", "violent_victims.rds"))
-
-# family and ipv victims
-family_ipv_victims_clean <- family_ipv_victims_raw |> 
-  filter(str_detect(geo, "Ontario|Canada")) |> 
-  select(
-    year = ref_date,
-    region = geo,
-    gender = gender_of_victim,
-    age = age_of_victim,
-    gender = gender_of_victim,
-    family_relationship = relationship_of_accused_to_victim_family_non_family,
-    ipv_relationship = relationship_of_accused_to_victim_intimate_partner_non_intimate_partner,
-    statistics,
-    value
-  ) |> 
-  mutate(
-    region = str_remove_all(region, "-Gatineau|–Gatineau|,.*"),
-    region = str_replace(region, "Kitchener.*", "Waterloo Region"),
-    relationship = if_else(is.na(family_relationship), ipv_relationship, family_relationship),
-    rel_category = if_else(is.na(family_relationship), "IPV", "Family"),
-    relationship = str_remove(relationship, " .*relationship"),
-    gender = str_replace_all(gender, c("Gender of victim unknown" = "Unknown", " victims" = "")),
-    age = str_replace(age, "Age of victim unknown", "Unknown")
-  ) |> 
-  select(-family_relationship, -ipv_relationship) |> 
-  pivot_wider(names_from = statistics, values_from = value) |> 
-  clean_names() |> 
-  rename(num_victims = number_of_victims, victims_per_100k = rate_per_100_000_population) |> 
-  filter(
-    # 75-79 and 80-84 missing for 2023, so kept 75-84 instead for all years
-    str_detect(age, "Total|11 years and younger|12 to 17 years|17 years and younger|18 years and older|65 years and older|75 to 79 years|80 to 84 years", negate = TRUE),
-    str_detect(gender, "Male|Female|Unknown"),
-    str_detect(relationship, "Total", negate = TRUE),
-    !(is.na(num_victims) & is.na(victims_per_100k))
-  ) |>     
-  relocate(rel_category, relationship, .after = age) |> 
-  group_by(year, region, rel_category) |> 
-  mutate(perc_of_victims_rel_category = round(num_victims / sum(num_victims) * 100, 2)) |> 
-  ungroup() 
-
-write_rds(family_ipv_victims_clean, here("datasets", "crime", "data", "family_ipv_victims.rds"))
-  
-  
 # Clean latest occurrence data
 
 # Define the code descriptions for later use
@@ -1269,5 +1132,8 @@ wat_region_occurrences <- wat_region_occurrences |>
 # Save clean file
 write_parquet(wat_region_occurrences, here("datasets", "crime", "data", "wat_region_occurrences.parquet"))
 
-
-
+# ---------------------------------------------------------------------------
+# Data-quality flags and footnotes for every Statistics Canada table above,
+# written to data/quality_flags.parquet and data/quality_notes.csv
+# ---------------------------------------------------------------------------
+source(here("datasets", "crime", "R", "03_quality_flags.R"))

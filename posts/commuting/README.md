@@ -13,6 +13,24 @@ Post: https://chartingwaterlooregion.ca/posts/commuting/
 Files that cannot be re-downloaded by script, or are over 25 MB, are attached to a GitHub Release
 (tag shown in the table) and fetched by `R/01_get_data.R`.
 
+## Reliability
+
+| Issue | Left out of the post because |
+|---|---|
+| **Commuting flows:** Statistics Canada randomly rounds each flow to a multiple of 5 to protect confidentiality, so small flows, and the shares worked out from them, are approximate. (table 98-10-0459) <!-- flags: 98-10-0459:note1 --> | |
+| **Men+ and Women+:** because the non-binary population is small, non-binary people are counted in the Men+ and Women+ categories. (tables 98-10-0459, 98-10-0462) <!-- flags: 98-10-0459:note3, 98-10-0462:note3 --> | Does not apply: every chart uses the total for all genders, so the Men+ and Women+ split is not used. |
+
+<!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
+     in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
+     caveat another source's own documentation gives. Closely related flags share a row - one
+     table graded acceptable for one municipality and good for another is one issue. Say which
+     figures it touches and what it means for them, in a sentence or two, and end with the
+     table number in brackets.
+
+     The post's "Reliability" table prints every row whose second column is empty. Never
+     delete a row: to leave an issue out of the post, write why in the second column. An empty
+     table prints "No data-reliability issues to note for this post." -->
+
 ## Data dictionary
 
 <!-- Generated. Leave this heading in place and do not write the table by hand: running

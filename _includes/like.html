@@ -104,19 +104,21 @@
   // Under the author and dates at the top.
   meta.insertAdjacentElement("afterend", build("cwr-like-header"));
 
-  // And where the analysis stops. Every post closes with "Data sources", usually
-  // "Other sources", then a Reproducibility box - house structure, set by
-  // _templates/post/index.qmd and checked by /review-post - and all of it is
-  // reference material rather than part of the piece. Asking for a like after
-  // them means asking at the wrong moment.
+  // And where the analysis stops. Every post closes with "Data sources and
+  // reliability", usually "Other sources", then a Reproducibility box - house
+  // structure, set by _templates/post/index.qmd and checked by /review-post - and
+  // all of it is reference material rather than part of the piece. Asking for a
+  // like after them means asking at the wrong moment.
   //
   // Pandoc builds the id from the heading, so a post that reworded that heading
-  // would not match. "#data-and-methods" is the name that section carried before
-  // 2026-09-14 and is kept so older posts still place the button correctly. After
+  // would not match. The section has been "Data sources and reliability" since
+  // 2026-09-18; "#data-sources" (2026-09-14 to 2026-09-18) and "#data-and-methods"
+  // (before that) are kept so older posts still place the button correctly. After
   // those, the button falls back to the licence appendix and then to the end of
   // the page: still on the post, just lower down. Renaming the section is the
   // thing that moves it.
-  const end = main.querySelector("#data-sources") ||
+  const end = main.querySelector("#data-sources-and-reliability") ||
+              main.querySelector("#data-sources") ||
               main.querySelector("#data-and-methods") ||
               main.querySelector("#quarto-appendix");
   if (end) end.insertAdjacentElement("beforebegin", build("cwr-like-end"));

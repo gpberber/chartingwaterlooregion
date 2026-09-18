@@ -42,6 +42,11 @@ For every `ggplot` chunk:
   and naming the sample, through `cwr_caption(sample = )` rather than typed (style rule 9b); where the source publishes confidence intervals, they are
   drawn or stated in that note - flag any that were dropped. The post's Data sources prose says the
   data are a sample too.
+- No chart draws a figure flagged unusable in `data/quality_flags.csv` (E use with caution, F too
+  unreliable, x suppressed, `..` not available) as a number - not as a zero, not joined across by a line as if it
+  existed. A chart that shows figures flagged `caution` (D acceptable, or an
+  unfamiliar symbol) tells the reader in a note, unless its row in the README's Reliability table
+  records Greg's decision not to (style rule 9c).
 - Chart text shortens North Dumfries through `cwr_short_name()` (axis labels, map labels, direct
   labels, notes), and no horizontal stacked bar uses a legend where `cwr_stack_keys()` would name
   the segments on the bars (style rules 2b and 3d).
@@ -89,9 +94,12 @@ For every `ggplot` chunk:
 - README lists each source with URL, licence, and access date. The licence must be the source's own
   (e.g. Statistics Canada Open Licence, Open Government Licence – Kitchener), never "CC BY" or "MIT";
   files obtained by request rather than from an open-data portal need their terms confirmed.
-- The post has a `## Data sources` section that prints the README's table with
-  `cwr_sources_table("<slug>")` in an `#| output: asis` chunk, rather than a second copy of the table
-  typed into the post; a `## Other sources` section follows it whenever anything non-data is cited.
+- The post has a `## Data sources and reliability` section with two subheadings: `### Sources`,
+  which prints the README's source table with `cwr_sources_table("<slug>")`, and `### Reliability`,
+  which prints the README's Reliability table with `cwr_reliability_table("<slug>")`, each in an
+  `#| output: asis` chunk rather than a copy typed into the post. A `## Other sources` section
+  follows whenever anything non-data is cited. A post still headed `## Data sources` (written before
+  2026-09-18) is flagged for the new structure.
 - A post that uses WRPS occurrence data (`load_wrps_occurrences()` or `wat_region_occurrences`)
   shows `wrps_disclaimer` in its Data sources section; WRPS requires it on any publication.
 - The post does not override `license:` in its YAML (site default is CC BY, set in `posts/_metadata.yml`).
@@ -106,6 +114,26 @@ For every `ggplot` chunk:
   Run `Rscript -e 'source(here::here("R","data_bundle.R")); cwr_dictionary_check("<slug>")'`
   and report the result. The post's README has a generated `## Data dictionary` section matching
   the current data; refresh it with `cwr_dictionary_readme("<slug>")` if it is missing or stale. If the data changed since the last bundle, `data_bundle_version` must be bumped.
+- **No figure flagged E, F, x or `..` is used.** Every `cwr_quality_flags()` call in
+  `R/02_clean_data.R` assigns its result, and the code after it uses that result rather than the
+  data it was given - a call whose result is thrown away reports E figures and then uses them.
+  Flag any unassigned call, and any data the post reads from a flagged table that bypasses the
+  check. Greg never uses figures flagged E ("use with caution"); the function blanks them, and
+  nothing downstream may put them back (a join to the raw file, a hand-typed value, a fill).
+- **Data quality.** Every source table with quality flags goes through `cwr_quality_flags()` in
+  `R/02_clean_data.R`, on the rows the post keeps, and its footnotes are saved by `01_get_data.R`
+  and passed as `notes =` (Statistics Canada tables always have both). Re-run the cleaning script
+  and list **every** row of `data/quality_flags.csv` in the findings, with the level, the symbol or
+  footnote, and which chart it reaches - Greg asked to be told about every flag that applies, so do
+  not summarise them away. Each one needs a row in the README's `## Reliability` table (closely
+  related flags may share one) ending with its hidden code, `<!-- flags: table:symbol -->` or
+  `table:note<n>` for a footnote; the render stops on a flag with no code, and warns on a code
+  the data no longer has - report either. A source with no flag column needs its own
+  documented caveats in that table too. A table that was read but never checked is a finding.
+  List every row whose "Left out of the post because" column is filled, so Greg sees what the post
+  leaves out and why. If a flag in `data/quality_flags.csv` has no row at all, it may be one Greg
+  deleted: remind him to put it back with the reason in that column rather than leave it out of
+  the record.
 - No `Sys.getenv()` secret is required, or the README says which and how to get it.
 
 ## 5. Metadata
