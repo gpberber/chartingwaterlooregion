@@ -61,7 +61,7 @@ After years (no kidding!) of procrastination, I've decided to start publishing s
 
 ## Where does its data come from?
 
-CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources" section at the end of each post lists the sources, with their links and licences, where applicable.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources and reliability" section at the end of each post lists the sources, with their links and licences, where applicable.
 
 ## Is it independent?
 
