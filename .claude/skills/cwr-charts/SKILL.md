@@ -19,6 +19,8 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `*50` tints, `cowboysilver30`, `cowboysilver_alpha30` | lighter versions for secondary series and backgrounds |
 | `manual_2_colours` ... `manual_5_colours` | ordered palettes; map to groups with `set_names()` |
 | `cwr_region` (`"Region"`) | the stock label for Waterloo Region in all chart text (rule 2a) |
+| `cwr_short_name()`, `cwr_short_names` | the house short form of a long municipal name, "N. Dumfries", for all chart text (rule 2b) |
+| `cwr_stack_keys(data, x, y, fill, labels, colours)` | names a horizontal stacked bar's segments on the bars instead of a legend (rule 3d) |
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons, keyed by `cwr_region` for the Region |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
@@ -119,6 +121,14 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    it types "Region" with a comment pointing at `cwr_region`; a source that says "WRPS",
    "Waterloo (CD)" or "Kitchener - Cambridge - Waterloo" is recoded to it there. Titles,
    subtitles and prose are Greg's and may use the full name; alt text may too, for clarity.
+2b. **North Dumfries is "N. Dumfries" in chart text - always through `cwr_short_name()`.** Every
+   chart, every post (Greg, 2026-09-18): axis labels (`scale_y_discrete(labels = cwr_short_name)`,
+   composed with any labeller the chart already has), direct labels, map labels (measure the label
+   with the short name too, so `cwr_label_spot()` places what is drawn), legend keys, tooltips and
+   caption notes - the same reach as `cwr_region`. Data files, alt text, titles, subtitles and prose
+   keep "North Dumfries", so a screen reader and a downloaded table still say it in full. Never type
+   the short form: a new long name goes into `cwr_short_names` in `R/theme_cwr.R` and every chart
+   picks it up. Joins and lookups (such as map nudges) stay keyed by the full name.
 3. **Direct labels beat legends.** Label line ends, bar ends, or points; then
    `guide = "none"`. Use a legend only when labels would collide.
 3a. **Line labels come from `cwr_line_labels()`, never typed coordinates.** A hand-typed
@@ -150,6 +160,17 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    (`shape = 15, size = 7`) carrying the `tooltip`. The order matters: the topmost element
    under the mouse fires, and a dot drawn over the squares has no tooltip, so pointing
    straight at a year showed nothing until this was caught.
+3d. **A horizontal stacked bar names its segments on the bars, never in a legend.** The New York
+   Times way, adopted for the commuting post's first chart (Greg, 2026-09-18): the first segment's
+   name, in capitals and its segment's colour, above the top bar starting where the bar starts; the
+   last segment's above the top bar ending where the bar ends (hung from the end, not from the
+   segment's start as the Times does, because a short segment is narrower than its name on a phone);
+   any segment in between named under the bottom bar, centred on its own segment there with a short
+   tick, in grey30 since a pale segment colour is too faint as text. `cwr_stack_keys()` places all of
+   it from the data and draws the baseline (stopping at the top bar's top edge so it cannot run up
+   beside the first name). The chart stacks with `position_stack(reverse = TRUE)`, turns the legend
+   off, and reserves a row above and below with `scale_y_discrete(expand = expansion(add = c(1.1,
+   0.9)))`. Worked case: `fig-commuting` in the commuting post.
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).

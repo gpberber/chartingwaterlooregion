@@ -59,6 +59,11 @@ the same call in a situation the templates do not cover.
   columns (scatter) after the first render. Bold the focus label.
 - Bar value labels go inside the bar in white when the bar is long enough, outside in
   grey30 otherwise; the templates use a `threshold` to split them.
+- A horizontal stacked bar names its segments on the bars, not in a legend: first and last above
+  the top bar, at its two ends, and any in between under the bottom bar with a tick
+  (`cwr_stack_keys()`). Each name then sits beside the colour it names.
+- Long municipal names are shortened in chart text through `cwr_short_name()` ("N. Dumfries"),
+  as "Region" is through `cwr_region`: the label column and map shapes have no width to spare.
 - Legends only when direct labels would collide (many groups, crossing lines). Then use the
   theme default: inside, top-left, horizontal, no title.
 - `coord_cartesian(clip = "off")` whenever a label or header sits outside the panel.

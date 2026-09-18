@@ -51,7 +51,9 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get
   no label. Captions are optional and usually omitted. Tables are gt only.
 - Chart text calls Waterloo Region "Region": use `cwr_region` for every axis, legend, direct
-  label, tooltip and note (cleaning scripts type "Region"). Line labels are positioned with
+  label, tooltip and note (cleaning scripts type "Region"). The same chart text calls North
+  Dumfries "N. Dumfries", through `cwr_short_name()` (never typed); data, alt text and titles keep
+  the full name. A horizontal stacked bar names its segments on the bars with `cwr_stack_keys()`. Line labels are positioned with
   `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
 - Census: long-form variables (commuting, labour, education, housing, immigration and more, plus
   average and aggregate income; median income is 100% data) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If

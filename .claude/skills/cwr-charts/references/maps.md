@@ -42,7 +42,8 @@ p <- ggplot() +
 	geom_sf(data = shapes, fill = NA, colour = cowboysilver, linewidth = 0.4) +
 	geom_text(
 		data = labels,
-		aes(x, y, label = paste0(name, "\n", <value_label>)),
+		# cwr_short_name(): the house short form of a long municipal name
+		aes(x, y, label = paste0(cwr_short_name(name), "\n", <value_label>)),
 		size = label_size * 0.9, lineheight = 0.95
 	) +
 	# datum = NA drops the graticule, the faint grid of latitude and longitude
@@ -76,8 +77,9 @@ fill_limits <- c(0, <60>)
 shaded <- shapes |> left_join(<values>, join_by(csd))
 
 # Each label goes in the widest gap its shape has that holds the whole
-# label, which needs the label's size in metres: measure the text (see the
-# commuting post for the grid measurement) rather than guessing it.
+# label, which needs the label's size in metres: measure the text as drawn,
+# short names and all (see the commuting post for the measurement), rather
+# than guessing it.
 labels <- shapes |>
 	st_drop_geometry() |>
 	mutate(
@@ -97,7 +99,8 @@ p <- ggplot() +
 	scale_fill_gradient(low = fill_low, high = dodgerblue, limits = fill_limits, guide = "none") +
 	geom_text(
 		data = labels,
-		aes(x, y, label = paste0(name, "\n", <value_label>), colour = text_colour),
+		# cwr_short_name(): the house short form of a long municipal name
+		aes(x, y, label = paste0(cwr_short_name(name), "\n", <value_label>), colour = text_colour),
 		size = label_size * 0.9, lineheight = 0.95
 	) +
 	scale_colour_identity() +

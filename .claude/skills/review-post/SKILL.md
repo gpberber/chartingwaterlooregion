@@ -42,6 +42,9 @@ For every `ggplot` chunk:
   and naming the sample, through `cwr_caption(sample = )` rather than typed (style rule 9b); where the source publishes confidence intervals, they are
   drawn or stated in that note - flag any that were dropped. The post's Data sources prose says the
   data are a sample too.
+- Chart text shortens North Dumfries through `cwr_short_name()` (axis labels, map labels, direct
+  labels, notes), and no horizontal stacked bar uses a legend where `cwr_stack_keys()` would name
+  the segments on the bars (style rules 2b and 3d).
 - No chart is a pie or a donut (`geom_arc_bar`, `coord_polar` on a bar, any package drawing one).
   The About page promises readers there are none; this is the check that keeps that true.
 - Numbers written into a chart's `alt` text are computed from the data, not typed. Typed figures go

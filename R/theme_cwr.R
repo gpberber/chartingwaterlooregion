@@ -87,6 +87,27 @@ manual_2_colours <- c(cowboysilver, dodgerblue)
 # says why in a comment.)
 cwr_region <- "Region"
 
+# Municipal names too long for a chart's label column or for the shape they
+# label on a map, and the short form every chart uses instead (Greg,
+# 2026-09-18). Chart text only - axis labels, direct labels, map labels,
+# legend keys, tooltips, caption notes: the same reach as cwr_region. Data
+# files, alt text, titles, subtitles and prose keep
+# the full name, so a screen reader and a downloaded table still say "North
+# Dumfries". Add a name here and every chart that passes its labels through
+# cwr_short_name() picks it up.
+cwr_short_names <- c("North Dumfries" = "N. Dumfries")
+
+# Shorten any of those names wherever they appear in `x`. Works as a labeller -
+# scale_y_discrete(labels = cwr_short_name) - or on a label column in mutate().
+# Matched as whole words, so a longer name that merely contains one is left
+# alone.
+cwr_short_name <- function(x) {
+  str_replace_all(
+    as.character(x),
+    set_names(cwr_short_names, paste0("\\b", names(cwr_short_names), "\\b"))
+  )
+}
+
 # Named palettes for the comparisons that recur across posts. The Region's
 # entry is named by cwr_region, so data labelled with it matches.
 comp_colours <- set_names(
@@ -376,6 +397,95 @@ cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE, sampl
 #   scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))
 cwr_wrap <- function(x, width = 22) {
   str_replace_all(str_wrap(x, width = width), "\n", "<br>")
+}
+
+# Name the segments of a horizontal stacked bar on the bars themselves, the way
+# the New York Times labels one, instead of in a legend (Greg, 2026-09-18). Each
+# name then sits beside the colour it names, and there is no key to look away
+# to. The first segment's name goes above the top bar, starting where the bar
+# starts; the last segment's goes above the top bar, ending where the bar ends;
+# any segment in between is named under the bottom bar, centred on its own
+# segment there and joined to it by a short tick. Names are in capitals.
+#
+# Built from the data, so the names follow their segments when the numbers
+# change - never type their coordinates. It returns layers, added with `+`:
+#
+#   p <- ggplot(bars, aes(x = percent, y = district, fill = destination)) +
+#     geom_col(width = 0.7, position = position_stack(reverse = TRUE)) +
+#     cwr_stack_keys(bars, percent, district, destination,
+#                    labels = c(`In their own municipality` = "HOME DISTRICT", ...),
+#                    colours = destination_colours) +
+#     scale_fill_manual(values = destination_colours, guide = "none") +
+#     scale_y_discrete(expand = expansion(add = c(1.1, 0.9))) +
+#     coord_cartesian(clip = "off")
+#
+# What the chart itself must do:
+#   - stack with position_stack(reverse = TRUE), so the first level of `fill`
+#     is at the left, and pass the same `width` as geom_col();
+#   - `y` and `fill` must be factors, in the order drawn (bottom bar first);
+#   - reserve a row above and below for the names, with
+#     scale_y_discrete(expand = expansion(add = c(1.1, 0.9))) - cwr_figure()
+#     counts it into the height - and turn the legend off;
+#   - no baseline of its own: this draws one, from just under the bottom bar
+#     to the top edge of the top one, so it cannot run up beside the first
+#     name. Drop it with `baseline = FALSE`.
+#
+# The outer names are set in their segment's colour. The in-between names sit
+# on white under the bar rather than against it, where a pale segment colour
+# is too faint to read, so they are grey30, the house text grey.
+cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
+                           middle_colour = "grey30", baseline = TRUE) {
+  segments <- data |>
+    mutate(.x = {{ x }}, .y = {{ y }}, .fill = {{ fill }}) |>
+    arrange(.y, .fill) |>
+    # Where each segment starts and ends along its bar
+    mutate(xmax = cumsum(.x), xmin = xmax - .x, .by = .y)
+
+  fill_levels <- levels(pull(segments, .fill))
+  top_row <- nlevels(pull(segments, .y))
+  half <- width / 2
+  first <- fill_levels[1]
+  last <- fill_levels[length(fill_levels)]
+  middle <- setdiff(fill_levels, c(first, last))
+
+  # A category axis puts the first level at y = 1 and the last at y = the
+  # number of rows; each bar reaches `half` either side of that
+  keys <- bind_rows(
+    segments |>
+      filter(as.integer(.y) == top_row, .fill == first) |>
+      mutate(x = xmin, y = top_row + half, hjust = 0, vjust = -0.5),
+    segments |>
+      filter(as.integer(.y) == top_row, .fill == last) |>
+      mutate(x = xmax, y = top_row + half, hjust = 1, vjust = -0.5),
+    segments |>
+      filter(as.integer(.y) == 1, .fill %in% middle) |>
+      mutate(x = (xmin + xmax) / 2, y = 1 - half - 0.2, hjust = 0.5, vjust = 1.2)
+  ) |>
+    mutate(
+      label = unname(labels[as.character(.fill)]),
+      colour = if_else(.fill %in% middle, middle_colour, unname(colours[as.character(.fill)]))
+    ) |>
+    select(label, x, y, hjust, vjust, colour)
+
+  ticks <- keys |> filter(y < 1)
+
+  list(
+    if (baseline) {
+      annotate("segment", x = 0, xend = 0, y = 0.5, yend = top_row + half,
+               colour = "black", linewidth = 0.5)
+    },
+    geom_segment(
+      data = ticks, aes(x = x, xend = x, y = 1 - half, yend = y),
+      inherit.aes = FALSE, colour = "grey50", linewidth = 0.3
+    ),
+    # I() takes each colour as given rather than through the chart's colour
+    # scale, so the names cannot collide with a scale the chart already has
+    geom_text(
+      data = keys,
+      aes(x = x, y = y, label = label, hjust = hjust, vjust = vjust, colour = I(colour)),
+      inherit.aes = FALSE, size = label_size * 0.8
+    )
+  )
 }
 
 # Place line-chart labels against their own lines.

@@ -136,7 +136,9 @@ nudge <- tribble(
 # nudges above can simply be added to it.
 #
 # "Township" goes on a second line rather than after the name, so that even
-# "North Dumfries Township" stays narrow enough to sit inside its own boundary.
+# "N. Dumfries Township" stays narrow enough to sit inside its own boundary.
+# cwr_short_name() gives the house short form of a long municipal name; the
+# nudges above are still keyed by the full name.
 labels <- districts |>
   st_drop_geometry() |>
   st_as_sf(coords = c("label_lon", "label_lat"), crs = 4326) |>
@@ -152,8 +154,8 @@ labels <- districts |>
     y = y + replace_na(dy, 0),
     label = if_else(
       district_type == "Township",
-      paste0(district, "\nTownship"),
-      district
+      paste0(cwr_short_name(district), "\nTownship"),
+      cwr_short_name(district)
     ),
     # Land area, on its own line under the name. Whole square kilometres: the
     # boundary file gives four decimal places, which no one reading a map needs.
@@ -345,7 +347,7 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
   scale_x_continuous(limits = c(0, axis_max), expand = expansion(mult = c(0, 0))) +
   # An extra row and a half of space above Kitchener, which is where the column
   # heading hangs. add is in rows, because the scale is discrete.
-  scale_y_discrete(expand = expansion(add = c(0.6, 1.6))) +
+  scale_y_discrete(expand = expansion(add = c(0.6, 1.6)), labels = cwr_short_name) +
   # Stops the heading and any label that overhangs the panel from being cut off
   coord_cartesian(clip = "off") +
   labs(
@@ -476,8 +478,8 @@ p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
   # edge. No room is needed on the right for outside labels, as there are none.
   scale_x_continuous(expand = expansion(mult = c(0, 0.02))) +
   # Everything from the "|" on is the panel name carried by the sort key above,
-  # and is not for reading.
-  scale_y_discrete(labels = \(x) str_split_i(x, fixed("|"), 1)) +
+  # and is not for reading. What is left is the name, in its house short form.
+  scale_y_discrete(labels = \(x) cwr_short_name(str_split_i(x, fixed("|"), 1))) +
   # Free on y, fixed on x. Free on y is what lets each panel hold its own
   # order, and it is why the second panel carries its own row labels: the rows
   # are no longer the same rows in the same places.
@@ -603,6 +605,8 @@ p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)
   ) +
   # Room on the right for any label that sits outside its bar
   scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  # The house short form of a long municipal name
+  scale_y_discrete(labels = cwr_short_name) +
   # Free on x only, because the two measures share no unit. The rows are shared,
   # so only the first panel carries the place names.
   # label_wrap_gen() breaks a heading too wide for its panel onto a second line;
@@ -712,6 +716,8 @@ language_bars <- function(which) {
     ) +
     # Room on the right for any label that sits outside its bar
     scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+    # The house short form of a long municipal name
+    scale_y_discrete(labels = cwr_short_name) +
     coord_cartesian(clip = "off") +
     # Every bar carries its number, so the value axis and its gridlines are gone.
     theme(

@@ -75,31 +75,48 @@ commuting_bars <- commuting |>
     label = if_else(percent >= 10, label, "")
   )
 
+destination_colours <- c(
+  `In their own municipality` = dodgerblue,
+  `Elsewhere in the Region` = dodgerblue50,
+  `Outside the Region` = cowboysilver
+)
+
 p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) +
   # reverse = TRUE stacks the first level at the left. Left to itself ggplot2
   # stacks factor levels from the right, which would put the longest journey
   # nearest the axis and read backwards.
   geom_col(width = 0.7, position = position_stack(reverse = TRUE)) +
-  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
   # position_stack() with vjust 0.5 puts each label in the middle of its own
   # segment rather than at the end of the bar.
   geom_text(
     aes(label = label), position = position_stack(vjust = 0.5, reverse = TRUE),
     colour = "white", size = label_size * 0.8
   ) +
+  # The segments are named on the bars rather than in a legend: nearest above
+  # the top bar at its start, furthest above it at its end, and the one in
+  # between under the bottom bar. cwr_stack_keys() in R/theme_cwr.R places
+  # them from the data, and draws the baseline.
+  cwr_stack_keys(
+    commuting_bars, percent, district, destination,
+    labels = c(
+      `In their own municipality` = "HOME DISTRICT",
+      `Elsewhere in the Region` = "ELSEWHERE IN REGION",
+      `Outside the Region` = "OUTSIDE REGION"
+    ),
+    colours = destination_colours
+  ) +
   # Dark to light as the distance grows: the eye reads the ramp as distance
   # without being told. The colours mean distance here, not city and township,
-  # so a legend has to say so.
-  scale_fill_manual(
-    values = c(
-      `In their own municipality` = dodgerblue,
-      `Elsewhere in the Region` = dodgerblue50,
-      `Outside the Region` = cowboysilver
-    )
-  ) +
+  # so the bars carry their own key.
+  scale_fill_manual(values = destination_colours, guide = "none") +
   # The bars fill the width by construction, so the axis says nothing the
   # segments do not.
   scale_x_continuous(expand = expansion(mult = c(0, 0))) +
+  # Room above the top bar and below the bottom one for the segment names. On a
+  # discrete scale `add` is in rows, and cwr_figure() counts it into the height.
+  # cwr_short_name() gives the house short form of a long municipal name.
+  scale_y_discrete(expand = expansion(add = c(1.1, 0.9)), labels = cwr_short_name) +
+  coord_cartesian(clip = "off") +
   labs(
     title = "Where each municipality's commuters work",
     subtitle = "Subtitle: what is measured, for whom, and when",
@@ -116,20 +133,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
     panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    # theme_cwr() floats the legend just above the panel, which reserves no
-    # height, so it needs a <br> at the end of the subtitle to clear the bars.
-    # "top" makes the plot give the legend its own row instead, so the gap under
-    # the subtitle is exactly the legend's height, whatever the subtitle says.
-    legend.position = "top",
-    # legend.justification alone does nothing once the legend is in the top
-    # strip; that strip has its own justification setting.
-    legend.justification.top = "left",
-    # Line the keys up with the title's left edge rather than the bars', and
-    # drop the legend's own padding: the subtitle already leaves a margin under
-    # itself, and the two together read as a gap.
-    legend.location = "plot",
-    legend.margin = margin(0, 0, 0, 0)
+    panel.grid.major.y = element_blank()
   )
 
 alt_lines <- commuting_bars |>
@@ -147,12 +151,6 @@ cwr_figure(
     paste(alt_lines, collapse = ". "), "."
   ),
   # No height given: cwr_figure() sets it from the number of rows.
-  phone = list(
-    # Three keys will not fit across a phone in one row, so they stack into a
-    # column, still in the top strip the desktop version puts them in.
-    guides(fill = guide_legend(ncol = 1)),
-    theme(legend.direction = "vertical")
-  )
 )
 ```
 
@@ -225,6 +223,8 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
   scale_colour_identity() +
   # Room on the right for any label that sits outside its bar
   scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  # The house short form of a long municipal name
+  scale_y_discrete(labels = cwr_short_name) +
   facet_wrap(vars(mode), nrow = 1, scales = "free_x") +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
@@ -458,11 +458,14 @@ metres_per_text_mm <- frame$metres_per_text_mm
 # widths: "Waterloo" is half as wide again as "15.8%", and treating the label
 # as one block as wide as the name keeps it higher in a shape that narrows
 # downwards than it needs to be.
-name_size <- text_size_mm(region_shapes$name)
+#
+# Names are measured as they are drawn, in the house short form (cwr_short_name()
+# turns "North Dumfries" into "N. Dumfries").
+name_size <- text_size_mm(cwr_short_name(region_shapes$name))
 share_size <- text_size_mm(rep("00.0%", nrow(region_shapes)))
 label_spots <- region_shapes |>
   st_drop_geometry() |>
-  bind_cols(text_size_mm(paste0(region_shapes$name, "\n00.0%"))) |>
+  bind_cols(text_size_mm(paste0(cwr_short_name(region_shapes$name), "\n00.0%"))) |>
   mutate(
     w = w_mm * metres_per_text_mm,
     h = h_mm * metres_per_text_mm,
@@ -591,7 +594,7 @@ flow_map <- function(home_name) {
     # The municipality's name, bold for the home one, over its share
     geom_text(
       data = labels,
-      aes(x, y, label = paste0(name, "\n", share_label(percent)),
+      aes(x, y, label = paste0(cwr_short_name(name), "\n", share_label(percent)),
           colour = text_colour),
       fontface = if_else(labels$is_home, "bold", "plain"),
       size = label_font_mm, lineheight = 0.95
@@ -610,7 +613,7 @@ flow_caption <- function(home_name) {
     sample = "census_2021",
     notes = c(
       "Share of workers with a usual place of work",
-      paste0("The share on ", home_name, " is of people who both live and work there"),
+      paste0("The share on ", cwr_short_name(home_name), " is of people who both live and work there"),
       "Red marks the most common workplace outside the Region, in its direction but nearer than it is"
     )
   )
@@ -835,6 +838,8 @@ rank_chart <- function(ranked) {
     scale_colour_identity() +
     # Room on the right for a label that sits outside its bar
     scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+    # The house short form of a long municipal name
+    scale_y_discrete(labels = cwr_short_name) +
     coord_cartesian(clip = "off") +
     # Every bar carries its number, so the value axis and its gridlines are gone.
     theme(
