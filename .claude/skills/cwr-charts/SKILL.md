@@ -52,6 +52,7 @@ Two things `theme_cwr()` now handles that a chart used to have to ask for:
 | ranking plus a second number per row | value + rate/change | `gglollipoprect`, `gghorbarrect`, `ggdumbbellrect` |
 | a few categories, one value each | short labels, <= 6 | `ggvertbar` (bars.md) |
 | us vs them per category | two values per category | `ggcompbar_horiz` / `ggcompbar_vert` (bars.md), `ggdumbbell` (comparisons.md) |
+| sample estimates and their margins of error | estimate, lower, upper per category | `ggdoterror` (comparisons.md) |
 | change between two points | before/after per category | `ggarrow`, `ggarrowrect` (comparisons.md), `ggslope` (lines.md) |
 | change over time, few series | long time series | `ggline` (lines.md) |
 | composition over time | stacked groups | `ggarea` (lines.md) |
@@ -262,9 +263,9 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      (98-10-0462 does) - and surveys publish CIs or coefficients of variation. Do not filter them away
      in `02_clean_data.R`: keep `lower` and `upper` beside the estimate. Then, in order of preference:
      **draw them** when a reader will compare values close enough that the intervals change what the
-     chart says (whiskers with `geom_linerange()` or `geom_errorbar(orientation = "y")` on a bar or
-     dot, a `geom_ribbon()` around a line, in `cowboysilver`, and a note saying "Lines show 95%
-     confidence intervals"); otherwise **state them in the note** ("95% confidence intervals are
+     chart says (for one estimate per category, the `ggdoterror` template: a blue dot on a blue
+     interval bar fading to its ends; otherwise whiskers with `geom_linerange()` on a bar, a `geom_ribbon()` around a
+     line, in `cowboysilver`; and a note saying "Bars show 95% confidence intervals"); otherwise **state them in the note** ("95% confidence intervals are
      within about ±2 percentage points" - a range across the bars, measured, not guessed).
    - **A share worked out here has no published interval.** When the chart divides one sampled count
      by another, the source's count intervals do not give the share's. Do not invent one or improvise

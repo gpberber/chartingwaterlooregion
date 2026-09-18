@@ -1,4 +1,4 @@
-# Comparison charts: dumbbells and arrows
+# Comparison charts: dumbbells, arrows and dots with intervals
 
 Use when the story is the gap or the change between two values per category (before/after, us/them).
 
@@ -259,6 +259,76 @@ plot_data |>
     title = "Title",
     subtitle = "Subtitle",
     caption = cwr_caption("Source")
+  )
+```
+
+## ggdoterror
+
+Dot per category with its confidence interval as a fading, flat-ended bar behind it, x axis on top.
+
+```r
+# One estimate per row, a dot, with its confidence interval as a fading bar
+# behind it (the New York Times poll-chart look). For sample data (style
+# rule 9b): lower and upper are the published 95% bounds, kept beside the
+# estimate in 02_clean_data.R. Add sample = to cwr_caption() and say what the
+# bars are in a note ("Bars show 95% confidence intervals").
+plot_data <- <data_object> |>
+  mutate(
+    <y_variable> = reorder(<y_variable>, <estimate>),
+    y_label = if_else(<y_variable> == "<bold_y_value>", "**<bold_y_value>**", as.character(<y_variable>))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(<y_variable>, y_label) |> deframe()
+
+plot_data |>
+  ggplot(aes(y = <y_variable>)) +
+
+  # The interval: a flat-ended bar from lower to upper bound, strongest in the
+  # middle and fading to both ends. A tile is centred on x and as wide as the
+  # interval; height is a share of the row. The gradient is a grid pattern
+  # (R 4.1+): group = FALSE runs it across each bar on its own, not across
+  # the whole panel. Translucent blue, so gridlines show through as on the NYT.
+  geom_tile(
+    aes(x = (<lower> + <upper>) / 2, width = <upper> - <lower>),
+    height = 0.24,
+    fill = grid::linearGradient(
+      colours = c(alpha(dodgerblue, 0.08), alpha(dodgerblue, 0.5), alpha(dodgerblue, 0.08)),
+      group = FALSE
+    )
+  ) +
+
+  # The estimate: a dot with a white rim so it stands off the bar
+  geom_point(
+    aes(x = <estimate>),
+    shape = 21, size = 4.5, stroke = 1,
+    fill = dodgerblue, colour = "white"
+  ) +
+
+  scale_x_continuous(
+    #limits = c(min, max),
+    #breaks = seq(min, max, by),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: vertical gridlines only, no x ticks or axis line
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "Title",
+    subtitle = "Subtitle",
+    caption = cwr_caption("Source", notes = "Bars show 95% confidence intervals")
   )
 ```
 

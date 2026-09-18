@@ -15,6 +15,7 @@ words and the template gets chosen for you. This is for when you want to know wh
 | ...and show a second number beside the ranking | `gghorbarrect`, `gglollipoprect` |
 | A few categories, one value each | `ggvertbar` |
 | Compare two groups, category by category | `ggcompbar_horiz`, `ggdumbbell` |
+| Sample estimates with their margins of error | `ggdoterror` |
 | A trend over months or years | `ggline` |
 | Change between exactly two dates | `ggslope`, `ggarrow`, `ggdumbbell` |
 | How a total splits, and how the split moves | `ggarea` |
@@ -53,12 +54,13 @@ words and the template gets chosen for you. This is for when you want to know wh
 | `ggribbon` | Line with a shaded band | A range rather than a single figure over time: highest and lowest, a confidence interval, best and worst case. |
 | `ggslope` | Slope chart | Exactly two dates: who rose, who fell, and whether the order changed between them. |
 
-### Comparison charts: dumbbells and arrows
+### Comparison charts: dumbbells, arrows and dots with intervals
 
 | Snippet | Chart | Good for |
 |---|---|---|
 | `ggdumbbell` | Dumbbell chart | The gap between two values in each category: 2019 against 2024, one group against another. |
 | `ggdumbbellrect` | Dumbbell with a value column | The same gap, with its size spelled out in a column rather than left to the eye. |
+| `ggdoterror` | Dots with confidence intervals | Sample estimates side by side with their margins of error: poll results, survey shares, long-form census rates with published bounds. |
 | `ggarrow` | Arrow chart | Change per category when the direction is the point: which went up, which fell, and how far. |
 | `ggarrowrect` | Arrow chart with a value column | The same, with the size of each change printed beside its arrow. |
 
