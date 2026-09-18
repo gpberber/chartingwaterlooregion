@@ -403,6 +403,8 @@ cwr_figure(
 )
 ```
 
+When I first drafted the preceding analysis, my cow references were made in jest, as indicated by the heading's [interrobang](https://en.wikipedia.org/wiki/Interrobang).
+
 ## Income
 
 
