@@ -100,7 +100,7 @@ list2env(grouped_land_pop_figures, environment()) |> invisible()
 
 ```
 
-On the map below, it appears as if the townships are chomping the smaller cities they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km land mass. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city. Judged solely by its area then, the Region is largely rural in character.
+If you haven't spent much time driving through the townships, you may have no idea how vast they are relative to the cities. On a map, it looks like they're chomping the urban core they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city. Judged solely by its area then, the Region is largely rural in character.
 
 ```{r}
 #| label: land-mass
@@ -204,7 +204,7 @@ p <- ggplot() +
   # lines coord_sf() draws by default - which this map has no use for.
   coord_sf(datum = NA) +
   labs(
-    title = "The Region's three cities are almost entirely surrounded by the four townships",
+    title = "The townships appear to swallow their urban core",
     subtitle = "Cities and townships, land mass",
     caption = cwr_caption("Statistics Canada, 2021 census boundary files")
   ) +
