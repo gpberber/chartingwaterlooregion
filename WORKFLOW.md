@@ -36,6 +36,8 @@ chartingwaterlooregion/
     theme_cwr.R          house chart style: colours, theme_cwr(), cwr_caption(), cwr_session_info()
     data_helpers.R       move big files to and from GitHub Releases
     data_bundle.R        build each post's downloadable data zip and data dictionary
+    data_quality.R       cwr_quality_flags(): finds the data-quality flags on a post's data,
+                         blanks figures never used (E, F, x, ..), records them (3.2)
     packages.R           every package the site uses; install_missing()
   posts/
     _metadata.yml        defaults for every post (author, licence, echo: false, figure sizes)
@@ -66,13 +68,14 @@ The slug becomes the URL (`.../posts/housing-starts/`), so keep it short, lowerc
 ```         
 posts/housing-starts/
   index.qmd          the post, starts with draft: true
-  README.md          data sources, licences, how to reproduce
+  README.md          data sources, reliability issues, licences, how to reproduce
   R/01_get_data.R    fetches raw inputs into data-raw/
   R/02_clean_data.R  turns data-raw/ into small tidy files in data/
   data-raw/          raw inputs (gitignored, never committed)
   data/              tidy files the post reads (committed when under 25 MB)
   data/tables.csv    one row per table the post uses (drives the reader download, 3.3)
   data/dictionary.csv  one row per column of those tables
+  data/quality_flags.csv  the data-quality flags on the data used, written by 02_clean_data.R (3.2)
   images/            thumbnail.png plus any static images
 ../chartingwaterlooregion-background/housing-starts/   PDFs, articles, notes
 ```
@@ -446,6 +449,16 @@ A post is reproducible when someone can clone the repo, run `source("R/packages.
 - **An edit is committed and pushed but the live site has not changed.** Pushing is not publishing. `master` holds the source; the site is served from the `gh-pages` branch, which only moves when `quarto publish gh-pages` runs. Run `/publish` with no argument, or the manual command in section 11. (GitHub Pages then takes a minute or two, and its cache can serve the old page for a little longer - reload with a `?x=1` on the end of the address to be sure.)
 
 - **A chunk runs but no chart appears in the Plots pane.** It almost certainly did appear, underneath the chunk instead. RStudio shows chunk output inline by default, and always does so in Visual mode; the Plots pane is not used at all in that setting. To put charts in the Plots pane, work in Source mode and switch output to the console: the gear beside **Run**, **Chunk Output in Console**, or Tools > Global Options > R Markdown > uncheck *Show output inline for all R Markdown documents*. If the chart is missing from both places, and raw `<picture>` HTML was printed instead, the session is holding an old copy of `cwr_figure()` - run the setup chunk again to re-source `R/theme_cwr.R`.
+
+- **The render stops with "these data-quality flags have no row in the README's Reliability table".** A flag in the post's `data/quality_flags.csv` is not covered by any row of the README's `## Reliability` table. Add a row for it, or add its code to the row that already covers it - the error names the code to use (`<!-- flags: ... -->`, section 3.2). If the issue should not appear in the post, it still needs its row, with the reason in **Left out of the post because**. Never delete the flag or skip the check to get past it.
+
+- **The render warns that the Reliability table "covers flags that data/quality_flags.csv no longer lists".** The data changed (a new download, a different filter) and some row describes a flag that is no longer there. Read the row: delete its code if the issue is gone, or fix the row if it moved.
+
+- **The cleaning script stops with "must be removed, but there is no value column to blank".** It found figures flagged E, F, x or `..` but cannot tell which column holds them. Tell it: `value_cols = "the_column"` for a long table, `values = c(...)` for a wide census table (section 3.2).
+
+- **A README edit does not show up in the post.** A full render reuses the post's saved results in `_freeze/`, and those refresh only when `index.qmd` changes - not when the README does. Render the post on its own, `quarto render posts/<slug>`, which always re-runs it. `/publish` does this for every post going live and for any live post whose README changed.
+
+- **A download script fails with `CUBE_NOT_AVAILABLE` or "does not exist".** Statistics Canada has withdrawn (or renumbered) the table. Check its page on the Statistics Canada site. If it is gone, remove it everywhere it is used - `/new-dataset` lists the places, the same list used when the crime dataset lost four victims tables on 2026-09-18 - and keep your local raw copy, which may be the last one.
 
 - **A chart looks stale after changing data.** Freeze cached the old result. Touch the post (any edit to `index.qmd`) and render again; or delete `_freeze/posts/<slug>/` to force a full re-run.
 
