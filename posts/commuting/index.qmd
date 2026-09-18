@@ -300,7 +300,28 @@ flows <- read_csv(
   col_types = cols(home_csd = col_character(), work_csd = col_character()),
   show_col_types = FALSE
 ) |>
-  clean_names()
+  clean_names() |>
+  # The City of Brantford and the County of Brant that wraps around it are two
+  # census subdivisions but one place as far as a commute is concerned, so they
+  # are counted together, as the feeder chart further down does. Matched on
+  # their codes, because "Brant" alone would also catch Brantford. The pair
+  # keep Brant's code, whose point in flow_places.csv marks them on the map.
+  mutate(
+    brant_pair = work_csd %in% c("3529005", "3529006"),
+    work = if_else(brant_pair, "Brantford/Brant", work),
+    work_csd = if_else(brant_pair, "3529005", work_csd)
+  ) |>
+  summarise(
+    workers = sum(workers), percent = sum(percent),
+    .by = c(home_csd, home, work_csd, work, in_region)
+  ) |>
+  # So the most common workplace outside the Region is picked again. It is the
+  # same place for every municipality as before; for North Dumfries, Brant
+  # becomes Brantford/Brant and its share grows.
+  mutate(
+    top_outside = !in_region & workers == max(workers[!in_region]),
+    .by = home_csd
+  )
 
 # The Region's seven outlines, projected into the house map projection
 # (cwr_map_crs, in R/maps.R). Everything drawn on the map is projected the same
@@ -331,7 +352,11 @@ map_points <- read_csv(
   ))()
 
 label_points <- map_points |> filter(in_region)
-outside_places <- map_points |> filter(!in_region)
+outside_places <- map_points |>
+  filter(!in_region) |>
+  # Named as the combined place above, so its label is measured at the width it
+  # is drawn
+  mutate(name = if_else(csd == "3529005", "Brantford/Brant", name))
 
 # The outside places are drawn closer than they are. Brant's middle is 20 km
 # beyond the Region's edge and Stratford's 17, and a frame wide enough to show
