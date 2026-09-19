@@ -209,21 +209,28 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    description a screen reader has, so write what the chart shows, not what it is.
 8. **Long category labels wrap; they do not shrink.** On a horizontal chart the
    category names compete with the bars for width, and on a phone they can take
-   more of the picture than the data. Wrap them with `cwr_wrap()` as a labeller -
-   `scale_y_discrete(labels = \(x) cwr_wrap(x, width = 30))` - and wrap harder for
-   the phone by putting a second `scale_y_discrete()` in `phone`, which replaces
-   the first rather than adding to it. Two things follow. A wrapped label is two
-   lines deep, so the row has to be deeper - **pass `row_height = 0.45, phone_row_height =
-   0.45` to `cwr_figure()` once labels wrap, and narrow the bars in proportion
-   (`geom_col(width = 0.58)` for 0.37 → 0.45) so they stay the house thickness** - or the
-   second line touches the row above; and the
-   break is emitted as `<br>`, not `"\n"`, because `theme_cwr()` draws the left axis with
-   ggtext. The gap between one label and the next is whatever is left of its row, so
-   `theme_cwr()` sets a wrapped label's own lines solid (`lineheight = 1.0`) to leave as much
-   of it as possible. Do not loosen that to buy breathing room: it spends the very space it is
-   trying to make. Buy the room with `row_height`. Shortening the names themselves
-   is better still where it can be done without changing their meaning, and belongs
-   in the post's `02_clean_data.R`, not in the chart.
+   more of the picture than the data. **Wrapping is automatic in `cwr_figure()`, on
+   both versions (Greg, 2026-09-18).** A category name wraps between words once it is
+   longer than `cwr_label_width` (30 characters) on the desktop or `cwr_phone_label_width`
+   (15, the length of "Crime in Canada") on the phone. That version's rows then deepen to
+   `cwr_wrapped_row_height` / `cwr_phone_wrapped_row_height` (0.45 in) for a two-line name,
+   plus `cwr_wrapped_line_height` (0.17 in) for each line past two, and its bars
+   (`geom_col` width) and tiles (`geom_tile` height) are thinned by the same factor so
+   they keep the house thickness. It wraps whatever the chart's own y scale prints
+   (labeller, named vector, `**Region**` bold line by line), so write nothing for it: no
+   `cwr_wrap()` labeller, no wrapping `scale_y_discrete()` in `phone`, no `row_height`,
+   no narrowed `geom_col(width = )`. The width rises to the longest single word when that
+   is longer - a word never splits, so wrapping below it narrows nothing
+   ("Blandford-Blenheim" keeps the commuting feeders chart on one line). A chart that sets
+   its own `row_height` / `phone_row_height` keeps it, and `label_width = Inf` /
+   `phone_label_width = Inf` turns the wrap off for that version. The break is `<br>`,
+   not `"\n"`, because `theme_cwr()` draws the left axis with ggtext. The gap between one
+   label and the next is whatever is left of its row, so `theme_cwr()` sets a wrapped
+   label's own lines solid (`lineheight = 1.0`); do not loosen that to buy breathing room,
+   since it spends the very space it is trying to make. Shortening the names themselves
+   is better still where it can be done without changing their meaning, and belongs in
+   the post's `02_clean_data.R`, not in the chart: a name wrapped to four lines on a phone
+   deepens every row of that chart.
 9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
 9a. **Long-form census data is charted as shares or rates, never as counts.** Before drafting any

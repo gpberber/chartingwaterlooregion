@@ -64,6 +64,11 @@ the same call in a situation the templates do not cover.
   (`cwr_stack_keys()`). Each name then sits beside the colour it names.
 - Long municipal names are shortened in chart text through `cwr_short_name()` ("N. Dumfries"),
   as "Region" is through `cwr_region`: the label column and map shapes have no width to spare.
+- Category names wrap between words automatically in `cwr_figure()`: past 30 characters on the
+  desktop, past 15 ("Crime in Canada") on the phone, with deeper rows (more for three or four
+  lines) and bars thinned to keep their thickness. A narrower label column is a wider plot. The
+  wrap never goes below the longest single word, since splitting there would deepen rows
+  without narrowing anything.
 - Legends only when direct labels would collide (many groups, crossing lines). Then use the
   theme default: inside, top-left, horizontal, no title.
 - `coord_cartesian(clip = "off")` whenever a label or header sits outside the panel.

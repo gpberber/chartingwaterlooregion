@@ -296,7 +296,10 @@ cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
 # size taken from the survey's own documentation.
 cwr_sample_notes <- c(
   census_2021 = "Estimates from the 2021 census long-form questionnaire, a 25% sample of households",
-  census_2016 = "Estimates from the 2016 census long-form questionnaire, a 25% sample of households"
+  census_2016 = "Estimates from the 2016 census long-form questionnaire, a 25% sample of households",
+  # "Crime Perception in Ontario Cities", December 2025: automated phone (IVR)
+  # survey, October 22-23, 2025, n = 800 in each of ten cities
+  liaison_2025 = "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city"
 )
 
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
@@ -687,6 +690,104 @@ label_size <- 4
 cwr_row_height <- 0.37
 cwr_phone_row_height <- 0.30
 
+# Category names wrap at this many characters (Greg, 2026-09-18). On a phone,
+# 15 - the length of "Crime in Canada", the longest one-line label that left a
+# phone dot chart enough room. On a desktop, 30: the image is twice as wide,
+# and a name of up to 30 characters takes about a third of it, which leaves the
+# plot most of the page. A narrower label column is a wider plot. A row whose
+# name wraps needs more depth, or the second line runs into the next name
+# (style rule 8), so a chart with any wrapped name draws its rows this deep.
+cwr_label_width <- 30
+cwr_phone_label_width <- 15
+cwr_wrapped_row_height <- 0.45
+cwr_phone_wrapped_row_height <- 0.45
+# Those depths hold a two-line name. Each line past two adds the height of one
+# line of axis text (15 pt x 0.8, set solid, is about 0.17 in), so a long name
+# that wraps to three or four lines on a phone does not run into the next.
+cwr_wrapped_line_height <- 0.17
+
+# Row depth for a chart whose longest name runs to `lines` lines
+cwr_wrapped_depth <- function(lines, two_line_depth) {
+  two_line_depth + max(lines - 2, 0) * cwr_wrapped_line_height
+}
+
+# Wrap a chart's category names (the discrete y axis) at `width`
+# characters, breaking only between words, with cwr_wrap(). It wraps whatever
+# the chart's own y scale would print - its labeller, a named vector, or the
+# categories themselves - so charts need do nothing. A name already broken with
+# <br> is joined up and re-wrapped at this width, and a bold name (**Region**)
+# is bolded line by line so the markdown still closes on each line. Names
+# carrying other HTML are left alone.
+#
+# Returns the plot, with a replacement y scale when anything wrapped, and the
+# most lines any name now runs to.
+cwr_wrap_category_labels <- function(plot, width = cwr_label_width) {
+  y_scale <- plot$scales$get_scales("y")
+  built <- ggplot_build(plot)
+  built_y <- built$layout$panel_scales_y[[1]]
+  if (is.null(built_y) || !built_y$is_discrete() || !is.finite(width)) {
+    return(list(plot = plot, lines = 1))
+  }
+
+  # What the chart's scale prints for a set of categories, before wrapping
+  original_labels <- if (is.null(y_scale)) waiver() else y_scale$labels
+  print_labels <- function(breaks) {
+    if (inherits(original_labels, "waiver")) return(as.character(breaks))
+    if (is.function(original_labels)) return(as.character(original_labels(breaks)))
+    if (!is.null(names(original_labels))) {
+      return(coalesce(unname(original_labels[as.character(breaks)]), as.character(breaks)))
+    }
+    as.character(original_labels)
+  }
+
+  wrap_one <- function(label) {
+    plain <- str_replace_all(label, "<br>", " ")
+    bold <- str_detect(plain, "^\\*\\*.*\\*\\*$")
+    plain <- str_remove_all(plain, "^\\*\\*|\\*\\*$")
+    # Other markup cannot be split safely, so it is left as the chart set it
+    if (str_detect(plain, "<|\\*")) return(label)
+    if (str_length(plain) <= width) return(label)
+    lines <- str_split_1(str_wrap(plain, width = width), "\n")
+    if (bold) lines <- paste0("**", lines, "**")
+    paste(lines, collapse = "<br>")
+  }
+  wrap_labels <- function(breaks) map_chr(print_labels(breaks), wrap_one)
+
+  # Did any name on the chart need wrapping? Checked against every panel's
+  # categories, since free-scale facets each have their own.
+  all_breaks <- built$layout$panel_scales_y |>
+    map(\(scale) scale$get_breaks()) |>
+    unlist() |>
+    unique()
+
+  # A word is never split, so the label column can never be narrower than the
+  # longest single word. Wrapping names to less than that narrows nothing and
+  # only deepens every row: on the commuting post, "Blandford-Blenheim" (18
+  # characters, one word) would have kept the column as wide as before while
+  # "Centre Wellington" broke onto two lines. So the width rises to the longest
+  # word when that is longer.
+  longest_word <- print_labels(all_breaks) |>
+    str_replace_all("<br>", " ") |>
+    str_remove_all("\\*\\*") |>
+    str_split("\\s+") |>
+    unlist() |>
+    str_length() |>
+    max()
+  width <- max(width, longest_word)
+  before <- print_labels(all_breaks)
+  after <- wrap_labels(all_breaks)
+  # The most lines any name runs to, whether wrapped here or already
+  # broken by the chart itself, since either needs the deeper row
+  lines <- max(str_count(after, "<br>")) + 1
+  if (identical(before, after)) return(list(plot = plot, lines = lines))
+
+  # Replace the chart's y scale with a copy that wraps what it would print,
+  # keeping everything else about it (limits, position, expansion)
+  new_scale <- if (is.null(y_scale)) scale_y_discrete() else y_scale$clone()
+  new_scale$labels <- wrap_labels
+  list(plot = suppressMessages(plot + new_scale), lines = lines)
+}
+
 # The height a chart must be drawn at for its category rows to come out
 # `row_height` inches deep, or NULL if its y axis is not categories.
 #
@@ -862,11 +963,14 @@ cwr_phone_theme <- function(width = 4.2) {
 # version on top instead of the desktop one. Nothing is written to the post
 # while drafting.
 #
-# Three things are changed automatically for the phone version, because the
+# Four things are changed automatically for the phone version, because the
 # panel is half as wide: titles wrap; right-hand axis labels move outside the
 # panel (the templates tuck them inside, above the gridlines, which collides
-# with the data on a narrow panel); and text drawn with geom_text/geom_label
-# is scaled by phone_text_scale so value labels stay narrower than bars.
+# with the data on a narrow panel); category names longer than
+# `phone_label_width` characters wrap, with deeper rows to hold them (see
+# cwr_wrap_category_labels(); the desktop does the same past `label_width`);
+# and text drawn with geom_text/geom_label is scaled
+# by phone_text_scale so value labels stay narrower than bars.
 # Anything else that only the phone version needs goes in `phone`, a list of
 # ggplot pieces added to it with `+`, for example:
 #   phone = list(scale_x_date(date_breaks = "2 years", date_labels = "%Y"))
@@ -877,6 +981,8 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
                        phone = list(), phone_text_scale = 0.8,
                        row_height = cwr_row_height,
                        phone_row_height = cwr_phone_row_height,
+                       label_width = cwr_label_width,
+                       phone_label_width = cwr_phone_label_width,
                        dpi = 288, draft_phone = FALSE) {
   stopifnot(str_starts(id, "fig-"))
 
@@ -926,20 +1032,66 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # Per-chart phone adjustments supplied by the caller
   for (piece in phone) phone_plot <- phone_plot + piece
 
+  # Long category names wrap - past 30 characters on the desktop, past 15
+  # ("Crime in Canada") on the phone - which narrows the label column and
+  # widens the plot (cwr_wrap_category_labels() above). A wrapped name needs a
+  # deeper row, so that version's rows deepen, unless the chart set its own
+  # row_height / phone_row_height, and its bars and tiles are thinned in step
+  # further down so they stay the house thickness. Pass label_width = Inf or
+  # phone_label_width = Inf to keep a chart's names on one line.
+  desktop_wrap <- cwr_wrap_category_labels(plot, label_width)
+  desktop_plot <- desktop_wrap$plot
+  desktop_thickness <- 1
+  if (desktop_wrap$lines > 1 && missing(row_height)) {
+    wrapped_depth <- cwr_wrapped_depth(desktop_wrap$lines, cwr_wrapped_row_height)
+    desktop_thickness <- row_height / wrapped_depth
+    row_height <- wrapped_depth
+  }
+
+  phone_wrap <- cwr_wrap_category_labels(phone_plot, phone_label_width)
+  phone_plot <- phone_wrap$plot
+  phone_thickness <- 1
+  if (phone_wrap$lines > 1 && missing(phone_row_height)) {
+    wrapped_depth <- cwr_wrapped_depth(phone_wrap$lines, cwr_phone_wrapped_row_height)
+    phone_thickness <- phone_row_height / wrapped_depth
+    phone_row_height <- wrapped_depth
+  }
+
   # Heights not given are worked out from the rows (see cwr_fit_height() above).
   # The phone version is measured on its own, after its adjustments, because
   # they can change its shape - stacking side-by-side panels doubles the rows.
   # A chart with no category axis and no height given falls back to 5 in, and
   # 90% of that on a phone.
   if (is.null(height)) {
-    height <- cwr_fit_height(plot, width, row_height, dpi) %||% 5
+    height <- cwr_fit_height(desktop_plot, width, row_height, dpi) %||% 5
   }
   if (is.null(phone_height)) {
     phone_height <- cwr_fit_height(phone_plot, phone_width, phone_row_height, dpi) %||%
       (height * 0.9)
   }
 
-  ggsave(desktop_file, plot, width = width, height = height,
+  # Deeper rows (wrapped names, above) would draw thicker bars, since a bar's
+  # thickness is a share of its row. Thin them by the same factor, in place,
+  # the way the phone text is shrunk below: a bar's `width`, a tile's `height`.
+  # Layers are shared by the desktop and phone plots, so each version sets its
+  # own factor from the original before it is saved, and the original is put
+  # back afterwards.
+  thickness_param <- function(layer) {
+    if (inherits(layer$geom, "GeomBar") && !is.null(layer$aes_params$width)) return("width")
+    if (inherits(layer$geom, "GeomTile") && !is.null(layer$aes_params$height)) return("height")
+    NA_character_
+  }
+  thick_layers <- keep(plot$layers, \(layer) !is.na(thickness_param(layer)))
+  thick_params <- map_chr(thick_layers, thickness_param)
+  original_thickness <- map2(thick_layers, thick_params, \(layer, param) layer$aes_params[[param]])
+  set_thickness <- function(factor) {
+    pwalk(list(thick_layers, thick_params, original_thickness),
+          \(layer, param, value) layer$aes_params[[param]] <- value * factor)
+  }
+  on.exit(set_thickness(1), add = TRUE)
+
+  set_thickness(desktop_thickness)
+  ggsave(desktop_file, desktop_plot, width = width, height = height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
 
   # Shrink text geoms for the phone. Layers are ggproto objects, which behave
@@ -957,6 +1109,7 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   on.exit(restore_sizes(), add = TRUE)
   walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
 
+  set_thickness(phone_thickness)
   ggsave(phone_file, phone_plot, width = phone_width, height = phone_height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
 

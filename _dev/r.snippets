@@ -264,15 +264,10 @@ snippet ggwraplabels
 	# a name is never split mid-word, and it emits <br> rather than a newline
 	# because theme_cwr() draws the left axis with ggtext.
 	#
-	# Width is in characters. 30 suits the desktop; wrap harder for the phone by
-	# passing a second scale to cwr_figure()'s `phone` argument, which replaces
-	# this one rather than adding to it:
-	#   phone = list(scale_y_discrete(labels = cwr_wrap))
-	#
-	# A wrapped label is two lines deep, so give cwr_figure() deeper rows -
-	# row_height = 0.45, phone_row_height = 0.45 - to keep it off the row above,
-	# and narrow the bars to geom_col(width = 0.58) so they keep the house
-	# thickness.
+	# Usually not needed: cwr_figure() already wraps category names past 30
+	# characters on the desktop and 15 on the phone, and deepens the rows and
+	# thins the bars to match. Use this only to wrap narrower than that on the
+	# desktop. Width is in characters.
 	scale_y_discrete(labels = \(x) cwr_wrap(x, width = ${1:30})) +
 	
 snippet ggcolours

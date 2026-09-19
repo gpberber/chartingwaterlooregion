@@ -58,7 +58,11 @@ For every `ggplot` chunk:
   `#| output: asis`, and `alt` is filled in with what the chart shows. Flag any chart that uses
   knitr's `fig-cap`/`fig-width` options instead (it would have no phone version). Flag a chart
   with categories on its y axis that types `height` or `phone_height`: those are set from the
-  rows so bars are one thickness across the site (only `row_height` for wrapped labels is fine).
+  rows so bars are one thickness across the site.
+  Flag a chart that wraps its category labels by hand (a `cwr_wrap()` labeller, `<br>` labels, a
+  wrapping `scale_y_discrete()` in `phone =`, or `row_height`/`geom_col(width = 0.58)` set for
+  wrapped names): `cwr_figure()` wraps them itself, at 30 characters on the desktop and 15 on the
+  phone, and sets the row depth and bar thickness to match.
 - `caption =` is optional; do not ask for one unless the chart needs a note that cannot live in
   the image. Flag a caption that only repeats the chart's own title or subtitle.
 - Numbering follows the post type by itself. In a **Deep dive**, check every reference to a chart

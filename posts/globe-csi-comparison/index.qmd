@@ -47,6 +47,15 @@ crime_rates <- read_csv(
   here("posts", "globe-csi-comparison", "data", "crime_rates.csv"),
   col_types = cols(ucr_code = col_character())
 )
+
+# Share of Kitchener residents who said each type of crime had increased over
+# the past year, with the survey's 95% margin of error as lower and upper
+# bounds (Liaison Strategies, October 2025). One row per type of crime.
+crime_perception <- read_csv(
+  here("posts", "globe-csi-comparison", "data", "crime_perception.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
 ```
 
 <!-- Opening paragraph: the question this post asks and the one-line answer. -->
@@ -54,6 +63,119 @@ crime_rates <- read_csv(
 ## First finding as a plain-language heading
 
 <!-- One or two paragraphs, then one chart. -->
+
+```{r}
+#| label: crime-perception
+#| output: asis
+
+# Share of Kitchener residents who say each type of crime has increased over
+# the past year, from Liaison Strategies' survey of 800 residents. Built from
+# the ggdoterror template: each share is a dot, and the survey's 95% margin
+# of error (plus or minus 3.46 points) is the fading bar behind it. The
+# survey publishes one margin for the whole sample, not one per answer, so
+# every bar is the same width (see R/02_clean_data.R).
+
+# The seven Kitchener questions are sorted by share. "Crime in Canada" asked
+# about the whole country, a different question, so it sits apart at the
+# top and is drawn in red, the house colour for the Canada comparison.
+perception_plot_data <- crime_perception |>
+  mutate(
+    sort_key = if_else(asked_about == "Canada", Inf, increased),
+    crime = fct_reorder(crime, sort_key),
+    colour = if_else(asked_about == "Canada", habsred, dodgerblue)
+  )
+
+p <- perception_plot_data |>
+  ggplot(aes(y = crime)) +
+
+  # The margin of error: a flat-ended bar from lower to upper bound, strongest
+  # in the middle and fading to both ends. A tile is centred on x and as wide
+  # as the interval; height is a share of the row. The gradient is a grid
+  # pattern: group = FALSE runs it across each bar on its own, not across the
+  # whole panel. Translucent, so gridlines show through. A pattern fill cannot
+  # be mapped to a column, so the red Canada bar is its own layer.
+  geom_tile(
+    data = \(d) filter(d, asked_about == "Kitchener"),
+    aes(x = (lower + upper) / 2, width = upper - lower),
+    height = 0.24,
+    fill = grid::linearGradient(
+      colours = c(alpha(dodgerblue, 0.08), alpha(dodgerblue, 0.5), alpha(dodgerblue, 0.08)),
+      group = FALSE
+    )
+  ) +
+  geom_tile(
+    data = \(d) filter(d, asked_about == "Canada"),
+    aes(x = (lower + upper) / 2, width = upper - lower),
+    height = 0.24,
+    fill = grid::linearGradient(
+      colours = c(alpha(habsred, 0.08), alpha(habsred, 0.5), alpha(habsred, 0.08)),
+      group = FALSE
+    )
+  ) +
+
+  # The share: a dot with a white rim so it stands off the bar
+  geom_point(
+    aes(x = increased, fill = colour),
+    shape = 21, size = 4.5, stroke = 1,
+    colour = "white"
+  ) +
+
+  scale_fill_identity() +
+
+  # Percent of residents; the unit belongs in the subtitle (style rule 1c)
+  scale_x_continuous(
+    limits = c(55, 75),   # the highest bound, robbery's, is 74.46
+    breaks = seq(55, 75, 5),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    position = "top"
+  ) +
+
+  # The row order is set here, not left to the layers: each tile layer sees
+  # only some rows, and ggplot2 would otherwise order the rows in the order
+  # the layers first meet them, which puts the rows out of order
+  scale_y_discrete(
+    position = "left",
+    limits = levels(pull(perception_plot_data, crime))
+  ) +
+
+  # Horizontal chart: vertical gridlines only, no x ticks or axis line
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "Share of Kitchener residents who say crime has increased, by type of crime",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Liaison Strategies, Crime Perception in Ontario Cities",
+      notes = "Bars show the survey's 95% margin of error, ±3.46 points",
+      sample = "liaison_2025"
+    )
+  )
+
+# Alt text built from the data, highest share first, so it cannot disagree
+# with the dots
+perception_alt <- perception_plot_data |>
+  arrange(desc(sort_key)) |>
+  mutate(entry = str_glue("{crime} {increased}%")) |>
+  pull(entry) |>
+  str_flatten_comma()
+
+# On a phone, cwr_figure() wraps the names longer than "Crime in Canada" and
+# deepens the rows to fit them (cwr_wrap_phone_labels() in theme_cwr.R)
+cwr_figure(
+  p, "fig-crime-perception",
+  alt = str_glue(
+    "Dot chart of the share of 800 Kitchener residents surveyed in October 2025 ",
+    "who said each type of crime had increased over the past year, each with a ",
+    "margin of error of plus or minus 3.46 points: {perception_alt}. ",
+    "The first row asked about crime in Canada as a whole."
+  )
+)
+```
 
 ```{r}
 #| label: csi
@@ -596,30 +718,6 @@ crime_chart("1310", "incidents")
 crime_chart("1310", "index")
 ```
 :::
-
-```{r}
-#| label: first
-#| output: asis
-
-# Pick a template from the cwr-charts skill and build the chart as `p`, then hand
-# it to cwr_figure(): it saves a desktop and a phone version of the chart to
-# figures/ and writes the figure. Width is fixed at the paragraph width. A
-# chart with categories on its y axis (bars, lollipops) needs no height: it is
-# worked out so every row is drawn the same depth in every post. Any other chart
-# (a line chart, a map) adds `height = 5, phone_height = 4.5` or whatever suits
-# it. A Deep dive gets "Figure 1" under the chart and can be
-# referred to as @fig-first; a Snapshot gets no label. That follows the post
-# type in `categories` above, so there is nothing to set here.
-#
-# Running this chunk rather than rendering draws both versions to look at, the
-# desktop one last, and writes nothing to the post.
-p <- ggplot()
-
-cwr_figure(
-  p, "fig-first",
-  alt = "What the chart shows, for screen readers."
-)
-```
 
 ## Second finding
 

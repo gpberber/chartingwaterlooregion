@@ -225,6 +225,49 @@ crime_rates <- incidents_checked |>
   mutate(across(c(ucr_code, region), as.character)) |>
   select(offence_group, ucr_code, violation, region, year, incidents, incidents_per_100k, base_year, index)
 
+# ---- Perceived change in crime: Kitchener survey -----------------------------
+# Liaison Strategies' "Crime Perception in Ontario Cities" (December 30, 2025)
+# asked 800 residents of each of Ontario's ten largest cities, by automated
+# phone survey (IVR) on October 22-23, 2025, whether each type of crime had
+# increased, stayed about the same or decreased over the past year. The first
+# question was about crime in Canada as a whole; the rest about the
+# respondent's own city.
+#
+# The figures are published only in a PDF report, with no data file to
+# download, so they are typed in here from the Kitchener pages (26-35, "Total"
+# column, "Increased" row). The PDF is in the background folder,
+# ../chartingwaterlooregion-background/crime/.
+#
+# The report gives one margin of error for each city's full sample: plus or
+# minus 3.46 percentage points, 19 times out of 20 (a 95% confidence
+# interval). That is the margin for a 50% share, the widest there is, so it is
+# a slightly generous interval for shares near 65%. Liaison publishes no
+# interval for each answer, so the one published figure is applied to every
+# share rather than a narrower one being worked out here.
+perception_moe <- 3.46
+
+crime_perception <- tribble(
+  ~crime,                   ~page, ~increased,
+  "Crime in Canada",           28,         70,
+  "Homicide",                  29,         66,
+  "Assault",                   30,         68,
+  "Robbery",                   31,         71,
+  "Break and enter",           32,         66,
+  "Motor vehicle theft",       33,         64,
+  "Fraud and cybercrime",      34,         67,
+  "Hate-motivated crime",      35,         63
+) |>
+  mutate(
+    city = "Kitchener",
+    # "Crime in Canada" asked about the whole country; the others about Kitchener
+    asked_about = if_else(crime == "Crime in Canada", "Canada", "Kitchener"),
+    lower = increased - perception_moe,
+    upper = increased + perception_moe,
+    respondents = 800
+  ) |>
+  select(city, crime, asked_about, increased, lower, upper, respondents, page)
+
 # ---- Write -----------------------------------------------------------------
 write_csv(csi_comparison, file.path(data_dir, "csi_comparison.csv"))
 write_csv(crime_rates, file.path(data_dir, "crime_rates.csv"))
+write_csv(crime_perception, file.path(data_dir, "crime_perception.csv"))
