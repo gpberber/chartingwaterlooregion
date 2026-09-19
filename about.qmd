@@ -49,7 +49,7 @@ toc: false
 
 ## What is it?
 
-Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories about life in Waterloo Region using data from (mostly) open sources. In **snapshots**---posts with a few charts and some basic analysis that can be read in under five minutes---and the occasional **deep dive** containing more rigorous analysis, CWR will answer questions from the fundamental to the frivolous. Has crime in the Region gotten worse over the past 25 years? CWR will take a stab at answering that. Which fast-food chain incurs more health-code violations, McDonald's or Tim Hortons? CWR will bite into that one as well. (Thankfully, bad puns will not be a regular CWR feature.) Basically, CWR is one guy's effort to illustrate facts and features of Waterloo Region using well-designed charts built from open data.
+Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories about life in Waterloo Region using data from (mostly) open sources. In **snapshots**---posts with a few charts and some basic analysis that can be read in under five minutes---and the occasional **deep dive** containing more rigorous analysis, CWR will answer questions from the fundamental to the frivolous. Has crime in the Region gotten worse over the past 25 years? CWR will take a stab at answering that (sorry!). What do the townships have more of, cows or people? CWR will investigate that burning issue as well. Basically, CWR is one guy's effort to illustrate facts and features of Waterloo Region using well-designed charts built from open data.
 
 ## Who writes it?
 
@@ -61,7 +61,7 @@ After years (no kidding!) of procrastination, I've decided to start publishing s
 
 ## Where does its data come from?
 
-CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources and reliability" section at the end of each post lists the sources, with their links and licences, where applicable.
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources and reliability" section at the end of each post lists the sources, with their links and licences, where applicable. Notes about data reliability that are critical to the proper interpretation of chart data will also be included in this section.
 
 ## Is it independent?
 
