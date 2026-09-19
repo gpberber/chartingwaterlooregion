@@ -399,32 +399,15 @@ cwr_figure(
 )
 ```
 
-When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" And lo and behold, I learned that every five years, not only is there the Census of Population that we are all familiar with, but there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
-
-Before I answer this---in case there are any cattle farmers reading---another thing I learned while writing this post is that cows are a specific type of cattle, along with heifers, steers, calves, and bulls. To this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.
-
-Now on to the question. The population figures above are 2025 estimates, but our cow data is from 2021, so for a fair comparison, we'll use the 2021 township populations as well.  The chart below shows a total of xxx people lived in the townships that year. How many cows lived in them? Guess the answer before you click the tab to reveal it. 
-
-::: panel-tabset
-### People
-
 ```{r}
-#| label: cattle-people
-#| output: asis
-
-# Two tabs, one chart: the first shows the people alone, the second adds the
-# cattle. Everything that fixes where the people bar sits - the rows, the axis
-# range, the chart's height - is the same in both, so switching to the second
-# tab looks like the cattle bar appearing and nothing else moving.
+#| label: prep-cattle
+#| include: false
 
 # The four townships added together: all cattle and every resident, counted on
 # the same day - 11 May 2021, census day for both the Census of Agriculture and
 # the Census of Population. sum() is used without na.rm = TRUE on purpose: if
 # the quality check in 02_clean_data.R had blanked a township's figure, the
 # total would come out missing rather than quietly short.
-#
-# The bar is labelled "Cows" because the post uses the word for all cattle -
-# calves, steers, heifers, cows and bulls - as the paragraph above explains.
 cattle_people <- cattle |>
   summarise(Cows = sum(cattle), People = sum(population)) |>
   pivot_longer(everything(), names_to = "what", values_to = "count") |>
@@ -438,6 +421,32 @@ cattle_people <- cattle |>
     # characters of label fit across it on a phone.
     inside = count >= (nchar(label) + 1.5) * (max(count) * 1.2 / 45)
   )
+
+num_people <- cattle_people |> filter(what == "People") |> pull(count) |> comma(accuracy = 1)
+```
+
+When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" And lo and behold, I learned that every five years, not only is there the Census of Population that we are all familiar with, but there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
+
+Before I answer this---in case there are any cattle farmers reading---another thing I learned while writing this post is that cows are a specific type of cattle, along with heifers, steers, calves, and bulls. To this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.
+
+Now on to the question. The population figures above are 2025 estimates, but our cow data is from 2021, so for a fair comparison, we'll use the 2021 Census populations as well. As we see, a total of `r num_people` people lived in the townships on May 11, 2021. How many cows lived in them on that day? Guess the answer before you click the tab to reveal it. 
+
+::: panel-tabset
+### People
+
+```{r}
+#| label: cattle-people
+#| output: asis
+
+# Two tabs, one chart: the first shows the people alone, the second adds the
+# cattle. Everything that fixes where the people bar sits - the rows, the axis
+# range, the chart's height - is the same in both, so switching to the second
+# tab looks like the cattle bar appearing and nothing else moving.
+
+
+# The bar is labelled "Cows" because the post uses the word for all cattle -
+# calves, steers, heifers, cows and bulls - as the paragraph above explains.
+
 
 # The longest bar of the two, so both tabs share one axis range. Left to
 # itself, the first tab's axis would stretch the people bar across the chart.
@@ -513,8 +522,8 @@ cattle_alt <- function(show_cattle) {
 # whatever replaces it, both tabs keep the same number of lines.
 p <- cattle_chart(show_cattle = FALSE) +
   labs(
-    title = "People and cattle in the four townships, 2021",
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "On Census day in 2021, the Region's townships had more...",
+    subtitle = "Townships, total population, 2021-05-11",
     caption = cwr_caption("Statistics Canada Table 98-10-0002-01", credit = TRUE)
   )
 
@@ -530,7 +539,7 @@ cwr_figure(
 )
 ```
 
-### People and cattle
+### People and cows
 
 ```{r}
 #| label: cattle
@@ -538,8 +547,8 @@ cwr_figure(
 
 p <- cattle_chart(show_cattle = TRUE) +
   labs(
-    title = "People and cattle in the four townships, 2021",
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "On Census day in 2021, the Region's townships had more...cows than people!",
+    subtitle = "Townships, total population, 2021-05-11",
     caption = cwr_caption(
       c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
       credit = TRUE
@@ -557,13 +566,6 @@ cwr_figure(
 )
 ```
 :::
-
-```{r}
-#| label: tbl-first
-#| tbl-cap: "Caption shown under the table."
-
-# gt table here (one table per chunk).
-```
 
 ## Data sources and reliability
 
