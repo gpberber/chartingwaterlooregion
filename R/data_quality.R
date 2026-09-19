@@ -24,7 +24,8 @@
 #
 # Where the flags are in a Statistics Canada download:
 #   - Regular tables (get_cansim()): a STATUS column holds "..", "x", "E", "F",
-#     "A" to "D"; a SYMBOL column holds "p", "r"; TERMINATED holds "t".
+#     "A" to "D"; a SYMBOL column holds "p", "r"; TERMINATED holds "t". cansim
+#     turns "F" into a missing status; the function puts it back (see below).
 #   - Census tables (98-10-xxxx): one Symbol column holds all of them. A wide
 #     census table has one Symbol column after each value column (Symbol,
 #     Symbol_1, Symbol_2 ...), each belonging to the column just before it.
@@ -124,6 +125,34 @@ cwr_quality_flags <- function(data, table, notes = NULL, log = NULL,
     values <- make_clean_names(values)
     owner <- set_names(cols[match(flag_cols, cols) - 1], flag_cols)
     flag_cols <- flag_cols[owner %in% values | str_detect(flag_cols, "^(status|terminated)")]
+  }
+
+  # ---- Put back the F that cansim drops --------------------------------------
+  # cansim (0.5.0) reads Statistics Canada's CSVs with "F" in its list of
+  # missing-value strings, so a figure flagged F ("too unreliable to be
+  # published") arrives with no value AND no status - the flag is lost before
+  # this function sees it. In a regular table (STATUS and VALUE columns), a
+  # missing figure with no status is what an F becomes and nothing else: "..",
+  # "x" and "E" all survive the download. So the F is put back, in the data
+  # checked here and in the data handed back, where a post may read the status
+  # to say why a figure is missing. Confirmed 2026-09-18 against Statistics
+  # Canada's own CSV for table 32-10-0372-01 (Wilmot, Ontario, Total pigs,
+  # 2021), which shows "F" on a cell cansim returns empty.
+  #
+  # Census tables (98-10-xxxx) are left alone: they carry a Symbol column, not
+  # STATUS, and in every census table the site has downloaded no blank figure
+  # lacks a symbol, so there is no lost F to restore and no evidence of what a
+  # bare blank would mean there.
+  #
+  # The rows must also still be straight from get_cansim(), which the
+  # COORDINATE column marks. A table that has been pivoted and had its flags
+  # joined back on (the crime dataset, in the globe-csi post) has blanks for
+  # combinations that were never published at all, and calling those F would be
+  # wrong. The crime dataset's raw files had no lost F when checked (2026-09-18).
+  if (all(c("status", "value", "coordinate") %in% cols) && !str_starts(table, "98-10")) {
+    lost_f <- is.na(data[["value"]]) & is.na(data[["status"]])
+    data[["status"]][lost_f] <- "F"
+    original[[match("status", cols)]][lost_f] <- "F"
   }
 
   # A few readable columns to say where a flag sits: the period, the place and

@@ -1,0 +1,37 @@
+year,district,animal,animals,status
+2011,North Dumfries,Cattle,4073,NA
+2016,North Dumfries,Cattle,3311,NA
+2021,North Dumfries,Cattle,4612,D
+2011,Wellesley,Cattle,39301,NA
+2016,Wellesley,Cattle,39752,NA
+2021,Wellesley,Cattle,34818,A
+2011,Wilmot,Cattle,11573,NA
+2016,Wilmot,Cattle,10818,NA
+2021,Wilmot,Cattle,10581,C
+2011,Woolwich,Cattle,36080,NA
+2016,Woolwich,Cattle,35234,NA
+2021,Woolwich,Cattle,33264,B
+2011,North Dumfries,Pigs,6207,NA
+2016,North Dumfries,Pigs,8053,NA
+2021,North Dumfries,Pigs,NA,E
+2011,Wellesley,Pigs,68379,NA
+2016,Wellesley,Pigs,67748,NA
+2021,Wellesley,Pigs,52479,D
+2011,Wilmot,Pigs,15846,NA
+2016,Wilmot,Pigs,13937,NA
+2021,Wilmot,Pigs,NA,F
+2011,Woolwich,Pigs,20391,NA
+2016,Woolwich,Pigs,16353,NA
+2021,Woolwich,Pigs,NA,E
+2011,North Dumfries,Sheep,454,NA
+2016,North Dumfries,Sheep,NA,x
+2021,North Dumfries,Sheep,NA,F
+2011,Wellesley,Sheep,4851,NA
+2016,Wellesley,Sheep,4364,NA
+2021,Wellesley,Sheep,5789,B
+2011,Wilmot,Sheep,1730,NA
+2016,Wilmot,Sheep,1922,NA
+2021,Wilmot,Sheep,2018,D
+2011,Woolwich,Sheep,3302,NA
+2016,Woolwich,Sheep,2235,NA
+2021,Woolwich,Sheep,5218,B

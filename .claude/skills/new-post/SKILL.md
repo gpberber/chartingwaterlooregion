@@ -30,7 +30,9 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    possible). Ask for a one-sentence `description` for the listing card; fill them in.
 9. Do not write any of the post. The scaffold's headings, placeholder comments and stock sections
    are left exactly as copied; the prose is Greg's. Adding a chart later means adding that chunk
-   alone. Report what was created and the next steps: put raw data in `data-raw/` (or write
+   alone - and the post's first chart goes IN the template's `first` chunk, replacing its
+   placeholder code and renaming its label and id, never in a new chunk beside it (see the
+   `cwr-charts` skill, "Scope"). Later charts are new chunks after it. Report what was created and the next steps: put raw data in `data-raw/` (or write
    `R/01_get_data.R` to fetch it - for Ontario municipal census populations 1996-2021, `gt::towny` is
    already installed; see `WORKFLOW.md` section 3.2 for how to use it and its traps), write
    `R/02_clean_data.R` to produce small tidy files in `data/`, running `cwr_quality_flags()` on the

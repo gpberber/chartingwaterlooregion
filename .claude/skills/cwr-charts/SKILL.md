@@ -387,6 +387,17 @@ cwr_figure(p, "fig-flows-waterloo", alt = flow_alt("Waterloo"), height = 7.5, ph
 A request for a chart is a request for the chart chunk. Do not write an introduction, a heading, a
 finding, or a sentence interpreting it, and do not touch the post's other sections - the template's
 placeholder comments and stock headings stay exactly as they are until Greg writes them himself.
+
+**The first chart in a post goes in the template's `first` chunk** (under "First finding as a
+plain-language heading"), not in a new chunk beside it (Greg, 2026-09-18, after it happened in
+three posts running). Replace everything inside that chunk - the placeholder `p <- ggplot()`, its
+`cwr_figure(p, "fig-first", ...)` and the template's instructions comment - with the chart, and
+rename the label and id after the chart (`label: commuting`, `"fig-commuting"`). If the first
+chart is a set of tabs, the `panel-tabset` takes that chunk's place, its first tab's chunk doing the
+shared work. Every later chart is a new chunk after it, still under the first heading unless Greg
+says where. Delete the stale `figures/fig-first.png` and `fig-first-phone.png` if a render left
+them. Once no `first` chunk is left, a new chart simply goes after the last one.
+
 Yours to write: the `cwr_caption()` source line, the `alt` text, the code comments, and a
 **working title**.
 

@@ -98,7 +98,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - The writing is Greg's, not Claude's. "Create a post" means scaffold it and stop: no opening
   paragraph, no headings of your own, no analysis. "Add a chart" means add the chart chunk and
   nothing else - no prose around it, and never reword, fill in, or delete the template's stock
-  sections and placeholder comments. A post renders fine with every stock section untouched and
+  sections and placeholder comments. The one exception is the template's `first` chart chunk: the
+  post's first chart goes IN it (its placeholder code replaced, label and `fig-` id renamed after
+  the chart), never beside it; a first chart made of tabs takes that chunk's place. Later charts
+  go in new chunks after it. A post renders fine with every stock section untouched and
   `data/tables.csv` and `data/dictionary.csv` still empty, so nothing forces the extras; leave
   them alone and say in one line what is still outstanding. Write prose only when asked for it.
   A chart's finding title and subtitle are prose too, and Greg's: when drafting a chart, give it a
