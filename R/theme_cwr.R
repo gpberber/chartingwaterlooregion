@@ -682,9 +682,9 @@ label_size <- 4
 
 # ---- 6. Responsive figures ------------------------------------------------
 # How deep one category row is drawn, in inches: the bar plus the gap below it.
-# Taken from the welcome post's income chart, the one that read best: a bar of
-# the standard width = 0.7 is then about a quarter of an inch thick, deep enough
-# to hold a direct label with room around it. The phone value is smaller by the
+# Taken from the income chart (now in the households-and-income post), the one
+# that read best: a bar of the standard width = 0.7 is then about a quarter of
+# an inch thick, deep enough to hold a direct label with room around it. The phone value is smaller by the
 # same factor cwr_figure() shrinks label text by there (phone_text_scale), so a
 # label fills its bar the same way on both.
 cwr_row_height <- 0.37

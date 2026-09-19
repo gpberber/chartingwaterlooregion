@@ -1,0 +1,380 @@
+---
+title: "Households and income"
+description: "One sentence for the listing card: the question and the answer."
+date: "2026-09-19"
+categories: [Snapshot, Income, Households]
+image: images/thumbnail.png
+draft: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/households-and-income/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
+# Post-specific packages go here, and in R/packages.R
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+# example <- read_csv(here("posts", "households-and-income", "data", "example.csv"))
+
+# Median household and median individual income from the 2021 census, which
+# reports income earned in 2020, restated in 2026 dollars by 02_clean_data.R.
+# Eight rows: the seven municipalities and the Region as a whole.
+income <- read_csv(
+  here("posts", "households-and-income", "data", "income.csv"),
+  show_col_types = FALSE
+)
+
+# How people live: the average number of people in a household and the share
+# of dwellings that are single-detached houses. 2021 census.
+households <- read_csv(
+  here("posts", "households-and-income", "data", "households.csv"),
+  show_col_types = FALSE
+)
+```
+
+<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+
+## First finding as a plain-language heading
+
+<!-- One or two paragraphs, then one chart. -->
+
+```{r}
+#| label: income
+#| output: asis
+
+# The two measures: the column each comes from and the heading its panel
+# carries. Kept in a table so the panel headings and the alt text are built
+# from one list and cannot drift apart. There is no separate spoken form here
+# because both headings read aloud exactly as they are written.
+income_measures <- tribble(
+  ~column,                   ~panel,
+  "household_income_2026",   "Household",
+  "individual_income_2026",  "Individual"
+)
+
+income_panels <- income |>
+  select(district, district_type, household_income_2026, individual_income_2026) |>
+  pivot_longer(
+    c(household_income_2026, individual_income_2026),
+    names_to = "column", values_to = "value"
+  ) |>
+  left_join(income_measures, join_by(column)) |>
+  mutate(
+    measure = factor(panel, levels = income_measures$panel),
+    # Each panel is ordered by its own figures rather than sharing one order,
+    # so a place can sit seventh for household income and third for individual
+    # income. That disagreement between the two panels is the point of putting
+    # them side by side.
+    #
+    # ggplot2 has one discrete scale for the whole chart, so a factor of place
+    # names can carry only one order. The way round it is to make each bar's
+    # identity the place *and* its panel - "Kitchener|Median individual income"
+    # - and sort that combined key by value. Drawn with a free y scale, each
+    # panel shows only its own eight levels in its own order, and the scale
+    # below strips the panel name off again before the label is drawn.
+    # (tidytext::reorder_within() does exactly this. It is two lines here, so
+    # the package is not worth adding.)
+    #
+    # fct_reorder() sorts ascending and a horizontal bar chart draws the first
+    # level at the bottom, so the highest income ends up on top of its panel.
+    row = fct_reorder(paste(district, measure, sep = "|"), value),
+    # Rounded to the nearest hundred dollars. The census medians themselves are
+    # rounded before publication, and multiplying by an index does not add
+    # precision, so a figure to the dollar would be false exactness.
+    label = label_currency(accuracy = 100, big.mark = ",")(value)
+  )
+
+p <- ggplot(income_panels, aes(x = value, y = row, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Every label sits inside its bar end. The shortest bar here still holds
+      # its label comfortably, so unlike the household chart below there is no test for
+      # which ones have to move outside.
+      #
+      # White on the dark city blue only. On the light township blue and the
+      # Region's silver, white is a contrast ratio of under three to one, which
+      # is too faint to read at this size, so those labels are black.
+      colour = if_else(district_type == "City", "white", "black")
+    ),
+    hjust = 1.15,
+    size = label_size * 0.8
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = dodgerblue50, Region = cowboysilver),
+    guide = "none"   # the colours are explained by the bars themselves
+  ) +
+  # A little air at the bar ends so the longest bar does not touch the panel
+  # edge. No room is needed on the right for outside labels, as there are none.
+  scale_x_continuous(expand = expansion(mult = c(0, 0.02))) +
+  # Everything from the "|" on is the panel name carried by the sort key above,
+  # and is not for reading. What is left is the name, in its house short form.
+  scale_y_discrete(labels = \(x) cwr_short_name(str_split_i(x, fixed("|"), 1))) +
+  # Free on y, fixed on x. Free on y is what lets each panel hold its own
+  # order, and it is why the second panel carries its own row labels: the rows
+  # are no longer the same rows in the same places.
+  #
+  # x stays shared, which is the other point of the chart: a household is more
+  # than one earner, and at one scale the individual bars come out visibly
+  # shorter. Given its own scale - as the household chart below does, where
+  # the two measures share no unit - the second panel would look like the
+  # first and that comparison would be lost.
+  facet_wrap(vars(measure), nrow = 1, scales = "free_y") +
+  labs(
+    title = "Households and individuals in the townships outearn those in the cities",
+    subtitle = "Median total income in 2020<sup>1</sup> of people living in private dwellings, 2026 dollars<sup>2</sup>",
+    # One footnote, keyed to whatever in the title or subtitle needs it.
+    caption = cwr_caption(
+      c("Statistics Canada Tables 98-10-0057-01, 98-10-0070-01", "and 18-10-0004-01"),
+      credit = TRUE,
+      notes = c("latest year available, from 2021 census", "adjusted by the Ontario all-items CPI")
+      # No sampling note: census medians are published for 100% of the
+      # population, from tax records linked to every respondent
+    )
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed. Typed, the figures would be
+# right today and quietly wrong the first time the data is revised - and wrong
+# only for the readers who cannot see the chart to check it against.
+alt_lines <- income_panels |>
+  # Each line reads down its own panel, highest first, as the bars are drawn
+  arrange(measure, desc(value)) |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = measure
+  ) |>
+  mutate(line = paste0(measure, ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-income",
+  alt = paste0(
+    "Two panels of horizontal bars, one row per municipality and one for ",
+    "Waterloo Region as a whole, with the three cities in dark blue, the four ",
+    "townships in light blue and the Region in grey. Each panel is ordered by its own ",
+    "figures, highest at the top, and both are drawn to the same dollar scale. ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  # No height given: cwr_figure() sets it from the number of rows.
+  # Two panels side by side will not fit across a phone, so the phone version
+  # stacks them. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_y"))
+)
+```
+
+```{r}
+#| label: households
+#| output: asis
+
+# Two measures, each with its own unit, so each panel gets its own scale and its
+# own number format. The panel heading carries the unit wherever the label
+# cannot: "3.4" says nothing on its own, "85%" says most of it.
+# Roughly how many characters of label fit across one panel of a two-panel
+# chart at this font size, read off a render.
+panel_chars_wide <- 45
+
+household_measures <- tribble(
+  ~column,                    ~panel,                                   ~accuracy, ~suffix,
+  "average_household_size",   "Average private household size, number of persons",            0.1,      "",
+  "single_detached_percent",  "Single-detached houses, as % of private dwellings",  1,        "%"
+)
+
+household_panels <- households |>
+  # One order for both panels, set on the first, so a place sits on the same row
+  # in each and can be read straight across.
+  mutate(district = fct_reorder(district, average_household_size)) |>
+  pivot_longer(
+    c(average_household_size, single_detached_percent),
+    names_to = "column", values_to = "value"
+  ) |>
+  left_join(household_measures, join_by(column)) |>
+  mutate(
+    measure = factor(panel, levels = household_measures$panel),
+    label = label_number(accuracy = accuracy, suffix = suffix)(value)
+  ) |>
+  # Whether a label fits inside its bar, asked panel by panel because each panel
+  # has its own scale. What decides it is the width of the text in the axis's
+  # own units: the axis runs to about 1.2 times the longest bar, and one
+  # character is 1 / panel_chars_wide of that. A label needs its length plus a
+  # space or so of padding.
+  mutate(
+    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars_wide),
+    .by = measure
+  )
+
+p <- ggplot(household_panels, aes(x = value, y = district, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      # White inside the dark city bars only; inside the light township
+      # bars, and outside any bar, black reads better
+      colour = if_else(inside & district_type == "City", "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = dodgerblue50),
+    guide = "none"   # the same two colours as every other chart in the post
+  ) +
+  # Room on the right for any label that sits outside its bar
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  # The house short form of a long municipal name
+  scale_y_discrete(labels = cwr_short_name) +
+  # Free on x only, because the two measures share no unit. The rows are shared,
+  # so only the first panel carries the place names.
+  # label_wrap_gen() breaks a heading too wide for its panel onto a second line;
+  # panel headings are drawn by the theme as plain text, so cwr_wrap() - which
+  # emits <br> - would show its markup instead of acting on it.
+  facet_wrap(vars(measure), nrow = 1, scales = "free_x",
+             labeller = label_wrap_gen(26)) +
+  # Stops a label that overhangs the panel edge from being cut off
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption("Statistics Canada Table 98-10-0041-01", credit = TRUE)
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing.x = unit(1.4, "lines")
+  )
+
+# Built from the plotted rows rather than typed, as above. Each line reads down
+# its panel in the order the rows are drawn, top first.
+alt_lines <- household_panels |>
+  arrange(measure, desc(district)) |>
+  summarise(
+    entries = paste(paste0(district, " ", label), collapse = ", "),
+    .by = measure
+  ) |>
+  mutate(line = paste0(measure, ": ", entries)) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-households",
+  alt = paste0(
+    "Two panels of horizontal bars, one row per municipality, both ordered by ",
+    "average household size, with the three cities in dark blue and the four ",
+    "townships in light blue. ",
+    paste(alt_lines, collapse = ". "), "."
+  ),
+  # No height given: cwr_figure() sets it from the number of rows.
+  # Two panels side by side will not fit across a phone, so the phone version
+  # stacks them. Adding a facet replaces the one above.
+  phone = list(facet_wrap(vars(measure), ncol = 1, scales = "free_x",
+                          labeller = label_wrap_gen(26)))
+)
+```
+
+## Second finding
+
+```{r}
+#| label: tbl-first
+#| tbl-cap: "Caption shown under the table."
+
+# gt table here (one table per chunk).
+```
+
+## Data sources and reliability
+
+<!-- Where the data came from, what was excluded and why, and any caveat a careful
+     reader should know: write that here, above the tables. If any of it is sample data
+     (the census long form, a survey), say so here, how big the sample is, and whether
+     the charts show confidence intervals. Neither table is written here - the chunks
+     below print both straight out of this post's README.md, so there is only ever one
+     copy of each.
+
+     Keep this heading as it is. _includes/like.html puts the "Like this post"
+     button immediately above it, on the reasoning that the analysis ends here and
+     everything below is reference material. It finds the spot by the id Pandoc
+     builds from the heading text, so rewording the heading does not break the
+     button - it quietly drops it to the foot of the page instead. -->
+
+### Sources
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("households-and-income")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this post's
+# README.md - edit them there, not here. To leave an issue out of the post, do
+# not delete its row: write why in its "Left out of the post because" column,
+# and it drops out of the post while the README keeps the record.
+cwr_reliability_table("households-and-income")
+```
+
+## Other sources
+
+<!-- Anything cited that is not data: reports, articles, books, a method borrowed
+     from someone else. Quoted material stays under its owner's terms, never this
+     site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+**Reproduce the post**: get the code and data for this post from [`posts/households-and-income/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/households-and-income) on GitHub.
+
+**Download the data:** `r cwr_bundle_link("households-and-income", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/households-and-income#data-dictionary).
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

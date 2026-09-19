@@ -60,126 +60,7 @@ unzip(boundary_zip, exdir = file.path(raw_dir, "csd_boundaries"))
 get_cansim("17-10-0155-01") |>
   write_csv(file.path(raw_dir, "table_17100155.csv"))
 
-# ---- 3. Income, 2021 census ------------------------------------------------
-# Two census tables, both published for census subdivisions:
-#
-#   98-10-0057-01  median household total income
-#   98-10-0070-01  median total income of people aged 15 and over
-#
-# Both report income earned in 2020, the calendar year before the census. That
-# is as recent as census income gets: the census is taken every five years and
-# asks about the year before it.
-#
-# Each table covers every census subdivision in Canada - 98-10-0057-01 alone is
-# 2.5 million rows - and only Waterloo Region's eight geographies are ever
-# used, so each is cut to them here rather than written out whole. The other
-# raw files in this folder are untouched downloads; these two are the exception
-# because writing them whole would leave 400 MB on disk to reach eight rows.
-#
-# Every census subdivision code begins with its census division code, and
-# Waterloo Region is division 3530, so codes starting "3530" are the seven
-# municipalities. The bare code "3530" is the division itself - the Region as a
-# whole - which is the eighth row, and it comes free with the same filter.
-walk2(
-  c("98-10-0057-01", "98-10-0070-01"),
-  c("table_98100057.csv", "table_98100070.csv"),
-  \(table_number, file_name) {
-    get_cansim(table_number) |>
-      filter(str_starts(GeoUID, "3530")) |>
-      write_csv(file.path(raw_dir, file_name))
-  }
-)
-
-# ---- 4. Consumer Price Index ----------------------------------------------
-# Table 18-10-0004-01, the monthly CPI, used to restate those 2020 incomes in
-# today's dollars.
-#
-# All-items for Ontario. The CPI is not published for Kitchener-Cambridge-
-# Waterloo - in Ontario only Toronto, Ottawa and Thunder Bay get their own
-# index - so the province is the closest published basket. Canada-wide would
-# also be defensible; Ontario is nearer the prices these households pay.
-#
-# The monthly table rather than the annual averages in 18-10-0005-01, because
-# the current year has no annual average yet and 02_clean_data.R needs one.
-# Averaging the months of a year is exactly how Statistics Canada computes it.
-# Filtered on the way in for the same reason as above: over a million rows.
-get_cansim("18-10-0004-01") |>
-  filter(GEO == "Ontario", `Products and product groups` == "All-items") |>
-  write_csv(file.path(raw_dir, "table_18100004.csv"))
-
-# ---- 5. Households and dwellings, 2021 census ------------------------------
-# Table 98-10-0041, "Structural type of dwelling and household size". One table
-# answers two questions at once: what kind of dwelling people live in, and how
-# many of them live in it. It publishes average household size directly, which
-# is better than working one out here from the size categories - their top band,
-# "5 or more persons", is open-ended and cannot be averaged honestly.
-#
-# Cut to Waterloo Region on the way in, for the reason given in section 3.
-get_cansim("98-10-0041") |>
-  filter(str_starts(GeoUID, "3530")) |>
-  write_csv(file.path(raw_dir, "table_98100041.csv"))
-
-# ---- 6. Mother tongue, 2021 census ----------------------------------------
-# Named languages, which only the detailed mother tongue table carries. The
-# broad-category tables - English, French, non-official and nothing finer - are
-# no use here, because the whole question is which non-official language.
-#
-# 98-10-0180 crosses every census subdivision in Canada with 538 languages and
-# is 618 MB zipped; thirty-two numbers from it are wanted. So it is fetched a
-# cell at a time through Statistics Canada's coordinate service instead of being
-# downloaded at all.
-#
-# A coordinate names one cell of the cube: the member number of each dimension
-# in order, which here is geography, age, gender, mother tongue, and single or
-# multiple response. Member 1 is the "Total" of any dimension, so
-# "2445.1.1.256.1" is Wellesley, all ages, all genders, Pennsylvania German,
-# single and multiple responses counted together.
-#
-# The member numbers are the cube's own, read from its metadata (Statistics
-# Canada's getCubeMetadata service, product 98100180) and fixed for the life of
-# the table. They are written out here beside the names the metadata gives them,
-# so that a reader can check them rather than trust them.
-mother_tongue_places <- tribble(
-  ~member, ~place,
-  2439,    "Waterloo Region",   # the census division, not the city of the name
-  2440,    "North Dumfries",
-  2441,    "Cambridge",
-  2442,    "Kitchener",
-  2443,    "Waterloo",
-  2444,    "Wilmot",
-  2445,    "Wellesley",
-  2446,    "Woolwich"
-)
-
-mother_tongue_languages <- tribble(
-  ~member, ~language,
-  1,       "Total - Mother tongue",
-  5,       "Non-official languages",
-  253,     "German",
-  256,     "Pennsylvania German"
-)
-
-# Every place crossed with every language. A cell with nothing in it -
-# Pennsylvania German in North Dumfries - does not come back at all, which
-# 02_clean_data.R reads as a zero.
-expand_grid(
-  geography = mother_tongue_places$member,
-  language = mother_tongue_languages$member
-) |>
-  mutate(
-    cansimTableNumber = "98-10-0180",
-    COORDINATE = paste(geography, 1, 1, language, 1, sep = ".")
-  ) |>
-  select(cansimTableNumber, COORDINATE) |>
-  get_cansim_data_for_table_coord_periods(periods = 1) |>
-  # What comes back names the geography only as "Waterloo (2)" and the like -
-  # the service disambiguates duplicate names with a number rather than a code -
-  # so the place is put back on from the coordinate that asked for it.
-  mutate(geography = as.integer(str_split_i(COORDINATE, fixed("."), 1))) |>
-  left_join(mother_tongue_places, join_by(geography == member)) |>
-  write_csv(file.path(raw_dir, "table_98100180_coords.csv"))
-
-# ---- 7. Cattle, 2021 Census of Agriculture --------------------------------
+# ---- 3. Cattle, 2021 Census of Agriculture --------------------------------
 # Table 32-10-0370-01, "Cattle inventory on farms, Census of Agriculture, 2021":
 # head of cattle on census day, 11 May 2021, by type of animal. The whole table
 # is small (46,000 figures), so it is downloaded in full and cut to Waterloo
@@ -195,7 +76,7 @@ get_cansim("32-10-0370") |>
   filter(str_starts(GeoUID, "3530")) |>
   write_csv(file.path(raw_dir, "table_32100370.csv"))
 
-# ---- 8. Population, 2021 census --------------------------------------------
+# ---- 4. Population, 2021 census --------------------------------------------
 # Table 98-10-0002-01, "Population and dwelling counts: Canada and census
 # subdivisions (municipalities)": the 2021 census count, taken on the same day
 # as the Census of Agriculture. A count rather than the yearly estimates in
@@ -205,14 +86,13 @@ get_cansim("98-10-0002") |>
   filter(str_starts(GeoUID, "3530")) |>
   write_csv(file.path(raw_dir, "table_98100002.csv"))
 
-# ---- 9. Footnotes ----------------------------------------------------------
+# ---- 5. Footnotes ----------------------------------------------------------
 # Each Statistics Canada table carries footnotes, some of them about the
 # quality or comparability of the figures. They are saved beside the tables so
 # that 02_clean_data.R can report the ones that apply to the rows this post
 # keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
 # The file names match the tables': table_17100155_notes.csv and so on.
-c("17-10-0155-01", "98-10-0057-01", "98-10-0070-01", "18-10-0004-01",
-  "98-10-0041", "98-10-0180", "32-10-0370-01", "98-10-0002-01") |>
+c("17-10-0155-01", "32-10-0370-01", "98-10-0002-01") |>
   walk(\(table_number) {
     get_cansim_table_notes(table_number) |>
       write_csv(file.path(

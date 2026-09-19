@@ -1,0 +1,257 @@
+---
+title: "Language"
+description: "One sentence for the listing card: the question and the answer."
+date: "2026-09-19"
+categories: [Snapshot, Language, Demographics]
+image: images/thumbnail.png
+draft: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/language/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
+# Post-specific packages go here, and in R/packages.R
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+# example <- read_csv(here("posts", "language", "data", "example.csv"))
+
+# Mother tongue in each of the seven municipalities, 2021 census: the share of
+# people whose mother tongue is neither English nor French, and the share of
+# those whose mother tongue is German or Pennsylvania German.
+language <- read_csv(
+  here("posts", "language", "data", "language.csv"),
+  show_col_types = FALSE
+)
+```
+
+<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+
+## First finding as a plain-language heading
+
+<!-- One or two paragraphs, then one chart. -->
+
+::: panel-tabset
+### Mother tongue is not English or French
+
+```{r}
+#| label: language-other
+#| output: asis
+
+# The two measures, one to a tab. The second is a share of a share - German or
+# Pennsylvania German among those whose mother tongue is neither English nor
+# French. Both are percentages, but of different denominators, so each chart
+# keeps its own scale.
+
+# Roughly how many characters of label fit across a chart at this font size on
+# a phone, read off a render. Used below to decide which labels fit inside
+# their bars.
+panel_chars_wide <- 45
+
+language_bars_data <- language |>
+  # One order for both tabs, set on the first, so a place stays on the same row
+  # when the reader switches tabs and only its bar changes length.
+  mutate(district = fct_reorder(district, non_official_percent)) |>
+  pivot_longer(
+    c(non_official_percent, german_percent_of_non_official),
+    names_to = "measure", values_to = "value"
+  ) |>
+  mutate(label = label_number(accuracy = 1, suffix = "%")(value)) |>
+  # Whether a label fits inside its bar, asked for each measure on its own
+  # because each chart has its own scale. The axis runs to about 1.2 times the
+  # longest bar, and one character is 1 / panel_chars_wide of that; a label
+  # needs its length plus a space or so of padding.
+  mutate(
+    inside = value >= (nchar(label) + 1.5) * (max(value) * 1.2 / panel_chars_wide),
+    .by = measure
+  )
+
+# Both tabs draw the same chart from a different measure, so it is built once
+# here. Titles, subtitles and captions differ, so each tab adds its own labs().
+language_bars <- function(which) {
+  bars <- language_bars_data |> filter(measure == which)
+
+  ggplot(bars, aes(x = value, y = district, fill = district_type)) +
+    geom_col(width = 0.7) +
+    # The baseline the bars grow from; theme_cwr()'s own x axis line is switched
+    # off below, because with labels on the bars there is no axis to carry.
+    geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+    geom_text(
+      aes(
+        label = label,
+        # Inside the bar end, or just past it
+        hjust = if_else(inside, 1.15, -0.15),
+        # White inside the dark city bars only; inside the light township
+        # bars, and outside any bar, black reads better
+        colour = if_else(inside & district_type == "City", "white", "black")
+      ),
+      size = label_size * 0.8
+    ) +
+    scale_colour_identity() +
+    scale_fill_manual(
+      values = c(City = dodgerblue, Township = dodgerblue50),
+      guide = "none"
+    ) +
+    # Room on the right for any label that sits outside its bar
+    scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+    # The house short form of a long municipal name
+    scale_y_discrete(labels = cwr_short_name) +
+    coord_cartesian(clip = "off") +
+    # Every bar carries its number, so the value axis and its gridlines are gone.
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank()
+    )
+}
+
+# Alt text read top to bottom, in the order the rows are drawn
+language_alt <- function(which) {
+  language_bars_data |>
+    filter(measure == which) |>
+    arrange(desc(district)) |>
+    summarise(entries = paste(paste0(district, " ", label), collapse = ", ")) |>
+    pull(entries)
+}
+
+# Said once, in both tabs' captions
+mother_tongue_note <- "Mother tongue is the language first learned at home in childhood and still understood"
+
+p <- language_bars("non_official_percent") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-10-0180-01",
+      credit = TRUE,
+      notes = mother_tongue_note
+    )
+  )
+
+cwr_figure(
+  p, "fig-language-other",
+  alt = paste0(
+    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "people whose mother tongue is neither English nor French, highest at the ",
+    "top, with the three cities in dark blue and the four townships in light blue. ",
+    language_alt("non_official_percent"), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+### Is German or Pennsylvania German
+
+```{r}
+#| label: language-german
+#| output: asis
+
+p <- language_bars("german_percent_of_non_official") +
+  labs(
+    title = "Title: the finding, in one line",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-10-0180-01",
+      credit = TRUE,
+      notes = c(mother_tongue_note, "German and Pennsylvania German counted together")
+    )
+  )
+
+cwr_figure(
+  p, "fig-language-german",
+  alt = paste0(
+    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "people with a mother tongue other than English or French whose mother ",
+    "tongue is German or Pennsylvania German. Rows are in the same order as the ",
+    "previous tab, not by these figures. The three cities are in dark blue and the ",
+    "four townships in light blue. ",
+    language_alt("german_percent_of_non_official"), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+:::
+
+## Second finding
+
+```{r}
+#| label: tbl-first
+#| tbl-cap: "Caption shown under the table."
+
+# gt table here (one table per chunk).
+```
+
+## Data sources and reliability
+
+<!-- Where the data came from, what was excluded and why, and any caveat a careful
+     reader should know: write that here, above the tables. If any of it is sample data
+     (the census long form, a survey), say so here, how big the sample is, and whether
+     the charts show confidence intervals. Neither table is written here - the chunks
+     below print both straight out of this post's README.md, so there is only ever one
+     copy of each.
+
+     Keep this heading as it is. _includes/like.html puts the "Like this post"
+     button immediately above it, on the reasoning that the analysis ends here and
+     everything below is reference material. It finds the spot by the id Pandoc
+     builds from the heading text, so rewording the heading does not break the
+     button - it quietly drops it to the foot of the page instead. -->
+
+### Sources
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("language")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this post's
+# README.md - edit them there, not here. To leave an issue out of the post, do
+# not delete its row: write why in its "Left out of the post because" column,
+# and it drops out of the post while the README keeps the record.
+cwr_reliability_table("language")
+```
+
+## Other sources
+
+<!-- Anything cited that is not data: reports, articles, books, a method borrowed
+     from someone else. Quoted material stays under its owner's terms, never this
+     site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+**Reproduce the post**: get the code and data for this post from [`posts/language/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/language) on GitHub.
+
+**Download the data:** `r cwr_bundle_link("language", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/language#data-dictionary).
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

@@ -247,9 +247,9 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    type, and the language questions other than language of work. **Income is split, so check the
    statistic, not the topic:** since 2016 census income comes from tax and benefit records linked to
    every respondent, and **medians are published for 100% of the population**, while averages and
-   aggregates come only from the 25% sample (the 2021 Income Reference Guide says so). The welcome
-   post's median incomes are therefore a full count and need no sampling note - a note put on them
-   in error was taken off again the same day. Tables mark it in the member names of a statistics
+   aggregates come only from the 25% sample (the 2021 Income Reference Guide says so). The
+   households-and-income post's median incomes are therefore a full count and need no sampling
+   note - a note put on them in error was taken off again the same day. Tables mark it in the member names of a statistics
    dimension ("... - 100% data", "... - 25% sample data"); where a statistic is unlabelled, look it up
    in the census reference guide for the topic rather than guessing. The commuting post's last three
    charts were rebuilt from counts to shares for this reason (2026-09-18).
@@ -353,7 +353,7 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
 
 When a chart would be made of the same picture several times over - one municipality at a time, one
 measure at a time - put each in a tab of a Quarto `panel-tabset` rather than in a grid of small
-multiples that nothing fits into. The rules, from the welcome post's mother tongue charts and the
+multiples that nothing fits into. The rules, from the language post's mother tongue charts and the
 commuting post's flow maps:
 
 - One chunk per tab, tab headings as `###` so they stay out of the two-level table of contents.
