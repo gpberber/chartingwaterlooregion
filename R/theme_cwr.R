@@ -759,22 +759,44 @@ cwr_fit_height <- function(plot, width, row_height, dpi) {
 # The theme changes every phone version of a chart gets, because its panel is
 # half as wide: titles and the caption wrap, and right-hand axis labels move
 # outside the panel. Shared by cwr_figure() and cwr_interactive().
-cwr_phone_theme <- function() {
+#
+# `width` is the width of the phone image in inches. The title, subtitle and
+# caption boxes are given a fixed width worked out from it - the image less the
+# plot margin either side - rather than ggtext's default of "the whole width of
+# wherever it is drawn". The default measured and drew the text against two
+# different widths: ggplot sizes the title's row with the box measured against
+# the full image (4.2 in), then draws it in its cell, which is the image less
+# the 8 pt margins (3.98 in). A line between those two widths therefore fitted
+# when measured and wrapped when drawn, so the row was one line short: the
+# second line landed on the subtitle and the first was cut off at the top of
+# the PNG. "Pigs on farms in the four townships, 2021" (4.19 in of bold Inter)
+# was the case that showed it (2026-09-18). A fixed width is the same number
+# both times, so the row always fits what is drawn.
+#
+# The margins are taken from here too, so the two cannot drift apart. A chart
+# that changes plot.margin in `phone = ` keeps these box widths; a wider side
+# margin there would bring the problem back and needs the width to match.
+cwr_phone_theme <- function(width = 4.2) {
+  side_margin <- 8   # points, left and right
+  box_width <- unit(width, "in") - unit(2 * side_margin, "pt")
   theme(
     plot.title = element_textbox_simple(
       size = base_size * 1.0, face = "bold", lineheight = 1.1,
+      width = box_width,
       margin = margin(0, 0, 5, 0)
     ),
     plot.subtitle = element_textbox_simple(
       size = base_size * 0.7, face = "bold", lineheight = 1.1,
+      width = box_width,
       margin = margin(0, 0, 10, 0)
     ),
     plot.caption = element_textbox_simple(
       size = base_size * 0.6, colour = cowboysilver, lineheight = 1.1,
+      width = box_width,
       margin = margin(t = 10)
     ),
     axis.text.y.right = element_text(hjust = 0, margin = margin(l = 6, r = 0)),
-    plot.margin = margin(t = 8, r = 8, b = 8, l = 8)
+    plot.margin = margin(t = 8, r = side_margin, b = 8, l = side_margin)
   )
 }
 
@@ -899,7 +921,7 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # element_textbox_simple() (ggtext) is element_markdown() with word wrap.
   # theme() merges with what the plot already has, so only the named
   # properties change (the right-axis text keeps its size and vjust).
-  phone_plot <- plot + cwr_phone_theme()
+  phone_plot <- plot + cwr_phone_theme(phone_width)
 
   # Per-chart phone adjustments supplied by the caller
   for (piece in phone) phone_plot <- phone_plot + piece
@@ -1068,7 +1090,7 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
     number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
   }
 
-  phone_plot <- plot + cwr_phone_theme()
+  phone_plot <- plot + cwr_phone_theme(phone_width)
   for (piece in phone) phone_plot <- phone_plot + piece
 
   # What every hover does: the tooltip in the house font on a white card, and

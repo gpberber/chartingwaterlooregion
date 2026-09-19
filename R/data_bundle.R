@@ -34,15 +34,15 @@
 #
 # Usage (the /publish skill runs this):
 #   source(here::here("R", "data_bundle.R"))
-#   cwr_dictionary_check("kitchener-phone-wait-times")      # every column documented?
-#   cwr_data_bundle("kitchener-phone-wait-times", version = 1)   # build zip and upload
+#   cwr_dictionary_check("commuting")               # every column documented?
+#   cwr_data_bundle("commuting", version = 1)       # build zip and upload
 #
 # cwr_data_bundle() rewrites the README section itself. To refresh it on its own,
 # after changing a cleaning script or a description:
-#   cwr_dictionary_readme("kitchener-phone-wait-times")
+#   cwr_dictionary_readme("commuting")
 #
 # In a post's Reproducibility box:
-#   cwr_bundle_link("kitchener-phone-wait-times", 1)        # markdown link to the zip
+#   cwr_bundle_link("commuting", 1)        # markdown link to the zip
 # ---------------------------------------------------------------------------
 
 library(here)
