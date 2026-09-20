@@ -397,7 +397,7 @@ cwr_figure(
 )
 ```
 
-The latest population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop people`, or `r city_pop_share` of the Region's population of `r region_pop` . So despite covering `r township_area_share` of the Region's land, the townships are home to only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
 
 ```{r}
 #| label: prep-cattle
