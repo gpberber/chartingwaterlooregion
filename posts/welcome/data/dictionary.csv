@@ -1,6 +1,6 @@
 table,column,description,units
 districts,csduid,"Statistics Canada census subdivision identifier, seven digits; the first four (3530) are the census division code for Waterloo Region",
-districts,district,Name of the municipality,
+districts,district,Name of the census subdivision,
 districts,district_type,"City or Township, from the census subdivision type code (CY or TP)",
 districts,population,Estimated resident population on 1 July 2025,people
 districts,area_sq_km,Land area published by Statistics Canada in the 2021 census boundary file; excludes inland water,square kilometres
