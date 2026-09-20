@@ -399,7 +399,7 @@ cwr_figure(
 )
 ```
 
-The latest StatsCan population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+The latest population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
 
 ```{r}
 #| label: prep-cattle
@@ -524,8 +524,8 @@ cattle_alt <- function(show_cattle) {
 # whatever replaces it, both tabs keep the same number of lines.
 p <- cattle_chart(show_cattle = FALSE) +
   labs(
-    title = "On Census day in 2021, the townships had more...",
-    subtitle = "Townships, total population, 2021-05-11",
+    title = "In May 2021, the townships had more...",
+    subtitle = "Townships, number of people, 11 May 2021",
     caption = cwr_caption("Statistics Canada Table 98-10-0002-01", credit = TRUE)
   )
 
@@ -549,8 +549,8 @@ cwr_figure(
 
 p <- cattle_chart(show_cattle = TRUE) +
   labs(
-    title = "On Census day in 2021, the townships had more...cows than people!",
-    subtitle = "Townships, total population, 2021-05-11",
+    title = "In May 2021, the townships had more...cows than people!",
+    subtitle = "Townships, number of people and cows, 11 May 2021",
     caption = cwr_caption(
       c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
       credit = TRUE
@@ -611,14 +611,6 @@ cwr_sources_table("welcome")
 # not delete its row: write why in its "Left out of the post because" column,
 # and it drops out of the post while the README keeps the record.
 cwr_reliability_table("welcome")
-```
-
-## Other sources
-
-```{=html}
-<!-- Anything cited that is not data: reports, articles, books, a method borrowed
-     from someone else. Quoted material stays under its owner's terms, never this
-     site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
 ```
 
 ::: {.callout-note collapse="true"}
