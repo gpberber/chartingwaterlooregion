@@ -85,7 +85,7 @@ list2env(grouped_land_pop_figures, environment()) |> invisible()
 
 ```
 
-If you haven't gone for many drives through the townships, you may have no idea how vast they are relative to the cities in the Region's heart. On a map, they look like a giant jaw chomping the urban core they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city. Judged solely by its area then, the Region is largely rural in character.
+If you haven't gone for many drives through the townships, you may have no idea how vast they are relative to the cities in the Region's heart. On a map, they look like a giant jaw chomping the urban core they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city.
 
 ```{r}
 #| label: land-mass
@@ -189,7 +189,7 @@ p <- ggplot() +
   # lines coord_sf() draws by default - which this map has no use for.
   coord_sf(datum = NA) +
   labs(
-    title = "The townships cover vastly more territory than the three cities",
+    title = "The townships cover vastly more territory than the cities",
     subtitle = "Land area, square km",
     caption = cwr_caption("Statistics Canada, 2021 census boundary files")
   ) +
@@ -233,7 +233,7 @@ cwr_figure(
 #| include: false
 
 # objects to use for inline text in population discussion
-kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)
+kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)|> comma(accuracy = 1)
 kit_area <- districts |> filter(district == "Kitchener") |> pull(area_sq_km) |> comma(accuracy = 1)
 nd_area <- districts |> filter(district == "North Dumfries") |> pull(area_sq_km) |> comma(accuracy = 1)
 
@@ -241,7 +241,7 @@ nd_area <- districts |> filter(district == "North Dumfries") |> pull(area_sq_km)
 
 ## More cows than people?!
 
-You don't have to drive through the townships to know that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's look at how many more people live in the cities than in the townships. The latest StatsCan population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. Having a combined density of only `r township_density` residents per square km, the townships contain one resident for every `r density_ratio` city residents. With all that land and so few people, there's certainly lots of room for cows!
+You don't have to drive through the townships to know that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's look at how many more people live in the cities than in the townships.
 
 ```{r}
 #| label: sizes
@@ -399,6 +399,8 @@ cwr_figure(
 )
 ```
 
+The latest StatsCan population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+
 ```{r}
 #| label: prep-cattle
 #| include: false
@@ -425,9 +427,9 @@ cattle_people <- cattle |>
 num_people <- cattle_people |> filter(what == "People") |> pull(count) |> comma(accuracy = 1)
 ```
 
-When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" And serendipitously, I learned that every five years, not only is there the Census of Population that we are all familiar with, there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
+When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" Serendipitously, I learned that every five years, not only is there the Census of Population that we all know, there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
 
-(Just in case there are any cattle farmers reading, I do know that cows are a specific type of cattle. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
+(In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
 
 The population estimates above are for 2025, but our cow data is from 2021, so for a fair comparison, we'll use the 2021 Census populations as well. On Census day in 2021, a total of `r num_people` people lived in the townships. How many cows lived in them on that day? Click the other tab to find out. 
 
