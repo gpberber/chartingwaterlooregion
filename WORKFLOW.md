@@ -214,9 +214,9 @@ quarto publish gh-pages --no-render --no-prompt
 
 ### 3.8 Update a published post
 
-Edit `index.qmd`, run `/preview`, then `/publish` with no argument. Quarto adds a "Modified" date automatically. If the data changed, re-run the scripts in `R/` first, bump `data_bundle_version` in the setup chunk so a new zip is built, and mention the refresh date in the post.
+Edit `index.qmd`, run `/preview`, then `/publish` with no argument. `/publish` adds a `date-modified:` line to the post's YAML, which shows readers a "Modified" date beside the published one; say no when it asks if the edit is not worth flagging. If the data changed, re-run the scripts in `R/` first, bump `data_bundle_version` in the setup chunk so a new zip is built, and mention the refresh date in the post.
 
-**Correcting a published post.** The "Modified" date Quarto adds is automatic: it changes whenever the file is saved, including a visual-editor save that only reflows the text, so it is not a correction notice on its own. When a post goes out with something wrong in it, say so in the post. Put a note directly under the YAML header, above the opening paragraph, and leave it there permanently:
+**Correcting a published post.** A "Modified" date says only that something changed, not what. It is not a correction notice. When a post goes out with something wrong in it, say so in the post. Put a note directly under the YAML header, above the opening paragraph, and leave it there permanently:
 
 ``` markdown
 ::: {.callout-warning appearance="simple"}

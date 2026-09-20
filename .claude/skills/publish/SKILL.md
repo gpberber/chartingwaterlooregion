@@ -15,6 +15,13 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
 
 1. If a slug is given: confirm with the user that `posts/<slug>` should go public, then set
    `draft: false` in its YAML. Suggest running `/review-post <slug>` first if it has not been done.
+   **Dates.** A post's `date:` is its publication date, so set it to today when flipping
+   `draft: false` - whatever date the scaffold put there is the day drafting started, not the day
+   it goes live - and make sure the post has no `date-modified:` line, so no "Modified" date shows
+   on a post nobody has revised yet. When republishing a post that is **already live** and whose
+   `index.qmd` changed, leave `date:` alone and set `date-modified:` to today in its YAML instead;
+   ask first if the change is cosmetic, since it puts a "Modified" date on the post for readers.
+   (`posts/_metadata.yml` deliberately sets no site-wide `date-modified`.)
 2. Build and upload the data bundle for the post (skip when publishing with no slug and no data
    changed). Read `data_bundle_version` from the post's setup chunk; if the tables changed since
    the last bundle, bump that number in the post first so old links keep pointing at old data.

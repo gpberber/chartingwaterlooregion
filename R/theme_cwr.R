@@ -1480,7 +1480,10 @@ cwr_reliability_table <- function(slug, readme = here::here("posts", slug, "READ
   if (length(shown) == 0) {
     cat("No data-reliability issues to note for this post.\n")
   } else {
-    cat(c("| Issue |", "|---|", str_c("| ", shown, " |")), sep = "\n")
+    # "Items of note" rather than "Issues": most rows are a caveat worth knowing
+    # about, not a fault in the data. The README's own column keeps the heading
+    # "Issue", which only the writer sees.
+    cat(c("| Items of note |", "|---|", str_c("| ", shown, " |")), sep = "\n")
     cat("\n")
   }
   invisible(shown)

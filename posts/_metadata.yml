@@ -3,7 +3,13 @@
 
 title-block-banner: true
 author: "Greg Berberich"
-date-modified: last-modified
+
+# No date-modified here on purpose. Set site-wide to `last-modified`, it showed a
+# "Modified" date on every post, taken from the file's timestamp, so a draft
+# reflowed in the visual editor looked freshly revised. Instead `date:` is the
+# day the post went live (/publish sets it when it flips draft: false), and a
+# post gains its own `date-modified:` line only when it is changed after that -
+# which /publish adds. A post that has never been revised shows no Modified date.
 
 # Adds a "Reusing this post" box at the end of every post (heading set in _quarto.yml).
 # Text and charts are CC BY 4.0; code is MIT (see LICENSE and LICENSE-CONTENT.md).
