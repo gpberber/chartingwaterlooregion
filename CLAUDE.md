@@ -69,7 +69,9 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `cwr_quality_flags()` blanks all four to NA and returns the data, so every call is assigned
   (`kept <- kept |> cwr_quality_flags(...)`) and the script carries on with what it returns.
   Never add a blanked figure back, chart it as zero or bridge the gap. Other flags are his call -
-  `cwr-charts` rule 9c. Every issue found gets a row in the README's `## Reliability` table
+  `cwr-charts` rule 9c - and a figure rated D, "acceptable" (Statistics Canada's lowest published
+  rating, not a caution), is charted as it is, with its Reliability row as the disclosure and no
+  note on the chart. Every issue found gets a row in the README's `## Reliability` table
   (closely related flags share one), which the post's "Data sources and reliability" section
   prints with `cwr_reliability_table()`. A row is never deleted: an issue Greg decides not to
   disclose stays in the README with his reason in the "Left out of the post because" column,

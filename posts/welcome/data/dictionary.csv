@@ -8,3 +8,7 @@ districts,density_per_sq_km,"population divided by area_sq_km, so people per squ
 districts,label_room_km,"Radius of the largest circle that fits inside the municipality, a measure of how much room a map label has there",kilometres
 districts,label_lon,"Longitude of the centre of that largest inscribed circle, used to place the map label",decimal degrees (EPSG:4326)
 districts,label_lat,"Latitude of the centre of that largest inscribed circle, used to place the map label",decimal degrees (EPSG:4326)
+cattle,district,Name of the township,
+cattle,cattle,"Cattle of every kind on farms in the township on 11 May 2021 - calves, steers, heifers, cows and bulls",head of cattle
+cattle,cattle_status,"Statistics Canada's quality rating for that cattle count: A excellent, B very good, C good, D acceptable",
+cattle,population,Population counted in the township by the 2021 census on 11 May 2021,people

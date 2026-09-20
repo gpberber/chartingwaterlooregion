@@ -1,5 +1,5 @@
-district,cattle,population
-North Dumfries,4612,10619
-Wellesley,34818,11318
-Wilmot,10581,21429
-Woolwich,33264,26999
+district,cattle,cattle_status,population
+North Dumfries,4612,D,10619
+Wellesley,34818,A,11318
+Wilmot,10581,C,21429
+Woolwich,33264,B,26999

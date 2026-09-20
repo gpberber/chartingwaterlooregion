@@ -58,8 +58,14 @@ library(janitor)
 # decision from what is only worth knowing:
 #   unusable - no publishable figure (F, x, ..), or one this site never uses
 #              (E); cwr_quality_flags() blanks every one of them
-#   caution  - a figure exists but is weak; the reader should be told
-#   note     - worth knowing, rarely changes a chart
+#   caution  - a figure exists but carries a warning from its publisher, or a
+#              symbol this legend does not know; the reader should be told
+#   note     - worth knowing, rarely changes a chart. Statistics Canada's
+#              quality ratings A to D all sit here: D, "acceptable", is its
+#              lowest published rating but is not a caution - "use with
+#              caution" is E, which this site never uses at all. A D figure is
+#              charted as it is and disclosed in the README's Reliability
+#              table, with no note on the chart (Greg's rule, 2026-09-20).
 # A symbol not listed here is reported as "caution" with a prompt to look it up
 # in that table's own legend, which is printed under the table on the web page.
 cwr_quality_legend <- tribble(
@@ -69,7 +75,7 @@ cwr_quality_legend <- tribble(
   ".",   "not available for any reference period",                        "unusable",
   "..",  "not available for a specific reference period",                 "unusable",
   "E",   "use with caution (never used on this site)",                    "unusable",
-  "D",   "data quality: acceptable",                                      "caution",
+  "D",   "data quality: acceptable",                                      "note",
   "C",   "data quality: good",                                            "note",
   "B",   "data quality: very good",                                       "note",
   "A",   "data quality: excellent",                                       "note",

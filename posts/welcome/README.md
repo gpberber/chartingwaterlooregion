@@ -69,7 +69,7 @@ Then `quarto render posts/welcome` from a terminal.
 Every column of every table in `data/tables.csv`. Types and example values are read from the data itself; descriptions and units come from `data/dictionary.csv`. **This section is generated - edit `data/dictionary.csv`, not the table below**, then run `cwr_dictionary_readme("welcome")` from `R/data_bundle.R` (building the download bundle does it too). The same dictionary ships as `data_dictionary.csv` inside the bundle.
 
 | Table | Column | Type | Description | Units | Values |
-|------------|------------|------------|------------|------------|------------|
+|---|---|---|---|---|---|
 | districts | csduid | number | Statistics Canada census subdivision identifier, seven digits; the first four (3530) are the census division code for Waterloo Region |  | 3530004 to 3530035 |
 | districts | district | text | Name of the municipality |  | Kitchener; Cambridge; Waterloo; ... (7 distinct values) |
 | districts | district_type | text | City or Township, from the census subdivision type code (CY or TP) |  | City; Township |
@@ -79,3 +79,7 @@ Every column of every table in `data/tables.csv`. Types and example values are r
 | districts | label_room_km | number | Radius of the largest circle that fits inside the municipality, a measure of how much room a map label has there | kilometres | 3.088863 to 8.220127 |
 | districts | label_lon | number | Longitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | -80.71725 to -80.33542 |
 | districts | label_lat | number | Latitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | 43.32466 to 43.58204 |
+| cattle | district | text | Name of the township |  | North Dumfries; Wellesley; Wilmot; ... (4 distinct values) |
+| cattle | cattle | number | Cattle of every kind on farms in the township on 11 May 2021 - calves, steers, heifers, cows and bulls | head of cattle | 4612 to 34818 |
+| cattle | cattle_status | text | Statistics Canada's quality rating for that cattle count: A excellent, B very good, C good, D acceptable |  | D; A; C; ... (4 distinct values) |
+| cattle | population | number | Population counted in the township by the 2021 census on 11 May 2021 | people | 10619 to 26999 |

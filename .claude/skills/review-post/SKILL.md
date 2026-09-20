@@ -18,7 +18,8 @@ decides. Then offer to apply the fixes.
 ## 1. Writing
 
 - Every number in the prose matches the rendered output (recompute from the data if unsure).
-- The opening paragraph states the question and the answer; a reader who stops there knows the finding.
+- The opening paragraph sets up the question the post answers. It need not give the answer away:
+  posts here are often written so the reader guesses along and findings are revealed as they come.
 - Headings are plain-language findings, not variable names or "Analysis".
 - Jargon (CSI, UCR, clearance rate) is explained the first time it appears.
 - No "we can see that", "interestingly", "it is worth noting".
@@ -44,9 +45,10 @@ For every `ggplot` chunk:
   data are a sample too.
 - No chart draws a figure flagged unusable in `data/quality_flags.csv` (E use with caution, F too
   unreliable, x suppressed, `..` not available) as a number - not as a zero, not joined across by a line as if it
-  existed. A chart that shows figures flagged `caution` (D acceptable, or an
-  unfamiliar symbol) tells the reader in a note, unless its row in the README's Reliability table
-  records Greg's decision not to (style rule 9c).
+  existed. Figures carrying Statistics Canada's D rating, "acceptable" - its lowest published
+  rating, and not a caution, which is E - are charted as they are and disclosed in the README's
+  Reliability table that the post prints; they need no note on the chart, so flag one that has
+  gained a note nobody asked for (style rule 9c).
 - Chart text shortens North Dumfries through `cwr_short_name()` (axis labels, map labels, direct
   labels, notes), and no horizontal stacked bar uses a legend where `cwr_stack_keys()` would name
   the segments on the bars (style rules 2b and 3d).

@@ -235,10 +235,13 @@ census_population_kept <- census_population_kept |>
 # One row per township. The chart adds them up; the file keeps them apart so a
 # reader downloading the data can see each township's figures.
 cattle <- townships |>
-  left_join(cattle_kept |> select(csduid = geo_uid, cattle = value), join_by(csduid)) |>
+  # `status` is Statistics Canada's quality grade for that township's cattle
+  # count, A (excellent) to D (acceptable); the chart notes any graded D.
+  left_join(cattle_kept |> select(csduid = geo_uid, cattle = value, cattle_status = status),
+            join_by(csduid)) |>
   left_join(census_population_kept |> select(csduid = geo_uid, population = value),
             join_by(csduid)) |>
-  select(district, cattle, population) |>
+  select(district, cattle, cattle_status, population) |>
   arrange(district)
 
 write_csv(cattle, file.path(data_dir, "cattle.csv"))

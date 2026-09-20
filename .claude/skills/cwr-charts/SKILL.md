@@ -303,12 +303,18 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      shown: Statistics Canada rates it too unreliable" or "... flags it for use with caution"). If
      a blanked figure leaves a chart unable to make its point, say so at hand-off rather than
      working around it.
-   - **caution** (D acceptable, any symbol not in the standard legend): the figure exists but is
-     weak. The usual answer is a note naming which values carry it ("Figures for 2020 and 2021:
-     acceptable quality (Statistics Canada)"); a lighter or hollow mark on those values as well, if
-     Greg wants it. If the finding rests on a flagged value, say so at hand-off.
-   - **note** (A to C grades, p preliminary, r revised, `...`, `0s`, quality footnotes): mention at
-     hand-off; preliminary figures that the chart's story depends on also get a note.
+   - **caution** (a symbol this site's legend does not know, or a publisher's own warning): the
+     figure exists but comes with a caveat nobody here has weighed yet. Look the symbol up in the
+     table's own legend and tell Greg what it means before charting it.
+   - **note** (A to D grades, p preliminary, r revised, `...`, `0s`, quality footnotes): mention at
+     hand-off; preliminary figures that the chart's story depends on also get a note. **Statistics
+     Canada's quality ratings, A excellent to D acceptable, all sit here.** D is its lowest
+     published rating, not a caution - "use with caution" is E, which this site never uses at all.
+     A D figure is charted as it is, and **its row in the README's Reliability table is the whole
+     disclosure: no note on the chart** (Greg's rule, 2026-09-20 - the table the post prints is
+     enough, and a note crowds the chart for something the reader can look up). Never add one
+     unasked; build one only if Greg asks for it on a particular chart. Still say at hand-off which
+     values carry the rating, especially when the finding rests on one.
    - Every issue also gets a row in the README's `## Reliability` table, which the post prints under
      "Data sources and reliability" (`cwr_reliability_table()`); closely related flags share a row.
      One Greg decides not to disclose keeps its row, with his reason in the second column, so the

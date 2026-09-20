@@ -234,8 +234,6 @@ cwr_figure(
 
 # objects to use for inline text in population discussion
 kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)|> comma(accuracy = 1)
-kit_area <- districts |> filter(district == "Kitchener") |> pull(area_sq_km) |> comma(accuracy = 1)
-nd_area <- districts |> filter(district == "North Dumfries") |> pull(area_sq_km) |> comma(accuracy = 1)
 
 ```
 
@@ -576,19 +574,6 @@ And there we have it: more cows than people resided in the townships on Census d
 In CWR's debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region's rolling hills. We learned there were lots of roads and hills to roam because the townships cover `r township_area` square km, over three-quarters of the Region's `r region_area` square km, while holding only `r township_pop` people, a ninth of its `r region_pop` residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we'll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now when this year's census data gets released, we'll revisit this post and see if cows still outnumber people in cattle country.
 
 ## Data sources and reliability
-
-```{=html}
-<!-- Where the data came from, what was excluded and why, and any caveat a careful
-     reader should know: write that here, above the table. The table itself is not
-     written here - the chunk below prints the "Data sources" table straight out of
-     this post's README.md, so there is only ever one copy of it.
-
-     Keep this heading as it is. _includes/like.html puts the "Like this post"
-     button immediately above it, on the reasoning that the analysis ends here and
-     everything below is reference material. It finds the spot by the id Pandoc
-     builds from the heading text, so rewording the heading does not break the
-     button - it quietly drops it to the foot of the page instead. -->
-```
 
 ### Sources
 
