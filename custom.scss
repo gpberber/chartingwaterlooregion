@@ -392,17 +392,62 @@ $code-color: #333333;
   .cwr-like-button.is-liked { padding-left: 0; }
 }
 
-// Where the analysis stops, just before "Data sources and reliability". Centred between two
-// hairlines, so it reads as the close of the piece and separates the writing from
-// the reference material that follows. The rules are the only thing marking it
-// off; there is no "did you enjoy this?" line, which would be the one piece of
-// salesmanship on the site.
+// ---- The house mark -------------------------------------------------------
+// The site's own chart vocabulary borrowed as a printer's mark: the dot and
+// confidence interval of the ggdoterror template, drawn small and centred - an
+// estimate with its margin of error, which is what this site does. It closes the
+// analysis at the end of every post, above the Like button, and any post can put
+// one between sections with a fenced div:
+//
+//     ::: {.cwr-mark}
+//     :::
+//
+// Two background layers on one element rather than a pair of nested ones: the bar
+// is a gradient fading to both ends, as the chart's interval does, and the dot is a
+// radial gradient with a white rim so it sits on the bar the way the chart's dot
+// does. Sized in px, not a share of the column: it is a mark, and it should look the
+// same on a phone as on a desktop rather than stretching.
+@mixin cwr-mark($dot: 15px, $bar: 7px, $width: 180px) {
+  content: "";
+  display: block;
+  width: $width;
+  height: $dot;
+  margin-left: auto;
+  margin-right: auto;
+  background-repeat: no-repeat;
+  background-image:
+    // The dot: solid blue, then a white rim, then nothing
+    radial-gradient(circle closest-side,
+      $cwr-blue 0 68%, white 68% 100%, transparent 100%),
+    // The interval: strongest in the middle, fading to both ends
+    linear-gradient(to right,
+      rgba($cwr-blue, 0.08), rgba($cwr-blue, 0.5) 50%, rgba($cwr-blue, 0.08));
+  background-size: $dot $dot, 100% $bar;
+  background-position: center, center;
+}
+
+// On its own between two sections of a post
+.cwr-mark {
+  @include cwr-mark;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+// Where the analysis stops, just before "Data sources and reliability". It reads as
+// the close of the piece and separates the writing from the reference material that
+// follows. The mark above it is the only thing marking it off; there is no "did you
+// enjoy this?" line, which would be the one piece of salesmanship on the site. It
+// replaced a pair of full-width hairlines (2026-09-20).
 .cwr-like-end {
-  margin: 2.5rem 0 2.5rem 0;
-  padding: 1.5rem 0;
-  border-top: 1px solid $cwr-grey-50;
-  border-bottom: 1px solid $cwr-grey-50;
+  margin: 1.25rem 0 2.5rem 0;   // closer to the paragraph above than to what follows
+  padding: 0;
+  border: 0;
   text-align: center;
+
+  &::before {
+    @include cwr-mark;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .cwr-like-button {

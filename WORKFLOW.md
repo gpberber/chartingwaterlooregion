@@ -383,6 +383,15 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
 
 - Share and Like buttons: `_includes/share.html` and `_includes/like.html`, styled in `custom.scss`. Both find their place on the finished page rather than in a Quarto template, so neither needs a change to any post.
 
+- **The house mark**, the small blue dot and fading interval bar that closes the analysis at the end of every post, above the Like button. It is the `ggdoterror` chart - an estimate with its margin of error - shrunk to a printer's mark, drawn in CSS with no image file, and it appears on its own. To put one between two sections of a post, write a fenced div with nothing in it:
+
+  ``` markdown
+  ::: {.cwr-mark}
+  :::
+  ```
+
+  Its size lives in one place, the `cwr-mark` mixin in `custom.scss` (dot 15px, bar 7px, width 180px); change it there and every mark on the site follows.
+
 - **The logo, the favicons and the social card are generated. Never edit them by hand.** `images/logo-mark.svg`, `images/favicon.svg`, `images/apple-touch-icon.png`, `images/social-card.png`, `images/logo.svg` and `favicon.ico` all come out of one script. Change the script and run it again:
 
   ``` bash
