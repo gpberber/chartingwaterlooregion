@@ -42,9 +42,9 @@ cattle <- read_csv(
 )
 ```
 
-As a kid, one of my favourite family activities was "going for a drive." That is literally what we called it. Mom or Dad would announce that we were "going for a drive" and the five of us would pile into the Montego and go for a drive. Unless we ended up in Hespeler, where we'd get ice cream cones at a convenience store on Cooper Street, a drive never had a destination. Almost all of them involved meandering through one or more of the Region's townships. I particularly liked it when Dad decided to drive through the Paradise Lake area in Wellesley township. I thought it was neat that we had a little cottage-y area so close to home. These drives provided me with an early appreciation for the Region's vastness and variety, and for the contrasts between its rock 'n' roll heart and its country soul. In this inaugural post, we'll start exploring some of these contrasts and, in the process, answer the burning question: "What do the townships have more of, cows or people?"
+As a kid, one of my favourite family activities was "going for a drive." That is literally what we called it. Mom or Dad would announce that we were "going for a drive" and the five of us would pile into the Montego and go for a drive. Unless we ended up in Hespeler, where we'd get ice cream cones at a convenience store on Cooper Street, a drive never had a destination. Almost all of them involved meandering through one or more of the Region's townships. I particularly liked it when Dad decided to drive through the Paradise Lake area in Wellesley township. I thought it was neat that we had a little cottage-y area so close to home. These drives provided me with an early appreciation for the Region's vastness and variety, and for the contrasts between its rock 'n' roll heart and its country soul. In CWR's inaugural post, we'll start exploring some of these contrasts and, in the process, answer the burning question: "What do the townships have more of, cows or people?"
 
-## An urban core with vast rural fringes
+## An urban island in a sea of farmland 
 
 ```{r}
 #| label: district-inline-objects
@@ -189,8 +189,8 @@ p <- ggplot() +
   # lines coord_sf() draws by default - which this map has no use for.
   coord_sf(datum = NA) +
   labs(
-    title = "The townships appear to swallow their urban core",
-    subtitle = "Cities and townships, land mass",
+    title = "The townships cover vastly more territory than the three cities",
+    subtitle = "Land area, square km",
     caption = cwr_caption("Statistics Canada, 2021 census boundary files")
   ) +
   # theme_cwr() is built for charts with axes; a map wants none of them. Each
@@ -241,7 +241,7 @@ nd_area <- districts |> filter(district == "North Dumfries") |> pull(area_sq_km)
 
 ## More cows than people?!
 
-You don't have to drive through the townships to know that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's look at how many more people live in the cities than in the townships. The latest StatsCan population estimates from 2025 show that, with `kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. Having a combined density of only `r township_density` residents per square km, the townships contain one resident for every `r density_ratio` city residents. With all that land and so few people, there's certainly lots of room for cows!
+You don't have to drive through the townships to know that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's look at how many more people live in the cities than in the townships. The latest StatsCan population estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the most residents in the Region, with slightly more even than the other two cities combined. Together, the cities had a population of `r city_pop`, making up `r city_pop_share` of the Region's `r region_pop` residents in 2025. So despite containing `r township_area_share` of the Region's land, the townships contain only `r township_pop` residents, or `r township_pop_share` of the Region's population. Having a combined density of only `r township_density` residents per square km, the townships contain one resident for every `r density_ratio` city residents. With all that land and so few people, there's certainly lots of room for cows!
 
 ```{r}
 #| label: sizes
@@ -355,7 +355,7 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
   coord_cartesian(clip = "off") +
   labs(
     title = "The townships are very sparsely populated compared to the cities",
-    subtitle = "Cities and townships, estimated population, 2025",
+    subtitle = "Estimated population, 2025",
     caption = cwr_caption(
       c("Statistics Canada Table 17-10-0155-01",
         "the 2021 census boundary files"),
@@ -425,11 +425,11 @@ cattle_people <- cattle |>
 num_people <- cattle_people |> filter(what == "People") |> pull(count) |> comma(accuracy = 1)
 ```
 
-When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" And lo and behold, I learned that every five years, not only is there the Census of Population that we are all familiar with, but there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
+When I conceived this post, cows did not figure into it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" And serendipitously, I learned that every five years, not only is there the Census of Population that we are all familiar with, there is also the Census of Agriculture, which us non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
 
-Before I answer this---in case there are any cattle farmers reading---another thing I learned while writing this post is that cows are a specific type of cattle, along with heifers, steers, calves, and bulls. To this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.
+(Just in case there are any cattle farmers reading, I do know that cows are a specific type of cattle. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
 
-Now on to the question. The population figures above are 2025 estimates, but our cow data is from 2021, so for a fair comparison, we'll use the 2021 Census populations as well. As we see, a total of `r num_people` people lived in the townships on May 11, 2021. How many cows lived in them on that day? Guess the answer before you click the tab to reveal it. 
+The population estimates above are for 2025, but our cow data is from 2021, so for a fair comparison, we'll use the 2021 Census populations as well. On Census day in 2021, a total of `r num_people` people lived in the townships. How many cows lived in them on that day? Click the other tab to find out. 
 
 ::: panel-tabset
 ### People
@@ -522,7 +522,7 @@ cattle_alt <- function(show_cattle) {
 # whatever replaces it, both tabs keep the same number of lines.
 p <- cattle_chart(show_cattle = FALSE) +
   labs(
-    title = "On Census day in 2021, the Region's townships had more...",
+    title = "On Census day in 2021, the townships had more...",
     subtitle = "Townships, total population, 2021-05-11",
     caption = cwr_caption("Statistics Canada Table 98-10-0002-01", credit = TRUE)
   )
@@ -547,7 +547,7 @@ cwr_figure(
 
 p <- cattle_chart(show_cattle = TRUE) +
   labs(
-    title = "On Census day in 2021, the Region's townships had more...cows than people!",
+    title = "On Census day in 2021, the townships had more...cows than people!",
     subtitle = "Townships, total population, 2021-05-11",
     caption = cwr_caption(
       c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
@@ -566,6 +566,12 @@ cwr_figure(
 )
 ```
 :::
+
+And there we have it: more cows than people resided in the townships on Census day in 2021. What I thought was a joke is actually true!
+
+## What have we learned?
+
+In CWR's debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region's rolling hills. We learned there were lots of roads and hills to roam because the townships cover `r township_area` square km, over three-quarters of the Region's `r region_area` square km, while holding only `r township_pop` people, a ninth of its `r region_pop` residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we'll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now when this year's census data gets released, we'll revisit this post and see if cows still outnumber people in cattle country.
 
 ## Data sources and reliability
 
