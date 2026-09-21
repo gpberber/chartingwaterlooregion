@@ -19,6 +19,7 @@ cwr_packages <- c(
 
   # Rendering and publishing
   "quarto", "rmarkdown", "knitr", "sessioninfo", "gh", "httr2",
+  "xml2", "jsonlite", "yaml", "magick",   # R/seo_post_render.R, run after every render
 
   # Data sources and file formats
   "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",

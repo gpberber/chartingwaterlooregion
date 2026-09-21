@@ -23,6 +23,11 @@ project:
                         # <source srcset>, which Quarto does not scan for resources
     - CNAME             # tells GitHub Pages the custom domain; must be republished every
                         # time, because publishing overwrites the whole gh-pages branch
+  # Search-engine tidying of the built pages in _site/ after every render:
+  # canonical links, structured data, a Dataset block for posts with a data
+  # download, a 1200 x 630 sharing picture and lazy-loaded images. The script
+  # explains each one; it never touches a .qmd or _freeze/.
+  post-render: R/seo_post_render.R
 
 execute:
   freeze: auto           # re-run R only when a post source changes; results cached in _freeze/

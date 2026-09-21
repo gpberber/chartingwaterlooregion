@@ -39,6 +39,7 @@ chartingwaterlooregion/
     data_quality.R       cwr_quality_flags(): finds the data-quality flags on a post's data,
                          blanks figures never used (E, F, x, ..), records them (3.2)
     packages.R           every package the site uses; install_missing()
+    seo_post_render.R    run by Quarto after every render: tidies _site/ for search engines (section 8)
   posts/
     _metadata.yml        defaults for every post (author, licence, echo: false, figure sizes)
     <slug>/              one folder per post (layout in section 3)
@@ -409,6 +410,10 @@ The app lives in `posts/<slug>/app/app.R`, is deployed to shinyapps.io with `rsc
 - **Two of those five places have their wrapping tuned to this exact sentence.** The About hero and the home page title both carry `text-wrap: balance`, so when the window is too narrow for one line they split into two even ones instead of dropping the last word on its own. The hero also has `max-width: 30em`, deliberately *above* the sentence's one-line width of about 27.7em, so only the column decides where it breaks. **Do not put a narrower cap back on it:** the old `26em` was cutting the line about 30px before the space actually ran out, which looks like a wrapping problem and is really a CSS one. If you reword the tagline, check both at several window widths - not just the one you have open. The home page is the awkward one: it wraps around 800-900px and again near 600px, but comes back to a single line at 700px, because that is where Quarto drops the margin sidebar and the text column gets wider.
 
 - **Folders listed under `resources:` in `_quarto.yml` start with a slash** (`/images/`, `/fonts/`). Without it Quarto copies every folder of that name anywhere in the project, and until 2026-09-17 that quietly put a screenshot from the crime exploration notebooks under `datasets/` on the live site. The `!datasets/` line under `render:` does not prevent this: it stops pages being built from that folder, not files being copied out of it. If you add a resource line, start it with `/` unless you mean "every folder with this name".
+
+- **Search engines.** `R/seo_post_render.R` runs by itself after every render (`post-render:` in `_quarto.yml`) and edits only the built pages in `_site/`, never a `.qmd` or `_freeze/`. It gives every page a canonical link (the one address Google should rank, `/posts/<slug>/` rather than `.../index.html`) and rewrites the sitemap to match; adds hidden structured data saying each post is an article, by whom and when, and, for a post with a data download, a Dataset description so Google Dataset Search can list its tables; builds a 1200 x 630 sharing picture from the post's first chart for link previews; lazy-loads every image after the first; and keeps the 404 page out of search results. Nothing in a post has to change. To use a different chart for the sharing picture, add `share-figure: fig-<id>` to the post's YAML (`none` keeps the listing thumbnail). The words search engines lean on most are yours: the post's `title` and `description`. `/review-post` suggests search wording but never changes it. Outside the code:
+  - **Google Search Console** (search.google.com/search-console): the property is the Domain `chartingwaterlooregion.ca`, verified by a TXT record at Spaceship. After each new post, paste its address into URL Inspection and choose Request indexing. Performance → Queries shows what people searched to find the site.
+  - **Bing Webmaster Tools** (bing.com/webmasters), imported from Search Console; it also covers DuckDuckGo.
 
 After any of these, `quarto render` then `/publish` with no argument.
 

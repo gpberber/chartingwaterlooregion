@@ -58,6 +58,12 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    placeholder, and publishing with it means the site counts nothing. If it is still there, stop and
    ask the user for the code from their goatcounter.com dashboard address.
 
+   Check that the search tidying ran (`R/seo_post_render.R`, run by Quarto after every render):
+   the render output ends with a `seo_post_render.R: ... pages tagged` line, and
+   `grep -c 'rel="canonical"' _site/posts/<slug>/index.html` prints 1. If not, run
+   `Rscript R/seo_post_render.R` and read its error. Never publish without it: the sitemap would
+   go back to listing `index.html` addresses.
+
    Then check for links whose target is percent-encoded R code:
    ```bash
    grep -rn 'href="[^"]*%60\|src="[^"]*%60' _site --include=*.html

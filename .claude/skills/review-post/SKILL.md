@@ -145,6 +145,17 @@ For every `ggplot` chunk:
 ## 5. Metadata
 
 - `title`, `description` (one sentence, used on the listing card), `date`, `categories`, `image` set and the file exists.
+- **Search.** The title and description are Greg's prose, so these are suggestions, never edits;
+  quote the current text and say what a searcher would type. Flag a title with no word a person
+  would search for (a place, a topic: "population", "rent", "commuting"), and a description that
+  names neither the place (Waterloo Region, or the municipality) nor the topic, or runs well
+  outside about 120 to 160 characters (Google often shows it under the title in results, cut to
+  fit). A playful title can stay playful if the description carries the search words. Report the
+  character count of the description.
+- **Sharing picture.** `R/seo_post_render.R` makes a 1200 x 630 sharing picture from the post's
+  first chart, or the chart named by `share-figure: fig-<id>` in the YAML (`none` keeps the
+  thumbnail). After rendering, look at `_site/posts/<slug>/figures/share.png` and say whether that
+  chart is the one that best sells the post; if another would, suggest `share-figure:`.
 - The first category is `Snapshot` or `Deep dive`, followed by 2 to 3 topic categories. A Snapshot
   is a few simple charts and basic analysis read in under 5 minutes (roughly 800 words of prose
   plus a handful of charts); anything longer or more involved is a Deep dive. Count the prose words

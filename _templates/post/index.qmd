@@ -4,6 +4,7 @@ description: "One sentence for the listing card: the question and the answer."
 date: "{{date}}"
 categories: [Snapshot]   # first entry is the post type: Snapshot (under 5 min) or Deep dive; then 2 to 3 topics
 image: images/thumbnail.png
+# share-figure: fig-name   # chart used for link previews (1200 x 630); default is the first chart; none keeps the thumbnail
 draft: true
 ---
 

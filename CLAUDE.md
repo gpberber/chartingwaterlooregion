@@ -17,6 +17,11 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `datasets/crime/` is the worked example.
 - `R/theme_cwr.R` is the house chart style (colours, `theme_cwr()`, helpers). Every post sources it.
   `R/data_helpers.R` moves big files to and from GitHub Releases. `R/packages.R` lists every package.
+  `R/seo_post_render.R` runs after every render (`post-render:` in `_quarto.yml`) and edits only
+  `_site/`: canonical links, clean sitemap addresses, JSON-LD (BlogPosting, a Dataset for posts with
+  a data bundle, WebSite on the home page), a 1200 x 630 `figures/share.png` from the first chart
+  (or `share-figure:`), lazy-loaded images, noindex on 404. Post titles and descriptions stay
+  Greg's; `/review-post` only suggests search wording.
 - `_templates/post/` is the scaffold `/new-post` copies. `_dev/` holds tooling (safety script,
   hooks, snippet converter). Neither is rendered.
 - `_freeze/` is Quarto's cache of rendered results and is committed; never edit it by hand.
