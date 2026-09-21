@@ -71,7 +71,7 @@ Every column of every table in `data/tables.csv`. Types and example values are r
 | Table | Column | Type | Description | Units | Values |
 |---|---|---|---|---|---|
 | districts | csduid | number | Statistics Canada census subdivision identifier, seven digits; the first four (3530) are the census division code for Waterloo Region |  | 3530004 to 3530035 |
-| districts | district | text | Name of the municipality |  | Kitchener; Cambridge; Waterloo; ... (7 distinct values) |
+| districts | district | text | Name of the census subdivision |  | Kitchener; Cambridge; Waterloo; ... (7 distinct values) |
 | districts | district_type | text | City or Township, from the census subdivision type code (CY or TP) |  | City; Township |
 | districts | population | number | Estimated resident population on 1 July 2025 | people | 12413 to 323917 |
 | districts | area_sq_km | number | Land area published by Statistics Canada in the 2021 census boundary file; excludes inland water | square kilometres | 64.056 to 326.5574 |
