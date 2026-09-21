@@ -408,21 +408,29 @@ The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener 
 # the Census of Population. sum() is used without na.rm = TRUE on purpose: if
 # the quality check in 02_clean_data.R had blanked a township's figure, the
 # total would come out missing rather than quietly short.
+#
+# The chart is the two figures themselves rather than bars, so each row carries
+# where it sits (x) and the finished text of its number.
 cattle_people <- cattle |>
   summarise(Cows = sum(cattle), People = sum(population)) |>
   pivot_longer(everything(), names_to = "what", values_to = "count") |>
   mutate(
-    # A horizontal chart draws the first level at the bottom, so cattle (first
-    # in the summarise() above) goes at the bottom and people on top
     what = fct_inorder(what),
     label = label_comma(accuracy = 1)(count),
-    # Whether a label fits inside its bar, the same test as the other bar
-    # charts: the axis runs to about 1.2 times the longest bar, and roughly 45
-    # characters of label fit across it on a phone.
-    inside = count >= (nchar(label) + 1.5) * (max(count) * 1.2 / 45)
+    # People on the left, cows on the right
+    x = if_else(what == "People", 0, 1)
   )
 
 num_people <- cattle_people |> filter(what == "People") |> pull(count) |> comma(accuracy = 1)
+
+# Cows per hundred people, worked out from the figures above rather than typed,
+# and rounded: the two counts are exact, but a ratio to the decimal would be
+# false precision on top of a census.
+cows_per_100 <- round(
+  (cattle_people |> filter(what == "Cows") |> pull(count)) /
+    (cattle_people |> filter(what == "People") |> pull(count)) * 100
+)
+
 ```
 
 When I conceived this post, cows did not figure in it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" Serendipitously, I learned that every five years there is not only the Census of Population we all know, but also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
@@ -438,83 +446,78 @@ The population estimates above are for 2025, but the cow data is from 2021, so f
 #| label: cattle-people
 #| output: asis
 
-# Two tabs, one chart: the first shows the people alone, the second adds the
-# cattle. Everything that fixes where the people bar sits - the rows, the axis
-# range, the chart's height - is the same in both, so switching to the second
-# tab looks like the cattle bar appearing and nothing else moving.
+# Two tabs, one chart, and the chart is the figures themselves: no bars, no
+# axes, just the two counts at reading size with the ratio under them. The first
+# tab shows the people alone, and everything that fixes where that figure sits -
+# its x position, the y range, the chart's height - is the same in both, so
+# switching to the second tab looks like the cows arriving and nothing else
+# moving.
 
+# The three rows of the chart, each placed by its own y and centred on it: the
+# word on top, the figure under it, and the ratio on a line of its own below.
+# Read off a render, tightened until the group sits close without the ratio
+# touching the descender on 70,365.
+row_word  <-  0.26
+row_count <-  0
+row_ratio <- -0.26
 
-# The bar is labelled "Cows" because the post uses the word for all cattle -
-# calves, steers, heifers, cows and bulls - as the paragraph above explains.
-
-
-# The longest bar of the two, so both tabs share one axis range. Left to
-# itself, the first tab's axis would stretch the people bar across the chart.
-cattle_axis_max <- max(cattle_people$count)
-
-# The chart for one tab. `show_cattle = FALSE` draws the people bar alone but
-# keeps the cattle row, empty and unnamed, so the people bar stays where the
-# second tab draws it.
 cattle_chart <- function(show_cattle) {
-  bars <- cattle_people |> filter(show_cattle | what == "People")
+  shown <- cattle_people |> filter(show_cattle | what == "People")
 
-  ggplot(bars, aes(x = count, y = what, fill = what)) +
-    geom_col(width = 0.7) +
-    # The baseline, as a segment that stops just past the two rows rather than
-    # a line the full height of the panel (see the population chart above).
-    # Drawn across both rows on both tabs.
-    annotate(
-      "segment",
-      x = 0, xend = 0, y = 0.5, yend = nlevels(cattle_people$what) + 0.5,
-      colour = "black", linewidth = 0.5
+  ggplot(shown, aes(x = x)) +
+    geom_text(
+      aes(y = row_word, label = str_to_lower(what)),
+      colour = "grey30", size = label_size * 1.1
     ) +
     geom_text(
-      aes(
-        label = label,
-        # Inside the bar end, or just past it
-        hjust = if_else(inside, 1.15, -0.15),
-        # White on the dark blue only; on the silver, and outside a bar, black
-        # reads better
-        colour = if_else(inside & what == "Cows", "white", "black")
-      ),
-      size = label_size * 0.8
+      aes(y = row_count, label = label, colour = what),
+      fontface = "bold", size = label_size * 3.2
     ) +
-    scale_colour_identity() +
-    scale_fill_manual(
-      values = c(Cows = dodgerblue, People = cowboysilver),
-      guide = "none"   # each bar is named on the axis
+    # Only on the second tab, and centred between the two figures
+    {if (show_cattle)
+      annotate(
+        "text", x = 0.5, y = row_ratio,
+        label = paste0(cows_per_100, " cows for every 100 people"),
+        colour = dodgerblue, size = label_size * 1.1
+      )} +
+    scale_colour_manual(
+      values = c(People = cowboysilver, Cows = dodgerblue),
+      guide = "none"   # each figure is named above it
     ) +
-    # One range for both tabs, with room on the right for a label that sits
-    # outside its bar
-    scale_x_continuous(limits = c(0, cattle_axis_max),
-                       expand = expansion(mult = c(0, 0.20))) +
-    # `limits` keeps both rows even when the first tab has no cattle bar; the
-    # label for the empty row is blank until the second tab
-    scale_y_discrete(
-      limits = levels(cattle_people$what),
-      labels = \(x) if_else(x == "Cows" & !show_cattle, "", x)
-    ) +
+    # Both scales are fixed rather than fitted to what is drawn, which is what
+    # keeps the people figure in the same place on both tabs
+    scale_x_continuous(limits = c(-0.35, 1.35), expand = expansion(0)) +
+    scale_y_continuous(limits = c(-0.32, 0.34), expand = expansion(0)) +
     coord_cartesian(clip = "off") +
-    # Both bars carry their number, so the value axis and its gridlines are gone
+    # Nothing here is a scale a reader reads, so every axis and gridline goes.
+    # Each element is named individually because theme_cwr() sets them
+    # individually - including axis.text.y.left, which is more specific than
+    # axis.text.y and would otherwise win.
     theme(
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
-      axis.line.x = element_blank(),
-      panel.grid.major.x = element_blank(),
-      panel.grid.major.y = element_blank()
+      axis.text.x = element_blank(), axis.text.y = element_blank(),
+      axis.text.y.left = element_blank(),
+      axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
+      axis.line.x = element_blank(), axis.line.y = element_blank(),
+      axis.title.x = element_blank(), axis.title.y = element_blank(),
+      panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank()
     )
 }
 
 # Alt text for a tab, built from the plotted figures, like every alt text in
 # the post
 cattle_alt <- function(show_cattle) {
-  cattle_people |>
+  figures <- cattle_people |>
     filter(show_cattle | what == "People") |>
-    arrange(desc(what)) |>
-    mutate(entry = paste0(str_to_lower(what), " ", label)) |>
+    mutate(entry = paste0(label, " ", str_to_lower(what))) |>
     pull(entry) |>
-    paste(collapse = "; ") |>
-    str_to_sentence()
+    paste(collapse = " and ")
+
+  if (show_cattle) {
+    paste0(figures, ", or ", cows_per_100, " cows for every 100 people")
+  } else {
+    figures
+  }
 }
 
 # The same title on both tabs. A title that wraps onto one more line in one
@@ -530,12 +533,13 @@ p <- cattle_chart(show_cattle = FALSE) +
 cwr_figure(
   p, "fig-cattle-people",
   alt = paste0(
-    "One horizontal bar, in grey, for the people living in North Dumfries, ",
-    "Wellesley, Wilmot and Woolwich townships together on 11 May 2021, with an ",
-    "empty row below it. ", cattle_alt(FALSE), "."
-  )
-  # No height given: cwr_figure() sets it from the number of rows, which is
-  # two on both tabs.
+    "The number of people living in North Dumfries, Wellesley, Wilmot and ",
+    "Woolwich townships together on 11 May 2021, written large: ",
+    cattle_alt(FALSE), "."
+  ),
+  # This chart has no rows to set a height from, so both tabs are given the
+  # same one and the figures stay put as the reader switches between them.
+  height = 2.2, phone_height = 2.2
 )
 ```
 
@@ -558,11 +562,12 @@ p <- cattle_chart(show_cattle = TRUE) +
 cwr_figure(
   p, "fig-cattle",
   alt = paste0(
-    "Two horizontal bars for North Dumfries, Wellesley, Wilmot and Woolwich ",
-    "townships together on 11 May 2021: people in grey on top, where the ",
-    "previous tab drew them, and cattle in blue below. ", cattle_alt(TRUE), "."
-  )
-  # No height given: cwr_figure() sets it from the number of rows.
+    "The same figure for people, where the previous tab wrote it, with the ",
+    "number of cattle on farms in those four townships on the same day beside ",
+    "it: ", cattle_alt(TRUE), "."
+  ),
+  # The same height as the first tab, for the reason given there
+  height = 2.2, phone_height = 2.2
 )
 ```
 :::
