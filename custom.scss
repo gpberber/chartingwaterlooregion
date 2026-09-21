@@ -442,6 +442,37 @@ $code-color: #333333;
   }
 }
 
+// ---- A photo in the text --------------------------------------------------
+// A snapshot set into a post, as opposed to a chart: centred at 60% of the
+// column on a desktop, where full width would fill the screen and push the
+// text below it out of sight, and full width on a phone, where 60% would be too
+// small to see. The caption is centred under it. Used as
+// `![caption](images/photo.jpg){.cwr-photo fig-align="center" fig-alt="..."}`.
+// The space under the caption, since the margin taken off below goes from both
+// the image's block and the one around the whole figure
+figure:has(img.cwr-photo) figcaption {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+// Bootstrap and Quarto each leave a line's worth of space under the image -
+// one on the image, one on the block around it - which floats the caption away
+// from the photo it belongs to
+img.cwr-photo {
+  width: 60%;
+  margin-bottom: 0.25rem;
+}
+
+.quarto-figure:has(img.cwr-photo) {
+  margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+  img.cwr-photo {
+    width: 100%;
+  }
+}
+
 // ---- The house mark -------------------------------------------------------
 // The site's own chart vocabulary borrowed as a printer's mark: the dot and
 // confidence interval of the ggdoterror template, drawn small and centred - an

@@ -1,7 +1,7 @@
 ---
 title: "Welcome to Charting Waterloo Region!"
 description: "An introduction to the municipality that's a little bit country, a little bit rock 'n' roll."
-date: "2026-09-20"
+date: "2026-09-21"
 categories: [Snapshot, Agriculture, Population, Geography]
 image: images/thumbnail.png
 draft: false
@@ -41,6 +41,8 @@ cattle <- read_csv(
   show_col_types = FALSE
 )
 ```
+
+![My brother and I with our family's first Mercury Montego, circa 1974.](images/montego-1974.jpg){.cwr-photo fig-align="center" fig-alt="A faded colour snapshot of two small boys in brown jackets standing on either side of the front of a red Mercury Montego parked in a wet driveway, with two-storey houses and a newly built street behind them."}
 
 As a kid, one of my favourite family activities was "going for a drive." That is literally what we called it. Mom or Dad would announce that we were "going for a drive" and the five of us would pile into the Montego and go for a drive. A drive never had a destination, unless we ended up in Hespeler, where we'd get ice cream cones at a convenience store on Cooper Street. Almost all of them meandered through one or more of the Region's townships. I particularly liked it when Dad drove through the Paradise Lake area in Wellesley Township. I thought it was neat that we had a little cottage-y area so close to home. These drives gave me an early appreciation for the Region's vastness and variety, and for the contrasts between its rock 'n' roll heart and its country soul. In CWR's inaugural post, we'll start exploring some of these contrasts and, in the process, answer the burning question: "What do the townships have more of, cows or people?"
 
