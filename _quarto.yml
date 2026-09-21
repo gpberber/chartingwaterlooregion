@@ -113,6 +113,10 @@ format:
       # "Like this post" under a post's author row: one GoatCounter event, no
       # count shown. Same gate as the share button, so posts only.
       - _includes/like.html
+      # Contents list as a tap-to-open strip on a phone, where Quarto drops the
+      # margin column that normally holds it. Only on a page whose YAML asks for
+      # it (About today), so posts are untouched.
+      - _includes/phone-toc.html
     df-print: paged
     code-copy: true
     knitr:

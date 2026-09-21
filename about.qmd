@@ -21,7 +21,15 @@ about:
     - icon: envelope
       text: Email
       href: "mailto:greg@chartingwaterlooregion.ca"
-toc: false
+# The page is a list of questions, so the contents list is a quick way to find
+# one; the site sets toc: true in _quarto.yml and this page used to opt out.
+toc: true
+# On a phone Quarto drops the margin column the list sits in, and fourteen
+# questions is exactly the length that needs one. This marker asks
+# _includes/phone-toc.html for a tap-to-open copy at the top of the page.
+include-in-header:
+  text: |
+    <meta name="cwr-phone-toc" content="1">
 ---
 
 ```{=html}

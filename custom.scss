@@ -392,6 +392,56 @@ $code-color: #333333;
   .cwr-like-button.is-liked { padding-left: 0; }
 }
 
+// ---- Contents list on a phone ---------------------------------------------
+// Built by _includes/phone-toc.html on a page that asks for it, and shown only
+// where Quarto has dropped the margin column that normally holds the list.
+// Bootstrap's lg breakpoint is where that column goes, so that is where this
+// strip takes over; above it the strip is hidden and the margin column is back,
+// and the two are never both on screen.
+.cwr-phone-toc {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .cwr-phone-toc {
+    display: block;
+    margin: 0 0 2rem 0;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid $cwr-grey-50;
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+
+    // The tap target: the whole row, with the marker the browser draws for a
+    // <details> kept, since it is the thing that says this opens.
+    > summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: $cwr-blue;
+    }
+
+    // No bullets: the questions are the list, and a marker in front of each
+    // one competes with the question mark at the end of it.
+    ul {
+      margin: 0.7rem 0 0.2rem 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover, &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
 // ---- The house mark -------------------------------------------------------
 // The site's own chart vocabulary borrowed as a printer's mark: the dot and
 // confidence interval of the ggdoterror template, drawn small and centred - an

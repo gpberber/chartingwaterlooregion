@@ -1,0 +1,136 @@
+<!-- ---------------------------------------------------------------------------
+     Contents list on a phone.
+
+     Quarto puts "On this page" in the right-hand margin column, and that column
+     is dropped below Bootstrap's lg breakpoint - so on a phone the list is not
+     hidden, it is gone. That costs a post nothing, since a post is read straight
+     through, but the About page is a list of questions and a reader arriving with
+     one of them in mind would have to scroll past all the others to find it.
+
+     So on a narrow screen this moves the existing list to the top of the page and
+     wraps it in a <details>, which is a tap-to-open strip that needs no JavaScript
+     of its own to work once it is built. Collapsed by default: the answer to the
+     first question should still be the first thing under the title.
+
+     Only on pages that ask for it, with `phone-toc: true` in their YAML - About
+     today. It is one list moved, not a second one built, so the two can never
+     disagree, and a page with no headings is left alone.
+
+     Styling lives in custom.scss under "Contents list on a phone". Pulled in
+     site-wide by `include-after-body` in _quarto.yml, like the share and like
+     buttons, and like them it decides for itself whether it belongs on the page.
+--------------------------------------------------------------------------- -->
+<script>
+(() => {
+  // The page opts in through its YAML, which Quarto writes into the body as a
+  // data attribute of the meta block. Reading a marker rather than the path
+  // means a second page can have one by adding the same line.
+  const wants = document.querySelector('meta[name="cwr-phone-toc"]');
+  if (!wants) return;
+
+  const toc = document.querySelector("#TOC");
+  const main = document.querySelector("main.content");
+  if (!toc || !main || !toc.querySelector("a")) return;
+
+  // Built once and left in place. Below the breakpoint the stylesheet shows this
+  // copy and hides the margin column; above it, the reverse - so a reader who
+  // turns their phone sideways gets the right one without anything rebuilding.
+  const strip = document.createElement("details");
+  strip.className = "cwr-phone-toc";
+
+  const summary = document.createElement("summary");
+  // The same words as the margin column's heading, so it is recognisably the
+  // same thing in a different place.
+  summary.textContent = document.querySelector("#toc-title")?.textContent || "On this page";
+  strip.appendChild(summary);
+
+  // The list itself, moved rather than copied. Quarto's own scroll-spy still
+  // tracks the margin copy; this one is a set of links, which is all it needs
+  // to be.
+  const list = toc.querySelector("ul").cloneNode(true);
+  // The margin column's list carries Bootstrap's collapse class, which would
+  // hide it here; it is the stylesheet that decides what shows on a phone.
+  list.className = "";
+  strip.appendChild(list);
+
+  // Closing the strip after a tap: on a phone the answer is what the reader
+  // wanted, not a list still covering it.
+  strip.addEventListener("click", (event) => {
+    if (event.target.closest("a")) strip.open = false;
+  });
+
+  // Below everything that introduces the page - the hero block and the title -
+  // and above the first section, so the strip reads as a way into the content
+  // rather than as something sitting on top of the masthead.
+  const intro = [...main.children].filter((el) =>
+    el.classList.contains("cwr-hero") ||
+    el.classList.contains("quarto-title-block") ||
+    el.tagName === "HEADER" ||
+    el.tagName === "H1"
+  );
+  const last = intro[intro.length - 1];
+
+  if (last) {
+    last.insertAdjacentElement("afterend", strip);
+  } else {
+    main.insertAdjacentElement("afterbegin", strip);
+  }
+
+  // ---- And on a desktop, start the margin list level with the first heading --
+  // Quarto hangs the margin column from the top of the page, which on a page
+  // with a hero block leaves the list floating opposite the masthead. Lining it
+  // up with the first heading is a measurement rather than a fixed offset,
+  // because the hero's height changes with the width of the window.
+  const firstHeading = main.querySelector("section h2, h2");
+
+  // A gap above the list is wanted at the top of the page and nowhere else. The
+  // column the list sits in is sticky, so a plain margin would hold that gap for
+  // the whole scroll and keep the list a third of the way down the screen. The
+  // theme rewrites that column's sticky offset on every scroll - it has a fixed
+  // navbar to allow for - so the offset is no use to us either.
+  //
+  // Instead the margin shrinks as the page scrolls: the list starts level with
+  // the first heading, rides up with the text, and once the gap is used up it
+  // sits where the theme puts it and sticks there as it always did.
+  let gap = 0;
+
+  const applyGap = () => {
+    toc.style.marginTop = Math.max(0, gap - window.scrollY) + "px";
+  };
+
+  const measureGap = () => {
+    toc.style.marginTop = "";          // measure against no offset of our own
+    gap = 0;
+
+    if (firstHeading && getComputedStyle(toc).display !== "none") {
+      gap = Math.max(0, Math.round(firstHeading.getBoundingClientRect().top -
+                                   toc.getBoundingClientRect().top) +
+                        window.scrollY);
+    }
+    applyGap();
+  };
+
+  measureGap();
+
+  // Cheap on every scroll: one subtraction, and the browser is asked to write
+  // the style once a frame rather than once an event.
+  let queued = false;
+  window.addEventListener("scroll", () => {
+    if (queued || gap === 0) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; applyGap(); });
+  }, { passive: true });
+
+  // The hero reflows as the window changes, so the measurement is taken again
+  // once things have settled rather than on every pixel of a drag.
+  let settling;
+  window.addEventListener("resize", () => {
+    clearTimeout(settling);
+    settling = setTimeout(measureGap, 150);
+  });
+
+  // Web fonts land after this runs and change how tall the hero is, so the
+  // measurement is taken once more when they have.
+  if (document.fonts?.ready) document.fonts.ready.then(measureGap);
+})();
+</script>
