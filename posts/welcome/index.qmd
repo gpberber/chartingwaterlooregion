@@ -239,7 +239,7 @@ kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)|> co
 
 ## More cows than people?!
 
-You don't have to drive through the townships to know that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's see how many more people live in the cities than in the townships.
+You don't have to drive through the townships to guess that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's see how many more people live in the cities than in the townships.
 
 ```{r}
 #| label: sizes
@@ -397,7 +397,7 @@ cwr_figure(
 )
 ```
 
-The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop` people, or `r city_pop_share` of the Region's population of `r region_pop`. So despite covering `r township_area_share` of the Region's land, the townships are home to only `r township_pop` residents, or `r township_pop_share` of the Region's population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop` people, or `r city_pop_share` of the Region's population of `r region_pop`. So despite covering `r township_area_share` of the Region's territory, the townships are home to only `r township_pop` residents, or `r township_pop_share` of total population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
 
 ```{r}
 #| label: prep-cattle
@@ -433,11 +433,11 @@ cows_per_100 <- round(
 
 ```
 
-When I conceived this post, cows did not figure in it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" Serendipitously, I learned that every five years there is not only the Census of Population we all know, but also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
+By the way, cows did not figure in this post when I first conceived it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" Serendipitously, I learned that not only is there the Census of Population we all know, but there's a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
 
 (In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
 
-The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we'll use the 2021 census populations as well. On census day in 2021, a total of `r num_people` people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.
+The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we'll use the 2021 census populations as well. On census day in 2021, just over 70,000 people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.
 
 ::: panel-tabset
 ### People
