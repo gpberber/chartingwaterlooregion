@@ -124,13 +124,17 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
-      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work; people who work from home are counted in their own municipality",
         # The intervals are narrow next to the gaps the chart shows, so they
-        # are stated rather than drawn (rule 9b); the widest is measured from
-        # the data by cwr_ci_range_note()
-        with(commuting_bars, cwr_ci_range_note(percent, percent_lower, percent_upper))
+        # are stated rather than drawn (rule 9b). The sentence is yours to
+        # edit; {widest} is filled with the widest interval on the chart,
+        # measured from the data by cwr_ci_widest().
+        str_glue(
+          "95% confidence intervals are within ±{widest} percentage points",
+          widest = with(commuting_bars, cwr_ci_widest(percent, percent_lower, percent_upper))
+        ),
+        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
       )
     )
   ) +
@@ -204,7 +208,7 @@ mode_bars <- commuting_mode |>
     label = label_number(accuracy = 0.1, suffix = "%")(percent),
     # A share whose sampling error is more than a third of its value
     # (`unreliable`, from R/census_ci.R) keeps its bar but carries the key to
-    # note 3. Township transit shares are this small because there is next to
+    # note 3, written out in the chart's caption below. Township transit shares are this small because there is next to
     # no transit service there, so the figures are realistic even though the
     # sample cannot pin them down; they are marked, not dropped. geom_text()
     # draws plain text, so the key is the Unicode superscript, not <sup>.
@@ -247,11 +251,12 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
-      sample = "census_2021",
       notes = c(
         "Other ways of getting to work are not shown, so the three do not add to 100%",
         "Active transportation is walking or cycling",
-        cwr_ci_notes[["unreliable"]]
+        # Keyed ³ on each share marked unreliable in the data
+        "Unreliable estimate: its sampling error is more than a third of its value",
+        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
       )
     )
   ) +
@@ -650,11 +655,11 @@ flow_caption <- function(home_name) {
   cwr_caption(
     c("Statistics Canada Table 98-10-0459-01", "the 2021 census boundary files"),
     credit = TRUE,
-    sample = "census_2021",
     notes = c(
       "Share of workers with a usual place of work",
       paste0("The share on ", cwr_short_name(home_name), " is of people who both live and work there"),
-      "Red marks the most common workplace outside the Region, in its direction but nearer than it is"
+      "Red marks the most common workplace outside the Region, in its direction but nearer than it is",
+      "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
     )
   )
 }
@@ -907,11 +912,11 @@ p <- rank_chart(between) +
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
-      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
         "Only commutes that cross a municipal border inside the Region are counted",
-        cwr_ci_notes[["no_intervals"]]
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error",
+        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
       )
     )
   )
@@ -957,10 +962,10 @@ p <- rank_chart(inbound_districts) +
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
-      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
-        "Only commutes into the Region from a home outside it are counted"
+        "Only commutes into the Region from a home outside it are counted",
+        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
       )
     )
   )
@@ -1023,11 +1028,11 @@ p <- ggplot(feeders, aes(x = percent, y = home)) +
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
       credit = TRUE,
-      sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
         "The ten municipalities sending the most commuters into the Region",
-        cwr_ci_notes[["no_intervals"]]
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error",
+        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
       )
     )
   ) +

@@ -12,9 +12,12 @@ snippet ggtitles
 		# alone; the key is superscripted for you, and the matching <sup>1</sup>
 		# goes in the title or subtitle by hand.
 		#
-		# cma = TRUE adds the house note explaining the Kitchener census
-		# metropolitan area as note 1. Set it on every chart drawn from CMA
-		# data rather than writing the geography out again.
+		# Every note is written out here, stock ones included (cwr-charts rule
+		# 1d), so it can be reworded or deleted in place. A chart drawn from
+		# Kitchener CMA data has str_glue("{cwr_region} excluding Wellesley
+		# Township") as note 1; a long-form census chart ends with "Estimates
+		# from the 2021 census long-form questionnaire, a 25% sample of
+		# households".
 		caption = cwr_caption("${3:Source}")
 	) +
 
@@ -760,8 +763,8 @@ snippet ggdoterror
 	# One estimate per row, a dot, with its confidence interval as a fading bar
 	# behind it (the New York Times poll-chart look). For sample data (style
 	# rule 9b): lower and upper are the published 95% bounds, kept beside the
-	# estimate in 02_clean_data.R. Add sample = to cwr_caption() and say what the
-	# bars are in a note ("Bars show 95% confidence intervals").
+	# estimate in 02_clean_data.R. Write the sample's stock note into
+	# cwr_caption(notes = ) after this one (cwr-charts rule 1d).
 	plot_data <- ${1:data_object} |>
 	  mutate(
 	    ${2:y_variable} = reorder(${2:y_variable}, ${3:estimate}),

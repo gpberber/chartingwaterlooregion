@@ -36,7 +36,8 @@
 #
 # A table with no published bounds (commuting flows, 98-10-0459, is one) gets no
 # interval: nothing here can be used on it, and none is invented. Its charts
-# carry the stock "no intervals" note instead (cwr_ci_notes in R/theme_cwr.R).
+# carry the stock "no intervals" note instead, written out in the post's chunk
+# (cwr-charts rule 1d).
 #
 # Worked example: posts/commuting/R/02_clean_data.R.
 

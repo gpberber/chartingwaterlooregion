@@ -24,8 +24,8 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `comp_colours`, `local_colours` | named palettes for recurring comparisons, keyed by `cwr_region` for the Region |
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
-| `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE, sample = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note; `sample = "census_2021"` adds the stock sampling note (rule 9b) |
-| `cwr_ci_notes`, `cwr_ci_range_note(estimate, lower, upper)` | stock notes on sampling uncertainty: an unreliable share (key on its label), no published intervals, and the widest interval measured from the data (rule 9b) |
+| `cwr_caption(source, credit = FALSE, notes = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); every note is written out in `notes` in the chunk, stock ones included (rule 1d) |
+| `cwr_ci_widest(estimate, lower, upper)` | the widest 95% interval on a chart, in points, for the `{widest}` placeholder in the stock interval note (rules 1d, 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
@@ -97,14 +97,13 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    drift apart - and put the matching `<sup>1</sup>` in the title or subtitle by hand, where
    ggtext renders it the same way. Numerals, not symbols; and never key a note with a bare `*`,
    which opens italics in a ggtext caption and swallows the line.
-1b. **A chart drawn from CMA data sets `cma = TRUE` and writes nothing.** Several Statistics
+1b. **A chart drawn from CMA data carries the CMA note, first.** Several Statistics
    Canada series are published for the Kitchener census metropolitan area and nothing smaller.
    The CMA is six of Waterloo Region's seven municipalities - Wellesley Township is the only
    exclusion and nothing outside the Region is in it - so the figures are a subset of the
    Region, not a different place, and Greg's prose may simply call it Waterloo Region. The
    qualification belongs on the chart all the same, because a chart travels without the post:
-   `cma = TRUE` makes it note 1, in wording that is identical across every post and fixable in
-   one place. Never type the geography into `notes` by hand.
+   it is note 1, in the stock wording of rule 1d, written out in the chunk.
 1c. **Units and scale live in the subtitle, so the axis can carry bare numbers.** A value axis
    never repeats a unit on every tick. Rescale the numbers instead - `label_number(scale = 1e-3)`
    with explicit `breaks` for thousands, `1e-6` for millions - and let the subtitle say which
@@ -116,6 +115,41 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    **say in the hand-off line** - "the x scale is in thousands" - not to write into the
    placeholder. He overrides this where a chart reads better the other way.
 
+1d. **Every note Claude puts on a chart is written out in the chunk, where Greg can edit or delete
+   it.** His rule (2026-09-21, and the same he set for data-quality notes a few days earlier): no
+   note is added by a function argument or looked up from a list behind the scenes. Each is a plain
+   string in `cwr_caption(notes = c(...))` in the post's own chunk - or in the one caption
+   function a set of tabs shares - so rewording one or deleting it means editing that line. Stock
+   wording keeps posts consistent, but it is copied in, not referenced. A note whose number comes
+   from the data writes the sentence out with a `{placeholder}` and fills it with `str_glue()`, so
+   the words stay editable and the number cannot go stale:
+
+   ```r
+   str_glue(
+     "95% confidence intervals are within ±{widest} percentage points",
+     widest = with(plot_data, cwr_ci_widest(percent, percent_lower, percent_upper))
+   )
+   ```
+
+   The stock wording, in the order the notes go (the sample note always last, directly above the
+   source line; each note's key goes in the title or subtitle, which is Greg's, so say so at
+   hand-off):
+
+   | Note | When | Wording |
+   |---|---|---|
+   | CMA geography | the chart's figures are for the Kitchener CMA (rule 1b); first | `str_glue("{cwr_region} excluding Wellesley Township")` |
+   | Intervals drawn | the chart draws them (rule 9b) | "Bars show 95% confidence intervals" (or "Lines", "The band") |
+   | Intervals stated | narrow enough not to draw (rule 9b) | "95% confidence intervals are within ±{widest} percentage points", as above |
+   | Unreliable estimate | keyed on each label whose `unreliable` is TRUE (rule 9b) | "Unreliable estimate: its sampling error is more than a third of its value" |
+   | No intervals published | a ranking or comparison from a table without bounds (rule 9b) | "No confidence intervals are published for these figures; shares close together may differ only by sampling error" |
+   | 2021 census long form | any long-form figure (rule 9b); last | "Estimates from the 2021 census long-form questionnaire, a 25% sample of households" |
+   | 2016 census long form | as above | "Estimates from the 2016 census long-form questionnaire, a 25% sample of households" |
+   | Liaison Strategies 2025 | the globe-csi perception survey | "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city" |
+
+   A survey used for the first time gets its own row here, in the same pattern ("Estimates from the
+   Labour Force Survey, a monthly sample of about N households", the size from the survey's own
+   documentation, not from memory). Data-quality flags follow rule 9c, which adds no chart note at
+   all for a D rating; any note Greg does ask for is written the same way.
 2. **Colour has meaning.** Blue = the Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
 2a. **Waterloo Region is "Region" in chart text - always `cwr_region`.** Axis and category
@@ -260,14 +294,11 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    This covers every sample, not only the census long form: the Labour Force Survey, the Canadian
    Community Health Survey, the General Social Survey, any poll. Greg wants the reader told every
    time (2026-09-18).
-   - **The note is always there, and never typed.** Pass `cwr_caption(sample = "census_2021")`,
-     which adds the stock note from `cwr_sample_notes` in `R/theme_cwr.R` ("Estimates from the 2021
-     census long-form questionnaire, a 25% sample of households") as the last note, directly above
-     the source line; like the CMA note it needs its key in the subtitle, which is Greg's, so say so
-     at hand-off. A sample with no entry yet - a survey used for the first time - gets one added to
-     `cwr_sample_notes` ("Estimates from the Labour Force Survey, a monthly sample of about N
-     households", the size from the survey's own documentation, not from memory), so the wording is
-     identical on every chart that uses it.
+   - **The note is always there, written out in the chunk.** The sample note from rule 1d's table
+     ("Estimates from the 2021 census long-form questionnaire, a 25% sample of households") is the
+     last string in `notes`, directly above the source line; like the CMA note it needs its key in
+     the subtitle, which is Greg's, so say so at hand-off. A survey used for the first time gets a row
+     in that table first, so the wording is the same on every chart that uses it.
    - **Every share gets an interval, worked out routinely** (Greg adopted this 2026-09-21, after a
      test on the commuting post). Census tables often carry a `Statistics` dimension - "Count", "95%
      confidence interval lower bound, Count", "... upper bound" (98-10-0462 does). Keep all three rows
@@ -286,13 +317,13 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
        blue dot on a blue interval bar fading to its ends; otherwise whiskers with
        `geom_linerange()` on a bar, a `geom_ribbon()` around a line, in `cowboysilver`; and a note
        saying "Bars show 95% confidence intervals");
-     - otherwise **state the widest in a note**, measured from the data by
-       `cwr_ci_range_note(percent, percent_lower, percent_upper)` ("95% confidence intervals are
-       within ±5 percentage points"), never typed. Region-wide shares, whose intervals are a
+     - otherwise **state the widest in a note**: the stock sentence written out, with its number
+       measured from the data by `cwr_ci_widest(percent, percent_lower, percent_upper)` through
+       `str_glue()` (rule 1d), never typed. Region-wide shares, whose intervals are a
        fraction of a point, get this and nothing more: drawing them implies a doubt that is not there.
    - **An unreliable share is kept and marked, not dropped.** A share whose CV is over a third keeps
      its bar; its label carries a note key (the Unicode superscript, since `geom_text()` draws plain
-     text) and the note is `cwr_ci_notes[["unreliable"]]` from `R/theme_cwr.R`; the alt text says
+     text) and the stock "Unreliable estimate" note (rule 1d) is written into `notes`; the alt text says
      "(unreliable estimate)" in place of the key. Greg's reasoning (2026-09-21): township transit
      shares of under 1% are unreliable as estimates but realistic, since there is next to no
      service. Tell him which shares are marked; he may drop one that is not realistic. This is our
@@ -300,8 +331,8 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      no interval and is not marked.
    - **A table with no published bounds gets no interval.** Commuting flows (98-10-0459) are one.
      Nothing in `R/census_ci.R` applies, and none is invented or borrowed from another table. A
-     ranking or comparison drawn from it carries `cwr_ci_notes[["no_intervals"]]` ("... shares close
-     together may differ only by sampling error"). At hand-off, say which ranks are close enough to
+     ranking or comparison drawn from it carries the stock "No confidence intervals are published"
+     note (rule 1d), written out. At hand-off, say which ranks are close enough to
      be in doubt and which shares rest on counts under about 50, which random rounding to a multiple
      of 5 makes rough whatever the interval.
    - **Report at hand-off** every chart's decision - drawn, stated, marked, or no intervals

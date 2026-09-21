@@ -72,10 +72,12 @@ the same call in a situation the templates do not cover.
 - Sample data carries its uncertainty. Every share from the census long form gets an approximate
   95% interval in the cleaning script (`R/census_ci.R`); a chart draws it only where it could
   change what a reader concludes, and otherwise states the widest in a note
-  (`cwr_ci_range_note()`). An estimate whose sampling error is over a third of its value is kept
-  and marked, not dropped (`cwr_ci_notes[["unreliable"]]`); a table that publishes no intervals
+  (`cwr_ci_widest()` fills its number). An estimate whose sampling error is over a third of its
+  value is kept and marked, not dropped; a table that publishes no intervals
   gets the stock note that close shares may differ only by sampling error. Readers are told what
   the numbers can bear, and only where it matters, so the notes are not skimmed past.
+- Every chart note is written out in the chunk, stock ones included (rule 1d), so Greg can reword
+  or delete it where he sees it; no function adds a note on its own.
 - Legends only when direct labels would collide (many groups, crossing lines). Then use the
   theme default: inside, top-left, horizontal, no title.
 - `coord_cartesian(clip = "off")` whenever a label or header sits outside the panel.

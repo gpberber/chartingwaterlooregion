@@ -270,8 +270,8 @@ Dot per category with its confidence interval as a fading, flat-ended bar behind
 # One estimate per row, a dot, with its confidence interval as a fading bar
 # behind it (the New York Times poll-chart look). For sample data (style
 # rule 9b): lower and upper are the published 95% bounds, kept beside the
-# estimate in 02_clean_data.R. Add sample = to cwr_caption() and say what the
-# bars are in a note ("Bars show 95% confidence intervals").
+# estimate in 02_clean_data.R. Write the sample's stock note into
+# cwr_caption(notes = ) after this one (cwr-charts rule 1d).
 plot_data <- <data_object> |>
   mutate(
     <y_variable> = reorder(<y_variable>, <estimate>),

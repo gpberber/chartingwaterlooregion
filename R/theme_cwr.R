@@ -266,65 +266,23 @@ theme_set(theme_cwr(base_size = 15))
 base_size <- 15
 
 # ---- 5. Helpers ----------------------------------------------------------
-# What a chart is actually showing when its numbers are published for the
-# Kitchener census metropolitan area rather than for the Region itself. The note
-# names the geography and not the CMA: a reader wants to know which places are in
-# the chart, and the acronym is the source line's business, not theirs.
-#
-# Statistics Canada builds a CMA out of whole municipalities around an urban
-# core, and this one is six of Waterloo Region's seven: Kitchener, Cambridge,
-# Waterloo, Woolwich, Wilmot and North Dumfries. Wellesley Township is the only
-# exclusion, and nothing from outside the Region is included - checked against
-# the 2021 census geographic attribute file, not assumed. So a CMA figure is a
-# subset of the Region, never a claim about somewhere else, and Wellesley is
-# about 1.7% of the Region's population, which makes the difference immaterial
-# to everything except land area (it is a fifth of that).
-#
-# Written down once rather than typed per chart so every post says the same
-# thing, and so one edit fixes them all if the boundaries are redrawn - CMA
-# definitions are revisited at every census.
-cwr_cma_note <- paste(cwr_region, "excluding Wellesley Township")
+# Every note on a chart is written out in the post's own chunk, as plain text in
+# cwr_caption(notes = ), so Greg can reword it or delete it where he reads it
+# (his rule, 2026-09-21). Nothing here adds a note behind his back. The stock
+# wording for the notes that recur - the CMA geography, a sample, confidence
+# intervals, an unreliable estimate - is kept in the cwr-charts skill (rule 1d),
+# which is where a new chart copies it from. A note with a number that comes
+# from the data writes the sentence out and leaves a {placeholder} for the
+# number, filled by str_glue(); cwr_ci_widest() below is one such number.
 
-# The stock notes for charts drawn from sample data, one per sample, picked by
-# name with cwr_caption(sample = ). A reader is told every time a chart's numbers
-# are estimates from a sample rather than a full count, in the same words every
-# time, so the note is recognised at a glance and one edit fixes every chart.
-#
-# The census long form goes to one household in four; the short form (age,
-# gender, households, dwellings, most language questions) is a full count and
-# needs no note. Add a survey the first time a post uses it, with the sample
-# size taken from the survey's own documentation.
-cwr_sample_notes <- c(
-  census_2021 = "Estimates from the 2021 census long-form questionnaire, a 25% sample of households",
-  census_2016 = "Estimates from the 2016 census long-form questionnaire, a 25% sample of households",
-  # "Crime Perception in Ontario Cities", December 2025: automated phone (IVR)
-  # survey, October 22-23, 2025, n = 800 in each of ten cities
-  liaison_2025 = "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city"
-)
-
-# Stock notes on the uncertainty in sample estimates (style rule 9b), so the
-# wording is the same on every chart. Passed in `notes` like any other:
-#   unreliable    keyed on each marked label - a share whose coefficient of
-#                 variation is over a third (`unreliable` from R/census_ci.R),
-#                 kept on the chart but marked
-#   no_intervals  for a chart from a table that publishes no confidence
-#                 intervals (commuting flows), where a close ranking could be
-#                 sampling error
-# A chart whose intervals are narrow enough not to draw states them with
-# cwr_ci_range_note() instead.
-cwr_ci_notes <- c(
-  unreliable = "Unreliable estimate: its sampling error is more than a third of its value",
-  no_intervals = "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
-)
-
-# "95% confidence intervals are within ±5 percentage points": the widest
-# interval on the chart, measured from the data rather than typed, rounded up to
-# a whole point (or to a tenth when all are under one point). Pass the plotted
+# The widest 95% confidence interval on a chart, in percentage points, for the
+# note "95% confidence intervals are within ±{widest} percentage points" (style
+# rule 9b): measured from the data rather than typed, and rounded up to a whole
+# point, or to a tenth when every interval is under one point. Pass the plotted
 # shares and their bounds, in percent.
-cwr_ci_range_note <- function(estimate, lower, upper) {
+cwr_ci_widest <- function(estimate, lower, upper) {
   widest <- max(estimate - lower, upper - estimate, na.rm = TRUE)
-  widest <- if (widest < 1) ceiling(widest * 10) / 10 else ceiling(widest)
-  paste0("95% confidence intervals are within ±", widest, " percentage points")
+  if (widest < 1) ceiling(widest * 10) / 10 else ceiling(widest)
 }
 
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
@@ -356,17 +314,11 @@ cwr_ci_range_note <- function(estimate, lower, upper) {
 # and they say how many notes there are. Never key a note with a bare `*` - an
 # asterisk opens italics in a ggtext caption and swallows the rest of the line.
 #
-# `cma = TRUE` puts `cwr_cma_note` at the head of the notes, for a chart drawn
-# from CMA data. It is numbered along with the rest, so it needs its key in the
-# subtitle like any other note; first, because the geography qualifies the
-# subject of the chart and that is the earliest thing a subtitle names. Set it
-# rather than typing the note, so that the wording cannot drift from post to post.
-#
-# `sample` names the sample a chart's numbers come from - one of the names in
-# `cwr_sample_notes`, such as "census_2021" - and puts its stock note at the end
-# of the notes, directly above the source line, since it is a note about the
-# source. Numbered with the rest, so it too needs its key in the subtitle. Any
-# confidence interval the chart draws or states goes in `notes` as usual.
+# Every note is written out in full in the chunk, including the recurring ones
+# (the CMA geography, a sample, confidence intervals): the stock wording is in
+# the cwr-charts skill, rule 1d, to be copied, so Greg can edit or delete any
+# note where he sees it. A note about the source - the sample note - goes last,
+# directly above the source line.
 #
 # The notes are drawn above the source line, which is where a reader looks for a
 # qualification and where Datawrapper puts them, with a blank line between the two
@@ -378,16 +330,7 @@ cwr_ci_range_note <- function(estimate, lower, upper) {
 #     notes = c("Figures for 2020 are estimates",
 #               "Two industries suppressed by Statistics Canada")
 #   )
-cwr_caption <- function(source, credit = FALSE, notes = NULL, cma = FALSE, sample = NULL) {
-  if (cma) notes <- c(cwr_cma_note, notes)
-  if (!is.null(sample)) {
-    if (!sample %in% names(cwr_sample_notes)) {
-      stop("No stock note for sample '", sample, "'. Add it to cwr_sample_notes in R/theme_cwr.R.",
-           call. = FALSE)
-    }
-    notes <- c(notes, cwr_sample_notes[[sample]])
-  }
-
+cwr_caption <- function(source, credit = FALSE, notes = NULL) {
   # The byline is a source like any other, so it decides the plural too
   label <- if (length(source) > 1 || credit) "Sources: " else "Source: "
   caption <- paste0(label, paste(source, collapse = ", "))

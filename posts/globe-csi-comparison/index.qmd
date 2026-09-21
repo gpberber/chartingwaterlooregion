@@ -151,8 +151,10 @@ p <- perception_plot_data |>
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Liaison Strategies, Crime Perception in Ontario Cities",
-      notes = "Bars show the survey's 95% margin of error, ±3.46 points",
-      sample = "liaison_2025"
+      notes = c(
+        "Bars show the survey's 95% margin of error, ±3.46 points",
+        "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city"
+      )
     )
   )
 

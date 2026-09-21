@@ -24,9 +24,12 @@ labs(
 	# alone; the key is superscripted for you, and the matching <sup>1</sup>
 	# goes in the title or subtitle by hand.
 	#
-	# cma = TRUE adds the house note explaining the Kitchener census
-	# metropolitan area as note 1. Set it on every chart drawn from CMA
-	# data rather than writing the geography out again.
+	# Every note is written out here, stock ones included (cwr-charts rule
+	# 1d), so it can be reworded or deleted in place. A chart drawn from
+	# Kitchener CMA data has str_glue("{cwr_region} excluding Wellesley
+	# Township") as note 1; a long-form census chart ends with "Estimates
+	# from the 2021 census long-form questionnaire, a 25% sample of
+	# households".
 	caption = cwr_caption("<Source>")
 ) +
 ```
