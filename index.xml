@@ -17,7 +17,7 @@
 <width>144</width>
 </image>
 <generator>quarto-1.9.38</generator>
-<lastBuildDate>Sun, 20 Sep 2026 04:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 21 Sep 2026 04:00:00 GMT</lastBuildDate>
 <item>
   <title>Welcome to Charting Waterloo Region!</title>
   <dc:creator>Greg Berberich</dc:creator>
@@ -28,6 +28,16 @@
 
 
 
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/montego-1974.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="My brother and I with our family’s first Mercury Montego, circa 1974."><img src="https://chartingwaterlooregion.ca/posts/welcome/images/montego-1974.jpg" class="cwr-photo img-fluid quarto-figure quarto-figure-center figure-img" alt="A faded colour snapshot of two small boys in brown jackets standing on either side of the front of a red Mercury Montego parked in a wet driveway, with two-storey houses and a newly built street behind them."></a></p>
+</figure>
+</div>
+<figcaption>My brother and I with our family’s first Mercury Montego, circa 1974.</figcaption>
+</figure>
+</div>
 <p>As a kid, one of my favourite family activities was “going for a drive.” That is literally what we called it. Mom or Dad would announce that we were “going for a drive” and the five of us would pile into the Montego and go for a drive. A drive never had a destination, unless we ended up in Hespeler, where we’d get ice cream cones at a convenience store on Cooper Street. Almost all of them meandered through one or more of the Region’s townships. I particularly liked it when Dad drove through the Paradise Lake area in Wellesley Township. I thought it was neat that we had a little cottage-y area so close to home. These drives gave me an early appreciation for the Region’s vastness and variety, and for the contrasts between its rock ‘n’ roll heart and its country soul. In CWR’s inaugural post, we’ll start exploring some of these contrasts and, in the process, answer the burning question: “What do the townships have more of, cows or people?”</p>
 <section id="an-urban-island-in-a-sea-of-farmland" class="level2">
 <h2 class="anchored" data-anchor-id="an-urban-island-in-a-sea-of-farmland">An urban island in a sea of farmland</h2>
@@ -37,8 +47,8 @@
 <section id="more-cows-than-people" class="level2">
 <h2 class="anchored" data-anchor-id="more-cows-than-people">More cows than people?!</h2>
 <p>You don’t have to drive through the townships to guess that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let’s see how many more people live in the cities than in the townships.</p>
-<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-sizes-phone.png" width="403" height="368"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-sizes.png" alt="Horizontal bars of population, one per municipality, largest first, with the three cities in dark blue and the four townships in light blue, and each municipality's residents per square kilometre boxed in a column on the right. Kitchener 323,917 residents, 2,368 per square kilometre; Cambridge 165,354 residents, 1,463 per square kilometre; Waterloo 142,450 residents, 2,224 per square kilometre; Woolwich 31,382 residents, 96 per square kilometre; Wilmot 22,890 residents, 87 per square kilometre; North Dumfries 13,051 residents, 69 per square kilometre; Wellesley 12,413 residents, 45 per square kilometre." class="img-fluid" width="797" height="382"> </picture></p>
 <p>The latest estimates from 2025 show that, with 323,917 residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have 631,721 people, or 89% of the Region’s population of 711,457. So despite covering 77% of the Region’s territory, the townships are home to only 79,736 residents, or 11% of total population. With a combined density of only 75 residents per square km, they certainly have lots of room for cows!</p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-sizes-phone.png" width="403" height="368"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-sizes.png" alt="Horizontal bars of population, one per municipality, largest first, with the three cities in dark blue and the four townships in light blue, and each municipality's residents per square kilometre boxed in a column on the right. Kitchener 323,917 residents, 2,368 per square kilometre; Cambridge 165,354 residents, 1,463 per square kilometre; Waterloo 142,450 residents, 2,224 per square kilometre; Woolwich 31,382 residents, 96 per square kilometre; Wilmot 22,890 residents, 87 per square kilometre; North Dumfries 13,051 residents, 69 per square kilometre; Wellesley 12,413 residents, 45 per square kilometre." class="img-fluid" width="797" height="382"> </picture></p>
 <p>By the way, cows did not figure in this post when I conceived it. Not until I saw the density data did I jokingly add the “More cows than people?!” heading to this section. And even after that, it took a while before I thought, <em>I wonder if there actually is any data on how many cows there are in the townships</em>. Serendipitously, I found that not only is there a Census of Population, there’s also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could answer the question, “What do the townships have more of, cows or people?”</p>
 <p>(In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say <em>cows</em>, I mean <em>cattle</em>.)</p>
 <p>The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we’ll use the 2021 census populations as well. On census day in 2021, just over 70,000 people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.</p>
@@ -148,7 +158,7 @@
 <div class="cell-output cell-output-stdout">
 <pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
 OS:        Windows 11 x64 (build 26200)
-Rendered:  2026-09-20
+Rendered:  2026-09-21
 Quarto:    1.9.38
 
     package version       date         source
@@ -188,7 +198,7 @@ Quarto:    1.9.38
   <category>Population</category>
   <category>Geography</category>
   <guid>https://chartingwaterlooregion.ca/posts/welcome/</guid>
-  <pubDate>Sun, 20 Sep 2026 04:00:00 GMT</pubDate>
+  <pubDate>Mon, 21 Sep 2026 04:00:00 GMT</pubDate>
   <media:content url="https://chartingwaterlooregion.ca/posts/welcome/images/thumbnail.png" medium="image" type="image/png" height="172" width="144"/>
 </item>
 </channel>
