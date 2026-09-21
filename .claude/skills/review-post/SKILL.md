@@ -32,8 +32,9 @@ For every `ggplot` chunk:
   "Subtitle: what is measured..."); any title that still only describes the data - a working
   title Claude drafted, such as "Where commuters from Kitchener work" - is flagged for Greg to keep
   or rewrite as a finding (style rule 1); and no stock template text is left unwritten: the opening
-  paragraph comment, "First finding as a plain-language heading", "Second finding", and the empty
-  `tbl-first` chunk all have to be replaced or removed before a post goes live.
+  paragraph comment and "First finding as a plain-language heading" have to be replaced or
+  removed before a post goes live (posts scaffolded before 2026-09-21 may also carry a
+  "Second finding" heading and an empty `tbl-first` chunk; flag those too).
 - No chart shows counts from long-form census data (style rule 9a): commuting, labour,
   education, housing, immigration, average or aggregate income and the other long-form topics are
   a 25% sample (median income is 100% data), so labels, axes
