@@ -53,6 +53,7 @@ Two things `theme_cwr()` now handles that a chart used to have to ask for:
 | a few categories, one value each | short labels, <= 6 | `ggvertbar` (bars.md) |
 | us vs them per category | two values per category | `ggcompbar_horiz` / `ggcompbar_vert` (bars.md), `ggdumbbell` (comparisons.md) |
 | sample estimates and their margins of error | estimate, lower, upper per category | `ggdoterror` (comparisons.md) |
+| two totals, and which is bigger | two counts | `ggnumcomp` (comparisons.md) |
 | change between two points | before/after per category | `ggarrow`, `ggarrowrect` (comparisons.md), `ggslope` (lines.md) |
 | change over time, few series | long time series | `ggline` (lines.md) |
 | composition over time | stacked groups | `ggarea` (lines.md) |
