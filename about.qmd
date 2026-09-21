@@ -109,6 +109,10 @@ Yes, I am human and can make mistakes. If you spot an error or have a question a
 
 Social-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR's privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it's easy to share CWR content without loading any trackers. CWR has no accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog.
 
+## How often will it contain new content?
+
+While I gain my bearings as a blogger, I'm going to under-promise and hopefully over-deliver. My initial aim is to publish two Snapshots and one Deep dive a month. Once I optimize my workflow and get used to writing for a general audience, I'll likely up it to one Snapshot a week but keep it to a single Deep dive per month.
+
 ## Can I subscribe to it?
 
 If you use an RSS reader, which aggregates articles from sites you like into a handy chronological feed, CWR's feed is at https://chartingwaterlooregion.ca/index.xml. Your reader will also find it if you just give it chartingwaterlooregion.ca. If enough people start reading this blog and indicate they'd like another way to subscribe, I will consider wiring that feature into the site.

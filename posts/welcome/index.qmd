@@ -431,7 +431,7 @@ cows_per_100 <- round(
 
 ```
 
-By the way, cows did not figure in this post when I first conceived it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. So I asked Claude, "Is there such a thing as a cow inventory dataset in Canada, or are the number of cows somehow tracked in any way?" Serendipitously, I learned that not only is there the Census of Population we all know, but there's a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could actually answer the question, "What do the townships have more of, cows or people?"
+By the way, cows did not figure in this post when I conceived it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. Serendipitously, I found that not only is there a Census of Population, there's also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could answer the question, "What do the townships have more of, cows or people?"
 
 (In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
 
