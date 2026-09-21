@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="/site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="/site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="/site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="/site_libs/bootstrap/bootstrap-04aa3cc0cd54095522fb165ee459bc81.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="/site_libs/bootstrap/bootstrap-f941df06e0ab9848ba81e48f545a3102.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -560,23 +560,25 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-  // And where the analysis stops. Every post closes with "Data sources", usually
+  // And where the analysis stops. Every post closes with "Data sources and
 
-  // "Other sources", then a Reproducibility box - house structure, set by
+  // reliability", usually "Other sources", then a Reproducibility box - house
 
-  // _templates/post/index.qmd and checked by /review-post - and all of it is
+  // structure, set by _templates/post/index.qmd and checked by /review-post - and
 
-  // reference material rather than part of the piece. Asking for a like after
+  // all of it is reference material rather than part of the piece. Asking for a
 
-  // them means asking at the wrong moment.
+  // like after them means asking at the wrong moment.
 
   //
 
   // Pandoc builds the id from the heading, so a post that reworded that heading
 
-  // would not match. "#data-and-methods" is the name that section carried before
+  // would not match. The section has been "Data sources and reliability" since
 
-  // 2026-09-14 and is kept so older posts still place the button correctly. After
+  // 2026-09-18; "#data-sources" (2026-09-14 to 2026-09-18) and "#data-and-methods"
+
+  // (before that) are kept so older posts still place the button correctly. After
 
   // those, the button falls back to the licence appendix and then to the end of
 
@@ -584,7 +586,9 @@ ul.task-list li input[type="checkbox"] {
 
   // thing that moves it.
 
-  const end = main.querySelector("#data-sources") ||
+  const end = main.querySelector("#data-sources-and-reliability") ||
+
+              main.querySelector("#data-sources") ||
 
               main.querySelector("#data-and-methods") ||
 
