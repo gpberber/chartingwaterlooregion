@@ -64,8 +64,14 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   average and aggregate income; median income is 100% data) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If
   Greg asks for counts from one, flag it before building. Any chart from sample data (census long
   form, surveys) carries the stock note from `cwr_caption(sample = )`, with confidence intervals
-  drawn or stated when the source publishes them - rule 9b. The sample is also recorded in the
-  README's Data sources table (Sample column) and Notes, and in `data/tables.csv` (`sample`).
+  drawn or stated when the source publishes them - rule 9b. Every long-form share gets an
+  approximate 95% interval in `02_clean_data.R` from the published count bounds (`R/census_ci.R`);
+  a chart draws it only where it could change the reading, otherwise states the widest
+  (`cwr_ci_range_note()`). A share whose CV is over a third is kept and marked
+  (`cwr_ci_notes[["unreliable"]]`), not dropped; a table with no published bounds gets no interval,
+  and a ranking from it gets `cwr_ci_notes[["no_intervals"]]`. The sample is also recorded in the
+  README's Data sources table (Sample column), Notes (Sampling) and Reliability table (a printed
+  "Sample estimates" row, the post's methodology note), and in `data/tables.csv` (`sample`).
 - Data quality: every source table goes through `cwr_quality_flags()` (`R/data_quality.R`) in
   `02_clean_data.R`, on the rows the post keeps, with the table's footnotes saved by
   `01_get_data.R`; it writes `data/quality_flags.csv`. Tell Greg every flag and quality footnote it

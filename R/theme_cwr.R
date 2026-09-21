@@ -302,6 +302,31 @@ cwr_sample_notes <- c(
   liaison_2025 = "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city"
 )
 
+# Stock notes on the uncertainty in sample estimates (style rule 9b), so the
+# wording is the same on every chart. Passed in `notes` like any other:
+#   unreliable    keyed on each marked label - a share whose coefficient of
+#                 variation is over a third (`unreliable` from R/census_ci.R),
+#                 kept on the chart but marked
+#   no_intervals  for a chart from a table that publishes no confidence
+#                 intervals (commuting flows), where a close ranking could be
+#                 sampling error
+# A chart whose intervals are narrow enough not to draw states them with
+# cwr_ci_range_note() instead.
+cwr_ci_notes <- c(
+  unreliable = "Unreliable estimate: its sampling error is more than a third of its value",
+  no_intervals = "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+)
+
+# "95% confidence intervals are within ±5 percentage points": the widest
+# interval on the chart, measured from the data rather than typed, rounded up to
+# a whole point (or to a tenth when all are under one point). Pass the plotted
+# shares and their bounds, in percent.
+cwr_ci_range_note <- function(estimate, lower, upper) {
+  widest <- max(estimate - lower, upper - estimate, na.rm = TRUE)
+  widest <- if (widest < 1) ceiling(widest * 10) / 10 else ceiling(widest)
+  paste0("95% confidence intervals are within ±", widest, " percentage points")
+}
+
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
 # The caption names whoever published the numbers, and nothing else. A chart that

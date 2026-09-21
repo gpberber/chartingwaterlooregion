@@ -38,6 +38,15 @@ table_notes <- function(file_stem) {
            col_types = cols(.default = col_character()))
 }
 
+# ---- Confidence intervals for shares ---------------------------------------
+# Commuting is a long-form question, asked of one household in four, so every
+# count is an estimate. Table 98-10-0462 publishes a 95% confidence interval for
+# each count, and R/census_ci.R turns those into approximate intervals for the
+# shares worked out here (how, and what they leave out, is explained there):
+# cwr_se_from_bounds(), cwr_share_se() and cwr_add_share_ci(). Table 98-10-0459
+# publishes no intervals, so the flows get none.
+source(here("R", "census_ci.R"))
+
 # ---- The seven municipalities ----------------------------------------------
 # The census table names each place but not what kind of place it is, and
 # names two of them "Waterloo" - the city and the Region. So the seven are
@@ -57,8 +66,9 @@ municipalities <- tribble(
 # ---- Read ------------------------------------------------------------------
 # Table 98-10-0462 crosses where people who live in each municipality go to
 # work with age, gender and mode of travel. Age and gender are held at their
-# totals, and only the count is wanted rather than the confidence bounds around
-# it. Two cuts of it are used: every destination at total mode (just below) and
+# totals. Each figure comes as three rows - the count and the lower and upper
+# bounds of its 95% confidence interval - and all three are kept (see
+# "Confidence intervals for shares" above). Two cuts of it are used: every destination at total mode (just below) and
 # three modes at total destination ("Main mode of commuting" further down), so
 # it is read once, cut to those rows for the seven municipalities, and checked
 # as one table. Every column is read as text except the value, so codes keep
@@ -77,11 +87,22 @@ commuting_462 <- read_csv(
     geo_uid %in% municipalities$geo_uid,
     str_starts(age_15a, "Total"),
     str_starts(gender_3, "Total"),
-    statistics_3 == "Count",
     str_starts(main_mode_of_commuting_11a, "Total") |
       (str_starts(commuting_destination_5, "Total") & main_mode_of_commuting_11a %in% modes)
   ) |>
-  cwr_quality_flags("98-10-0462", notes = table_notes("table_98100462"), log = quality_log)
+  cwr_quality_flags("98-10-0462", notes = table_notes("table_98100462"), log = quality_log) |>
+  # One row per figure, with its bounds beside it: value, lower, upper
+  mutate(statistic = case_when(
+    str_detect(statistics_3, "lower bound") ~ "lower",
+    str_detect(statistics_3, "upper bound") ~ "upper",
+    .default = "value"
+  )) |>
+  pivot_wider(
+    id_cols = c(geo_uid, commuting_destination_5, main_mode_of_commuting_11a),
+    names_from = statistic,
+    values_from = value
+  ) |>
+  mutate(se = cwr_se_from_bounds(lower, upper))
 
 # Where people go to work: every destination, at total mode
 commuting_raw <- commuting_462 |>
@@ -101,15 +122,30 @@ destinations <- tribble(
   "Commute to a different province or territory",                                                                       "Outside the Region"
 )
 
+# The standard error of each municipality's total, for the intervals
+destination_totals <- commuting_raw |>
+  filter(str_starts(commuting_destination_5, "Total")) |>
+  select(geo_uid, se_total = se)
+
 commuting <- commuting_raw |>
   # An inner join drops the table's own "Total - Commuting destination" row,
   # which would otherwise be double-counted with the parts that make it up.
   inner_join(destinations, join_by(commuting_destination_5)) |>
-  summarise(workers = sum(value), .by = c(geo_uid, destination)) |>
+  # "Outside the Region" is two of the table's categories added together; the
+  # standard error of a sum is the square root of the summed squares, treating
+  # the two as independent.
+  summarise(workers = sum(value), se_x = sqrt(sum(se^2)), .by = c(geo_uid, destination)) |>
   mutate(percent = workers / sum(workers) * 100, .by = geo_uid) |>
+  # The share's interval. The denominator is the sum of the parts, which the
+  # table's rounding can leave a few people off its own total, so the total
+  # row supplies only the standard error.
+  left_join(destination_totals, join_by(geo_uid)) |>
+  mutate(se_p = cwr_share_se(workers, se_x, sum(workers), se_total), .by = geo_uid) |>
+  cwr_add_share_ci() |>
   # And this one drops the Region's own rows, keeping the seven municipalities
   inner_join(municipalities, join_by(geo_uid)) |>
-  select(district, district_type, destination, workers, percent) |>
+  select(district, district_type, destination, workers, percent,
+         percent_lower, percent_upper, cv, unreliable) |>
   arrange(district, destination)
 
 # ---- Main mode of commuting ------------------------------------------------
@@ -125,12 +161,18 @@ commuting_mode <- commuting_462 |>
   # Each mode's share of all commuters in the municipality. The total row is
   # picked out as the denominator before the other modes are dropped.
   mutate(
-    percent = value / value[str_starts(main_mode_of_commuting_11a, "Total")] * 100,
+    total = value[str_starts(main_mode_of_commuting_11a, "Total")],
+    se_total = se[str_starts(main_mode_of_commuting_11a, "Total")],
+    percent = value / total * 100,
     .by = geo_uid
   ) |>
   filter(main_mode_of_commuting_11a %in% modes) |>
+  # The share's interval, as for the destinations above
+  mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
+  cwr_add_share_ci() |>
   inner_join(municipalities, join_by(geo_uid)) |>
-  select(district, district_type, mode = main_mode_of_commuting_11a, workers = value, percent) |>
+  select(district, district_type, mode = main_mode_of_commuting_11a, workers = value, percent,
+         percent_lower, percent_upper, cv, unreliable) |>
   arrange(district, mode)
 
 # ---- Commuting flows --------------------------------------------------------

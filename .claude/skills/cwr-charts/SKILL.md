@@ -25,9 +25,11 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `theme_cwr()` (already `theme_set`) | the Tufte-inspired theme |
 | `base_size` (15), `label_size` (4) | text sizes used inside geoms and annotations |
 | `cwr_caption(source, credit = FALSE, notes = NULL, cma = FALSE, sample = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); `cma = TRUE` adds the CMA note; `sample = "census_2021"` adds the stock sampling note (rule 9b) |
+| `cwr_ci_notes`, `cwr_ci_range_note(estimate, lower, upper)` | stock notes on sampling uncertainty: an unreliable share (key on its label), no published intervals, and the widest interval measured from the data (rule 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `R/census_ci.R` (sourced by a cleaning script, not the post) | `cwr_se_from_bounds()`, `cwr_share_se()`, `cwr_add_share_ci()`: approximate 95% intervals for shares from long-form counts with published bounds (rule 9b) |
 | `cwr_map_crs`, `cwr_label_point()`, `cwr_label_spot()`, `cwr_map_nudges`, `cwr_map_theme()`, `cwr_text_on_fill()` | the house map style, from `R/maps.R` (rule 12) |
 | `cwr_interactive(p, "fig-id", alt, height, phone_height)` | the same for a hover chart (ggiraph); chunk without `output: asis`; numbered in Deep dives like `cwr_figure()` |
 
@@ -266,27 +268,53 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      `cwr_sample_notes` ("Estimates from the Labour Force Survey, a monthly sample of about N
      households", the size from the survey's own documentation, not from memory), so the wording is
      identical on every chart that uses it.
-   - **Confidence intervals, when the source publishes them.** Census tables often carry a
-     `Statistics` dimension - "Count", "95% confidence interval lower bound, Count", "... upper bound"
-     (98-10-0462 does) - and surveys publish CIs or coefficients of variation. Do not filter them away
-     in `02_clean_data.R`: keep `lower` and `upper` beside the estimate. Then, in order of preference:
-     **draw them** when a reader will compare values close enough that the intervals change what the
-     chart says (for one estimate per category, the `ggdoterror` template: a blue dot on a blue
-     interval bar fading to its ends; otherwise whiskers with `geom_linerange()` on a bar, a `geom_ribbon()` around a
-     line, in `cowboysilver`; and a note saying "Bars show 95% confidence intervals"); otherwise **state them in the note** ("95% confidence intervals are
-     within about ±2 percentage points" - a range across the bars, measured, not guessed).
-   - **A share worked out here has no published interval.** When the chart divides one sampled count
-     by another, the source's count intervals do not give the share's. Do not invent one or improvise
-     a formula: the note says the figures are sample estimates, and whether to model an interval is a
-     question for Greg.
-   - **Flag it at hand-off** when a source publishes intervals that the chart does not draw, so Greg
-     can decide whether they belong on the chart.
-   - **The chart is one of five places the sample is recorded.** The others, all set up in the post
+   - **Every share gets an interval, worked out routinely** (Greg adopted this 2026-09-21, after a
+     test on the commuting post). Census tables often carry a `Statistics` dimension - "Count", "95%
+     confidence interval lower bound, Count", "... upper bound" (98-10-0462 does). Keep all three rows
+     through `cwr_quality_flags()` in `02_clean_data.R`, pivot them to `value`, `lower` and `upper`,
+     and work out the interval of every share the post charts with `R/census_ci.R`:
+     `cwr_se_from_bounds()` backs each count's standard error out of its interval,
+     `cwr_share_se()` gives the share's (the US Census Bureau's proportion formula, which allows for
+     the part being counted inside the total), and `cwr_add_share_ci()` writes `percent_lower`,
+     `percent_upper`, `cv` (coefficient of variation) and `unreliable` (CV over `cwr_cv_limit`, a
+     third) beside `percent`. A sum of categories takes the square root of the summed squared
+     standard errors. A survey that publishes CIs or CVs keeps them as published. Worked example:
+     `posts/commuting/R/02_clean_data.R`.
+   - **Then each chart shows them only where they change the reading**, decided chart by chart:
+     - **draw them** when values sit close enough that the intervals could reverse an order or a
+       comparison a reader will make (for one estimate per category, the `ggdoterror` template: a
+       blue dot on a blue interval bar fading to its ends; otherwise whiskers with
+       `geom_linerange()` on a bar, a `geom_ribbon()` around a line, in `cowboysilver`; and a note
+       saying "Bars show 95% confidence intervals");
+     - otherwise **state the widest in a note**, measured from the data by
+       `cwr_ci_range_note(percent, percent_lower, percent_upper)` ("95% confidence intervals are
+       within ±5 percentage points"), never typed. Region-wide shares, whose intervals are a
+       fraction of a point, get this and nothing more: drawing them implies a doubt that is not there.
+   - **An unreliable share is kept and marked, not dropped.** A share whose CV is over a third keeps
+     its bar; its label carries a note key (the Unicode superscript, since `geom_text()` draws plain
+     text) and the note is `cwr_ci_notes[["unreliable"]]` from `R/theme_cwr.R`; the alt text says
+     "(unreliable estimate)" in place of the key. Greg's reasoning (2026-09-21): township transit
+     shares of under 1% are unreliable as estimates but realistic, since there is next to no
+     service. Tell him which shares are marked; he may drop one that is not realistic. This is our
+     own measure, not Statistics Canada's E flag, which is never used (rule 9c). A share of zero has
+     no interval and is not marked.
+   - **A table with no published bounds gets no interval.** Commuting flows (98-10-0459) are one.
+     Nothing in `R/census_ci.R` applies, and none is invented or borrowed from another table. A
+     ranking or comparison drawn from it carries `cwr_ci_notes[["no_intervals"]]` ("... shares close
+     together may differ only by sampling error"). At hand-off, say which ranks are close enough to
+     be in doubt and which shares rest on counts under about 50, which random rounding to a multiple
+     of 5 makes rough whatever the interval.
+   - **Report at hand-off** every chart's decision - drawn, stated, marked, or no intervals
+     published - so Greg can overrule it.
+   - **The chart is one of six places the sample is recorded.** The others, all set up in the post
      template: the **Sample** column of the README's Data sources table (printed in the post's Data
-     sources section), the README's **Sampling** note (what the intervals are and whether the charts
-     use them), the `sample` column of `data/tables.csv` (printed in the download bundle's README),
-     and `data/dictionary.csv`, which describes any kept confidence bound as one. Fill in the README
-     and the table when adding a sampled source; the Data sources prose above the table is Greg's.
+     sources section); the README's **Sampling** note (how the intervals were worked out and what each
+     chart does with them); the **"Sample estimates" row of the README's Reliability table**, the
+     post's methodology note, which the post prints (stock wording in the template README, adjusted
+     to the post's tables; its "Left out" column stays empty); the `sample` column of
+     `data/tables.csv` (printed in the download bundle's README); and `data/dictionary.csv`, which
+     describes `percent_lower`, `percent_upper`, `cv` and `unreliable`. Fill in the README and the
+     table when adding a sampled source; the Data sources prose above the table is Greg's.
 9c. **Data-quality flags reach the chart only as a decision Greg has made.** Greg's principle is
    reliable data, and he asked to be told about every quality flag that applies to data he plans
    to use (2026-09-18). `cwr_quality_flags()` (`R/data_quality.R`) finds them - Statistics Canada's

@@ -69,6 +69,13 @@ the same call in a situation the templates do not cover.
   lines) and bars thinned to keep their thickness. A narrower label column is a wider plot. The
   wrap never goes below the longest single word, since splitting there would deepen rows
   without narrowing anything.
+- Sample data carries its uncertainty. Every share from the census long form gets an approximate
+  95% interval in the cleaning script (`R/census_ci.R`); a chart draws it only where it could
+  change what a reader concludes, and otherwise states the widest in a note
+  (`cwr_ci_range_note()`). An estimate whose sampling error is over a third of its value is kept
+  and marked, not dropped (`cwr_ci_notes[["unreliable"]]`); a table that publishes no intervals
+  gets the stock note that close shares may differ only by sampling error. Readers are told what
+  the numbers can bear, and only where it matters, so the notes are not skimmed past.
 - Legends only when direct labels would collide (many groups, crossing lines). Then use the
   theme default: inside, top-left, horizontal, no title.
 - `coord_cartesian(clip = "off")` whenever a label or header sits outside the panel.

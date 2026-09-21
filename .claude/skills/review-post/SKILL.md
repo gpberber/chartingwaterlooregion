@@ -41,9 +41,19 @@ For every `ggplot` chunk:
   and alt text show shares or rates. Check every census table the post reads, and flag any count
   that comes from one.
 - Every chart drawn from sample data (census long form, LFS, CCHS, any survey) has a note saying so
-  and naming the sample, through `cwr_caption(sample = )` rather than typed (style rule 9b); where the source publishes confidence intervals, they are
-  drawn or stated in that note - flag any that were dropped. The post's Data sources prose says the
-  data are a sample too.
+  and naming the sample, through `cwr_caption(sample = )` rather than typed (style rule 9b). The
+  post's Data sources prose says the data are a sample too. For long-form census shares:
+  - the cleaning script works out every charted share's interval with `R/census_ci.R` where the
+    table publishes bounds, and the data carry `percent_lower`, `percent_upper`, `cv` and `unreliable`;
+  - each chart either draws the intervals (where they could change the reading) or states the widest
+    through `cwr_ci_range_note()`; flag a chart that does neither, and any close ranking or
+    comparison the intervals do not support, especially one the prose leans on;
+  - every share with `unreliable` TRUE carries a note key and `cwr_ci_notes[["unreliable"]]`, and
+    its alt text says "(unreliable estimate)";
+  - a chart from a table with no published intervals that ranks or compares shares carries
+    `cwr_ci_notes[["no_intervals"]]`;
+  - the README's Reliability table has a "Sample estimates" row, printed (its second column
+    empty), and its Sampling note says what each chart does with the intervals.
 - No chart draws a figure flagged unusable in `data/quality_flags.csv` (E use with caution, F too
   unreliable, x suppressed, `..` not available) as a number - not as a zero, not joined across by a line as if it
   existed. Figures carrying Statistics Canada's D rating, "acceptable" - its lowest published

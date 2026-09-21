@@ -9,6 +9,10 @@ library(janitor)
 library(here)
 
 source(here("R", "data_quality.R"))   # cwr_quality_flags()
+# Census long-form data only: approximate 95% intervals for shares, from the
+# confidence bounds Statistics Canada publishes for each count (cwr-charts rule
+# 9b; posts/commuting/R/02_clean_data.R is the worked example)
+# source(here("R", "census_ci.R"))
 
 raw_dir <- here("posts", "{{slug}}", "data-raw")
 data_dir <- here("posts", "{{slug}}", "data")

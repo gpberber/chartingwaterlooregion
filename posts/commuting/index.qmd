@@ -125,7 +125,13 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
       sample = "census_2021",
-      notes = "Workers with a usual place of work; people who work from home are counted in their own municipality"
+      notes = c(
+        "Workers with a usual place of work; people who work from home are counted in their own municipality",
+        # The intervals are narrow next to the gaps the chart shows, so they
+        # are stated rather than drawn (rule 9b); the widest is measured from
+        # the data by cwr_ci_range_note()
+        with(commuting_bars, cwr_ci_range_note(percent, percent_lower, percent_upper))
+      )
     )
   ) +
   theme(
@@ -195,7 +201,14 @@ mode_bars <- commuting_mode |>
     ),
     # One decimal place: the transit and active shares are small enough that
     # whole numbers would round several of them to the same value, or to 0
-    label = label_number(accuracy = 0.1, suffix = "%")(percent)
+    label = label_number(accuracy = 0.1, suffix = "%")(percent),
+    # A share whose sampling error is more than a third of its value
+    # (`unreliable`, from R/census_ci.R) keeps its bar but carries the key to
+    # note 3. Township transit shares are this small because there is next to
+    # no transit service there, so the figures are realistic even though the
+    # sample cannot pin them down; they are marked, not dropped. geom_text()
+    # draws plain text, so the key is the Unicode superscript, not <sup>.
+    label = if_else(unreliable, paste0(label, "³"), label)
   ) |>
   # Whether a label fits inside its bar, asked panel by panel because each
   # panel has its own scale: the longest bar in the panel sets it, and the axis
@@ -237,7 +250,8 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
       sample = "census_2021",
       notes = c(
         "Other ways of getting to work are not shown, so the three do not add to 100%",
-        "Active transportation is walking or cycling"
+        "Active transportation is walking or cycling",
+        cwr_ci_notes[["unreliable"]]
       )
     )
   ) +
@@ -259,8 +273,9 @@ alt_lines <- mode_bars |>
     entries = paste(paste0(district, " ", label), collapse = ", "),
     .by = mode
   ) |>
-  # The superscript key means nothing read aloud, so it is dropped here
-  mutate(line = paste0(str_remove(mode, "²"), ": ", entries)) |>
+  # The superscript keys mean nothing read aloud, so the panel's is dropped and
+  # an unreliable share's is said in words
+  mutate(line = paste0(str_remove(mode, "²"), ": ", str_replace_all(entries, "³", " (unreliable estimate)"))) |>
   pull(line)
 
 cwr_figure(
@@ -895,7 +910,8 @@ p <- rank_chart(between) +
       sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
-        "Only commutes that cross a municipal border inside the Region are counted"
+        "Only commutes that cross a municipal border inside the Region are counted",
+        cwr_ci_notes[["no_intervals"]]
       )
     )
   )
@@ -1010,7 +1026,8 @@ p <- ggplot(feeders, aes(x = percent, y = home)) +
       sample = "census_2021",
       notes = c(
         "Workers with a usual place of work",
-        "The ten municipalities sending the most commuters into the Region"
+        "The ten municipalities sending the most commuters into the Region",
+        cwr_ci_notes[["no_intervals"]]
       )
     )
   ) +
