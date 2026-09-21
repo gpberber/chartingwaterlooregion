@@ -241,6 +241,8 @@ kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)|> co
 
 You don't have to drive through the townships to guess that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's see how many more people live in the cities than in the townships.
 
+The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop` people, or `r city_pop_share` of the Region's population of `r region_pop`. So despite covering `r township_area_share` of the Region's territory, the townships are home to only `r township_pop` residents, or `r township_pop_share` of total population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+
 ```{r}
 #| label: sizes
 #| output: asis
@@ -396,8 +398,6 @@ cwr_figure(
   )
 )
 ```
-
-The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop` people, or `r city_pop_share` of the Region's population of `r region_pop`. So despite covering `r township_area_share` of the Region's territory, the townships are home to only `r township_pop` residents, or `r township_pop_share` of total population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
 
 ```{r}
 #| label: prep-cattle
