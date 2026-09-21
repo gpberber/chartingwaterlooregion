@@ -719,15 +719,6 @@ crime_chart("1310", "index")
 ```
 :::
 
-## Second finding
-
-```{r}
-#| label: tbl-first
-#| tbl-cap: "Caption shown under the table."
-
-# gt table here (one table per chunk).
-```
-
 ## Data sources and reliability
 
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
