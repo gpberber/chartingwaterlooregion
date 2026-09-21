@@ -421,8 +421,6 @@ cattle_people <- cattle |>
     x = if_else(what == "People", 0, 1)
   )
 
-num_people <- cattle_people |> filter(what == "People") |> pull(count) |> comma(accuracy = 1)
-
 # Cows per hundred people, worked out from the figures above rather than typed,
 # and rounded: the two counts are exact, but a ratio to the decimal would be
 # false precision on top of a census.
