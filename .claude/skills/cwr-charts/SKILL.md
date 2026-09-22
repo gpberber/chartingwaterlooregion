@@ -29,6 +29,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
+| `cwr_gap()` | multiplies a sideways nudge written in data units; 1 on the desktop and `phone_gap` while `cwr_figure()` draws the phone version (rule 11) |
 | `R/census_ci.R` (sourced by a cleaning script, not the post) | `cwr_var_from_bounds()`, `cwr_share_se()`, `cwr_add_share_ci()`: 95% intervals for shares from long-form counts with published bounds, by Statistics Canada's own method, with E and F shares blanked (rule 9b) |
 | `cwr_census_tnr()` (in `R/data_quality.R`, run by `01_get_data.R`) | each area's long-form total non-response rate, from its Census Profile page (rule 9b) |
 | `cwr_map_crs`, `cwr_label_point()`, `cwr_label_spot()`, `cwr_map_nudges`, `cwr_map_theme()`, `cwr_text_on_fill()` | the house map style, from `R/maps.R` (rule 12) |
@@ -441,6 +442,13 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
     in the subtitle instead), no dense small multiples or twelve-series lines. Always Read
     both PNGs in `figures/`, the `-phone` one scaled to about 320 px wide, before calling a
     chart done.
+11a. **A gap written in data units is half as wide on a phone.** The same x scale is drawn
+    across half the width, so a label nudged clear of its point on a desktop can touch it
+    there. Write the nudge as `nudge * cwr_gap()` inside the aes and pass `phone_gap` to
+    `cwr_figure()` (2 keeps the gap the same distance on the page). A vertical nudge on a
+    category axis needs none of this - a row is about as deep on both versions - so lifting a
+    label instead is the other fix; Greg's case (2026-09-22) was the year labels on the
+    commuting post's work-at-home chart, where lifting them read as too high.
 
 12. **Maps come from `R/maps.R`; never rebuild one from scratch.** It holds the projection
     (`cwr_map_crs`, EPSG:3161), `cwr_label_point()` (the roomiest *point* inside a shape - the

@@ -191,6 +191,87 @@ commuting_mode <- read_csv(
          percent_lower, percent_upper, cv, quality) |>
   arrange(district, mode)
 
+# ---- Worked at home, 2016 and 2021 -------------------------------------------
+# The share of employed people in each district who worked at home, in both
+# censuses. The denominator is every employed person - the total of place of
+# work status, which also counts people who worked outside Canada, had no fixed
+# workplace address or had a usual place of work - so this is a share of all
+# workers, not of commuters.
+#
+# The Region's own rows are kept beside the seven districts, for the post to
+# quote; the chart draws only the districts.
+#
+# 2021, table 98-10-0467: the count and its interval bounds, fetched cell by
+# cell by 01_get_data.R, turned into a share with its interval like the modes
+# above.
+home_2021 <- read_csv(
+  file.path(raw_dir, "table_98100467.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(geo_uid %in% c("3530", municipalities$geo_uid)) |>
+  # A count the web service did not return is a zero, as for 98-10-0464 (none
+  # is missing in 2021)
+  mutate(value = if_else(
+    is.na(value) & is.na(status) & statistics_3 == "Count", 0, value
+  )) |>
+  cwr_quality_flags("98-10-0467", notes = table_notes("table_98100467"), log = quality_log) |>
+  figure_per_row(c("geo_uid", "place_of_work_status_5")) |>
+  mutate(
+    total = value[str_starts(place_of_work_status_5, "Total")],
+    se_total = se[str_starts(place_of_work_status_5, "Total")],
+    percent = value / total * 100,
+    .by = geo_uid
+  ) |>
+  filter(place_of_work_status_5 == "Worked at home") |>
+  mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
+  cwr_add_share_ci(value) |>
+  mutate(year = 2021L) |>
+  select(geo_uid, year, workers = value, total, percent, percent_lower, percent_upper, cv, quality)
+
+# 2016, data table 98-400-X2016321: one wide row per place, one column per
+# place of work status. The 2016 tables publish no confidence intervals, so
+# the 2016 shares have none, and no CV to rate them by; their counts are all in
+# the hundreds or more. The file carries no cell symbols; its notes are checked
+# like the other tables' footnotes.
+home_2016_raw <- read_csv(
+  file.path(raw_dir, "table_2016321_region.csv"),
+  col_types = cols(.default = col_character())
+) |>
+  clean_names() |>
+  mutate(geo_uid = geo_code_por) |>
+  cwr_quality_flags("98-400-X2016321", notes = table_notes("table_2016321"), log = quality_log)
+
+home_2016 <- home_2016_raw |>
+  # The two columns needed, found by the member names in their headings
+  select(
+    geo_uid,
+    total = matches("place_of_work_status_5.*total_place_of_work_status"),
+    workers = matches("place_of_work_status_5.*worked_at_home")
+  ) |>
+  mutate(
+    across(c(total, workers), as.numeric),
+    percent = workers / total * 100,
+    year = 2016L
+  )
+
+work_at_home <- bind_rows(home_2016, home_2021) |>
+  inner_join(
+    # "Region" is what the charts call Waterloo Region (cwr_region in R/theme_cwr.R)
+    bind_rows(tibble(geo_uid = "3530", district = "Region", district_type = "Region"), municipalities),
+    join_by(geo_uid)
+  ) |>
+  select(district, district_type, year, workers, total, percent,
+         percent_lower, percent_upper, cv, quality) |>
+  arrange(district, year)
+
+# 2016's long-form global non-response rate for each area (GNR, in the same
+# file), for the Reliability table's response-rate row. 2021's are read from
+# the Census Profile below.
+gnr_2016 <- home_2016_raw |>
+  select(geo_uid, gnr_long_2016 = gnr) |>
+  mutate(gnr_long_2016 = as.numeric(gnr_long_2016))
+
 # ---- Commuting flows --------------------------------------------------------
 # Table 98-10-0459, already cut to people who live in the Region. One row per
 # home municipality and place of work, including the thousands of places
@@ -318,7 +399,8 @@ region_shapes <- boundaries |>
 # table (cwr-charts rule 9b; R/data_quality.R explains both measures). One row
 # per area: the long-form total non-response rate, and the non-response and
 # imputation rates for the two commuting questions the charts rest on - place
-# of work, which decides the destination, and main mode of commuting.
+# of work, which decides the destination, and main mode of commuting - plus
+# 2016's long-form global non-response rate, for the work-at-home chart.
 # Statistics Canada says an area whose total non-response rate is 50% or more
 # should be used with caution, which this site treats as not usable at all;
 # the script stops rather than carry such an area into the charts.
@@ -338,6 +420,7 @@ census_quality <- read_csv(file.path(raw_dir, "census_tnr.csv"), show_col_types 
       pivot_wider(id_cols = geo_uid, names_from = indicator, values_from = value),
     join_by(geo_uid)
   ) |>
+  left_join(gnr_2016, join_by(geo_uid)) |>
   left_join(
     # "Region" is what the charts call Waterloo Region (cwr_region in R/theme_cwr.R)
     bind_rows(tibble(geo_uid = "3530", district = "Region"), municipalities |> select(geo_uid, district)),
@@ -346,7 +429,7 @@ census_quality <- read_csv(file.path(raw_dir, "census_tnr.csv"), show_col_types 
   relocate(district, .after = geo_uid)
 
 high_non_response <- census_quality |>
-  filter(tnr_long >= 50) |>
+  filter(tnr_long >= 50 | gnr_long_2016 >= 50) |>
   pull(district)
 if (length(high_non_response) > 0) {
   stop("A long-form total non-response rate is 50% or more: ",
@@ -358,6 +441,7 @@ if (length(high_non_response) > 0) {
 # ---- Write -----------------------------------------------------------------
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
+write_csv(work_at_home, file.path(data_dir, "work_at_home.csv"))
 write_csv(census_quality, file.path(data_dir, "census_quality.csv"))
 write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
 write_csv(inbound, file.path(data_dir, "commuting_inbound.csv"))

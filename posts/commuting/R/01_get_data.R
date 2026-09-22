@@ -12,6 +12,14 @@ library(cansim)   # Statistics Canada table downloads
 raw_dir <- here("posts", "commuting", "data-raw")
 dir.create(raw_dir, showWarnings = FALSE)
 
+# Big downloads that are only needed while this script runs go to a folder in
+# the computer's temporary directory rather than to data-raw/, which sits in
+# OneDrive and would otherwise sync them. tempdir() is a fresh folder every
+# time R starts, so its parent is used instead: that way a second run finds the
+# files already there.
+download_dir <- file.path(dirname(tempdir()), "cwr_downloads")
+dir.create(download_dir, showWarnings = FALSE)
+
 # ---- Commuting, 2021 census -----------------------------------------------
 # Table 98-10-0462, "Commuting destination by main mode of commuting, age and
 # gender". The dimension that matters is commuting destination, which sorts
@@ -54,7 +62,43 @@ get_cansim("98-10-0462") |>
 # cell function drops each cell's status ("..." not applicable, E, F), which
 # the data-quality check needs. A cell the service does not return at all is a
 # zero - census tables leave zeros out - and is written with no value and no
-# status for 02_clean_data.R to fill in.
+# status for 02_clean_data.R to fill in. wds_cells() below does the fetching,
+# for this table and for 98-10-0467 further down.
+
+# What each status code means, from Statistics Canada's own code list. Code 0
+# is "normal", which has no symbol.
+status_codes <- get_cansim_code_set("status") |>
+  select(statusCode, STATUS = statusRepresentationEn)
+
+# Fetches the cells named by `coordinates` from table `product_id` (written as
+# a number, 98100464) in one request, and returns one row per cell: its
+# coordinate, value and status. The answers do not come back in the order
+# asked, so each is matched to its cell by coordinate.
+wds_cells <- function(product_id, coordinates) {
+  httr2::request(
+    "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
+  ) |>
+    httr2::req_body_json(map(coordinates, \(coordinate) {
+      list(productId = product_id, coordinate = coordinate, latestN = 1)
+    })) |>
+    httr2::req_perform() |>
+    httr2::resp_body_json() |>
+    map(\(cell) {
+      point <- pluck(cell, "object", "vectorDataPoint", 1)
+      tibble(
+        COORDINATE = pluck(cell, "object", "coordinate"),
+        VALUE = pluck(point, "value", .default = NA_real_),
+        statusCode = as.character(pluck(point, "statusCode", .default = NA))
+      )
+    }) |>
+    list_rbind() |>
+    left_join(status_codes, join_by(statusCode)) |>
+    select(-statusCode)
+}
+
+# The Region and its seven districts, with their member ids in the Geography
+# dimension. The ids are the same in every 2021 census table with this
+# geography (checked in 98-10-0464 and 98-10-0467).
 mode_places <- tribble(
   ~GeoUID,    ~GEO,              ~place_member,
   "3530",     "Waterloo Region", 2439,
@@ -85,38 +129,10 @@ mode_cells <- mode_places |>
   cross_join(mode_modes) |>
   mutate(COORDINATE = str_glue("{place_member}.1.1.{statistic_member}.1.{mode_member}.0.0.0.0"))
 
-# What each status code means, from Statistics Canada's own code list. Code 0
-# is "normal", which has no symbol.
-status_codes <- get_cansim_code_set("status") |>
-  select(statusCode, STATUS = statusRepresentationEn)
-
-# One request for all 96 cells. The answers do not come back in the order
-# asked, so each is matched to its cell by coordinate.
-mode_response <- httr2::request(
-  "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
-) |>
-  httr2::req_body_json(map(mode_cells$COORDINATE, \(coordinate) {
-    list(productId = 98100464, coordinate = coordinate, latestN = 1)
-  })) |>
-  httr2::req_perform() |>
-  httr2::resp_body_json()
-
-mode_values <- mode_response |>
-  map(\(cell) {
-    point <- pluck(cell, "object", "vectorDataPoint", 1)
-    tibble(
-      COORDINATE = pluck(cell, "object", "coordinate"),
-      VALUE = pluck(point, "value", .default = NA_real_),
-      statusCode = as.character(pluck(point, "statusCode", .default = NA))
-    )
-  }) |>
-  list_rbind() |>
-  left_join(status_codes, join_by(statusCode))
-
 # The dimensions held at their totals are written out too, so the table's
 # footnotes can be matched to them in 02_clean_data.R
 mode_cells |>
-  left_join(mode_values, join_by(COORDINATE)) |>
+  left_join(wds_cells(98100464, mode_cells$COORDINATE), join_by(COORDINATE)) |>
   mutate(
     `Occupation - Broad category - National Occupational Classification (NOC) 2021 (11)` =
       "Total - Occupation - Broad category - National Occupational Classification (NOC) 2021",
@@ -128,6 +144,98 @@ mode_cells |>
          starts_with("Industry"), `Main mode of commuting (11A)`, VALUE, STATUS, COORDINATE) |>
   write_csv(file.path(raw_dir, "table_98100464.csv"))
 
+# ---- Place of work status, 2021 census --------------------------------------
+# Table 98-10-0467, "Place of work status by highest level of education, age
+# and gender", for the share of workers who worked at home. Place of work
+# status sorts every employed person into one of four groups: worked at home,
+# worked outside Canada, no fixed workplace address, and usual place of work;
+# its total is everyone employed in the census week. The table has 45 million
+# cells, so like 98-10-0464 only the 48 needed are fetched: 8 places x 2
+# statuses (the total and "Worked at home") x 3 statistics, with age, gender
+# and education at their totals. Coordinate: place . age . gender . statistic
+# . education . place of work status, then four zeros. Member ids from the
+# table's metadata (getCubeMetadata).
+home_statuses <- tribble(
+  ~`Place of work status (5)`,       ~status_member,
+  "Total - Place of work status",    1,
+  "Worked at home",                  2
+)
+
+home_cells <- mode_places |>
+  cross_join(mode_statistics) |>
+  cross_join(home_statuses) |>
+  mutate(COORDINATE = str_glue("{place_member}.1.1.{statistic_member}.1.{status_member}.0.0.0.0"))
+
+home_cells |>
+  left_join(wds_cells(98100467, home_cells$COORDINATE), join_by(COORDINATE)) |>
+  mutate(
+    `Age (15A)` = "Total - Age",
+    `Gender (3)` = "Total - Gender",
+    `Highest certificate, diploma or degree (16)` = "Total - Highest certificate, diploma or degree"
+  ) |>
+  select(GeoUID, GEO, `Age (15A)`, `Gender (3)`, `Statistics (3)`,
+         `Highest certificate, diploma or degree (16)`, `Place of work status (5)`,
+         VALUE, STATUS, COORDINATE) |>
+  write_csv(file.path(raw_dir, "table_98100467.csv"))
+
+# ---- Place of work status, 2016 census --------------------------------------
+# The 2016 census equivalent is data table 98-400-X2016321, "Place of Work
+# Status (5), Industry (21), Occupation (11) and Sex (3) for the Employed
+# Labour Force Aged 15 Years and Over in Private Households", the only 2016
+# table of place of work status for census subdivisions. (2016 tables were not
+# put into Statistics Canada's table database, so it has no 98-10 number and
+# cansim cannot fetch it.) Its total is the same group as 2021's - everyone
+# employed in the census week, in all four place-of-work groups - so the two
+# years compare directly. It publishes no confidence intervals.
+#
+# The file is one zip holding a 640 MB CSV for every census subdivision in
+# Canada, so like the flows it goes to the temporary download folder and only
+# the Region's eight rows at the table's totals are kept. The file is wide: one
+# column per place of work status. GNR is each area's long-form global
+# non-response rate, which 02_clean_data.R checks like the 2021 rates below.
+pow_2016_zip <- file.path(download_dir, "98-400-X2016321.zip")
+if (!file.exists(pow_2016_zip)) {
+  options(timeout = 1200)
+  download.file(
+    "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110710&OFT=CSV",
+    destfile = pow_2016_zip,
+    mode = "wb"
+  )
+}
+
+read_csv_chunked(
+  unz(pow_2016_zip, "98-400-X2016321_English_CSV_data.csv"),
+  callback = DataFrameCallback$new(\(chunk, pos) {
+    filter(
+      chunk,
+      str_starts(`GEO_CODE (POR)`, "3530"),
+      str_starts(`DIM: Occupation - National Occupational Classification (NOC) 2016 (11)`, "Total"),
+      `DIM: Sex (3)` == "Total - Sex",
+      str_starts(`DIM: Industry - North American Industry Classification System (NAICS) 2012 (21)`, "Total")
+    )
+  }),
+  chunk_size = 1e6,
+  col_types = cols(.default = col_character())
+) |>
+  write_csv(file.path(raw_dir, "table_2016321_region.csv"))
+
+# The table's notes, in the same shape as the footnotes saved for the 98-10
+# tables below, so 02_clean_data.R can check them the same way. They are read
+# from the metadata file in the zip; the two kept are the note on data quality
+# (which applies to the whole table) and the footnote on the place of work
+# status total.
+pow_2016_meta <- read_lines(unz(pow_2016_zip, "98-400-X2016321_English_meta.txt"))
+tibble(
+  `Note ID` = c("quality", "3"),
+  Note = c(
+    pow_2016_meta[str_which(pow_2016_meta, "^For information on data quality")],
+    pow_2016_meta[str_which(pow_2016_meta, "^Footnote 3$") + 1]
+  ),
+  `Dimension name` = c(NA, "Place of work status (5)"),
+  `Member Name` = c(NA, "Total - Place of work status")
+) |>
+  write_csv(file.path(raw_dir, "table_2016321_notes.csv"))
+
 # ---- Commuting flows, 2021 census ------------------------------------------
 # Table 98-10-0459, "Commuting flow from geography of residence to geography of
 # work": for every municipality people live in, how many work in every
@@ -136,13 +244,8 @@ mode_cells |>
 #
 # Every place is crossed with every other, so the table is 26 million rows -
 # 292 MB zipped, 2.2 GB unzipped - almost all of them zero. It is downloaded to
-# a folder in the computer's temporary directory rather than to data-raw/,
-# which sits in OneDrive and would otherwise sync a file that is only needed
-# while this script runs, and only the rows with one end of the commute in
-# Waterloo Region are kept. tempdir() is a fresh folder every time R starts, so its
-# parent is used instead: that way a second run finds the file already there.
-download_dir <- file.path(dirname(tempdir()), "cwr_downloads")
-dir.create(download_dir, showWarnings = FALSE)
+# the temporary download folder (see the top of this script), and only the rows
+# with one end of the commute in Waterloo Region are kept.
 flows_zip <- file.path(download_dir, "98100459-eng.zip")
 if (!file.exists(flows_zip)) {
   # The default 60-second timeout is too short for a file this size
@@ -283,7 +386,7 @@ get_cansim("98-10-0572") |>
 # quality or comparability of the figures. They are saved beside the tables so
 # that 02_clean_data.R can report the ones that apply to the rows this post
 # keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
-c("98-10-0462", "98-10-0464", "98-10-0459") |>
+c("98-10-0462", "98-10-0464", "98-10-0467", "98-10-0459") |>
   walk(\(table_number) {
     get_cansim_table_notes(table_number) |>
       write_csv(file.path(

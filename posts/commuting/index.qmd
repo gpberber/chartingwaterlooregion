@@ -35,6 +35,24 @@ commuting <- read_csv(
   here("posts", "commuting", "data", "commuting.csv"),
   show_col_types = FALSE
 )
+
+# The share of workers who worked at home, 2016 and 2021 censuses: one row per
+# district per year, plus the Region's own two rows. Built by 02_clean_data.R
+# from tables 98-400-X2016321 (2016) and 98-10-0467 (2021).
+work_at_home <- read_csv(
+  here("posts", "commuting", "data", "work_at_home.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The Region's share in each year, ready to drop into a sentence with
+# `r home_region_2016` and `r home_region_2021` (they print as "6.8%" and
+# "29.0%"). The 2021 figure's 95% interval is a fraction of a point.
+home_region <- work_at_home |>
+  filter(district == cwr_region) |>
+  mutate(label = label_number(accuracy = 0.1, suffix = "%")(percent))
+home_region_2016 <- home_region |> filter(year == 2016) |> pull(label)
+home_region_2021 <- home_region |> filter(year == 2021) |> pull(label)
 ```
 
 <!-- Opening paragraph: the question this post asks and the one-line answer. -->
@@ -42,6 +60,201 @@ commuting <- read_csv(
 ## First finding as a plain-language heading
 
 <!-- One or two paragraphs, then one chart. -->
+
+```{r}
+#| label: work-at-home
+#| output: asis
+
+# The share of each district's workers who worked at home, in the 2016 and 2021
+# censuses: two dots per row, 2016 in silver and 2021 in blue. work_at_home is
+# read in the load-data chunk.
+#
+# The ggdumbbell template (the cwr-charts skill), with the year dots named on
+# the top row instead of in its legend, and no highlighted row. The Region's
+# own rows are left out: the chart is by district.
+plot_data <- work_at_home |>
+  filter(year %in% c(2016, 2021), district != cwr_region) |>
+  pivot_wider(
+    id_cols = district,
+    names_from = year,
+    values_from = percent
+  ) |>
+  mutate(
+    # Ordered on the 2021 share: reorder() sorts ascending and a horizontal
+    # chart draws the first level at the bottom, so the district with the most
+    # people working at home ends up on top
+    district = reorder(district, `2021`),
+    # No row is highlighted; cwr_short_name() gives the house short form of a
+    # long district name
+    y_label = cwr_short_name(as.character(district))
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(district, y_label) |> deframe()
+
+# The right end of the background segments and of the x axis: just past the
+# largest share, rounded up to the next 5
+max_x <- ceiling(max(plot_data$`2021`) / 5) * 5
+
+# The top row's two dots are named with their year instead of the template's
+# legend: above the joining line and beside each dot, on the side facing the
+# other dot - 2016 to its right, 2021 to its left. hjust sets which side of its
+# anchor the text sits on (0 starts it there, 1 ends it there), and `nudge`
+# moves the anchor off the dot, in percentage points. The nudge is multiplied
+# by cwr_gap(), which cwr_figure() sets to `phone_gap` while it draws the phone
+# version, where a percentage point is half as wide.
+top_row <- plot_data |>
+  filter(district == last(levels(district))) |>
+  pivot_longer(c(`2016`, `2021`), names_to = "year", values_to = "percent") |>
+  mutate(
+    hjust = if_else(year == "2016", 0, 1),
+    nudge = if_else(year == "2016", 0.6, -0.6)
+  )
+
+p <- plot_data |>
+  ggplot() +
+
+  # Background reference segment spanning full x range
+  geom_segment(aes(
+    x = 0,
+    xend = max_x,
+    y = district,
+    yend = district
+    ),
+    color = "grey80",
+    linewidth = 0.3
+  ) +
+
+  # Dumbbell segment connecting x1 to x2
+  geom_segment(aes(
+    x = `2016`,
+    xend = `2021`,
+    y = district,
+    yend = district
+    ),
+    color = "grey50",
+    linewidth = 0.7
+  ) +
+
+  geom_point(aes(
+    x = `2016`,
+    y = district,
+    color = "2016"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  geom_point(aes(
+    x = `2021`,
+    y = district,
+    color = "2021"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  # The years, on the top row only, just above the line. grey30 is the colour
+  # theme_cwr() gives the axis labels. geom_label() rather than geom_text() so
+  # each sits on white rather than on the line it overlaps; label.size = 0
+  # drops the box's border, and the padding is tight so the white is only as
+  # wide as the year.
+  geom_label(
+    data = top_row,
+    aes(x = percent + nudge * cwr_gap(), y = district, label = year, hjust = hjust),
+    vjust = 0, nudge_y = 0.1,
+    colour = "grey30", fill = "white", label.size = 0,
+    label.padding = unit(0.08, "lines"),
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "2016" = cowboysilver,
+      "2021" = dodgerblue
+    ),
+    name = NULL,
+    breaks = c("2016", "2021"),
+    guide = "none"
+  ) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x),
+    breaks = seq(0, max_x, by = 10),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  # Room above the top row for the year labels
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels,
+    expand = expansion(add = c(0.6, 1))
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "Share of workers who worked at home, by district, 2016 and 2021",
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      c("Statistics Canada Table 98-10-0467-01", "2016 Census data table 98-400-X2016321"),
+      credit = TRUE,
+      notes = c(
+        # Who is counted: the total of place of work status, which is everyone
+        # employed in the census week (2021 Census Dictionary, "Place of work
+        # status")
+        "Share of all employed people, including those who worked outside Canada or had no fixed workplace address",
+        # The 2021 intervals are narrow next to the change the chart shows, so
+        # they are stated rather than drawn (rule 9b); {widest} is filled from
+        # the data. The 2016 table publishes none.
+        str_glue(
+          "95% confidence intervals for 2021 are within ±{widest} percentage points; none are published for 2016",
+          widest = with(
+            filter(work_at_home, district != cwr_region),
+            cwr_ci_widest(percent, percent_lower, percent_upper)
+          )
+        )
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first
+alt_lines <- plot_data |>
+  arrange(desc(district)) |>
+  mutate(line = paste0(
+    district, ": 2016 ", label_number(accuracy = 0.1)(`2016`), " per cent, 2021 ",
+    label_number(accuracy = 0.1)(`2021`), " per cent"
+  )) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-work-at-home",
+  # The year labels sit a percentage point or so off their dots, which is half
+  # the distance on a phone unless it is doubled
+  phone_gap = 2,
+  alt = paste0(
+    "Dot plot with one row per district and two dots on each row, grey for ",
+    "2016 and blue for 2021, joined by a line, placed along a scale of the percentage of ",
+    "employed people who worked at home. ",
+    paste(alt_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
 
 ```{r}
 #| label: commuting

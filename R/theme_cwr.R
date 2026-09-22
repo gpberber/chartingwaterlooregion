@@ -201,6 +201,13 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
       # empty: every property still comes from axis.text.y above.
       axis.text.y.left = element_markdown(),
 
+      # A ranked horizontal chart puts its x axis on top (style rule 6), where
+      # the margin above spaces the numbers away from the gridline tops they
+      # label rather than towards them. The top axis gets its own small gap
+      # below instead, so each number sits just above its gridline (Greg,
+      # 2026-09-22, on the commuting post's work-at-home chart).
+      axis.text.x.top = element_text(margin = margin(b = 2)),
+
       # One axis line only, where the data meets the baseline
       axis.line.x = element_line(color = "black", linewidth = 0.5, linetype = "solid"),
       axis.line.y = element_blank(),
@@ -284,6 +291,17 @@ cwr_ci_widest <- function(estimate, lower, upper) {
   widest <- max(estimate - lower, upper - estimate, na.rm = TRUE)
   if (widest < 1) ceiling(widest * 10) / 10 else ceiling(widest)
 }
+
+# The multiplier for a gap written in data units, so the same gap can be a
+# different number of data units on the phone. A phone draws the same x scale
+# across half the width, so a label nudged clear of its point on a desktop is
+# half as far from it there, and can touch it. Write such a nudge as
+# `nudge * cwr_gap()` inside the aes, and pass `phone_gap` to cwr_figure():
+# it is 1 while the desktop version is drawn and `phone_gap` while the phone
+# version is (2 keeps the gap the same distance on the page). Vertical nudges
+# on a category axis need none of this: a row is about as deep on both.
+# Worked case: the year labels on fig-work-at-home in the commuting post.
+cwr_gap <- function() getOption("cwr.gap", 1)
 
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
@@ -946,7 +964,7 @@ cwr_phone_theme <- function(width = 4.2) {
 cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
                        width = 8.3, height = NULL,
                        phone_width = 4.2, phone_height = NULL,
-                       phone = list(), phone_text_scale = 0.8,
+                       phone = list(), phone_text_scale = 0.8, phone_gap = 1,
                        row_height = cwr_row_height,
                        phone_row_height = cwr_phone_row_height,
                        label_width = cwr_label_width,
@@ -1078,8 +1096,17 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
 
   set_thickness(phone_thickness)
+  # A gap written in data units is half as wide on a phone, where the same
+  # scale is drawn across half the width, so a label nudged clear of its point
+  # on a desktop can end up touching it. A chart writes such a gap as
+  # `nudge * cwr_gap()` and passes `phone_gap`, the number the gap is
+  # multiplied by while the phone version is drawn (2 keeps it the same
+  # distance on the page). The aes is evaluated as the chart is saved, so
+  # setting the option here reaches it.
+  phone_gap_option <- options(cwr.gap = phone_gap)
   ggsave(phone_file, phone_plot, width = phone_width, height = phone_height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
+  options(phone_gap_option)
 
   # Drafting, there is no document for the HTML below to go into, so cat()ing it
   # would print tags to the console and show no chart at all. Draw the PNGs into

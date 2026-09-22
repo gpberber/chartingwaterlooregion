@@ -8,7 +8,7 @@ All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provid
 
 ## ggdumbbell
 
-Dumbbell: two dots per category joined by a segment, legend inside the panel.
+Dumbbell: two dots per category joined by a segment, the two named on the top row.
 
 ```r
 plot_data <- <data_object> |>
@@ -20,11 +20,25 @@ plot_data <- <data_object> |>
   ) |>
   mutate(
     <y_column> = reorder(<y_column>, `<value1>`),
-    y_label = if_else(<y_column> == "<highlight_value>", "**<highlight_value>**", as.character(<y_column>))
+    # cwr_short_name(): the house short form of a long district name (rule 2b)
+    y_label = if_else(<y_column> == "<highlight_value>", "**<highlight_value>**", cwr_short_name(as.character(<y_column>)))
   )
 
 # Pre-compute labels to avoid data masking issue in scale_y_discrete
 y_labels <- plot_data |> select(<y_column>, y_label) |> deframe()
+
+# The two dots are named on the top row instead of in a legend (rule 3): each
+# label beside its own dot, on the side facing the other, lifted just above the
+# joining line. `nudge` is in data units, which are half as wide on a phone, so
+# it is multiplied by cwr_gap() and cwr_figure() is passed phone_gap = 2
+# (rule 11a).
+top_row <- plot_data |>
+  filter(<y_column> == last(levels(<y_column>))) |>
+  pivot_longer(c(`<value1>`, `<value2>`), names_to = "series", values_to = "value") |>
+  mutate(
+    hjust = if_else(series == "<value1>", 0, 1),
+    nudge = if_else(series == "<value1>", <0.6>, -<0.6>)
+  )
 
 plot_data |>
   ggplot() +
@@ -67,6 +81,19 @@ plot_data |>
     shape = 19, size = 4
   ) +
 
+  # The series names, on the top row only. geom_label() rather than
+  # geom_text() so each sits on white rather than on the line it overlaps;
+  # label.size = 0 drops the box's border, and grey30 is the colour
+  # theme_cwr() gives the axis labels.
+  geom_label(
+    data = top_row,
+    aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
+    vjust = 0, nudge_y = 0.1,
+    colour = "grey30", fill = "white", label.size = 0,
+    label.padding = unit(0.08, "lines"),
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
   geom_vline(
     xintercept = 0,
     color = "black",
@@ -79,7 +106,8 @@ plot_data |>
       "<x2_label>" = dodgerblue
     ),
     name = NULL,
-    breaks = c("<x1_label>", "<x2_label>")
+    breaks = c("<x1_label>", "<x2_label>"),
+    guide = "none"
   ) +
 
   scale_x_continuous(
@@ -92,7 +120,9 @@ plot_data |>
 
   scale_y_discrete(
     position = "left",
-    labels = y_labels
+    labels = y_labels,
+    # Room above the top row for the series names
+    expand = expansion(add = c(0.6, 1))
   ) +
 
   # Horizontal chart: swap tufte's default grid orientation
@@ -101,12 +131,7 @@ plot_data |>
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
     panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
-    panel.grid.major.y = element_blank(),
-    legend.position = "inside",
-    legend.justification = c(0, 1),
-    legend.position.inside = c(0.05, 0.9),
-    legend.direction = "vertical",
-    legend.background = element_rect(fill = "white", color = NA)
+    panel.grid.major.y = element_blank()
   ) +
 
   labs(
@@ -132,11 +157,25 @@ plot_data <- <data_object> |>
   mutate(
     <y_column> = reorder(<y_column>, `<value1>`),
     <rect_variable> = round(<rect_variable>, <0>),
-    y_label = if_else(<y_column> == "<highlight_value>", "**<highlight_value>**", as.character(<y_column>))
+    # cwr_short_name(): the house short form of a long district name (rule 2b)
+    y_label = if_else(<y_column> == "<highlight_value>", "**<highlight_value>**", cwr_short_name(as.character(<y_column>)))
   )
 
 # Pre-compute labels to avoid data masking issue in scale_y_discrete
 y_labels <- plot_data |> select(<y_column>, y_label) |> deframe()
+
+# The two dots are named on the top row instead of in a legend (rule 3): each
+# label beside its own dot, on the side facing the other, lifted just above the
+# joining line. `nudge` is in data units, which are half as wide on a phone, so
+# it is multiplied by cwr_gap() and cwr_figure() is passed phone_gap = 2
+# (rule 11a).
+top_row <- plot_data |>
+  filter(<y_column> == last(levels(<y_column>))) |>
+  pivot_longer(c(`<value1>`, `<value2>`), names_to = "series", values_to = "value") |>
+  mutate(
+    hjust = if_else(series == "<value1>", 0, 1),
+    nudge = if_else(series == "<value1>", <0.6>, -<0.6>)
+  )
 
 plot_data |>
   ggplot() +
@@ -177,6 +216,19 @@ plot_data |>
     color = "<x2_label>"
     ),
     shape = 19, size = 4
+  ) +
+
+  # The series names, on the top row only. geom_label() rather than
+  # geom_text() so each sits on white rather than on the line it overlaps;
+  # label.size = 0 drops the box's border, and grey30 is the colour
+  # theme_cwr() gives the axis labels.
+  geom_label(
+    data = top_row,
+    aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
+    vjust = 0, nudge_y = 0.1,
+    colour = "grey30", fill = "white", label.size = 0,
+    label.padding = unit(0.08, "lines"),
+    size = label_size * 0.8, fontface = "bold"
   ) +
 
   geom_vline(
@@ -222,7 +274,8 @@ plot_data |>
       "<x2_label>" = dodgerblue
     ),
     name = NULL,
-    breaks = c("<x1_label>", "<x2_label>")
+    breaks = c("<x1_label>", "<x2_label>"),
+    guide = "none"
   ) +
 
   scale_x_continuous(
@@ -235,7 +288,9 @@ plot_data |>
 
   scale_y_discrete(
     position = "left",
-    labels = y_labels
+    labels = y_labels,
+    # Room above the top row for the series names
+    expand = expansion(add = c(0.6, 1))
   ) +
 
   # Horizontal chart: swap tufte's default grid orientation
@@ -245,12 +300,7 @@ plot_data |>
     axis.ticks.x = element_blank(),
     axis.line.x = element_blank(),
     panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
-    panel.grid.major.y = element_blank(),
-    legend.position = "inside",
-    legend.justification = c(0, 1),
-    legend.position.inside = c(0.05, 0.9),
-    legend.direction = "vertical",
-    legend.background = element_rect(fill = "white", color = NA)
+    panel.grid.major.y = element_blank()
   ) +
 
   coord_cartesian(clip = "off") +

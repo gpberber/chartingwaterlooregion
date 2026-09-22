@@ -65,7 +65,7 @@ catalogue <- tribble(
   "lines",           "ggarea",             "Stacked area chart by group.",
   "lines",           "ggribbon",           "Two lines with a shaded band between them (min/max, range, confidence).",
   "lines",           "ggslope",            "Slope chart: two time points, one line per group, points masked at the ends.",
-  "comparisons",     "ggdumbbell",         "Dumbbell: two dots per category joined by a segment, legend inside the panel.",
+  "comparisons",     "ggdumbbell",         "Dumbbell: two dots per category joined by a segment, the two named on the top row.",
   "comparisons",     "ggdumbbellrect",     "Dumbbell plus a boxed value column on the right (e.g. the change).",
   "comparisons",     "ggdoterror",         "Dot per category with its confidence interval as a fading, flat-ended bar behind it, x axis on top.",
   "comparisons",     "ggnumcomp",          "Two figures written large with their names above and a ratio below, no axes.",
