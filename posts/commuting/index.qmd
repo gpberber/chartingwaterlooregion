@@ -208,21 +208,17 @@ p <- plot_data |>
   ) +
 
   labs(
-    title = "Share of workers who worked at home, by district, 2016 and 2021",
-    subtitle = "Share of employed people who worked from home, %",
+    title = "A year into the pandemic, the share of people working at home was still much higher than in 2016",
+    subtitle = "Share^1^ of employed people who worked from home, 2016 and 2021, %",
     caption = cwr_caption(
       c("Statistics Canada Tables 98-10-0467-01", "98-400-X2016321"),
       credit = TRUE,
       notes = c(
-        # Who is counted: the total of place of work status, which is everyone
-        # employed in the census week (2021 Census Dictionary, "Place of work
-        # status")
-        "Share of all employed people, including those who worked outside Canada or had no fixed workplace address",
         # The 2021 intervals are narrow next to the change the chart shows, so
         # they are stated rather than drawn (rule 9b); {widest} is filled from
         # the data. The 2016 table publishes none.
         str_glue(
-          "95% confidence intervals for 2021 are within ±{widest} percentage points; none are published for 2016",
+          "95% confidence intervals for 2021 are within ±{widest} percentage points; none available for 2016",
           widest = with(
             filter(work_at_home, district != cwr_region),
             cwr_ci_widest(percent, percent_lower, percent_upper)
