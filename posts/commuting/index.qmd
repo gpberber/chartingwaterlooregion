@@ -209,9 +209,9 @@ p <- plot_data |>
 
   labs(
     title = "Share of workers who worked at home, by district, 2016 and 2021",
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    subtitle = "Share of employed people who worked from home, %",
     caption = cwr_caption(
-      c("Statistics Canada Table 98-10-0467-01", "2016 Census data table 98-400-X2016321"),
+      c("Statistics Canada Tables 98-10-0467-01", "98-400-X2016321"),
       credit = TRUE,
       notes = c(
         # Who is counted: the total of place of work status, which is everyone
