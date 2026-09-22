@@ -68,9 +68,18 @@
 <section id="what-have-we-learned" class="level2">
 <h2 class="anchored" data-anchor-id="what-have-we-learned">What have we learned?</h2>
 <p>In CWR’s debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region’s rolling hills. We learned there were lots of roads and hills to roam because the townships cover 1,056 square km, over three-quarters of the Region’s 1,370 square km, while holding only 79,736 people, a ninth of its 711,457 residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we’ll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now, when this year’s census data is released, we’ll revisit this post and see if cows still outnumber people in cattle country.</p>
-</section>
-<section id="data-sources-and-reliability" class="level2">
-<h2 class="anchored" data-anchor-id="data-sources-and-reliability">Data sources and reliability</h2>
+<div id="data-sources-and-reliability" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Data sources and reliability
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <section id="sources" class="level3">
 <h3 class="anchored" data-anchor-id="sources">Sources</h3>
 <table class="table">
@@ -140,8 +149,12 @@
 </tr>
 </tbody>
 </table>
+</section>
+</div>
+</div>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -150,7 +163,7 @@
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>Reproduce the post</strong>: get the code and data for this post from <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome"><code>posts/welcome/</code></a> on GitHub.</p>
 <p><strong>Download the data:</strong> <a href="https://github.com/gpberber/chartingwaterlooregion/releases/download/data-welcome-v1/welcome-data-v1.zip">welcome-data-v1.zip</a> holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post’s <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome#data-dictionary">README</a>.</p>
@@ -158,7 +171,7 @@
 <div class="cell-output cell-output-stdout">
 <pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
 OS:        Windows 11 x64 (build 26200)
-Rendered:  2026-09-21
+Rendered:  2026-09-22
 Quarto:    1.9.38
 
     package version       date         source
@@ -189,7 +202,6 @@ Quarto:    1.9.38
 </div>
 
 
-</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reusing this post</h2><div class="quarto-appendix-contents"><div>The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above. Material quoted from other sources stays under its owner's terms.<a rel="license" href="https://creativecommons.org/licenses/by/4.0/">(View License)</a></div></div></section></div> ]]></description>

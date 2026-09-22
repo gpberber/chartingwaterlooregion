@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-393d8052adb4aca42bf6ca2283a9c22c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-676feff5fba280fae08f1d93fc490f00.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -680,9 +680,11 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-  // And where the analysis stops. Every post closes with "Data sources and
+  // And where the analysis stops. Every post closes with "Key terms" (since
 
-  // reliability", usually "Other sources", then a Reproducibility box - house
+  // 2026-09-22), "Data sources and reliability", usually "Other sources", then
+
+  // a Reproducibility box - house
 
   // structure, set by _templates/post/index.qmd and checked by /review-post - and
 
@@ -692,9 +694,13 @@ ul.task-list li input[type="checkbox"] {
 
   //
 
-  // Pandoc builds the id from the heading, so a post that reworded that heading
+  // Since 2026-09-22 those sections are folded boxes (collapsed callouts) that
 
-  // would not match. The section has been "Data sources and reliability" since
+  // carry their ids explicitly (#key-terms, #data-sources-and-reliability), so
+
+  // rewording a box's heading no longer moves the button. Before that, Pandoc
+
+  // built the id from the heading, and a post that reworded it would not match. The section has been "Data sources and reliability" since
 
   // 2026-09-18; "#data-sources" (2026-09-14 to 2026-09-18) and "#data-and-methods"
 
@@ -706,7 +712,9 @@ ul.task-list li input[type="checkbox"] {
 
   // thing that moves it.
 
-  const end = main.querySelector("#data-sources-and-reliability") ||
+  const end = main.querySelector("#key-terms") ||
+
+              main.querySelector("#data-sources-and-reliability") ||
 
               main.querySelector("#data-sources") ||
 
