@@ -612,6 +612,33 @@ figure figcaption, .figure-caption, .quarto-float-caption {
 .callout-tip { border-left-color: $cwr-grey; }
 .callout.callout-style-default > .callout-header { font-weight: 600; }
 
+// A post's reference sections - Key terms, Data sources and reliability, Other
+// sources - fold into callouts like the Reproducibility box. Their tables were
+// already wider than the text column and used to spill into the empty margin;
+// inside a box that spill shows, so the tables here run smaller, fit the box,
+// and scroll sideways only if a column still cannot fit. The Sources and
+// Reliability subheadings drop to the size of body text in bold, since the
+// callout's own title is now the section heading above them.
+.callout .callout-body-container {
+  overflow-x: auto;
+
+  table {
+    font-size: 0.8rem;
+    width: 100%;
+  }
+
+  // File names (table_98100462.csv) have no spaces to wrap at, and were the
+  // one thing still pushing the Sources table wider than the box
+  td code { word-break: break-all; }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    border-bottom: none;
+  }
+}
+
 blockquote { border-left: 3px solid $cwr-grey-50; color: #444; }
 
 // ---------------------------------------------------------------------------

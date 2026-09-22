@@ -578,6 +578,7 @@ And there we have it: more cows than people lived in the townships on census day
 
 In CWR's debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region's rolling hills. We learned there were lots of roads and hills to roam because the townships cover `r township_area` square km, over three-quarters of the Region's `r region_area` square km, while holding only `r township_pop` people, a ninth of its `r region_pop` residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we'll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now, when this year's census data is released, we'll revisit this post and see if cows still outnumber people in cattle country.
 
+::: {#data-sources-and-reliability .callout-note collapse="true"}
 ## Data sources and reliability
 
 ### Sources
@@ -602,6 +603,8 @@ cwr_sources_table("welcome")
 # and it drops out of the post while the README keeps the record.
 cwr_reliability_table("welcome")
 ```
+
+:::
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download

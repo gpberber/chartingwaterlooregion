@@ -1069,6 +1069,7 @@ cwr_figure(
 ```
 :::
 
+::: {#key-terms .callout-note collapse="true"}
 ## Key terms
 
 <!-- The terms a reader needs to read the charts correctly, each with its official
@@ -1077,9 +1078,10 @@ cwr_figure(
      the definitions there. A term whose Definition cell is still empty is left out of
      the post, and the render warns until it is defined or deleted.
 
-     Keep this heading as it is. _includes/like.html puts the "Like this post" button
-     immediately above it, since the analysis ends here and everything below is
-     reference material. -->
+     This section is a folded box (a collapsed callout). Keep its id,
+     #key-terms: _includes/like.html puts the "Like this post" button immediately
+     above it, since the analysis ends here and everything below is reference
+     material. The heading inside the box can be reworded freely. -->
 
 ```{r}
 #| label: key-terms
@@ -1089,6 +1091,9 @@ cwr_figure(
 cwr_key_terms_table("commuting")
 ```
 
+:::
+
+::: {#data-sources-and-reliability .callout-note collapse="true"}
 ## Data sources and reliability
 
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
@@ -1096,11 +1101,10 @@ cwr_key_terms_table("commuting")
      written here - the chunk below prints the "Data sources" table straight out of
      this post's README.md, so there is only ever one copy of it.
 
-     Keep this heading as it is. _includes/like.html puts the "Like this post"
-     button immediately above it, on the reasoning that the analysis ends here and
-     everything below is reference material. It finds the spot by the id Pandoc
-     builds from the heading text, so rewording the heading does not break the
-     button - it quietly drops it to the foot of the page instead. -->
+     This section is a folded box (a collapsed callout), like the ones
+     around it. Keep its id, #data-sources-and-reliability: in a post with no Key
+     terms box, _includes/like.html puts the "Like this post" button above it. The
+     heading inside the box can be reworded freely. -->
 
 ### Sources
 
@@ -1125,11 +1129,17 @@ cwr_sources_table("commuting")
 cwr_reliability_table("commuting")
 ```
 
+:::
+
+::: {#other-sources .callout-note collapse="true"}
 ## Other sources
 
 <!-- Anything cited that is not data: reports, articles, books, a method borrowed
      from someone else. Quoted material stays under its owner's terms, never this
-     site's CC BY - see WORKFLOW.md section 9. Delete this section if unused. -->
+     site's CC BY - see WORKFLOW.md section 9. Delete this box, from its ::: line to the
+     closing :::, if unused. -->
+
+:::
 
 ::: {.callout-note collapse="true"}
 ## Reproducibility and data download

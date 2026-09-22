@@ -135,7 +135,10 @@ For every `ggplot` chunk:
   which prints the README's source table with `cwr_sources_table("<slug>")`, and `### Reliability`,
   which prints the README's Reliability table with `cwr_reliability_table("<slug>")`, each in an
   `#| output: asis` chunk rather than a copy typed into the post. A `## Other sources` section
-  follows whenever anything non-data is cited. A post still headed `## Data sources` (written before
+  follows whenever anything non-data is cited. Key terms, Data sources and reliability, and Other
+  sources are each a folded box, `::: {#key-terms .callout-note collapse="true"}` (ids
+  `#data-sources-and-reliability`, `#other-sources`), as in the template; flag a post where they are
+  still bare headings. A post still headed `## Data sources` (written before
   2026-09-18) is flagged for the new structure.
 - A post that uses WRPS occurrence data (`load_wrps_occurrences()` or `wat_region_occurrences`)
   shows `wrps_disclaimer` in its Data sources section; WRPS requires it on any publication.

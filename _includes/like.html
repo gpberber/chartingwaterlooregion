@@ -111,8 +111,10 @@
   // all of it is reference material rather than part of the piece. Asking for a
   // like after them means asking at the wrong moment.
   //
-  // Pandoc builds the id from the heading, so a post that reworded that heading
-  // would not match. The section has been "Data sources and reliability" since
+  // Since 2026-09-22 those sections are folded boxes (collapsed callouts) that
+  // carry their ids explicitly (#key-terms, #data-sources-and-reliability), so
+  // rewording a box's heading no longer moves the button. Before that, Pandoc
+  // built the id from the heading, and a post that reworded it would not match. The section has been "Data sources and reliability" since
   // 2026-09-18; "#data-sources" (2026-09-14 to 2026-09-18) and "#data-and-methods"
   // (before that) are kept so older posts still place the button correctly. After
   // those, the button falls back to the licence appendix and then to the end of
