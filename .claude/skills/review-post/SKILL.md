@@ -125,8 +125,9 @@ For every `ggplot` chunk:
   Flag every instance outside a quotation from a source.
 - The post has a `## Key terms` section just before `## Data sources and reliability`, printing the
   README's `## Key terms` table with `cwr_key_terms_table("<slug>")` in an `#| output: asis` chunk.
-  It lists only terms used in the main body of a chart - flag a statistical term, a census geography
-  term, or a term found only in a title, note or prose. Every term has a definition with its source in brackets (the render's WARNING line lists any that
+  It lists only terms used in a chart's title, subtitle or main body - flag a statistical term, a
+  census geography term, or a term found only in a note or in the prose, and flag a term a title or
+  subtitle names that has no row. Every term has a definition with its source in brackets (the render's WARNING line lists any that
   do not - Greg defines or deletes them), and every chart note, axis or legend label, alt text and
   sentence of prose that says who or what is counted agrees with those definitions. Check this line
   by line against the table: it is the check that would have caught "people who work from home are

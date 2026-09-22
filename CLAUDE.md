@@ -107,9 +107,11 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   flag in `data/quality_flags.csv` lacks a row carrying its code.
 - Key terms: every post ends its analysis with a `## Key terms` section, before "Data sources and
   reliability", printing the README's `## Key terms` table (Term | Definition) with
-  `cwr_key_terms_table()`. It lists only terms used in the main body of a chart (segment, legend,
-  panel, axis and direct labels) - never statistical terms, never census geography terms, never a
-  term found only in a title, note or prose; Greg asks for any other term he wants. Definitions are
+  `cwr_key_terms_table()`. It lists only terms used in a chart's title, subtitle or main body
+  (segment, legend, panel, axis and direct labels) - never statistical terms, never census
+  geography terms, never a term found only in a note or in the prose; Greg asks for any other term
+  he wants. A term the title or subtitle names is one the reader meets before the chart, so it is
+  in scope even when nothing inside the panel says it ("Worked at home", commuting, 2026-09-22). Definitions are
   the source's own, quoted, with the source in brackets:
   table metadata and footnotes, the census dictionary and reference guides, other official
   documentation. Claude drafts the table from the sources, and lists any such term that has no

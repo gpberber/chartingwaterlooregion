@@ -7,6 +7,7 @@ Post: https://chartingwaterlooregion.ca/posts/commuting/
 | Term | Definition |
 |------------------------------------|------------------------------------|
 | Commuters (who is counted) | "Population aged 15 years and over, in private households, with a job or absent from their job or business during the week of Sunday, May 2 to Saturday, May 8, 2021, and who reported having a usual place of work or no fixed workplace address." (2021 Census Dictionary, Main mode of commuting) The charts of where commuters work count only those "who reported having a usual place of work" (2021 Census Dictionary, Commuting destination); the chart of how they get to work also counts those with no fixed workplace address. People who worked at home or outside Canada are in neither. |
+| Worked at home | "Worked at home (including farms) - Persons whose job is located in the same building as their place of residence, persons who live and work on the same farm and teleworkers who spend most of their work week working at home." One category of place of work status, which "refers to whether a person worked at home, worked outside Canada, had no fixed workplace address, or worked at a specific address (usual place of work)". (Statistics Canada, Dictionary, Census of Population, 2021, "Place of work status"; the same wording is the footnote on the Place of work status dimension of table 98-10-0467-01) |
 | Home district | Workers who work in the township/city they live in. |
 | Elsewhere in Region | Workers who work in a Region township/city other than their home district. |
 | Outside Region | Workers who work outside the Region. |
@@ -14,11 +15,13 @@ Post: https://chartingwaterlooregion.ca/posts/commuting/
 | Active transportation | Walking or bicycling. |
 
 ```{=html}
-<!-- Only terms that appear in the main body of a chart - segment and legend names, panel
-     headings, axis and direct labels - and that a reader needs defined to read it: never
-     statistical terms (confidence interval, coefficient of variation), never census geography
-     terms (census subdivision, census division), never a term used only in a title, note or the
-     prose. Greg asks for any term he wants added. Quote the source's own definition and name the
+<!-- Only terms that appear in a chart - in its title or subtitle, or in its main body (segment
+     and legend names, panel headings, axis and direct labels) - and that a reader needs defined
+     to read it: never statistical terms (confidence interval, coefficient of variation), never
+     census geography terms (census subdivision, census division), never a term used only in a
+     note or the prose. A title or subtitle counts because the reader meets the term there before
+     the chart, even when nothing inside the panel says it. Greg asks for any term he wants
+     added. Quote the source's own definition and name the
      source in brackets at the end: the table's metadata, footnotes or category names, the census
      dictionary or reference guides, other official documentation. A term with no official
      definition is Greg's to define: its Definition cell is left empty, to be filled in or the row

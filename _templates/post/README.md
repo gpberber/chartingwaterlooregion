@@ -8,11 +8,12 @@ Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 |---|---|
 | | |
 
-<!-- Only terms that appear in the main body of a chart - segment and legend names, panel
-     headings, axis and direct labels - and that a reader needs defined to read it: never
-     statistical terms (confidence interval, coefficient of variation), never census geography
-     terms (census subdivision, census division), never a term used only in a title, note or the
-     prose. Greg asks for any term he wants added. Quote the source's own definition and name the
+<!-- Only terms that appear in a chart - in its title or subtitle, or in its main body (segment
+     and legend names, panel headings, axis and direct labels) - and that a reader needs defined
+     to read it: never statistical terms (confidence interval, coefficient of variation), never
+     census geography terms (census subdivision, census division), never a term used only in a
+     note or the prose. A title or subtitle counts because the reader meets the term there before
+     the chart, even when nothing inside the panel says it. Greg asks for any term he wants added. Quote the source's own definition and name the
      source in brackets at the end - the table's metadata, footnotes or category names, the census
      dictionary or reference guides, or other official documentation ("(2021 Census
      Dictionary)"). A term with no official definition is Greg's to define: Claude lists it with
