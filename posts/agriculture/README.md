@@ -34,7 +34,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 <!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
      in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
      caveat another source's own documentation gives. Closely related flags share a row - one
-     table graded acceptable for one municipality and good for another is one issue. Say which
+     table graded acceptable for one district and good for another is one issue. Say which
      figures it touches and what it means for them, in a sentence or two, and end with the
      table number in brackets.
 
@@ -80,8 +80,8 @@ Then `quarto render posts/agriculture` from a terminal.
 - Background reading for this post is kept outside the repository (`../chartingwaterlooregion-background/agriculture/`).
 - No API keys are needed. <!-- If one is, say which and how to get it. -->
 - Livestock is published for census consolidated subdivisions (CCS), groups of neighbouring
-  municipalities, not for municipalities. Each of the four townships is a CCS on its own, under its
-  own municipal code, in all three censuses, so the township figures are the townships exactly (see
+  census subdivisions, not for single districts. Each of the four townships is a CCS on its own, under
+  its own census subdivision code, in all three censuses, so the township figures are the townships exactly (see
   the welcome post's README). The figures are each table's total head count on census day: "Total
   cattle" (2021) or "Total cattle and calves" (2011, 2016), "Total pigs", and "Total sheep" (2021)
   or "Total sheep and lambs" (2011, 2016).

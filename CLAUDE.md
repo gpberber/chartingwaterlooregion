@@ -59,6 +59,11 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `cwr_caption(notes = )`, so Greg can edit or delete it there; the stock wording is copied from
   `cwr-charts` rule 1d, never added by an argument or a lookup. A number from the data goes in
   through a `str_glue()` placeholder.
+- "Municipality" means the Region, and only the Region. In Ontario it is a legal status: Waterloo
+  Region is officially The Regional Municipality of Waterloo. Its seven cities and townships are
+  **districts**, never municipalities - in chart text, alt text, notes, Key terms, READMEs, code
+  comments and anything said to Greg. Places outside the Region are "places". Quoting a source that
+  says "municipality" (Statistics Canada's census subdivision definitions) is the only exception.
 - Chart text calls Waterloo Region "Region": use `cwr_region` for every axis, legend, direct
   label, tooltip and note (cleaning scripts type "Region"). The same chart text calls North
   Dumfries "N. Dumfries", through `cwr_short_name()` (never typed); data, alt text and titles keep
@@ -100,6 +105,19 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   to put the row back with a note saying why it was left out. Each row ends with a hidden code for
   the flags it covers (`<!-- flags: 18-10-0004-01:note36 -->`); the post will not render while any
   flag in `data/quality_flags.csv` lacks a row carrying its code.
+- Key terms: every post ends its analysis with a `## Key terms` section, before "Data sources and
+  reliability", printing the README's `## Key terms` table (Term | Definition) with
+  `cwr_key_terms_table()`. It lists only terms used in the main body of a chart (segment, legend,
+  panel, axis and direct labels) - never statistical terms, never census geography terms, never a
+  term found only in a title, note or prose; Greg asks for any other term he wants. Definitions are
+  the source's own, quoted, with the source in brackets:
+  table metadata and footnotes, the census dictionary and reference guides, other official
+  documentation. Claude drafts the table from the sources, and lists any such term that has no
+  official definition with an empty Definition cell, for Greg to
+  define or delete (the post skips it and the render warns). **Every chart note, label, alt text and
+  sentence about who or what is counted is checked against those definitions before it is written**
+  - a note once said people who work at home were counted in their own municipality, when the
+  commuting tables leave them out (2026-09-22).
 - Data: raw never in git; files over 25 MB go to a GitHub Release via `/share-data`. Every post
   must be reproducible from its `R/` scripts plus the release.
 - Data download: every post lists the tables it uses in `data/tables.csv` and documents every

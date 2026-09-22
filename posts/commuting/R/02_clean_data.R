@@ -119,7 +119,7 @@ commuting_raw <- commuting_462 |>
 # what makes that middle line drawable at all.
 destinations <- tribble(
   ~commuting_destination_5,                                                                                             ~destination,
-  "Commute within census subdivision (CSD) of residence",                                                               "In their own municipality",
+  "Commute within census subdivision (CSD) of residence",                                                               "In their own district",
   "Commute to a different census subdivision (CSD) within census division (CD) of residence",                           "Elsewhere in the Region",
   "Commute to a different census subdivision (CSD) and census division (CD) within province or territory of residence",  "Outside the Region",
   "Commute to a different province or territory",                                                                       "Outside the Region"

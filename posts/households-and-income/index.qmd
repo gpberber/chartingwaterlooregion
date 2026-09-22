@@ -180,7 +180,7 @@ alt_lines <- income_panels |>
 cwr_figure(
   p, "fig-income",
   alt = paste0(
-    "Two panels of horizontal bars, one row per municipality and one for ",
+    "Two panels of horizontal bars, one row per district and one for ",
     "Waterloo Region as a whole, with the three cities in dark blue, the four ",
     "townships in light blue and the Region in grey. Each panel is ordered by its own ",
     "figures, highest at the top, and both are drawn to the same dollar scale. ",
@@ -299,7 +299,7 @@ alt_lines <- household_panels |>
 cwr_figure(
   p, "fig-households",
   alt = paste0(
-    "Two panels of horizontal bars, one row per municipality, both ordered by ",
+    "Two panels of horizontal bars, one row per district, both ordered by ",
     "average household size, with the three cities in dark blue and the four ",
     "townships in light blue. ",
     paste(alt_lines, collapse = ". "), "."

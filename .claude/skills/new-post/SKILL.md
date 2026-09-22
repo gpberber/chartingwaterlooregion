@@ -39,6 +39,11 @@ If either is missing, ask for it. The slug is lowercase, hyphenated, and becomes
    rows it keeps from each source (see the template; `01_get_data.R` saves each Statistics Canada
    table's footnotes for it) and telling Greg about every flag and footnote it reports before any
    chart uses that data,
+   draft the README's `## Key terms` table once the charts exist: only terms used in the main body
+   of a chart (never statistical or census geography terms), each with the source's own definition
+   (table notes or categories, census dictionary, reference guides; source in brackets, empty
+   Definition cell for a term with no official definition). Before writing any chart note, check
+   the source's definition of who is counted. Then
    fill `data/tables.csv` (including its `sample` column: the sample, or "None (full count)") and
    `data/dictionary.csv` for every table the post reads (these drive the
    reader download bundle and the generated `## Data dictionary` section of the post's README, which

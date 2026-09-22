@@ -384,7 +384,7 @@ cwr_wrap <- function(x, width = 22) {
 #   p <- ggplot(bars, aes(x = percent, y = district, fill = destination)) +
 #     geom_col(width = 0.7, position = position_stack(reverse = TRUE)) +
 #     cwr_stack_keys(bars, percent, district, destination,
-#                    labels = c(`In their own municipality` = "HOME DISTRICT", ...),
+#                    labels = c(`In their own district` = "HOME DISTRICT", ...),
 #                    colours = destination_colours) +
 #     scale_fill_manual(values = destination_colours, guide = "none") +
 #     scale_y_discrete(expand = expansion(add = c(1.1, 0.9))) +
@@ -1360,6 +1360,61 @@ cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.m
   cat(table_lines, sep = "\n")
   cat("\n")
   invisible(table_lines)
+}
+
+# ---- The post's key terms ------------------------------------------------------
+# The README's "## Key terms" table defines the terms used in the main body of
+# the post's charts - segment, legend, panel, axis and direct labels - and
+# nothing else: no statistical terms, no census geography terms, nothing found
+# only in a title, note or the prose (Greg, 2026-09-22; he asks for any term he
+# wants added). It has two columns, Term and Definition. Definitions are
+# the source's own, quoted from the table's metadata, the census dictionary or
+# other official documentation, with the source named in brackets at the end;
+# Greg adds his own where a source has none. Added 2026-09-22 after a chart note
+# said people who work at home were counted in their own municipality, when
+# the commuting tables leave them out altogether: a note, a label or a sentence
+# of prose is checked against these definitions before it is written.
+#
+# Claude drafts the table and may list a term it thinks a reader needs but
+# could find no official definition for, with the Definition cell left empty.
+# Those rows are Greg's to fill or delete; the post leaves them out, and the
+# render warns until each is settled, so none is forgotten.
+#
+# Printed as a markdown table, like the sources table, so the post says exactly
+# what the README says. Call it from a chunk with `#| output: asis`.
+cwr_key_terms_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+  table_lines <- cwr_readme_table(slug, "Key terms", readme)
+
+  # Split each row into its cells; the first two lines are the header and the
+  # |---|---| separator. A line "| a | b |" splits to "", " a ", " b ", "".
+  rows <- table_lines[-(1:2)] |>
+    map(\(line) {
+      cells <- str_split_1(str_trim(line), fixed("|"))
+      tibble(term = str_trim(cells[2]), definition = str_trim(cells[3]))
+    }) |>
+    list_rbind()
+
+  undefined <- rows |> filter(term != "", definition == "")
+  # Written to the console rather than raised as a warning: posts set
+  # `warning: false`, which would swallow it
+  if (nrow(undefined) > 0) {
+    cat(
+      "WARNING - post '", slug, "': these key terms have no definition yet and are left out of the post: ",
+      str_c(pull(undefined, term), collapse = ", "),
+      ". Add a definition in the README's Key terms table, or delete the row.\n",
+      sep = "", file = stderr()
+    )
+  }
+
+  defined <- rows |> filter(term != "", definition != "")
+  if (nrow(defined) == 0) {
+    cat("No key terms for this post.\n")
+    return(invisible(defined))
+  }
+  printed <- defined |> mutate(line = str_c("| ", term, " | ", definition, " |")) |> pull(line)
+  cat(c(table_lines[1:2], printed), sep = "\n")
+  cat("\n")
+  invisible(defined)
 }
 
 # ---- The post's reliability table --------------------------------------------

@@ -30,7 +30,7 @@ cwr_map_crs <- 3161
 # Where a label sits inside a shape.
 #
 # A centroid is the obvious choice and the wrong one: for a crescent or an
-# L-shaped municipality it can fall outside the shape altogether.
+# L-shaped district it can fall outside the shape altogether.
 # st_point_on_surface() is guaranteed to land inside but only promises
 # "inside", not "roomy", and it happily returns a point in a narrow arm where
 # no label would fit. st_inscribed_circle() answers the question actually

@@ -57,14 +57,14 @@ commuting_bars <- commuting |>
     # left to right as "how far do people go".
     destination = factor(
       destination,
-      levels = c("In their own municipality", "Elsewhere in the Region", "Outside the Region")
+      levels = c("In their own district", "Elsewhere in the Region", "Outside the Region")
     ),
     # Ordered on the share who stay put. fct_reorder() sorts ascending and a
     # horizontal chart draws the first level at the bottom, so the municipality
     # whose workers are most self-contained ends up on top.
     district = fct_reorder(
       district,
-      if_else(destination == "In their own municipality", percent, 0),
+      if_else(destination == "In their own district", percent, 0),
       .fun = max
     ),
     label = label_number(accuracy = 1, suffix = "%")(percent),
@@ -76,7 +76,7 @@ commuting_bars <- commuting |>
   )
 
 destination_colours <- c(
-  `In their own municipality` = dodgerblue,
+  `In their own district` = dodgerblue,
   `Elsewhere in the Region` = dodgerblue50,
   `Outside the Region` = cowboysilver
 )
@@ -99,7 +99,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
   cwr_stack_keys(
     commuting_bars, percent, district, destination,
     labels = c(
-      `In their own municipality` = "HOME DISTRICT",
+      `In their own district` = "HOME DISTRICT",
       `Elsewhere in the Region` = "ELSEWHERE IN REGION",
       `Outside the Region` = "OUTSIDE REGION"
     ),
@@ -118,7 +118,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
   scale_y_discrete(expand = expansion(add = c(1.1, 0.9)), labels = cwr_short_name) +
   coord_cartesian(clip = "off") +
   labs(
-    title = "Where each municipality's commuters work",
+    title = "Where each district's commuters work",
     subtitle = "Subtitle: what is measured, for whom, and when",
     fill = NULL,
     caption = cwr_caption(
@@ -154,8 +154,8 @@ alt_lines <- commuting_bars |>
 cwr_figure(
   p, "fig-commuting",
   alt = paste0(
-    "One horizontal bar per municipality, each split into three parts: the ",
-    "share of its workers who work in their own municipality, the share who ",
+    "One horizontal bar per district, each split into three parts: the ",
+    "share of its workers who work in their own district, the share who ",
     "work elsewhere in Waterloo Region, and the share who work outside it. ",
     paste(alt_lines, collapse = ". "), "."
   ),
@@ -252,7 +252,7 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
   # Stops a label that overhangs the panel edge from being cut off
   coord_cartesian(clip = "off") +
   labs(
-    title = "How commuters get to work, by municipality",
+    title = "How commuters get to work, by district",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0462-01",
@@ -297,7 +297,7 @@ cwr_figure(
   p, "fig-commuting-mode",
   alt = paste0(
     "Three panels of blue horizontal bars, each on its own scale, one row per ",
-    "municipality, showing the share of commuters who travel to work by car, ",
+    "district, showing the share of commuters who travel to work by car, ",
     "truck or van, by public transit, and by active transportation (walking ",
     "or cycling). ",
     paste(alt_lines, collapse = ". "), "."
@@ -686,7 +686,7 @@ flow_alt <- function(home_name) {
   elsewhere <- shares |> filter(name != home_name) |> arrange(desc(percent))
   outside <- flows |> filter(home == home_name, top_outside)
   paste0(
-    "Map of Waterloo Region's seven municipalities, each shaded darker the ",
+    "Map of Waterloo Region's seven districts, each shaded darker the ",
     "larger the share of ", home_name, "'s workers who work there. ",
     share_label(stay$percent), " of ", home_name, "'s workers work in ",
     home_name, ". Elsewhere in the Region: ",
@@ -916,7 +916,7 @@ rank_lines <- function(ranked) {
 
 p <- rank_chart(between) +
   labs(
-    title = "Commuters from elsewhere in the Region, by the municipality they work in",
+    title = "Commuters from elsewhere in the Region, by the district they work in",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
@@ -932,8 +932,8 @@ p <- rank_chart(between) +
 cwr_figure(
   p, "fig-destinations",
   alt = paste0(
-    "Horizontal bars ranking the seven municipalities by their share of the ",
-    "Region's commuters who travel to work in another municipality in the ",
+    "Horizontal bars ranking the seven districts by their share of the ",
+    "Region's commuters who travel to work in another district in the ",
     "Region. ",
     paste(rank_lines(between), collapse = ". "), "."
   )
@@ -965,7 +965,7 @@ inbound_districts <- inbound |>
 
 p <- rank_chart(inbound_districts) +
   labs(
-    title = "Commuters from outside the Region, by the municipality they work in",
+    title = "Commuters from outside the Region, by the district they work in",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0459-01",
@@ -980,7 +980,7 @@ p <- rank_chart(inbound_districts) +
 cwr_figure(
   p, "fig-inbound-districts",
   alt = paste0(
-    "Horizontal bars ranking the seven municipalities by their share of the ",
+    "Horizontal bars ranking the seven districts by their share of the ",
     "people who commute into Waterloo Region from outside it. ",
     paste(rank_lines(inbound_districts), collapse = ". "), "."
   )
@@ -1037,7 +1037,7 @@ p <- ggplot(feeders, aes(x = percent, y = home)) +
       credit = TRUE,
       notes = c(
         "Workers with a usual place of work",
-        "The ten municipalities sending the most commuters into the Region",
+        "The ten places sending the most commuters into the Region",
         "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
       )
     )
@@ -1054,7 +1054,7 @@ p <- ggplot(feeders, aes(x = percent, y = home)) +
 cwr_figure(
   p, "fig-inbound-feeders",
   alt = paste0(
-    "A lollipop chart of the ten municipalities that send the most commuters ",
+    "A lollipop chart of the ten places that send the most commuters ",
     "into Waterloo Region, ranked by each one's share of everyone who commutes ",
     "in, against an axis along the top in percent. ",
     paste(
@@ -1068,6 +1068,26 @@ cwr_figure(
 )
 ```
 :::
+
+## Key terms
+
+<!-- The terms a reader needs to read the charts correctly, each with its official
+     definition. The table is not written here: the chunk below prints it from the
+     "Key terms" table in this post's README.md, so there is only ever one copy. Edit
+     the definitions there. A term whose Definition cell is still empty is left out of
+     the post, and the render warns until it is defined or deleted.
+
+     Keep this heading as it is. _includes/like.html puts the "Like this post" button
+     immediately above it, since the analysis ends here and everything below is
+     reference material. -->
+
+```{r}
+#| label: key-terms
+#| output: asis
+
+# Prints the key terms from this post's README.md - edit them there, not here
+cwr_key_terms_table("commuting")
+```
 
 ## Data sources and reliability
 

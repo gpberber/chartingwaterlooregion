@@ -148,7 +148,7 @@ p <- language_bars("non_official_percent") +
 cwr_figure(
   p, "fig-language-other",
   alt = paste0(
-    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "Horizontal bars, one row per district, showing the percentage of ",
     "people whose mother tongue is neither English nor French, highest at the ",
     "top, with the three cities in dark blue and the four townships in light blue. ",
     language_alt("non_official_percent"), "."
@@ -177,7 +177,7 @@ p <- language_bars("german_percent_of_non_official") +
 cwr_figure(
   p, "fig-language-german",
   alt = paste0(
-    "Horizontal bars, one row per municipality, showing the percentage of ",
+    "Horizontal bars, one row per district, showing the percentage of ",
     "people with a mother tongue other than English or French whose mother ",
     "tongue is German or Pennsylvania German. Rows are in the same order as the ",
     "previous tab, not by these figures. The three cities are in dark blue and the ",

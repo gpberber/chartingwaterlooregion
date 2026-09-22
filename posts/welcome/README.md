@@ -34,7 +34,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 <!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
      in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
      caveat another source's own documentation gives. Closely related flags share a row - one
-     table graded acceptable for one municipality and good for another is one issue. Say which
+     table graded acceptable for one district and good for another is one issue. Say which
      figures it touches and what it means for them, in a sentence or two, and end with the
      table number in brackets.
 
@@ -61,7 +61,7 @@ Then `quarto render posts/welcome` from a terminal.
 - No API keys are needed.
 - Area is Statistics Canada's published 2021 census land area (the `LANDAREA` field of the boundary file), which excludes inland water. Density is that area divided into the 2025 population estimate, so it is people per square kilometre of land.
 - The cattle and census population tables are cut to Waterloo Region as they are downloaded, unlike the other raw files; nothing outside those rows is used.
-- Cattle (32-10-0370-01) are published for census consolidated subdivisions, groups of neighbouring municipalities, not for municipalities. Each of the four townships is a consolidated subdivision on its own, under its own municipal code, so the township figures are the townships exactly (checked against the 2021 geographic attribute file, Statistics Canada 92-151); the City of Waterloo is folded into the Kitchener one, which is why no city figures are used. The figures are the table's "Total cattle": calves, steers, heifers, cows and bulls.
+- Cattle (32-10-0370-01) are published for census consolidated subdivisions, groups of neighbouring census subdivisions, not for single districts. Each of the four townships is a consolidated subdivision on its own, under its own census subdivision code, so the township figures are the townships exactly (checked against the 2021 geographic attribute file, Statistics Canada 92-151); the City of Waterloo is folded into the Kitchener one, which is why no city figures are used. The figures are the table's "Total cattle": calves, steers, heifers, cows and bulls.
 - Sampling: none of the figures are from a sample. The population estimates are Statistics Canada's demographic estimates, not a survey. The Census of Agriculture counts every farm, and the 2021 township populations beside the cattle are the census full count.
 
 ## Data dictionary
@@ -76,7 +76,7 @@ Every column of every table in `data/tables.csv`. Types and example values are r
 | districts | population | number | Estimated resident population on 1 July 2025 | people | 12413 to 323917 |
 | districts | area_sq_km | number | Land area published by Statistics Canada in the 2021 census boundary file; excludes inland water | square kilometres | 64.056 to 326.5574 |
 | districts | density_per_sq_km | number | population divided by area_sq_km, so people per square kilometre of land | people per square kilometre | 44.69285 to 2367.556 |
-| districts | label_room_km | number | Radius of the largest circle that fits inside the municipality, a measure of how much room a map label has there | kilometres | 3.088863 to 8.220127 |
+| districts | label_room_km | number | Radius of the largest circle that fits inside the district, a measure of how much room a map label has there | kilometres | 3.088863 to 8.220127 |
 | districts | label_lon | number | Longitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | -80.71725 to -80.33542 |
 | districts | label_lat | number | Latitude of the centre of that largest inscribed circle, used to place the map label | decimal degrees (EPSG:4326) | 43.32466 to 43.58204 |
 | cattle | district | text | Name of the township |  | North Dumfries; Wellesley; Wilmot; ... (4 distinct values) |

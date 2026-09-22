@@ -32,7 +32,7 @@ words and the template gets chosen for you. This is for when you want to know wh
 | Snippet | Chart | Good for |
 |---|---|---|
 | `ggvertbar` | Vertical bar chart | A handful of categories with one number each and short labels: spending by department, trips by mode, a count for each of a few years. |
-| `gghorbar` | Horizontal bar chart, ranked | A ranking - and the default whenever the category names are long or there are more than about six of them: municipalities, offence types, wards. |
+| `gghorbar` | Horizontal bar chart, ranked | A ranking - and the default whenever the category names are long or there are more than about six of them: districts, offence types, wards. |
 | `gghorbarrect` | Ranked bars with a value column | A ranking where a second number matters as much as the bar: ranked by count, with the rate printed beside it. |
 | `ggcompbar_horiz` | Paired horizontal bars | Us against them, one pair per category: Waterloo Region beside Ontario, this year beside last. |
 | `ggcompbar_vert` | Paired vertical bars | The same comparison when there are only a few categories and the labels are short. |
@@ -84,8 +84,8 @@ words and the template gets chosen for you. This is for when you want to know wh
 
 | Snippet | Chart | Good for |
 |---|---|---|
-| `ggmap` | Map of the Region, labelled | Where something is rather than how much of it there is: which municipality, which corner of the Region. Labels sit inside the shapes. |
-| `ggmapshaded` | Shaded map (choropleth) | One value per municipality shown as shading, so the pattern reads before the numbers do: shares, rates, densities. |
+| `ggmap` | Map of the Region, labelled | Where something is rather than how much of it there is: which district, which corner of the Region. Labels sit inside the shapes. |
+| `ggmapshaded` | Shaded map (choropleth) | One value per district shown as shading, so the pattern reads before the numbers do: shares, rates, densities. |
 
 ### Small multiples and facets
 

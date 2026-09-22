@@ -63,7 +63,7 @@ Two things `theme_cwr()` now handles that a chart used to have to ask for:
 | a range or band over time | min/max per period | `ggribbon` (lines.md) |
 | relationship between two measures | x, y per unit | `ggscatter`, `ggbubble` (points.md) |
 | category x time grid | rank or value per cell | `ggheatrank`, `ggheatraw` (heatmaps.md) |
-| where something is, not how much | one value per municipality | `ggmap`, `ggmapshaded` (maps.md) |
+| where something is, not how much | one value per district | `ggmap`, `ggmapshaded` (maps.md) |
 | one chart per group | any of the above | `ggmultiples`, `ggfacet` (multiples.md) |
 | one chart per group, chosen by the reader | any of the above | a `panel-tabset`, see **Tabs** below |
 | bar thickness carries meaning | value + weight | `ggshadedbars` (bars.md) |
@@ -100,7 +100,7 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    which opens italics in a ggtext caption and swallows the line.
 1b. **A chart drawn from CMA data carries the CMA note, first.** Several Statistics
    Canada series are published for the Kitchener census metropolitan area and nothing smaller.
-   The CMA is six of Waterloo Region's seven municipalities - Wellesley Township is the only
+   The CMA is six of Waterloo Region's seven districts - Wellesley Township is the only
    exclusion and nothing outside the Region is in it - so the figures are a subset of the
    Region, not a different place, and Greg's prose may simply call it Waterloo Region. The
    qualification belongs on the chart all the same, because a chart travels without the post:
@@ -145,6 +145,16 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    | No intervals published | a ranking or comparison from a table without bounds (rule 9b) | "No confidence intervals are published for these figures; shares close together may differ only by sampling error" |
    | Liaison Strategies 2025 | the globe-csi perception survey | "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city" |
 
+   **A note that says who or what is counted is taken from the official definition, never from
+   memory or from the look of the data.** Read the table's own notes and the census dictionary's
+   "Reported for" line for the variable - they are in the README's Key terms table, which is drafted
+   before the charts - and write the note to match. Greg's case (2026-09-22): a commuting note said
+   people who work from home were "counted in their own municipality"; the dictionary says commuting
+   covers only people "who reported having a usual place of work", so home workers are not in the
+   figures at all. A universe can also differ between variables of one topic (main mode of
+   commuting covers people with no fixed workplace address too; commuting destination does not), so
+   check the variable the chart actually shows.
+
    A survey used for the first time gets its own row here, in the same pattern ("Estimates from the
    Labour Force Survey, a monthly sample of about N households", the size from the survey's own
    documentation, not from memory). **The census long form has no chart note** (Greg, 2026-09-22:
@@ -160,6 +170,12 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    it types "Region" with a comment pointing at `cwr_region`; a source that says "WRPS",
    "Waterloo (CD)" or "Kitchener - Cambridge - Waterloo" is recoded to it there. Titles,
    subtitles and prose are Greg's and may use the full name; alt text may too, for clarity.
+2c. **The seven cities and townships are "districts", never "municipalities".** In Ontario
+   "municipality" is a legal status, and Waterloo Region is officially The Regional Municipality of
+   Waterloo (Greg, 2026-09-22), so the word means the Region as a whole and nothing smaller. Titles,
+   labels, alt text, notes, Key terms, data values ("In their own district"), README text and code
+   comments all say district (or city and township, when the type matters); a place outside the
+   Region is a "place". Only a quotation from a source keeps its own wording.
 2b. **North Dumfries is "N. Dumfries" in chart text - always through `cwr_short_name()`.** Every
    chart, every post (Greg, 2026-09-18): axis labels (`scale_y_discrete(labels = cwr_short_name)`,
    composed with any labeller the chart already has), direct labels, map labels (measure the label
@@ -451,7 +467,7 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
 
 ## Tabs: one chart per tab
 
-When a chart would be made of the same picture several times over - one municipality at a time, one
+When a chart would be made of the same picture several times over - one district at a time, one
 measure at a time - put each in a tab of a Quarto `panel-tabset` rather than in a grid of small
 multiples that nothing fits into. The rules, from the language post's mother tongue charts and the
 commuting post's flow maps:
@@ -512,7 +528,7 @@ Yours to write: the `cwr_caption()` source line, the `alt` text, the code commen
 Every chart Claude drafts gets one in place of the template's "Title: the finding, in one line",
 so Greg can tell the charts apart while he works (his request, 2026-09-18, after a post of twelve
 charts all titled the same placeholder). Say what is plotted, for which places, split which way -
-"Where commuters from Kitchener work", "How commuters get to work, by municipality", "The ten
+"Where commuters from Kitchener work", "How commuters get to work, by district", "The ten
 places sending the most commuters into the Region". Never a finding, a comparison, an adjective
 that judges ("most", "only", "rising" are fine when they describe the selection, not the result),
 or a number from the data. The finding title that replaces it is Greg's, per style rule 1. Tabs

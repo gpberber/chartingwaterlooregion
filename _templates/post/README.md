@@ -2,6 +2,24 @@
 
 Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 
+## Key terms
+
+| Term | Definition |
+|---|---|
+| | |
+
+<!-- Only terms that appear in the main body of a chart - segment and legend names, panel
+     headings, axis and direct labels - and that a reader needs defined to read it: never
+     statistical terms (confidence interval, coefficient of variation), never census geography
+     terms (census subdivision, census division), never a term used only in a title, note or the
+     prose. Greg asks for any term he wants added. Quote the source's own definition and name the
+     source in brackets at the end - the table's metadata, footnotes or category names, the census
+     dictionary or reference guides, or other official documentation ("(2021 Census
+     Dictionary)"). A term with no official definition is Greg's to define: Claude lists it with
+     the Definition cell empty, to be filled in or deleted. The post's "Key terms" section prints every row that has a
+     definition, and the render warns about any that does not. Every chart note, label and
+     sentence about who or what is counted is checked against these rows (cwr-charts rule 1d). -->
+
 ## Data sources
 
 | File in `data-raw/` | What it is | Source (link) | Licence | Sample | Accessed |
@@ -24,7 +42,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 <!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
      in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
      caveat another source's own documentation gives. Closely related flags share a row - one
-     table graded acceptable for one municipality and good for another is one issue. Say which
+     table graded acceptable for one district and good for another is one issue. Say which
      figures it touches and what it means for them, in a sentence or two, and end with the
      table number in brackets.
 

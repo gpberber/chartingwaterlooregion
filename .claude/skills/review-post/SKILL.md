@@ -120,6 +120,17 @@ For every `ggplot` chunk:
 - README lists each source with URL, licence, and access date. The licence must be the source's own
   (e.g. Statistics Canada Open Licence, Open Government Licence – Kitchener), never "CC BY" or "MIT";
   files obtained by request rather than from an open-data portal need their terms confirmed.
+- No chart text, alt text, note, Key term or README line calls the Region's cities and townships
+  "municipalities" (style rule 2c): they are districts; "municipality" means the Region as a whole.
+  Flag every instance outside a quotation from a source.
+- The post has a `## Key terms` section just before `## Data sources and reliability`, printing the
+  README's `## Key terms` table with `cwr_key_terms_table("<slug>")` in an `#| output: asis` chunk.
+  It lists only terms used in the main body of a chart - flag a statistical term, a census geography
+  term, or a term found only in a title, note or prose. Every term has a definition with its source in brackets (the render's WARNING line lists any that
+  do not - Greg defines or deletes them), and every chart note, axis or legend label, alt text and
+  sentence of prose that says who or what is counted agrees with those definitions. Check this line
+  by line against the table: it is the check that would have caught "people who work from home are
+  counted in their own municipality" in the commuting post.
 - The post has a `## Data sources and reliability` section with two subheadings: `### Sources`,
   which prints the README's source table with `cwr_sources_table("<slug>")`, and `### Reliability`,
   which prints the README's Reliability table with `cwr_reliability_table("<slug>")`, each in an
@@ -168,7 +179,7 @@ For every `ggplot` chunk:
 - **Search.** The title and description are Greg's prose, so these are suggestions, never edits;
   quote the current text and say what a searcher would type. Flag a title with no word a person
   would search for (a place, a topic: "population", "rent", "commuting"), and a description that
-  names neither the place (Waterloo Region, or the municipality) nor the topic, or runs well
+  names neither the place (Waterloo Region, or the district) nor the topic, or runs well
   outside about 120 to 160 characters (Google often shows it under the title in results, cut to
   fit). A playful title can stay playful if the description carries the search words. Report the
   character count of the description.

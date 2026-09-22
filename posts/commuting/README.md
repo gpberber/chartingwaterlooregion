@@ -2,13 +2,39 @@
 
 Post: https://chartingwaterlooregion.ca/posts/commuting/
 
+## Key terms
+
+| Term | Definition |
+|---|---|
+| Commuters (who is counted) | "Population aged 15 years and over, in private households, with a job or absent from their job or business during the week of Sunday, May 2 to Saturday, May 8, 2021, and who reported having a usual place of work." People who worked at home, worked outside Canada or had no fixed workplace address are not included. (2021 Census Dictionary, Commuting destination: Reported for) |
+| Home district | Workers who "Commute within census subdivision (CSD) of residence": they work in the district they live in. (Statistics Canada, table 98-10-0462-01, commuting destination category) |
+| Elsewhere in Region | Workers who "Commute to a different census subdivision (CSD) within census division (CD) of residence": they work in another of the Region's districts. (Statistics Canada, table 98-10-0462-01, commuting destination category) |
+| Outside Region | Workers who "Commute to a different census subdivision (CSD) and census division (CD) within province or territory of residence" or "Commute to a different province or territory": they work outside the Region. (Statistics Canada, table 98-10-0462-01, commuting destination categories) |
+| Car, truck or van | Travelling to work by car, truck or van, "as a driver or as a passenger". (Statistics Canada, The Daily, November 30, 2022) |
+| Public transit | |
+| Active transportation | Commuting by "walking or bicycling". (Statistics Canada, The Daily, November 30, 2022) |
+| Brantford/Brant | |
+
+<!-- Only terms that appear in the main body of a chart - segment and legend names, panel
+     headings, axis and direct labels - and that a reader needs defined to read it: never
+     statistical terms (confidence interval, coefficient of variation), never census geography
+     terms (census subdivision, census division), never a term used only in a title, note or the
+     prose. Greg asks for any term he wants added. Quote the source's own definition and name the
+     source in brackets at the end: the table's metadata, footnotes or category names, the census
+     dictionary or reference guides, other official documentation. A term with no official
+     definition is Greg's to define: its Definition cell is left empty, to be filled in or the row
+     deleted. The post prints every row that has a definition, and the render warns about any
+     that does not. Every chart note, label and sentence about who or what is counted is still
+     checked against the source's definitions (cwr-charts rule 1d), whether or not the term is in
+     this table. -->
+
 ## Data sources
 
 | File in `data-raw/` | What it is | Source (link) | Licence | Sample | Accessed |
 |---|---|---|---|---|---|
 | `table_98100462.csv` | Table 98-10-0462-01, commuting destination by mode, age and gender, 2021 census | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810046201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | Census long form, 25% sample of private households | 2026-09-15 |
 | `table_98100459_region.csv`, `table_98100459_members.csv` | Table 98-10-0459-01, commuting flow from place of residence to place of work, 2021 census, cut to commutes with one end in the Region; the members file is the table's own list of places and codes | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810045901) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | Census long form, 25% sample of private households | 2026-09-17 |
-| `census_tnr.csv` | Long-form and short-form total non-response rates for the Region and its seven municipalities, read from each area's Census Profile page by `cwr_census_tnr()` | [Statistics Canada, Census Profile 2021](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/index.cfm?Lang=E) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | None (rates about the census's own collection) | 2026-09-22 |
+| `census_tnr.csv` | Long-form and short-form total non-response rates for the Region and its seven districts, read from each area's Census Profile page by `cwr_census_tnr()` | [Statistics Canada, Census Profile 2021](https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/index.cfm?Lang=E) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | None (rates about the census's own collection) | 2026-09-22 |
 | `table_98100572.csv` | Table 98-10-0572-01, long-form data quality indicators for commuting: non-response and imputation rates per question, cut to the Region's eight geographies | [Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810057201) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | Census long form, 25% sample of private households (the rates are weighted estimates) | 2026-09-22 |
 | `csd_boundaries.gpkg` | 2021 census subdivision cartographic boundary file (`lcsd000b21a_e`), cut to the Region and the places its residents commute to | [Statistics Canada](https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21) | [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence) | None (boundaries) | 2026-09-17 |
 
@@ -21,7 +47,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 |---|---|
 | **Long-form census:** every chart in this post is drawn from the 2021 census long-form questionnaire (tables 98-10-0462 and 98-10-0459). Its figures are estimates for people in private households, from the 2021 census long-form questionnaire sent to 25% of households; people living in collective dwellings, such as nursing and seniors' homes and student residences, are not included. Each responding household stands for about four, its weight adjusted by Statistics Canada for households that did not respond and matched to the full census counts of age, household size and other characteristics; answers left blank are filled in from similar households. (tables 98-10-0459, 98-10-0462) | |
 | **Sample estimates:** because the figures are estimates, each share worked out from table 98-10-0462 has a 95% confidence interval, built from the intervals Statistics Canada publishes for its counts by Statistics Canada's own method. The intervals cover sampling error and the variability from households that did not respond; they do not cover any bias if those households differ from the ones that did, answers filled in for blank questions, people the census missed or counted twice, misreported answers, or rounding. A share whose sampling error is 16.6% of its value or more - rated "use with caution" (E) or "too unreliable to be published" (F) on Statistics Canada's scale - is not reported: public transit in North Dumfries (F), Wilmot (E) and Woolwich (E). Table 98-10-0459 publishes no intervals, so close rankings drawn from it may differ only by sampling error. (tables 98-10-0459, 98-10-0462) | |
-| **Response rates:** 1.5% to 5.0% of the households sent the long form in each municipality returned nothing usable (3.3% for the Region; Statistics Canada advises caution only at 50% or more), and 1.3% to 4.6% of the answers to the place-of-work and mode-of-commuting questions were missing or filled in. (Census Profile 2021; table 98-10-0572) | |
+| **Response rates:** 1.5% to 5.0% of the households sent the long form in each district returned nothing usable (3.3% for the Region; Statistics Canada advises caution only at 50% or more), and 1.3% to 4.6% of the answers to the place-of-work and mode-of-commuting questions were missing or filled in. (Census Profile 2021; table 98-10-0572) | |
 | **Commuting flows:** Statistics Canada randomly rounds each flow to a multiple of 5 to protect confidentiality, so small flows, and the shares worked out from them, are approximate. (table 98-10-0459) <!-- flags: 98-10-0459:note1 --> | |
 | **Not applicable:** three counts are zero (commuters from North Dumfries and Wellesley who work in another province, and Wellesley's transit commuters), and a zero count has no confidence interval, so its bounds are marked "..." (not applicable). (table 98-10-0462) <!-- flags: 98-10-0462:... --> | Does not apply: a share of zero has no interval, so these bounds are never used; the zero itself is charted as published. |
 | **Men+ and Women+:** because the non-binary population is small, non-binary people are counted in the Men+ and Women+ categories. (tables 98-10-0459, 98-10-0462) <!-- flags: 98-10-0459:note3, 98-10-0462:note3 --> | Does not apply: every chart uses the total for all genders, so the Men+ and Women+ split is not used. |
@@ -29,7 +55,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 <!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
      in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
      caveat another source's own documentation gives. Closely related flags share a row - one
-     table graded acceptable for one municipality and good for another is one issue. Say which
+     table graded acceptable for one district and good for another is one issue. Say which
      figures it touches and what it means for them, in a sentence or two, and end with the
      table number in brackets.
 
@@ -90,5 +116,5 @@ Then `quarto render posts/commuting` from a terminal.
   rate and the non-response and imputation rates for the place-of-work and mode questions (from
   `census_tnr.csv` and table 98-10-0572); all are low.
 - The commuting table is cut down as it is downloaded, to Waterloo Region and its seven
-  municipalities. Whole, it covers every census subdivision in Canada and runs to hundreds of
+  districts. Whole, it covers every census subdivision in Canada and runs to hundreds of
   megabytes, and nothing outside those rows is used.

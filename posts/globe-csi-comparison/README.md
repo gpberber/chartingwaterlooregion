@@ -32,7 +32,7 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
 <!-- One row per data-quality issue in the data the post uses: each flag and quality footnote
      in data/quality_flags.csv (written by cwr_quality_flags() in R/02_clean_data.R), and any
      caveat another source's own documentation gives. Closely related flags share a row - one
-     table graded acceptable for one municipality and good for another is one issue. Say which
+     table graded acceptable for one district and good for another is one issue. Say which
      figures it touches and what it means for them, in a sentence or two, and end with the
      table number in brackets.
 

@@ -8,10 +8,10 @@ All templates assume `source(here::here("R", "theme_cwr.R"))` has run: it provid
 
 ## ggmap
 
-Outline map of the Region, one shape per municipality, labelled inside the shapes.
+Outline map of the Region, one shape per district, labelled inside the shapes.
 
 ```r
-# Outline map of the Region, one shape per municipality, labelled inside.
+# Outline map of the Region, one shape per district, labelled inside.
 # Shapes and label points come from a post's data/ (02_clean_data.R writes
 # them with cwr_label_point()); R/maps.R supplies the projection, the nudges
 # and the theme.

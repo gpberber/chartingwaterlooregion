@@ -104,8 +104,9 @@
   // Under the author and dates at the top.
   meta.insertAdjacentElement("afterend", build("cwr-like-header"));
 
-  // And where the analysis stops. Every post closes with "Data sources and
-  // reliability", usually "Other sources", then a Reproducibility box - house
+  // And where the analysis stops. Every post closes with "Key terms" (since
+  // 2026-09-22), "Data sources and reliability", usually "Other sources", then
+  // a Reproducibility box - house
   // structure, set by _templates/post/index.qmd and checked by /review-post - and
   // all of it is reference material rather than part of the piece. Asking for a
   // like after them means asking at the wrong moment.
@@ -117,7 +118,8 @@
   // those, the button falls back to the licence appendix and then to the end of
   // the page: still on the post, just lower down. Renaming the section is the
   // thing that moves it.
-  const end = main.querySelector("#data-sources-and-reliability") ||
+  const end = main.querySelector("#key-terms") ||
+              main.querySelector("#data-sources-and-reliability") ||
               main.querySelector("#data-sources") ||
               main.querySelector("#data-and-methods") ||
               main.querySelector("#quarto-appendix");
