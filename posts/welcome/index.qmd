@@ -210,7 +210,7 @@ cwr_figure(
   p, "fig-districts",
   alt = paste0(
     "Outline map of Waterloo Region showing the borders of its seven ",
-    "districts, each labelled with its name and land area: the cities of ",
+    "municipalities, each labelled with its name and land area: the cities of ",
     "Kitchener, Waterloo and Cambridge grouped together in the middle, ringed ",
     "by Woolwich Township to the north, Wellesley Township to the north west, ",
     "Wilmot Township to the south west and North Dumfries Township to the ",
@@ -386,9 +386,9 @@ alt_entries <- population_bars |>
 cwr_figure(
   p, "fig-sizes",
   alt = paste0(
-    "Horizontal bars of population, one per district, largest first, with ",
+    "Horizontal bars of population, one per municipality, largest first, with ",
     "the three cities in dark blue and the four townships in light blue, and each ",
-    "district's residents per square kilometre boxed in a column on the ",
+    "municipality's residents per square kilometre boxed in a column on the ",
     "right. ",
     paste(alt_entries, collapse = "; "), "."
   ),
