@@ -37,8 +37,15 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 
 Never redefine these in a post. If a post needs a new palette, add it to `theme_cwr.R`.
 
-Two things `theme_cwr()` now handles that a chart used to have to ask for:
+Three things `theme_cwr()` now handles that a chart used to have to ask for:
 
+- **The title, subtitle and caption wrap.** They are drawn as `element_textbox_simple()`
+  boxes sized to the image (8.3 in less the plot margins), so a long line breaks on to a
+  second line instead of running off the right edge, and `cwr_figure()` makes the image
+  taller to hold it. Never break a title by hand with `<br>` to make it fit; a `<br>` is
+  for a break you want in a particular place (rule 1). A chart saved at another width, or
+  one that widens `plot.margin`, passes that width to `theme_cwr(width = )` so the boxes
+  still match what is drawn.
 - **The left axis reads markdown.** `axis.text.y.left` is an `element_markdown()`, so
   `**bold**` (rule 5) and `<br>` (rule 8) work without a per-chart `theme()` line. Several
   templates still set it explicitly; that line is a harmless no-op, not something to copy

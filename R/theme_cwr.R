@@ -137,35 +137,47 @@ cwr_font <- function(family = "Inter") {
 # wide, shown at that size on a desktop (axis text a little smaller than the
 # body text) and shrunk to about 320 px on a phone, where the text is small
 # but the shapes still read; readers can tap a chart to enlarge it.
-theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
+#
+# `width` is the width of the image the chart will be saved at, in inches, and
+# is only used to size the title, subtitle and caption. They are drawn as text
+# boxes (element_textbox_simple(), from ggtext) rather than plain markdown, so
+# a line longer than the image wraps instead of running off the right edge; a
+# box needs to be told how wide it is, and "the image less the plot margin
+# either side" is that width. A chart saved at another width, or one that
+# widens plot.margin, passes its own `width` so the boxes still match what is
+# drawn - the phone version does exactly this in cwr_phone_theme(), and the
+# note there says what goes wrong when the two drift apart.
+theme_cwr <- function(base_size = 15, base_family = cwr_font(), width = 8.3) {
+  side_margin <- 6   # points, left and right; used again in plot.margin below
+  box_width <- unit(width, "in") - unit(2 * side_margin, "pt")
+
   theme_minimal(base_size = base_size, base_family = base_family) +
     theme(
-      # Text elements. element_markdown() (from ggtext) means titles can
-      # contain **bold** or <span style='color:...'> markup.
-      plot.title = element_markdown(
+      # Text elements. element_textbox_simple() (from ggtext) means titles can
+      # contain **bold** or <span style='color:...'> markup, and wrap.
+      plot.title = element_textbox_simple(
         size = base_size * 1.0,
-        hjust = 0,
-        vjust = 1,
+        width = box_width,
+        lineheight = 1.1,
         margin = margin(0, 0, 5, 0),
         face = "bold"
       ),
-      plot.subtitle = element_markdown(
+      plot.subtitle = element_textbox_simple(
         size = base_size * 0.7,
-        hjust = 0,
-        vjust = 1,
+        width = box_width,
+        lineheight = 1.1,
         margin = margin(0, 0, 10, 0),
         color = "black",
         face = "bold"
       ),
-      plot.caption = element_markdown(
+      plot.caption = element_textbox_simple(
         size = base_size * 0.6,
-        hjust = 0,
-        vjust = 1,
+        width = box_width,
         margin = margin(t = 10),
         color = cowboysilver,
         # A caption is more than one line whenever cwr_caption() is given
-        # notes, or whenever a long source line wraps on a phone. gridtext
-        # sets those lines solid, so they need opening up here.
+        # notes, or whenever a long source line wraps. gridtext sets those
+        # lines solid, so they need opening up here.
         lineheight = 1.3
       ),
 
@@ -257,7 +269,8 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font()) {
       # base_size, 15 pt, which put a 20 px white border on all four sides of every
       # PNG: on the page that read as a gap under the chart, and it inset the chart
       # from the text column instead of matching the paragraph width.
-      plot.margin = margin(t = 6, r = 6, b = 6, l = 6),
+      # The side margins are the ones the title boxes were sized against above.
+      plot.margin = margin(t = 6, r = side_margin, b = 6, l = side_margin),
       plot.title.position = "plot",
       plot.caption.position = "plot",
       panel.border = element_blank(),
