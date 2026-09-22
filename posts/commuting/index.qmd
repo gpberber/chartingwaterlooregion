@@ -57,7 +57,7 @@ home_region_2021 <- home_region |> filter(year == 2021) |> pull(label)
 
 <!-- Opening paragraph: the question this post asks and the one-line answer. -->
 
-## First finding as a plain-language heading
+## No place like home
 
 <!-- One or two paragraphs, then one chart. -->
 
