@@ -255,7 +255,7 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
     title = "How commuters get to work, by district",
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
-      "Statistics Canada Table 98-10-0462-01",
+      "Statistics Canada Table 98-10-0464-01",
       credit = TRUE,
       notes = c(
         "Other ways of getting to work are not shown, so the three do not add to 100%",
@@ -263,7 +263,12 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
         # Keyed ³ on each share not reported; drops out on its own if none is
         if (any(is.na(pull(mode_bars, percent)))) {
           "The sampling error exceeds 16.6%, so the value is too unreliable to report."
-        }
+        },
+        # Who is counted, from the census dictionary's "Main mode of commuting".
+        # Unlike the first chart, this one also counts people with no fixed
+        # workplace address. Last in the list so the keys above keep their
+        # numbers.
+        "Includes workers with a usual place of work or no fixed workplace address."
       )
     )
   ) +

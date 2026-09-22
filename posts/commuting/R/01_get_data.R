@@ -29,6 +29,105 @@ get_cansim("98-10-0462") |>
   filter(str_starts(GeoUID, "3530")) |>
   write_csv(file.path(raw_dir, "table_98100462.csv"))
 
+# ---- Main mode of commuting, 2021 census -----------------------------------
+# Table 98-10-0464, "Main mode of commuting by industry sectors, occupation
+# broad category and gender", for the mode chart. 98-10-0462 above has mode
+# too, but only for people with a usual place of work, because it is crossed
+# with commuting destination. The mode question itself also covers people with
+# no fixed workplace address (2021 Census Dictionary, "Main mode of
+# commuting"), and so does this table: about 29,000 more commuters in the
+# Region. It is the table Statistics Canada's own commuting release (The Daily,
+# 2022-11-30) quotes. 98-10-0461 was checked too and has 0462's limit, since
+# it is crossed with distance to a usual place of work.
+#
+# The table has 90 million cells, so only the 96 the chart needs are fetched,
+# one by one, from Statistics Canada's web data service: 8 places x 4 modes x
+# 3 statistics (the count and its 95% confidence interval bounds), with
+# industry, occupation and gender at their totals. A cell is named by its
+# "coordinate", the member id of each dimension in order, joined by dots:
+# place . occupation . gender . statistic . industry . mode, then four zeros
+# for dimensions the table does not have. Member 1 is each dimension's total.
+# The ids are from the table's metadata (getCubeMetadata), where they can be
+# checked.
+#
+# The service is called directly with httr2 rather than through cansim, whose
+# cell function drops each cell's status ("..." not applicable, E, F), which
+# the data-quality check needs. A cell the service does not return at all is a
+# zero - census tables leave zeros out - and is written with no value and no
+# status for 02_clean_data.R to fill in.
+mode_places <- tribble(
+  ~GeoUID,    ~GEO,              ~place_member,
+  "3530",     "Waterloo Region", 2439,
+  "3530004",  "North Dumfries",  2440,
+  "3530010",  "Cambridge",       2441,
+  "3530013",  "Kitchener",       2442,
+  "3530016",  "Waterloo",        2443,
+  "3530020",  "Wilmot",          2444,
+  "3530027",  "Wellesley",       2445,
+  "3530035",  "Woolwich",        2446
+)
+mode_statistics <- tribble(
+  ~`Statistics (3)`,                              ~statistic_member,
+  "Count",                                        1,
+  "95% confidence interval lower bound, Count",   2,
+  "95% confidence interval upper bound, Count",   3
+)
+mode_modes <- tribble(
+  ~`Main mode of commuting (11A)`,   ~mode_member,
+  "Total - Main mode of commuting",  1,
+  "Car, truck or van",               2,
+  "Public transit",                  9,
+  "Active transportation",           10
+)
+
+mode_cells <- mode_places |>
+  cross_join(mode_statistics) |>
+  cross_join(mode_modes) |>
+  mutate(COORDINATE = str_glue("{place_member}.1.1.{statistic_member}.1.{mode_member}.0.0.0.0"))
+
+# What each status code means, from Statistics Canada's own code list. Code 0
+# is "normal", which has no symbol.
+status_codes <- get_cansim_code_set("status") |>
+  select(statusCode, STATUS = statusRepresentationEn)
+
+# One request for all 96 cells. The answers do not come back in the order
+# asked, so each is matched to its cell by coordinate.
+mode_response <- httr2::request(
+  "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
+) |>
+  httr2::req_body_json(map(mode_cells$COORDINATE, \(coordinate) {
+    list(productId = 98100464, coordinate = coordinate, latestN = 1)
+  })) |>
+  httr2::req_perform() |>
+  httr2::resp_body_json()
+
+mode_values <- mode_response |>
+  map(\(cell) {
+    point <- pluck(cell, "object", "vectorDataPoint", 1)
+    tibble(
+      COORDINATE = pluck(cell, "object", "coordinate"),
+      VALUE = pluck(point, "value", .default = NA_real_),
+      statusCode = as.character(pluck(point, "statusCode", .default = NA))
+    )
+  }) |>
+  list_rbind() |>
+  left_join(status_codes, join_by(statusCode))
+
+# The dimensions held at their totals are written out too, so the table's
+# footnotes can be matched to them in 02_clean_data.R
+mode_cells |>
+  left_join(mode_values, join_by(COORDINATE)) |>
+  mutate(
+    `Occupation - Broad category - National Occupational Classification (NOC) 2021 (11)` =
+      "Total - Occupation - Broad category - National Occupational Classification (NOC) 2021",
+    `Gender (3)` = "Total - Gender",
+    `Industry - Sectors - North American Industry Classification System (NAICS) 2017 (21)` =
+      "Total - Industry - Sectors - North American Industry Classification System (NAICS) 2017"
+  ) |>
+  select(GeoUID, GEO, starts_with("Occupation"), `Gender (3)`, `Statistics (3)`,
+         starts_with("Industry"), `Main mode of commuting (11A)`, VALUE, STATUS, COORDINATE) |>
+  write_csv(file.path(raw_dir, "table_98100464.csv"))
+
 # ---- Commuting flows, 2021 census ------------------------------------------
 # Table 98-10-0459, "Commuting flow from geography of residence to geography of
 # work": for every municipality people live in, how many work in every
@@ -184,7 +283,7 @@ get_cansim("98-10-0572") |>
 # quality or comparability of the figures. They are saved beside the tables so
 # that 02_clean_data.R can report the ones that apply to the rows this post
 # keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
-c("98-10-0462", "98-10-0459") |>
+c("98-10-0462", "98-10-0464", "98-10-0459") |>
   walk(\(table_number) {
     get_cansim_table_notes(table_number) |>
       write_csv(file.path(

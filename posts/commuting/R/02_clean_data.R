@@ -71,17 +71,30 @@ municipalities <- tribble(
 # work with age, gender and mode of travel. Age and gender are held at their
 # totals. Each figure comes as three rows - the count and the lower and upper
 # bounds of its 95% confidence interval - and all three are kept (see
-# "Confidence intervals for shares" above). Two cuts of it are used: every destination at total mode (just below) and
-# three modes at total destination ("Main mode of commuting" further down), so
-# it is read once, cut to those rows for the seven municipalities, and checked
-# as one table. Every column is read as text except the value, so codes keep
-# their leading digits exactly as published.
+# "Confidence intervals for shares" above). Only every destination at total
+# mode is used: the mode chart comes from table 98-10-0464 instead (see "Main
+# mode of commuting" below). Every column is read as text except the value, so
+# codes keep their leading digits exactly as published.
 #
-# The three modes the mode chart shows; why these three is explained with the
-# chart's data below.
-modes <- c("Car, truck or van", "Public transit", "Active transportation")
+# The count and its two bounds become one row per figure, with the bounds
+# beside it (value, lower, upper), for this table and for 98-10-0464 below.
+figure_per_row <- function(data, id_cols) {
+  data |>
+    mutate(statistic = case_when(
+      str_detect(statistics_3, "lower bound") ~ "lower",
+      str_detect(statistics_3, "upper bound") ~ "upper",
+      .default = "value"
+    )) |>
+    pivot_wider(
+      id_cols = all_of(id_cols),
+      names_from = statistic,
+      values_from = value
+    ) |>
+    mutate(se = sqrt(cwr_var_from_bounds(value, lower, upper)))
+}
 
-commuting_462 <- read_csv(
+# Where people go to work: every destination, at total mode
+commuting_raw <- read_csv(
   file.path(raw_dir, "table_98100462.csv"),
   col_types = cols(.default = col_character(), VALUE = col_double())
 ) |>
@@ -90,26 +103,10 @@ commuting_462 <- read_csv(
     geo_uid %in% municipalities$geo_uid,
     str_starts(age_15a, "Total"),
     str_starts(gender_3, "Total"),
-    str_starts(main_mode_of_commuting_11a, "Total") |
-      (str_starts(commuting_destination_5, "Total") & main_mode_of_commuting_11a %in% modes)
+    str_starts(main_mode_of_commuting_11a, "Total")
   ) |>
   cwr_quality_flags("98-10-0462", notes = table_notes("table_98100462"), log = quality_log) |>
-  # One row per figure, with its bounds beside it: value, lower, upper
-  mutate(statistic = case_when(
-    str_detect(statistics_3, "lower bound") ~ "lower",
-    str_detect(statistics_3, "upper bound") ~ "upper",
-    .default = "value"
-  )) |>
-  pivot_wider(
-    id_cols = c(geo_uid, commuting_destination_5, main_mode_of_commuting_11a),
-    names_from = statistic,
-    values_from = value
-  ) |>
-  mutate(se = sqrt(cwr_var_from_bounds(value, lower, upper)))
-
-# Where people go to work: every destination, at total mode
-commuting_raw <- commuting_462 |>
-  filter(str_starts(main_mode_of_commuting_11a, "Total"))
+  figure_per_row(c("geo_uid", "commuting_destination_5"))
 
 # ---- Tidy ------------------------------------------------------------------
 # Statistics Canada measures distance in units of geography rather than in
@@ -152,16 +149,32 @@ commuting <- commuting_raw |>
   arrange(district, destination)
 
 # ---- Main mode of commuting ------------------------------------------------
-# The same table, cut the other way: destination held at its total and mode of
-# travel let through. Only three of the modes are kept, the three the chart
-# shows. They are each other's siblings or cousins in Statistics Canada's
+# Table 98-10-0464, which counts everyone the mode question covers: people with
+# a usual place of work and people with no fixed workplace address.
+# (98-10-0462's mode figures leave out the second group, since that table is
+# crossed with destination; 01_get_data.R explains the choice.) 01_get_data.R
+# fetched only the cells used - the total and three modes, with industry,
+# occupation and gender at their totals - so every row is kept.
+#
+# The three modes are each other's siblings or cousins in Statistics Canada's
 # hierarchy ("Public transit" and "Active transportation" sit under
 # "Sustainable transportation"), so none of the three double-counts another;
 # the "Other method" group is left out, so they do not add to 100.
-# (`modes` itself is set in the Read section, where the table is cut.)
-commuting_mode <- commuting_462 |>
-  filter(str_starts(commuting_destination_5, "Total")) |>
-  # Each mode's share of all commuters in the municipality. The total row is
+commuting_mode <- read_csv(
+  file.path(raw_dir, "table_98100464.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double())
+) |>
+  clean_names() |>
+  filter(geo_uid %in% municipalities$geo_uid) |>
+  # A count the web service did not return is a zero: census tables leave
+  # zero cells out. It has no status, unlike its bounds, which are marked
+  # "..." (not applicable). Wellesley's transit count is the one in 2021.
+  mutate(value = if_else(
+    is.na(value) & is.na(status) & statistics_3 == "Count", 0, value
+  )) |>
+  cwr_quality_flags("98-10-0464", notes = table_notes("table_98100464"), log = quality_log) |>
+  figure_per_row(c("geo_uid", "main_mode_of_commuting_11a")) |>
+  # Each mode's share of all commuters in the district. The total row is
   # picked out as the denominator before the other modes are dropped.
   mutate(
     total = value[str_starts(main_mode_of_commuting_11a, "Total")],
@@ -169,7 +182,7 @@ commuting_mode <- commuting_462 |>
     percent = value / total * 100,
     .by = geo_uid
   ) |>
-  filter(main_mode_of_commuting_11a %in% modes) |>
+  filter(!str_starts(main_mode_of_commuting_11a, "Total")) |>
   # The share's interval, as for the destinations above
   mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
   cwr_add_share_ci(value) |>
