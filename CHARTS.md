@@ -43,7 +43,6 @@ words and the template gets chosen for you. This is for when you want to know wh
 | Snippet | Chart | Good for |
 |---|---|---|
 | `gglollipop` | Lollipop chart, ranked | The same job as ranked bars, but easier to read when there are many categories or the values sit close together. |
-| `gglollipoplabel` | Lollipop with value labels | A ranking where the exact numbers matter as much as the order, so the axis can be dropped entirely. |
 | `gglollipoprect` | Lollipop with a value column | A ranking plus a second number per row: the value ranked, the change or rate boxed beside it. |
 
 ### Line, area, ribbon and slope charts

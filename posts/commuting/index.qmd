@@ -45,6 +45,15 @@ work_at_home <- read_csv(
 ) |>
   clean_names()
 
+# The share of the Region's workers who worked at home in each industry, 2016
+# census: one row per NAICS sector, ranked. 2016 only - the 2016 table is the
+# one crossed with industry (98-400-X2016321).
+work_at_home_industry <- read_csv(
+  here("posts", "commuting", "data", "work_at_home_industry.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
 # The Region's share in each year, ready to drop into a sentence with
 # `r home_region_2016` and `r home_region_2021` (they print as "6.8%" and
 # "29.0%"). The 2021 figure's 95% interval is a fraction of a point.
@@ -246,6 +255,121 @@ cwr_figure(
     "Dot plot with one row per district and two dots on each row, grey for ",
     "2016 and blue for 2021, joined by a line, placed along a scale of the percentage of ",
     "employed people who worked at home. ",
+    paste(alt_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: work-at-home-industry
+#| output: asis
+
+# The ten industries whose workers most often worked at home, for the Region as
+# a whole, in the 2016 census: the top ten of the 20 NAICS sectors, ranked by
+# the share of the sector's workers whose place of work status was "worked at
+# home". 2016 is the year whose table crosses place of work status with
+# industry for this geography, so the chart is one year only.
+# work_at_home_industry is read in the load-data chunk.
+#
+# The gglollipop template (the cwr-charts skill): an x axis on top and no value
+# labels, which is how every lollipop on this site reads (rule 4a). No row is
+# bolded - every row is an industry, and none of them is the focus the way the
+# Region is on a chart of places.
+plot_data <- work_at_home_industry |>
+  slice_max(percent, n = 10) |>
+  mutate(
+    # reorder() sorts ascending and a horizontal chart draws the first level at
+    # the bottom, so the industry with the largest share ends up on top
+    industry = reorder(industry, percent),
+    # The axis draws the short form of the longest sector names, which
+    # 02_clean_data.R works out; the data file keeps the published name
+    y_label = industry_short
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(industry, y_label) |> deframe()
+
+# The right end of the x axis: just past the largest share, rounded up to the
+# next 10
+max_x <- ceiling(max(plot_data$percent) / 10) * 10
+
+p <- plot_data |>
+  ggplot(aes(x = percent, y = industry)) +
+
+  geom_segment(aes(
+    x = 0, xend = percent,
+    y = industry,
+    yend = industry
+    ),
+    color = "grey50",
+    linewidth = 0.7
+  ) +
+
+  geom_point(
+    aes(
+      x = percent,
+      y = industry
+    ),
+    shape = 19, size = 4,
+    color = dodgerblue
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x),
+    breaks = seq(0, max_x, by = 10),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "The ten industries with the most people working at home, 2016",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first
+alt_lines <- plot_data |>
+  arrange(desc(percent)) |>
+  mutate(line = paste0(industry, " ", label_number(accuracy = 0.1)(percent), " per cent")) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-work-at-home-industry",
+  alt = paste0(
+    "Lollipop chart ranking the ten industries in Waterloo Region whose workers ",
+    "most often worked at home in 2016, as a percentage of everyone employed in ",
+    "the industry. ",
     paste(alt_lines, collapse = ". "), "."
   )
   # No height given: cwr_figure() sets it from the number of rows.

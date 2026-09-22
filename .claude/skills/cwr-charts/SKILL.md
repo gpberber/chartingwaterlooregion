@@ -59,7 +59,7 @@ Three things `theme_cwr()` now handles that a chart used to have to ask for:
 
 | The story is... | Data shape | Template (file) |
 |---|---|---|
-| ranking of categories | one value per category | `gglollipop`, `gglollipoplabel` (lollipops.md) or `gghorbar` (bars.md) |
+| ranking of categories | one value per category | `gglollipop` (lollipops.md; always with its x axis, rule 4a) or `gghorbar` (bars.md) |
 | ranking plus a second number per row | value + rate/change | `gglollipoprect`, `gghorbarrect`, `ggdumbbellrect` |
 | a few categories, one value each | short labels, <= 6 | `ggvertbar` (bars.md) |
 | us vs them per category | two values per category | `ggcompbar_horiz` / `ggcompbar_vert` (bars.md), `ggdumbbell` (comparisons.md) |
@@ -237,6 +237,14 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).
+4a. **A lollipop is the exception: it always shows its x axis and never value labels**
+   (Greg, 2026-09-22, "always do this for lollipop charts"). A dot at the end of a thin
+   segment is read against the scale, and a number printed beside every dot turns a
+   ranking into a table. So `gglollipop`, with the axis on top and vertical gridlines, is
+   the template for every lollipop on the site; the old `gglollipoplabel` was removed the
+   day the rule was set. A second number per row still goes in the boxed column of
+   `gglollipoprect`, which keeps its axis too. Labelled bars are unaffected - rule 4 is
+   about bars.
 5. **Bold the focus row** with the `y_label` trick (`**Region**`, from `cwr_region`, via `element_markdown`).
 6. **Value axis on the right** for vertical charts, labels sitting above gridlines
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the

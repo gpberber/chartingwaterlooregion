@@ -239,10 +239,22 @@ home_2016_raw <- read_csv(
   col_types = cols(.default = col_character())
 ) |>
   clean_names() |>
-  mutate(geo_uid = geo_code_por) |>
+  mutate(
+    geo_uid = geo_code_por,
+    # The industry column's heading is long enough to be unwieldy; the member
+    # names in it read "54 Professional, scientific and technical services",
+    # so the NAICS code is dropped from the front for the chart's axis
+    industry_2016 = str_squish(str_remove(
+      dim_industry_north_american_industry_classification_system_naics_2012_21,
+      "^[0-9-]+ "
+    ))
+  ) |>
   cwr_quality_flags("98-400-X2016321", notes = table_notes("table_2016321"), log = quality_log)
 
 home_2016 <- home_2016_raw |>
+  # The file now carries a row per industry as well (see the industry section
+  # below), so the district comparison keeps the table's own industry total
+  filter(str_starts(industry_2016, "Total")) |>
   # The two columns needed, found by the member names in their headings
   select(
     geo_uid,
@@ -269,8 +281,49 @@ work_at_home <- bind_rows(home_2016, home_2021) |>
 # file), for the Reliability table's response-rate row. 2021's are read from
 # the Census Profile below.
 gnr_2016 <- home_2016_raw |>
+  filter(str_starts(industry_2016, "Total")) |>
   select(geo_uid, gnr_long_2016 = gnr) |>
   mutate(gnr_long_2016 = as.numeric(gnr_long_2016))
+
+# ---- Worked at home by industry, 2016 ---------------------------------------
+# The same 2016 table, read across its 20 NAICS sectors for the Region as a
+# whole (census division 3530), for the chart that ranks industries by the
+# share of their workers who worked at home. The table's own industry total is
+# dropped: it is the Region-wide share the chart above already shows.
+#
+# 2016 publishes no confidence intervals, so these shares have none and no CV
+# to rate them by; the chart carries the note that says so. Counts are also
+# randomly rounded to a multiple of 5, which matters most for the smallest
+# sectors: management of companies and enterprises is 55 workers out of 465, so
+# rounding alone moves its share by about half a point either way.
+work_at_home_industry <- home_2016_raw |>
+  filter(geo_uid == "3530", !str_starts(industry_2016, "Total")) |>
+  select(
+    industry = industry_2016,
+    total = matches("place_of_work_status_5.*total_place_of_work_status"),
+    workers = matches("place_of_work_status_5.*worked_at_home")
+  ) |>
+  mutate(
+    across(c(total, workers), as.numeric),
+    percent = workers / total * 100,
+    year = 2016L,
+    # Six of the sector names are far too long for a chart axis, most of all on
+    # a phone, so the chart draws a shorter form of them (Greg, 2026-09-22) and
+    # `industry` keeps the published name for the data file. Shortening belongs
+    # here rather than in the chart (cwr-charts rule 8).
+    industry_short = case_match(
+      industry,
+      "Agriculture, forestry, fishing and hunting" ~ "Agriculture",
+      "Real estate and rental and leasing" ~ "Real estate",
+      "Professional, scientific and technical services" ~ "Professional, scientific, technical",
+      "Management of companies and enterprises" ~ "Management",
+      "Other services (except public administration)" ~ "Other services",
+      "Administrative and support, waste management and remediation services" ~ "Administrative and support",
+      .default = industry
+    )
+  ) |>
+  arrange(desc(percent)) |>
+  select(industry, industry_short, year, workers, total, percent)
 
 # ---- Commuting flows --------------------------------------------------------
 # Table 98-10-0459, already cut to people who live in the Region. One row per
@@ -442,6 +495,7 @@ if (length(high_non_response) > 0) {
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
 write_csv(work_at_home, file.path(data_dir, "work_at_home.csv"))
+write_csv(work_at_home_industry, file.path(data_dir, "work_at_home_industry.csv"))
 write_csv(census_quality, file.path(data_dir, "census_quality.csv"))
 write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
 write_csv(inbound, file.path(data_dir, "commuting_inbound.csv"))

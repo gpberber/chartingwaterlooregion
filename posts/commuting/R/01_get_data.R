@@ -190,9 +190,13 @@ home_cells |>
 #
 # The file is one zip holding a 640 MB CSV for every census subdivision in
 # Canada, so like the flows it goes to the temporary download folder and only
-# the Region's eight rows at the table's totals are kept. The file is wide: one
-# column per place of work status. GNR is each area's long-form global
-# non-response rate, which 02_clean_data.R checks like the 2021 rates below.
+# the Region's rows are kept: its eight geographies at every one of the 21
+# industry members (the table's own total, plus the 20 NAICS sectors), with
+# occupation and sex at their totals. The total-industry rows are what the
+# work-at-home chart compares with 2021; the sector rows are what the industry
+# chart ranks. The file is wide: one column per place of work status. GNR is
+# each area's long-form global non-response rate, which 02_clean_data.R checks
+# like the 2021 rates below.
 pow_2016_zip <- file.path(download_dir, "98-400-X2016321.zip")
 if (!file.exists(pow_2016_zip)) {
   options(timeout = 1200)
@@ -210,8 +214,7 @@ read_csv_chunked(
       chunk,
       str_starts(`GEO_CODE (POR)`, "3530"),
       str_starts(`DIM: Occupation - National Occupational Classification (NOC) 2016 (11)`, "Total"),
-      `DIM: Sex (3)` == "Total - Sex",
-      str_starts(`DIM: Industry - North American Industry Classification System (NAICS) 2012 (21)`, "Total")
+      `DIM: Sex (3)` == "Total - Sex"
     )
   }),
   chunk_size = 1e6,
