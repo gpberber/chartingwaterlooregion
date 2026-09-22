@@ -125,7 +125,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
       "Statistics Canada Table 98-10-0462-01",
       credit = TRUE,
       notes = c(
-        "Workers with a usual place of work; people who work from home are counted in their own municipality",
+        "Includes only workers with a fixed place of work outside the home.",
         # The intervals are narrow next to the gaps the chart shows, so they
         # are stated rather than drawn (rule 9b). The sentence is yours to
         # edit; {widest} is filled with the widest interval on the chart,
@@ -133,8 +133,7 @@ p <- ggplot(commuting_bars, aes(x = percent, y = district, fill = destination)) 
         str_glue(
           "95% confidence intervals are within ±{widest} percentage points",
           widest = with(commuting_bars, cwr_ci_widest(percent, percent_lower, percent_upper))
-        ),
-        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+        )
       )
     )
   ) +
@@ -204,36 +203,43 @@ mode_bars <- commuting_mode |>
       .fun = max
     ),
     # One decimal place: the transit and active shares are small enough that
-    # whole numbers would round several of them to the same value, or to 0
-    label = label_number(accuracy = 0.1, suffix = "%")(percent),
-    # A share whose sampling error is more than a third of its value
-    # (`unreliable`, from R/census_ci.R) keeps its bar but carries the key to
-    # note 3, written out in the chart's caption below. Township transit shares are this small because there is next to
-    # no transit service there, so the figures are realistic even though the
-    # sample cannot pin them down; they are marked, not dropped. geom_text()
-    # draws plain text, so the key is the Unicode superscript, not <sup>.
-    label = if_else(unreliable, paste0(label, "³"), label)
+    # whole numbers would round several of them to the same value, or to 0.
+    # A share is missing where 02_clean_data.R blanked it: its sampling error
+    # is so large that Statistics Canada's scale rates it E ("use with
+    # caution") or F ("too unreliable"), and this site uses neither. The row
+    # stays, named "Not reported" with the key to note 3, rather than drawn as a
+    # zero. geom_text() draws plain text, so the key is the Unicode
+    # superscript, not <sup>. (Wellesley's transit share is a true zero: no
+    # sampled household reported it, and it is charted as published.)
+    label = if_else(
+      is.na(percent),
+      "Not reported³",
+      label_number(accuracy = 0.1, suffix = "%")(percent)
+    )
   ) |>
   # Whether a label fits inside its bar, asked panel by panel because each
   # panel has its own scale: the longest bar in the panel sets it, and the axis
   # runs to about 1.2 times that.
   mutate(
-    inside = percent >= (nchar(label) + 1.5) * (max(percent) * 1.2 / panel_chars_three),
+    inside = !is.na(percent) &
+      percent >= (nchar(label) + 1.5) * (max(percent, na.rm = TRUE) * 1.2 / panel_chars_three),
     .by = mode
   )
 
 p <- ggplot(mode_bars, aes(x = percent, y = district)) +
   # One colour for every bar: the panels already say which mode is which, and
   # the cities and townships are not being compared here.
-  geom_col(width = 0.7, fill = dodgerblue) +
+  geom_col(data = mode_bars |> filter(!is.na(percent)), width = 0.7, fill = dodgerblue) +
   geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
   geom_text(
     aes(
+      # A missing share's text starts at the baseline, in grey
+      x = coalesce(percent, 0),
       label = label,
       # Inside the bar end, or just past it - hjust flips the text about its
       # anchor, and the anchor is the end of the bar either way
       hjust = if_else(inside, 1.15, -0.15),
-      colour = if_else(inside, "white", "black")
+      colour = case_when(inside ~ "white", is.na(percent) ~ "grey30", .default = "black")
     ),
     size = label_size * 0.8
   ) +
@@ -254,9 +260,10 @@ p <- ggplot(mode_bars, aes(x = percent, y = district)) +
       notes = c(
         "Other ways of getting to work are not shown, so the three do not add to 100%",
         "Active transportation is walking or cycling",
-        # Keyed ³ on each share marked unreliable in the data
-        "Unreliable estimate: its sampling error is more than a third of its value",
-        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+        # Keyed ³ on each share not reported; drops out on its own if none is
+        if (any(is.na(pull(mode_bars, percent)))) {
+          "The sampling error exceeds 16.6%, so the value is too unreliable to report."
+        }
       )
     )
   ) +
@@ -279,8 +286,11 @@ alt_lines <- mode_bars |>
     .by = mode
   ) |>
   # The superscript keys mean nothing read aloud, so the panel's is dropped and
-  # an unreliable share's is said in words
-  mutate(line = paste0(str_remove(mode, "²"), ": ", str_replace_all(entries, "³", " (unreliable estimate)"))) |>
+  # a missing share's reason is said in words
+  mutate(line = paste0(
+    str_remove(mode, "²"), ": ",
+    str_replace_all(entries, "Not reported³", "not reported, sampling error too large")
+  )) |>
   pull(line)
 
 cwr_figure(
@@ -658,8 +668,7 @@ flow_caption <- function(home_name) {
     notes = c(
       "Share of workers with a usual place of work",
       paste0("The share on ", cwr_short_name(home_name), " is of people who both live and work there"),
-      "Red marks the most common workplace outside the Region, in its direction but nearer than it is",
-      "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+      "Red marks the most common workplace outside the Region, in its direction but nearer than it is"
     )
   )
 }
@@ -915,8 +924,7 @@ p <- rank_chart(between) +
       notes = c(
         "Workers with a usual place of work",
         "Only commutes that cross a municipal border inside the Region are counted",
-        "No confidence intervals are published for these figures; shares close together may differ only by sampling error",
-        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
       )
     )
   )
@@ -964,8 +972,7 @@ p <- rank_chart(inbound_districts) +
       credit = TRUE,
       notes = c(
         "Workers with a usual place of work",
-        "Only commutes into the Region from a home outside it are counted",
-        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+        "Only commutes into the Region from a home outside it are counted"
       )
     )
   )
@@ -1031,8 +1038,7 @@ p <- ggplot(feeders, aes(x = percent, y = home)) +
       notes = c(
         "Workers with a usual place of work",
         "The ten municipalities sending the most commuters into the Region",
-        "No confidence intervals are published for these figures; shares close together may differ only by sampling error",
-        "Estimates from the 2021 census long-form questionnaire, a 25% sample of households"
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
       )
     )
   ) +

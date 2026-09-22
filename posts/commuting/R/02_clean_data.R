@@ -39,12 +39,15 @@ table_notes <- function(file_stem) {
 }
 
 # ---- Confidence intervals for shares ---------------------------------------
-# Commuting is a long-form question, asked of one household in four, so every
-# count is an estimate. Table 98-10-0462 publishes a 95% confidence interval for
-# each count, and R/census_ci.R turns those into approximate intervals for the
-# shares worked out here (how, and what they leave out, is explained there):
-# cwr_se_from_bounds(), cwr_share_se() and cwr_add_share_ci(). Table 98-10-0459
-# publishes no intervals, so the flows get none.
+# Commuting is a long-form question, asked of one private household in four, so
+# every count is a weighted estimate for everyone in private households.
+# Table 98-10-0462 publishes a 95% confidence interval for each count, and
+# R/census_ci.R turns those into intervals for the shares worked out here, by
+# Statistics Canada's own method (how, and what they leave out, is explained
+# there): cwr_var_from_bounds(), cwr_share_se() and cwr_add_share_ci(). The
+# last also rates each share on Statistics Canada's scale and blanks any rated
+# E ("use with caution") or F ("too unreliable"), which this site never uses.
+# Table 98-10-0459 publishes no intervals, so the flows get none.
 source(here("R", "census_ci.R"))
 
 # ---- The seven municipalities ----------------------------------------------
@@ -102,7 +105,7 @@ commuting_462 <- read_csv(
     names_from = statistic,
     values_from = value
   ) |>
-  mutate(se = cwr_se_from_bounds(lower, upper))
+  mutate(se = sqrt(cwr_var_from_bounds(value, lower, upper)))
 
 # Where people go to work: every destination, at total mode
 commuting_raw <- commuting_462 |>
@@ -141,11 +144,11 @@ commuting <- commuting_raw |>
   # row supplies only the standard error.
   left_join(destination_totals, join_by(geo_uid)) |>
   mutate(se_p = cwr_share_se(workers, se_x, sum(workers), se_total), .by = geo_uid) |>
-  cwr_add_share_ci() |>
+  cwr_add_share_ci(workers) |>
   # And this one drops the Region's own rows, keeping the seven municipalities
   inner_join(municipalities, join_by(geo_uid)) |>
   select(district, district_type, destination, workers, percent,
-         percent_lower, percent_upper, cv, unreliable) |>
+         percent_lower, percent_upper, cv, quality) |>
   arrange(district, destination)
 
 # ---- Main mode of commuting ------------------------------------------------
@@ -169,10 +172,10 @@ commuting_mode <- commuting_462 |>
   filter(main_mode_of_commuting_11a %in% modes) |>
   # The share's interval, as for the destinations above
   mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
-  cwr_add_share_ci() |>
+  cwr_add_share_ci(value) |>
   inner_join(municipalities, join_by(geo_uid)) |>
   select(district, district_type, mode = main_mode_of_commuting_11a, workers = value, percent,
-         percent_lower, percent_upper, cv, unreliable) |>
+         percent_lower, percent_upper, cv, quality) |>
   arrange(district, mode)
 
 # ---- Commuting flows --------------------------------------------------------
@@ -297,9 +300,52 @@ region_shapes <- boundaries |>
   st_transform(4326) |>
   select(csd = csduid, name = csdname)
 
+# ---- Census response rates -------------------------------------------------
+# How completely the long form was answered, for the README's Reliability
+# table (cwr-charts rule 9b; R/data_quality.R explains both measures). One row
+# per area: the long-form total non-response rate, and the non-response and
+# imputation rates for the two commuting questions the charts rest on - place
+# of work, which decides the destination, and main mode of commuting.
+# Statistics Canada says an area whose total non-response rate is 50% or more
+# should be used with caution, which this site treats as not usable at all;
+# the script stops rather than carry such an area into the charts.
+census_quality <- read_csv(file.path(raw_dir, "census_tnr.csv"), show_col_types = FALSE) |>
+  clean_names() |>
+  filter(questionnaire == "long") |>
+  mutate(geo_uid = str_remove(dguid, "^2021A000[35]")) |>
+  select(geo_uid, tnr_long = tnr_rate) |>
+  left_join(
+    read_csv(file.path(raw_dir, "table_98100572.csv"),
+             col_types = cols(.default = col_character(), VALUE = col_double())) |>
+      clean_names() |>
+      filter(str_starts(long_form_data_quality_indicators_commuting_8, "Place of work status|Main mode of commuting")) |>
+      mutate(indicator = long_form_data_quality_indicators_commuting_8 |>
+               str_to_lower() |>
+               str_replace_all("[^a-z]+", "_")) |>
+      pivot_wider(id_cols = geo_uid, names_from = indicator, values_from = value),
+    join_by(geo_uid)
+  ) |>
+  left_join(
+    # "Region" is what the charts call Waterloo Region (cwr_region in R/theme_cwr.R)
+    bind_rows(tibble(geo_uid = "3530", district = "Region"), municipalities |> select(geo_uid, district)),
+    join_by(geo_uid)
+  ) |>
+  relocate(district, .after = geo_uid)
+
+high_non_response <- census_quality |>
+  filter(tnr_long >= 50) |>
+  pull(district)
+if (length(high_non_response) > 0) {
+  stop("A long-form total non-response rate is 50% or more: ",
+       str_flatten_comma(high_non_response),
+       ". Statistics Canada says to use such data with caution, so this site does not use it.",
+       call. = FALSE)
+}
+
 # ---- Write -----------------------------------------------------------------
 write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
+write_csv(census_quality, file.path(data_dir, "census_quality.csv"))
 write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
 write_csv(inbound, file.path(data_dir, "commuting_inbound.csv"))
 write_csv(places, file.path(data_dir, "flow_places.csv"))

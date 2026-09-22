@@ -29,7 +29,8 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
-| `R/census_ci.R` (sourced by a cleaning script, not the post) | `cwr_se_from_bounds()`, `cwr_share_se()`, `cwr_add_share_ci()`: approximate 95% intervals for shares from long-form counts with published bounds (rule 9b) |
+| `R/census_ci.R` (sourced by a cleaning script, not the post) | `cwr_var_from_bounds()`, `cwr_share_se()`, `cwr_add_share_ci()`: 95% intervals for shares from long-form counts with published bounds, by Statistics Canada's own method, with E and F shares blanked (rule 9b) |
+| `cwr_census_tnr()` (in `R/data_quality.R`, run by `01_get_data.R`) | each area's long-form total non-response rate, from its Census Profile page (rule 9b) |
 | `cwr_map_crs`, `cwr_label_point()`, `cwr_label_spot()`, `cwr_map_nudges`, `cwr_map_theme()`, `cwr_text_on_fill()` | the house map style, from `R/maps.R` (rule 12) |
 | `cwr_interactive(p, "fig-id", alt, height, phone_height)` | the same for a hover chart (ggiraph); chunk without `output: asis`; numbered in Deep dives like `cwr_figure()` |
 
@@ -131,8 +132,8 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    )
    ```
 
-   The stock wording, in the order the notes go (the sample note always last, directly above the
-   source line; each note's key goes in the title or subtitle, which is Greg's, so say so at
+   The stock wording, in the order the notes go (a survey's sample note always last, directly above
+   the source line; each note's key goes in the title or subtitle, which is Greg's, so say so at
    hand-off):
 
    | Note | When | Wording |
@@ -140,15 +141,15 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    | CMA geography | the chart's figures are for the Kitchener CMA (rule 1b); first | `str_glue("{cwr_region} excluding Wellesley Township")` |
    | Intervals drawn | the chart draws them (rule 9b) | "Bars show 95% confidence intervals" (or "Lines", "The band") |
    | Intervals stated | narrow enough not to draw (rule 9b) | "95% confidence intervals are within ±{widest} percentage points", as above |
-   | Unreliable estimate | keyed on each label whose `unreliable` is TRUE (rule 9b) | "Unreliable estimate: its sampling error is more than a third of its value" |
+   | Not reported | keyed on each row whose share was blanked as E or F (rule 9b); only if one was | "The sampling error exceeds 16.6%, so the value is too unreliable to report." |
    | No intervals published | a ranking or comparison from a table without bounds (rule 9b) | "No confidence intervals are published for these figures; shares close together may differ only by sampling error" |
-   | 2021 census long form | any long-form figure (rule 9b); last | "Estimates from the 2021 census long-form questionnaire, a 25% sample of households" |
-   | 2016 census long form | as above | "Estimates from the 2016 census long-form questionnaire, a 25% sample of households" |
    | Liaison Strategies 2025 | the globe-csi perception survey | "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city" |
 
    A survey used for the first time gets its own row here, in the same pattern ("Estimates from the
    Labour Force Survey, a monthly sample of about N households", the size from the survey's own
-   documentation, not from memory). Data-quality flags follow rule 9c, which adds no chart note at
+   documentation, not from memory). **The census long form has no chart note** (Greg, 2026-09-22:
+   too long to repeat on every chart): it is stated once, in the README's Reliability table, which
+   the post prints (rule 9b). Data-quality flags follow rule 9c, which adds no chart note at
    all for a D rating; any note Greg does ask for is written the same way.
 2. **Colour has meaning.** Blue = the Region / the focus. Red = the main comparison
    (Canada) or a highlight. Grey = everyone else. Never more than five colours; never rainbow.
@@ -270,48 +271,80 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    deepens every row of that chart.
 9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
    have no more digits than the story needs. Percentages via `label_percent()`.
-9a. **Long-form census data is charted as shares or rates, never as counts.** Before drafting any
-   chart from a census table, check which questionnaire the variable comes from. The 2021 long form
-   went to one household in four, so its counts are estimates scaled up from a 25% sample, not
-   headcounts, and a bar labelled "16,515 commuters" claims a precision the data does not have.
-   Chart the share, rate or median instead (a share of the same sample is what it estimates well),
-   and keep counts out of labels, axes and alt text; they may still be summed in code as a
-   denominator. **If Greg asks for counts from a long-form table, say so before building it** - he
-   asked for this check "so I don't make this mistake again". Long-form: commuting, place of work,
-   labour, education, housing costs and condition, immigration and citizenship, ethnocultural and
-   religious origin, Indigenous identity, language of work, mobility. Short form (a full count,
-   counts are fine): population, age, gender, marital status, households and families, dwelling
-   type, and the language questions other than language of work. **Income is split, so check the
-   statistic, not the topic:** since 2016 census income comes from tax and benefit records linked to
-   every respondent, and **medians are published for 100% of the population**, while averages and
-   aggregates come only from the 25% sample (the 2021 Income Reference Guide says so). The
-   households-and-income post's median incomes are therefore a full count and need no sampling
-   note - a note put on them in error was taken off again the same day. Tables mark it in the member names of a statistics
-   dimension ("... - 100% data", "... - 25% sample data"); where a statistic is unlabelled, look it up
-   in the census reference guide for the topic rather than guessing. The commuting post's last three
-   charts were rebuilt from counts to shares for this reason (2026-09-18).
-9b. **A chart drawn from sample data says so in a note, and reports the uncertainty where it can.**
-   This covers every sample, not only the census long form: the Labour Force Survey, the Canadian
-   Community Health Survey, the General Social Survey, any poll. Greg wants the reader told every
-   time (2026-09-18).
-   - **The note is always there, written out in the chunk.** The sample note from rule 1d's table
-     ("Estimates from the 2021 census long-form questionnaire, a 25% sample of households") is the
-     last string in `notes`, directly above the source line; like the CMA note it needs its key in
-     the subtitle, which is Greg's, so say so at hand-off. A survey used for the first time gets a row
-     in that table first, so the wording is the same on every chart that uses it.
-   - **Every share gets an interval, worked out routinely** (Greg adopted this 2026-09-21, after a
-     test on the commuting post). Census tables often carry a `Statistics` dimension - "Count", "95%
-     confidence interval lower bound, Count", "... upper bound" (98-10-0462 does). Keep all three rows
-     through `cwr_quality_flags()` in `02_clean_data.R`, pivot them to `value`, `lower` and `upper`,
-     and work out the interval of every share the post charts with `R/census_ci.R`:
-     `cwr_se_from_bounds()` backs each count's standard error out of its interval,
-     `cwr_share_se()` gives the share's (the US Census Bureau's proportion formula, which allows for
-     the part being counted inside the total), and `cwr_add_share_ci()` writes `percent_lower`,
-     `percent_upper`, `cv` (coefficient of variation) and `unreliable` (CV over `cwr_cv_limit`, a
-     third) beside `percent`. A sum of categories takes the square root of the summed squared
-     standard errors. A survey that publishes CIs or CVs keeps them as published. Worked example:
+9a. **Long-form census data is charted as shares or rates by default; a count only rounded and with
+   its interval.** Before drafting any chart from a census table, check which questionnaire the
+   variable comes from. The 2021 long form went to one private household in four. Each responding
+   household carries a weight - about 4, adjusted for households that did not respond and matched to
+   the full census counts of age, household size and more in areas of 5,000 to 15,000 people - and a
+   published long-form "count" is the sum of those weights: Statistics Canada's estimate for everyone
+   in private households, not a count of respondents (98-306-X, chapters 2-4). So a count is a
+   legitimate figure, but "16,515 commuters" claims a precision it does not have. Chart the share,
+   rate or median by default - it is also what readers compare across places of different sizes. A
+   count, where the story needs one, is rounded to what its interval supports and given with it
+   ("about 16,500, give or take 500"). **If Greg asks for counts from a long-form table, say so
+   before building it** - he asked for this check "so I don't make this mistake again".
+   - **Never divide a long-form figure by a short-form one.** Long-form estimates are matched to
+     census counts only in whole weighting areas and only for some characteristics, so a long-form
+     total does not equal the short-form count of the same people; a share takes its numerator and
+     denominator from the same table.
+   - **Private households only.** The long form leaves out everyone in collective dwellings (nursing
+     and seniors' homes, student residences, group homes), so its totals are smaller than the full
+     census's. The README's "Long-form census" row says so (rule 9b).
+   - Long-form: commuting, place of work, labour, education, housing costs and condition,
+     immigration and citizenship, ethnocultural and religious origin, Indigenous identity, language
+     of work, mobility. Short form (a full count, counts are fine): population, age, gender, marital
+     status, households and families, dwelling type, and the language questions other than language
+     of work. **Income is split, so check the statistic, not the topic:** since 2016 census income
+     comes from tax and benefit records linked to every respondent, and **medians are published for
+     100% of the population**, while averages and aggregates come only from the 25% sample (the 2021
+     Income Reference Guide says so). The households-and-income post's median incomes are therefore
+     a full count and need no sampling record. Tables mark it in the member names of a statistics
+     dimension ("... - 100% data", "... - 25% sample data"); where a statistic is unlabelled, look it
+     up in the census reference guide for the topic rather than guessing. The commuting post's last
+     three charts were rebuilt from counts to shares for this reason (2026-09-18).
+9b. **Sample data is disclosed, and its uncertainty measured and shown where it matters.** This
+   covers every sample: the census long form, the Labour Force Survey, the Canadian Community Health
+   Survey, the General Social Survey, any poll. Greg wants the reader told every time (2026-09-18).
+   Sources: Statistics Canada's 2021 Census Data Quality Guidelines (98-26-0006) and Sampling and
+   Weighting Technical Report (98-306-X), both in the commuting post's background folder.
+   - **Where the reader is told.** For the **census long form**, in the README's Reliability table
+     only - no chart note (Greg, 2026-09-22). Its **"Long-form census"** row names the tables the post
+     draws from it (and so which charts) and says: "Its figures are estimates for people in private
+     households, from the 2021 census long-form questionnaire sent to 25% of households", that people
+     in collective dwellings are not included, and how weighting and imputation work. For **any other
+     survey**, the survey's stock note from rule 1d, written out as the last string in `notes`.
+   - **Every share gets an interval, the way Statistics Canada builds its own** (adopted 2026-09-21,
+     method matched to Statistics Canada's 2026-09-22). Census tables often carry a `Statistics`
+     dimension - "Count", "95% confidence interval lower bound, Count", "... upper bound" (98-10-0462
+     does). Keep all three rows through `cwr_quality_flags()` in `02_clean_data.R`, pivot them to
+     `value`, `lower` and `upper`, and use `R/census_ci.R`:
+     - `cwr_var_from_bounds(value, lower, upper)` backs each count's variance out of its published
+       interval, which is a "modified Wilson" interval on Student's t with 32 degrees of freedom (the
+       multiplier is 2.04, not 1.96); `sqrt()` it for a standard error. A sum of categories takes the
+       square root of the summed variances.
+     - `cwr_share_se()` gives the share's standard error (the US Census Bureau's proportion formula,
+       which allows for the part being counted inside the total; its cautious fallback is too wide
+       near 100%).
+     - `cwr_add_share_ci(data, count_col)` builds the share's modified Wilson interval, as Statistics
+       Canada does for proportions, and writes `percent_lower`, `percent_upper`, `cv` (coefficient of
+       variation) and `quality` beside `percent`.
+     A survey that publishes CIs or CVs keeps them as published. Worked example:
      `posts/commuting/R/02_clean_data.R`.
-   - **Then each chart shows them only where they change the reading**, decided chart by chart:
+   - **What an interval covers, in any wording that describes it:** sampling error and the
+     variability from households that did not respond. Not: bias if those households differ from the
+     ones that did, answers filled in for blank questions, people missed or counted twice,
+     misreported answers, rounding. Never write "sampling error only".
+   - **E and F shares are never used** (Greg, 2026-09-22), on Statistics Canada's survey scale: a CV
+     of 16.6% to 33.3% is E, "use with caution"; over 33.3% is F, "too unreliable to be published".
+     The census prints no such letters, but the rule is the same as for Statistics Canada's own E
+     and F flags (rule 9c): `cwr_add_share_ci()` blanks the share, its interval and its count to NA
+     and records the letter in `quality`. The chart keeps the row and names it "Not reported" with a note
+     key (the Unicode superscript, since `geom_text()` draws plain text), in grey at the baseline like
+     the agriculture post's missing figures; the stock "Not reported" note (rule 1d) is written into
+     `notes`, only when a row was blanked; the alt text says "not reported, sampling error too large".
+     Never a zero, never a bridged gap. A share of zero has no interval and is charted as published.
+   - **Then each chart shows the intervals only where they change the reading**, decided chart by
+     chart:
      - **draw them** when values sit close enough that the intervals could reverse an order or a
        comparison a reader will make (for one estimate per category, the `ggdoterror` template: a
        blue dot on a blue interval bar fading to its ends; otherwise whiskers with
@@ -321,31 +354,32 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
        measured from the data by `cwr_ci_widest(percent, percent_lower, percent_upper)` through
        `str_glue()` (rule 1d), never typed. Region-wide shares, whose intervals are a
        fraction of a point, get this and nothing more: drawing them implies a doubt that is not there.
-   - **An unreliable share is kept and marked, not dropped.** A share whose CV is over a third keeps
-     its bar; its label carries a note key (the Unicode superscript, since `geom_text()` draws plain
-     text) and the stock "Unreliable estimate" note (rule 1d) is written into `notes`; the alt text says
-     "(unreliable estimate)" in place of the key. Greg's reasoning (2026-09-21): township transit
-     shares of under 1% are unreliable as estimates but realistic, since there is next to no
-     service. Tell him which shares are marked; he may drop one that is not realistic. This is our
-     own measure, not Statistics Canada's E flag, which is never used (rule 9c). A share of zero has
-     no interval and is not marked.
    - **A table with no published bounds gets no interval.** Commuting flows (98-10-0459) are one.
      Nothing in `R/census_ci.R` applies, and none is invented or borrowed from another table. A
      ranking or comparison drawn from it carries the stock "No confidence intervals are published"
      note (rule 1d), written out. At hand-off, say which ranks are close enough to
      be in doubt and which shares rest on counts under about 50, which random rounding to a multiple
      of 5 makes rough whatever the interval.
-   - **Report at hand-off** every chart's decision - drawn, stated, marked, or no intervals
-     published - so Greg can overrule it.
-   - **The chart is one of six places the sample is recorded.** The others, all set up in the post
-     template: the **Sample** column of the README's Data sources table (printed in the post's Data
-     sources section); the README's **Sampling** note (how the intervals were worked out and what each
-     chart does with them); the **"Sample estimates" row of the README's Reliability table**, the
-     post's methodology note, which the post prints (stock wording in the template README, adjusted
-     to the post's tables; its "Left out" column stays empty); the `sample` column of
-     `data/tables.csv` (printed in the download bundle's README); and `data/dictionary.csv`, which
-     describes `percent_lower`, `percent_upper`, `cv` and `unreliable`. Fill in the README and the
-     table when adding a sampled source; the Data sources prose above the table is Greg's.
+   - **Check the response rates** for every area the post charts. `R/01_get_data.R` fetches the
+     long-form total non-response rate for each area with `cwr_census_tnr()` (`R/data_quality.R`; the
+     rates are only on each area's Census Profile page) and the topic's "Long-form data quality
+     indicators" table (98-10-0572 for commuting; 98-10-0569 labour, 98-10-0566 mobility and so on),
+     which gives each question's non-response and imputation rates. `02_clean_data.R` writes both to
+     `data/census_quality.csv` and **stops if an area's total non-response rate is 50% or more**:
+     Statistics Canada says to use such data "with caution", which this site treats as E. The README's
+     **"Response rates"** Reliability row gives the ranges. Tell Greg if any rate is high.
+   - **Report at hand-off** every chart's decision - drawn, stated, shares not reported, or no
+     intervals published - so Greg can overrule it.
+   - **The sample is recorded in five places, none of them a chart note for the census long form.**
+     All are set up in the post template: the **Sample** column of the README's Data sources table
+     (printed in the post's Data sources section); the README's **Sampling** note (how the intervals
+     were worked out and what each chart does with them); the **Reliability table's "Long-form
+     census", "Sample estimates" and "Response rates" rows**, the post's methodology note, which the
+     post prints (stock wording in the template README, adjusted to the post's tables; their "Left
+     out" column stays empty); the `sample` column of `data/tables.csv` (printed in the download
+     bundle's README); and `data/dictionary.csv`, which describes `percent_lower`, `percent_upper`,
+     `cv` and `quality`. Fill in the README and the table when adding a sampled source; the Data
+     sources prose above the table is Greg's.
 9c. **Data-quality flags reach the chart only as a decision Greg has made.** Greg's principle is
    reliable data, and he asked to be told about every quality flag that applies to data he plans
    to use (2026-09-18). `cwr_quality_flags()` (`R/data_quality.R`) finds them - Statistics Canada's

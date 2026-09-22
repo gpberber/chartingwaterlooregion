@@ -65,17 +65,23 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   the full name. A horizontal stacked bar names its segments on the bars with `cwr_stack_keys()`. Line labels are positioned with
   `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
 - Census: long-form variables (commuting, labour, education, housing, immigration and more, plus
-  average and aggregate income; median income is 100% data) are a 25% sample, so charts show shares or rates, never counts - `cwr-charts` rule 9a. If
-  Greg asks for counts from one, flag it before building. Any chart from sample data (census long
-  form, surveys) carries the stock sample note, with confidence intervals
-  drawn or stated when the source publishes them - rule 9b. Every long-form share gets an
-  approximate 95% interval in `02_clean_data.R` from the published count bounds (`R/census_ci.R`);
-  a chart draws it only where it could change the reading, otherwise states the widest
-  (its number from `cwr_ci_widest()`). A share whose CV is over a third is kept and marked
-  with the stock "unreliable" note, not dropped; a table with no published bounds gets no interval,
-  and a ranking from it gets the stock "no intervals" note. The sample is also recorded in the
-  README's Data sources table (Sample column), Notes (Sampling) and Reliability table (a printed
-  "Sample estimates" row, the post's methodology note), and in `data/tables.csv` (`sample`).
+  average and aggregate income; median income is 100% data) come from a 25% sample of private
+  households, weighted up to estimates for everyone in private households (collective dwellings
+  excluded). Charts show shares or rates by default; a count only rounded and with its interval;
+  never a long-form figure divided by a short-form one - `cwr-charts` rule 9a. If Greg asks for
+  counts from one, flag it before building. The long form is disclosed once, in a printed
+  "Long-form census" row of the README's Reliability table, never as a chart note; a survey's
+  sample note goes on its charts - rule 9b. Every long-form share gets a 95% interval in
+  `02_clean_data.R` from the published count bounds by Statistics Canada's own method
+  (`R/census_ci.R`); a chart draws it only where it could change the reading, otherwise states the
+  widest (its number from `cwr_ci_widest()`). A share with a CV of 16.6% or more (E) or over 33.3%
+  (F) is never used: blanked, its row "Not reported" with the stock note. A table with no published
+  bounds gets no interval, and a ranking from it gets the stock "no intervals" note. Each post
+  also fetches its areas' long-form total non-response rates (`cwr_census_tnr()`) and the topic's
+  per-question non-response and imputation rates; an area at 50% or more is not used. The README's
+  Reliability table carries printed "Long-form census", "Sample estimates" and "Response rates"
+  rows; the sample is also in the Data sources table (Sample column), Notes (Sampling) and
+  `data/tables.csv` (`sample`).
 - Data quality: every source table goes through `cwr_quality_flags()` (`R/data_quality.R`) in
   `02_clean_data.R`, on the rows the post keeps, with the table's footnotes saved by
   `01_get_data.R`; it writes `data/quality_flags.csv`. Tell Greg every flag and quality footnote it

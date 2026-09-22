@@ -333,3 +333,51 @@ cwr_note_rows <- function(notes) {
     ) |>
     select(kind, level, flag, meaning, rows, columns, examples)
 }
+
+# ---- Census response rates -------------------------------------------------
+# The long-form census's own quality indicators, which every post using
+# long-form data checks (cwr-charts rule 9b). Two kinds:
+#
+#   - The total non-response (TNR) rate: the share of households that sent
+#     back nothing usable. Statistics Canada gives one for each area and each
+#     questionnaire, and says data for an area whose rate is 50% or more should
+#     be "used with caution" - the same words as its E flag, so this site does
+#     not use long-form figures for such an area. The rates are printed on each
+#     area's Census Profile "More information" page and in no table the cansim
+#     package can fetch, so cwr_census_tnr() reads them from that page.
+#   - Non-response and imputation rates per question: the share of answers to
+#     one question that were missing, and that Statistics Canada filled in.
+#     These are ordinary tables, one per topic ("Long-form data quality
+#     indicators for commuting", 98-10-0572-01, and so on), fetched with
+#     get_cansim() like any other.
+#
+# Neither is a flag on a figure, so neither goes through cwr_quality_flags().
+# The post's README records both in its Reliability table.
+
+# Short-form and long-form TNR rates, in percent, for a set of 2021 census
+# DGUIDs ("2021A00053530013" is Kitchener; "2021A00033530" Waterloo Region).
+# Run in 01_get_data.R, which saves the result to data-raw/.
+cwr_census_tnr <- function(dguids) {
+  purrr::map(dguids, \(dguid) {
+    page <- httr2::request(str_c(
+      "https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/",
+      "moreinfo-plusinfo.cfm?Lang=E&cdguid=", dguid, "&DGUIDlist=", dguid
+    )) |>
+      httr2::req_perform() |>
+      httr2::resp_body_string()
+    # "Total non-response (TNR) rate, long-form census questionnaire: 2.9%"
+    rates <- str_match_all(
+      page,
+      r"(Total non-response \(TNR\) rate, (short|long)-form census questionnaire: ([0-9.]+)%)"
+    )[[1]]
+    if (nrow(rates) == 0) stop("No TNR rates found on the Census Profile page for ", dguid, call. = FALSE)
+    tibble(
+      dguid = dguid,
+      # The page title names the area: "... More information: Kitchener, City (CY) [...]"
+      geo = str_squish(str_match(page, r"(More information: ([^<\[]+))")[, 2]),
+      questionnaire = rates[, 2],
+      tnr_rate = as.numeric(rates[, 3])
+    )
+  }) |>
+    purrr::list_rbind()
+}

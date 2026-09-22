@@ -9,7 +9,7 @@ Post: https://chartingwaterlooregion.ca/posts/{{slug}}/
 | | | | | | |
 
 <!-- Sample: "None (full count)" for administrative data, a census short-form question or a
-     full register; otherwise name the sample, e.g. "Census long form, 25% sample of households"
+     full register; otherwise name the sample, e.g. "Census long form, 25% sample of private households"
      or the survey and its sample size, from the survey's own documentation. This column is
      printed in the post's Data sources section, so readers see it. -->
 
@@ -35,17 +35,32 @@ Files that cannot be re-downloaded by script, or are over 25 MB, are attached to
      will not render while any flag in data/quality_flags.csv lacks a row with its code, and a
      row left out of the post with a reason still counts.
 
-     A post using census long-form data (or any sample) also gets a methodology row, printed,
-     with its second column empty. Stock wording, adjusted to the post's tables:
-       | **Sample estimates:** these figures come from the census long-form questionnaire, which
-       went to one household in four, so every figure is an estimate. Where Statistics Canada
-       publishes a 95% confidence interval for a count, the interval for a share worked out from
-       it is approximated with the US Census Bureau's formula for a proportion; a share whose
-       sampling error is more than a third of its value is marked as unreliable. These intervals
-       cover sampling error only, not non-response or rounding, and are least exact for very
-       small shares and small places. (tables ...) | |
-     Add "No intervals are published for <table>, so close rankings there may be sampling error"
-     for a table without them. It needs no flag code.
+     A post using census long-form data gets three methodology rows, printed, with their second
+     column empty and no flag code (the charts carry no long-form note; these rows are the
+     disclosure). Stock wording, adjusted to the post's tables and charts
+     (posts/commuting/README.md is the worked example):
+       | **Long-form census:** every chart in this post is drawn from the 2021 census long-form
+       questionnaire (tables ...). Its figures are estimates for people in private households,
+       from the 2021 census long-form questionnaire sent to 25% of households; people living in
+       collective dwellings, such as nursing and seniors' homes and student residences, are not
+       included. Each responding household stands for about four, its weight adjusted by
+       Statistics Canada for households that did not respond and matched to the full census
+       counts of age, household size and other characteristics; answers left blank are filled
+       in from similar households. (tables ...) | |
+       | **Sample estimates:** because the figures are estimates, each share worked out from table
+       ... has a 95% confidence interval, built from the intervals Statistics Canada publishes for
+       its counts by Statistics Canada's own method. The intervals cover sampling error and the
+       variability from households that did not respond; they do not cover any bias if those
+       households differ from the ones that did, answers filled in for blank questions, people
+       the census missed or counted twice, misreported answers, or rounding. A share whose
+       sampling error is 16.6% of its value or more - rated "use with caution" (E) or "too
+       unreliable to be published" (F) on Statistics Canada's scale - is not reported: ... (tables ...) | |
+       | **Response rates:** ...% to ...% of the households sent the long form in each area
+       returned nothing usable (Statistics Canada advises caution only at 50% or more), and ...%
+       to ...% of the answers to the ... questions were missing or filled in. (Census Profile
+       2021; table ...) | |
+     For a table without published intervals add "Table ... publishes no intervals, so close
+     rankings drawn from it may differ only by sampling error" to the Sample estimates row.
 
      The post's "Reliability" table prints every row whose second column is empty. Never
      delete a row: to leave an issue out of the post, write why in the second column. An empty
@@ -83,7 +98,7 @@ Then `quarto render posts/{{slug}}` from a terminal.
 - No API keys are needed. <!-- If one is, say which and how to get it. -->
 - Sampling: <!-- Which sources are samples (see the Sample column above) and what that means for
   the figures; whether the source publishes confidence intervals; how R/census_ci.R turned them
-  into intervals for the shares and which data files carry them; and what each chart does with
-  them - draws them, states the widest in a note, marks unreliable shares - or, for a table with
-  none, that its rankings carry the stock "no intervals" note. "None of the data are sampled" if
-  so. -->
+  into intervals for the shares and which data files carry them; which shares are not shown as E
+  or F; what each chart does with the intervals - draws them or states the widest in a note - or,
+  for a table with none, that its rankings carry the stock "no intervals" note; and where the
+  response rates are kept (data/census_quality.csv). "None of the data are sampled" if so. -->

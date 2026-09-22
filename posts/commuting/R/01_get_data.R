@@ -159,6 +159,26 @@ sf::st_read(
 ) |>
   sf::write_sf(file.path(raw_dir, "csd_boundaries.gpkg"), delete_dsn = TRUE)
 
+# ---- Census response rates -------------------------------------------------
+# How completely the long form was answered in each area (cwr-charts rule 9b;
+# the helpers are in R/data_quality.R, which explains both measures).
+source(here("R", "data_quality.R"))
+
+# The total non-response rate for the Region and its seven municipalities, read
+# from each area's Census Profile page. Waterloo Region is census division
+# 3530; its municipalities are census subdivisions 3530004 to 3530035.
+c("2021A00033530", paste0("2021A0005", c(
+  "3530004", "3530010", "3530013", "3530016", "3530020", "3530027", "3530035"
+))) |>
+  cwr_census_tnr() |>
+  write_csv(file.path(raw_dir, "census_tnr.csv"))
+
+# Table 98-10-0572, the non-response and imputation rates for each commuting
+# question, cut to the Region's eight geographies like 98-10-0462 above
+get_cansim("98-10-0572") |>
+  filter(str_starts(GeoUID, "3530")) |>
+  write_csv(file.path(raw_dir, "table_98100572.csv"))
+
 # ---- Footnotes -------------------------------------------------------------
 # Each Statistics Canada table carries footnotes, some of them about the
 # quality or comparability of the figures. They are saved beside the tables so

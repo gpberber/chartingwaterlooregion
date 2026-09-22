@@ -69,13 +69,15 @@ the same call in a situation the templates do not cover.
   lines) and bars thinned to keep their thickness. A narrower label column is a wider plot. The
   wrap never goes below the longest single word, since splitting there would deepen rows
   without narrowing anything.
-- Sample data carries its uncertainty. Every share from the census long form gets an approximate
-  95% interval in the cleaning script (`R/census_ci.R`); a chart draws it only where it could
-  change what a reader concludes, and otherwise states the widest in a note
-  (`cwr_ci_widest()` fills its number). An estimate whose sampling error is over a third of its
-  value is kept and marked, not dropped; a table that publishes no intervals
-  gets the stock note that close shares may differ only by sampling error. Readers are told what
-  the numbers can bear, and only where it matters, so the notes are not skimmed past.
+- Sample data carries its uncertainty. Every share from the census long form gets a 95% interval
+  in the cleaning script (`R/census_ci.R`, Statistics Canada's own method); a chart draws it only
+  where it could change what a reader concludes, and otherwise states the widest in a note
+  (`cwr_ci_widest()` fills its number). A share rated E or F on Statistics Canada's scale (CV
+  16.6% or more) is not reported: its row says "Not reported" with a note. A table that publishes no
+  intervals gets the stock note that close shares may differ only by sampling error. The census
+  long form itself is disclosed once, in the README's Reliability table, not on every chart.
+  Readers are told what the numbers can bear, and only where it matters, so the notes are not
+  skimmed past.
 - Every chart note is written out in the chunk, stock ones included (rule 1d), so Greg can reword
   or delete it where he sees it; no function adds a note on its own.
 - Legends only when direct labels would collide (many groups, crossing lines). Then use the

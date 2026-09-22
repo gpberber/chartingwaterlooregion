@@ -269,8 +269,8 @@ base_size <- 15
 # Every note on a chart is written out in the post's own chunk, as plain text in
 # cwr_caption(notes = ), so Greg can reword it or delete it where he reads it
 # (his rule, 2026-09-21). Nothing here adds a note behind his back. The stock
-# wording for the notes that recur - the CMA geography, a sample, confidence
-# intervals, an unreliable estimate - is kept in the cwr-charts skill (rule 1d),
+# wording for the notes that recur - the CMA geography, a survey sample,
+# confidence intervals, a share not shown - is kept in the cwr-charts skill (rule 1d),
 # which is where a new chart copies it from. A note with a number that comes
 # from the data writes the sentence out and leaves a {placeholder} for the
 # number, filled by str_glue(); cwr_ci_widest() below is one such number.

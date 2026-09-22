@@ -13,7 +13,7 @@
 #                   `file` is a path from the project root, so a table can live
 #                   in the post's own data/ or in datasets/<name>/data/
 #                   `sample` says whether the figures are estimates from a
-#                   sample - "Census long form, 25% sample of households", a
+#                   sample - "Census long form, 25% sample of private households", a
 #                   survey and its size - or "None (full count)"; it goes into
 #                   the bundle's README beside the source, so somebody who only
 #                   downloads the numbers is told too. Older files without the

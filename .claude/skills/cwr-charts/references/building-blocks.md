@@ -27,9 +27,8 @@ labs(
 	# Every note is written out here, stock ones included (cwr-charts rule
 	# 1d), so it can be reworded or deleted in place. A chart drawn from
 	# Kitchener CMA data has str_glue("{cwr_region} excluding Wellesley
-	# Township") as note 1; a long-form census chart ends with "Estimates
-	# from the 2021 census long-form questionnaire, a 25% sample of
-	# households".
+	# Township") as note 1. A survey chart ends with its sample note; the
+	# census long form has none (it goes in the README's Reliability table).
 	caption = cwr_caption("<Source>")
 ) +
 ```

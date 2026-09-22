@@ -40,20 +40,27 @@ For every `ggplot` chunk:
   a 25% sample (median income is 100% data), so labels, axes
   and alt text show shares or rates. Check every census table the post reads, and flag any count
   that comes from one.
-- Every chart drawn from sample data (census long form, LFS, CCHS, any survey) has a note saying so
-  and naming the sample, written out in `cwr_caption(notes = )` (style rules 1d and 9b). The
+- Sample data is disclosed (style rule 9b). A chart from a survey (LFS, CCHS, a poll) has the
+  survey's note written out in `cwr_caption(notes = )`. The census long form has no chart note:
+  instead the README's Reliability table has a printed "Long-form census" row naming the tables
+  the post draws from it and saying the figures are estimates for people in private households
+  from the long form sent to 25% of households; flag a leftover long-form note on a chart. The
   post's Data sources prose says the data are a sample too. For long-form census shares:
   - the cleaning script works out every charted share's interval with `R/census_ci.R` where the
-    table publishes bounds, and the data carry `percent_lower`, `percent_upper`, `cv` and `unreliable`;
+    table publishes bounds, and the data carry `percent_lower`, `percent_upper`, `cv` and `quality`;
   - each chart either draws the intervals (where they could change the reading) or states the widest
     in the stock note (its number from `cwr_ci_widest()`); flag a chart that does neither, and any close ranking or
     comparison the intervals do not support, especially one the prose leans on;
-  - every share with `unreliable` TRUE carries a note key and the stock "Unreliable estimate" note, and
-    its alt text says "(unreliable estimate)";
+  - no share rated E or F (`quality`) is drawn: its row reads "Not reported" with a note key, the
+    stock "Not reported" note is in the caption, and the alt text says why;
+  - no count is charted unless rounded and given with its interval, and no share divides a
+    long-form figure by a short-form one (style rule 9a);
   - a chart from a table with no published intervals that ranks or compares shares carries
     the stock "No confidence intervals are published" note;
-  - the README's Reliability table has a "Sample estimates" row, printed (its second column
-    empty), and its Sampling note says what each chart does with the intervals.
+  - the README's Reliability table has printed "Long-form census", "Sample estimates" and
+    "Response rates" rows (second column empty), `data/census_quality.csv` exists with every
+    area's long-form total non-response rate under 50%, and the Sampling note says what each
+    chart does with the intervals. No interval is described as covering "sampling error only".
 - Every chart note is a string written out in the post's own code (style rule 1d): flag any note
   added by an argument or looked up from a list in `R/`, which Greg could not edit in the post.
 - No chart draws a figure flagged unusable in `data/quality_flags.csv` (E use with caution, F too
