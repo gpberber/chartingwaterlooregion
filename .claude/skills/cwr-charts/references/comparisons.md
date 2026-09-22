@@ -83,13 +83,13 @@ plot_data |>
 
   # The series names, on the top row only. geom_label() rather than
   # geom_text() so each sits on white rather than on the line it overlaps;
-  # label.size = 0 drops the box's border, and grey30 is the colour
+  # linewidth = 0 drops the box's border, and grey30 is the colour
   # theme_cwr() gives the axis labels.
   geom_label(
     data = top_row,
     aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
-    colour = "grey30", fill = "white", label.size = 0,
+    colour = "grey30", fill = "white", linewidth = 0,
     label.padding = unit(0.08, "lines"),
     size = label_size * 0.8, fontface = "bold"
   ) +
@@ -220,13 +220,13 @@ plot_data |>
 
   # The series names, on the top row only. geom_label() rather than
   # geom_text() so each sits on white rather than on the line it overlaps;
-  # label.size = 0 drops the box's border, and grey30 is the colour
+  # linewidth = 0 drops the box's border, and grey30 is the colour
   # theme_cwr() gives the axis labels.
   geom_label(
     data = top_row,
     aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
-    colour = "grey30", fill = "white", label.size = 0,
+    colour = "grey30", fill = "white", linewidth = 0,
     label.padding = unit(0.08, "lines"),
     size = label_size * 0.8, fontface = "bold"
   ) +
