@@ -70,6 +70,145 @@ home_region_2021 <- home_region |> filter(year == 2021) |> pull(label)
 
 <!-- One or two paragraphs, then one chart. -->
 
+::: panel-tabset
+### Ranked
+
+```{r}
+#| label: work-at-home-2016
+#| output: asis
+
+# The 2016 shares on their own, ranked: one blue bar per district, each
+# carrying its own number. The two tabs draw exactly the same chart; the only
+# difference is the colour of the district names, white on this tab and the
+# theme's own grey on the next, so the names are invisible here while still
+# taking up their room. That keeps the bars in the same place on both tabs, so
+# clicking between them only brings the names in. work_at_home is read in the
+# load-data chunk; the Region's own row is left out, because the chart is by
+# district.
+home_2016 <- work_at_home |>
+  filter(year == 2016, district != cwr_region)
+
+# Roughly how many characters fit across the panel at this font size, read off
+# a render; it decides whether a bar is long enough to hold its own label.
+# (The destinations chart further down uses the same figure for the same job.)
+panel_chars_home <- 40
+
+home_2016 <- home_2016 |>
+  mutate(
+    # reorder() sorts ascending and a horizontal chart draws the first level at
+    # the bottom, so the district where most people worked at home ends up on top
+    district = fct_reorder(district, percent),
+    share_label = label_number(accuracy = 0.1, suffix = "%")(percent),
+    # Whether a bar can hold its own label
+    inside = percent >= (nchar(share_label) + 1.5) * (max(percent) * 1.05 / panel_chars_home)
+  )
+
+# Built once and called by both tabs, which add their own titles.
+# `show_names` is the whole difference between them.
+home_2016_bars <- function(show_names) {
+  ggplot(home_2016, aes(x = percent, y = district)) +
+    geom_col(width = 0.7, fill = dodgerblue) +
+    # The baseline the bars grow from, stopping just past the end bars
+    annotate("segment", x = 0, xend = 0, y = 0.5, yend = nrow(home_2016) + 0.5,
+             colour = "black", linewidth = 0.5) +
+    # White inside a bar that can hold its label, black just past one that cannot
+    geom_text(
+      aes(
+        label = share_label,
+        hjust = if_else(inside, 1.15, -0.15),
+        colour = if_else(inside, "white", "black")
+      ),
+      size = label_size * 0.8
+    ) +
+    scale_colour_identity() +
+    # Room on the right for a label that sits outside its bar
+    scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+    # The house short form of a long district name
+    scale_y_discrete(labels = cwr_short_name) +
+    coord_cartesian(clip = "off") +
+    # Every bar carries its number, so the value axis and its gridlines are gone
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank()
+    ) +
+    # The names in white on the first tab: drawn, measured and laid out as
+    # usual, but the same colour as the page, so nothing moves when they appear
+    (if (show_names) NULL else theme(axis.text.y.left = element_markdown(colour = "white")))
+}
+
+# The rows of an alt text, read top to bottom in the order the bars are drawn
+home_2016_lines <- home_2016 |>
+  arrange(desc(percent)) |>
+  mutate(line = paste0(district, " ", share_label)) |>
+  pull(line)
+
+# ---- This tab ------------------------------------------------------------
+p <- home_2016_bars(show_names = FALSE) +
+  labs(
+    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+cwr_figure(
+  p, "fig-work-at-home-2016",
+  alt = paste0(
+    "Horizontal bars ranking the Region's seven districts by the share of ",
+    "employed people who worked at home in 2016, with the district names left ",
+    "off. The shares, longest bar first: ",
+    paste(
+      home_2016 |> arrange(desc(percent)) |> pull(share_label),
+      collapse = ", "
+    ), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+### Named
+
+```{r}
+#| label: work-at-home-2016-named
+#| output: asis
+
+# The same chart with the district names in the theme's own colour. Everything
+# else - the rows, their order, the bars and their labels - comes from the tab
+# above unchanged.
+p <- home_2016_bars(show_names = TRUE) +
+  labs(
+    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+cwr_figure(
+  p, "fig-work-at-home-2016-named",
+  alt = paste0(
+    "The same bars as above, now with the district names. ",
+    paste(home_2016_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+:::
+
 ```{r}
 #| label: work-at-home
 #| output: asis
