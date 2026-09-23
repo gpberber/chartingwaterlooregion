@@ -68,7 +68,10 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   label, tooltip and note (cleaning scripts type "Region"). The same chart text calls North
   Dumfries "N. Dumfries", through `cwr_short_name()` (never typed); data, alt text and titles keep
   the full name. A horizontal stacked bar names its segments on the bars with `cwr_stack_keys()`. Line labels are positioned with
-  `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`.
+  `cwr_line_labels()`, never hand-typed coordinates. Hover charts use `cwr_interactive()`. Text
+  drawn inside the plot area goes through `cwr_label()` - geom_text() with a halo behind the
+  letters - never `geom_label()` with a white fill; text inside a filled bar, tile or map polygon
+  stays `geom_text()`, since the fill is already its background.
 - Census: long-form variables (commuting, labour, education, housing, immigration and more, plus
   average and aggregate income; median income is 100% data) come from a 25% sample of private
   households, weighted up to estimates for everyone in private households (collective dwellings

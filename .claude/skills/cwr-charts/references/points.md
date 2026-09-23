@@ -46,7 +46,7 @@ plot_data |>
 
   # Point labels - drawn before geom_point so points render on top
   # commented out until nudge values determined
-  # geom_label(
+  # cwr_label(
   #   data = nudge_data,
   #   aes(
   #     x = <x_variable> + nudge_x,
@@ -54,8 +54,6 @@ plot_data |>
   #     label = `<label_variable>`
   #   ),
   #   size = 3.2,
-  #   fill = "white",
-  #   linewidth = 0,
   #   inherit.aes = FALSE
   # ) +
 
@@ -185,7 +183,7 @@ plot_data |>
 
   # Point labels - drawn before geom_point so bubbles render on top
   # commented out until nudge values determined
-  # geom_label(
+  # cwr_label(
   #   data = nudge_data,
   #   aes(
   #     x = `<x_variable>` + nudge_x,
@@ -193,23 +191,22 @@ plot_data |>
   #     label = `<label_variable>`
   #   ),
   #   size = 3.2,
-  #   fill = "white",
-  #   linewidth = 0,
   #   inherit.aes = FALSE
   # ) +
 
   geom_point(alpha = 0.7, colour = dodgerblue) +
 
   # Bubble size legend - uncomment after initial render
-  ## legend title uses annotate("label") for white background with no border
+  ## legend title uses annotate("shadowtext") for the house halo
   # annotate(
-  #   "label",
+  #   "shadowtext",
   #   x = legend_x, y = legend_y_title,
   #   label = "legend_title",
   #   hjust = 0.5,
   #   vjust = 0.0,
-  #   fill = "white",
-  #   linewidth = 0,
+  #   colour = "grey30",
+  #   bg.colour = "white",
+  #   bg.r = 0.15,
   #   fontface = "bold",
   #   size = 3.2
   # ) +
@@ -230,13 +227,11 @@ plot_data |>
   #   linewidth = 0.3,
   #   inherit.aes = FALSE
   # ) +
-  # geom_label(
+  # cwr_label(
   #   data = size_legend,
   #   aes(x = x + label_x_nudge, y = y + label_y_nudge, label = label),
   #   hjust = 0,
   #   size = 3.2,
-  #   fill = "white",
-  #   linewidth = 0,
   #   inherit.aes = FALSE
   # ) +
 

@@ -153,8 +153,11 @@ snippet ggfacet
 	
 snippet ggannotate
 	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+	# "shadowtext" is the house text annotation: the same halo cwr_label() puts
+	# behind every label inside the plot area, so the note stays readable over a
+	# gridline or a line. Plain "text" is for a note with nothing behind it.
 	annotate(
-		"${1:text}",
+		"${1:shadowtext}",
 		x = ${2:x_position}, 
 		y = ${3:y_position},  
 		# If have discrete y labels but a continuous y axis, use line below
@@ -164,7 +167,9 @@ snippet ggannotate
 		label = "${4:Annotation text}",
 		size = ${5:3.2},
 		fontface = "bold",
-		color = "${6:grey30}"
+		color = "${6:grey30}",
+		bg.colour = "white",   # the halo; drop both bg. lines for "text"
+		bg.r = 0.15
 	) +
 	
 snippet gggridx
@@ -198,9 +203,16 @@ snippet	ggvertbar_text
 	  size = 3.2
 	) +
 
-snippet gggeom_text
+snippet cwrlabel
 	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
-	geom_text(
+	# The house way to label anything inside the plot area (R/theme_cwr.R):
+	# geom_text() with a halo of the background colour around every letter, so
+	# the label stays readable where it crosses a gridline, a line or a point.
+	# A one-off annotation is annotate("shadowtext", x = , y = , label = ,
+	# bg.colour = "white", bg.r = 0.15). Text drawn inside a filled bar or tile
+	# keeps geom_text(): the fill is its background, and a white halo around
+	# white text would eat it.
+	cwr_label(
 	  aes(
 	    x = ${1:x_variable},
 	    y = ${2:y_variable},
@@ -215,33 +227,12 @@ snippet gggeom_text
 	  nudge_y = ${10:0},
 	  angle = ${11:0},
 	  lineheight = ${12:1.2},       # for multi-line labels via \n
-	  na.rm = TRUE,
-	  inherit.aes = ${13:FALSE}
-	) +
-
-snippet gglabel
-	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
-	geom_label(
-	  aes(
-	    x = ${1:x_variable},
-	    y = ${2:y_variable},
-	    label = ${3:label_variable}
-	  ),
-	  colour = "${4:grey30}",        # text colour
-	  fill = "${5:white}",          # box background colour
-	  linewidth = ${6:0},           # box border width; 0 = no border
-	  size = ${7:3.2},
-	  fontface = "${8:plain}",      # plain, bold, italic, bold.italic
-	  hjust = ${9:0.5},             # 0 = left, 0.5 = centre, 1 = right
-	  vjust = ${10:0.5},            # 0 = bottom, 0.5 = centre, 1 = top
-	  nudge_x = ${11:0},
-	  nudge_y = ${12:0},
-	  label.padding = unit(${13:0.25}, "lines"),  # internal padding around text
-	  label.r = unit(${14:0.15}, "lines"),        # corner radius; 0 = square corners
+	  bg.colour = "${13:white}",    # the halo's colour; NA draws no halo
+	  bg.r = ${14:0.15},            # its thickness, as a share of the text size
 	  na.rm = TRUE,
 	  inherit.aes = ${15:FALSE}
 	) +
-	
+
 snippet ggyaxis_break_label
 	# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
 	# Axis break indicator - squiggly line below lowest y gridline
@@ -518,7 +509,7 @@ snippet ggline
 	ggplot(plot_data, aes(x = ${11:x_variable}, y = ${13:y_variable}, colour = ${12:colour_variable})) +
 	
 		# line-name labels, positioned by cwr_line_labels() above
-		geom_label(
+		cwr_label(
 		  data = label_data,
 		  aes(
 		    x = x,
@@ -528,8 +519,6 @@ snippet ggline
 		    vjust = vjust    # set by cwr_line_labels(): 0 above the line, 1 below
 		  ),
 		  colour = "grey30",
-		  fill = "white", 
-		  linewidth = 0,
 		  size = 3.2,
 		  hjust = 0.5,     # centred on the label's x
 		  inherit.aes = FALSE
@@ -648,16 +637,14 @@ snippet ggdumbbell
 	    shape = 19, size = 4
 	  ) +
 	
-	  # The series names, on the top row only. geom_label() rather than
-	  # geom_text() so each sits on white rather than on the line it overlaps;
-	  # linewidth = 0 drops the box's border, and grey30 is the colour
-	  # theme_cwr() gives the axis labels.
-	  geom_label(
+	  # The series names, on the top row only. cwr_label() rather than
+	  # geom_text() so the halo clears the line each name sits over; grey30 is
+	  # the colour theme_cwr() gives the axis labels.
+	  cwr_label(
 	    data = top_row,
 	    aes(x = value + nudge * cwr_gap(), y = ${5:y_column}, label = series, hjust = hjust),
 	    vjust = 0, nudge_y = 0.1,
-	    colour = "grey30", fill = "white", linewidth = 0,
-	    label.padding = unit(0.08, "lines"),
+	    colour = "grey30",
 	    size = label_size * 0.8, fontface = "bold"
 	  ) +
 	
@@ -886,13 +873,13 @@ snippet ggarrow
 	  ) +
 	
 	  annotate(
-	    "label",
+	    "shadowtext",
 	    x = ${9:label_x},
 	    y = ${10:label_y},
 	    label = "${11:annotation_text}",
-	    fill = "white",
 	    color = "grey30",
-	    linewidth = 0,
+	    bg.colour = "white",   # the halo cwr_label() puts behind every in-plot label
+	    bg.r = 0.15,
 	    size = 3.2
 	  ) +
 	
@@ -936,7 +923,9 @@ snippet ggvertbar
 	
 	  # OPTION: direct bar labels - if using, see notes below
 	  # threshold controls inside/outside split - set to min(y_variable) for all inside,
-	  # Inf for all outside
+	  # Inf for all outside. Inside the bar is geom_text() (the bar is the label's
+	  # background); past the end it is cwr_label(), whose halo clears any
+	  # gridline the label crosses
 	  # geom_text(
 	  #   data = ${1:plot_data} |> filter(${3:y_variable} >= ${4:threshold}),
 	  #   aes(x = ${2:x_variable}, y = ${3:y_variable},
@@ -946,7 +935,7 @@ snippet ggvertbar
 	  #   size = 3.2,
 	  #   colour = "white"
 	  # ) +
-	  # geom_text(
+	  # cwr_label(
 	  #   data = ${1:plot_data} |> filter(${3:y_variable} < ${4:threshold}),
 	  #   aes(x = ${2:x_variable}, y = ${3:y_variable},
 	  #       label = label_number(big.mark = ",", scale = ${5:1}, suffix = "${6:}")(${3:y_variable})),
@@ -1024,7 +1013,9 @@ snippet gghorbar
 	
 	  # OPTION: direct bar labels - if using, see notes below
 	  # threshold controls inside/outside split - set to min(x_variable) for all inside,
-	  # -Inf for all outside
+	  # -Inf for all outside. Inside the bar is geom_text() (the bar is the label's
+	  # background); past the end it is cwr_label(), whose halo clears any
+	  # gridline the label crosses
 	  # geom_text(
 	  #   data = plot_data |> filter(${3:x_variable} >= ${11:threshold}),
 	  #   aes(x = ${3:x_variable}, y = ${2:y_variable},
@@ -1035,7 +1026,7 @@ snippet gghorbar
 	  #   size = 3.2,
 	  #   colour = "white"
 	  # ) +
-	  # geom_text(
+	  # cwr_label(
 	  #   data = plot_data |> filter(${3:x_variable} < ${11:threshold}),
 	  #   aes(x = ${3:x_variable}, y = ${2:y_variable},
 	  #       label = label_number(big.mark = ",", scale = ${12:1}, suffix = "${13:}")(${3:x_variable})),
@@ -1130,7 +1121,7 @@ snippet ggscatter
 	
 	  # Point labels - drawn before geom_point so points render on top
 	  # commented out until nudge values determined
-	  # geom_label(
+	  # cwr_label(
 	  #   data = nudge_data,
 	  #   aes(
 	  #     x = ${5:x_variable} + nudge_x,
@@ -1138,8 +1129,6 @@ snippet ggscatter
 	  #     label = `${7:label_variable}`
 	  #   ),
 	  #   size = 3.2,
-	  #   fill = "white",
-	  #   linewidth = 0,
 	  #   inherit.aes = FALSE
 	  # ) +
 	
@@ -1243,7 +1232,7 @@ snippet ggslope
 	ggplot(plot_data, aes(x = ${12:x_variable}, y = ${16:y_variable}, colour = ${15:colour_var}, group = ${17:group_var})) +
 	
 	  # commented out until label placements determined
-		#geom_label(
+		#cwr_label(
 		#  data = label_data,
 		#  aes(
 		#    x = x,
@@ -1252,8 +1241,6 @@ snippet ggslope
 		#    fontface = fontface
 		#  ),
 		#	 colour = "grey30",
-		#  fill = "white", 
-		#  linewidth = 0,
 		#  size = 3.2,
 		#  hjust = 0,       # 0 left, 1 right, 0.5 default centered
 		#	 vjust = 0,				# 0 bottom, 1 top, 0.5 default centered
@@ -1680,7 +1667,7 @@ snippet ggribbon
 	  ) +
 	  
 	  # line labels - commented out until label placements determined
-	  # geom_label(
+	  # cwr_label(
 	  #   data = label_data,
 	  #   aes(
 	  #     x = x,
@@ -1689,8 +1676,6 @@ snippet ggribbon
 	  #     fontface = fontface   
 	  #   ),
 	  #   colour = "grey30",
-	  #   fill = "white",
-	  #   linewidth = 0,
 	  #   size = 3.2,
 	  #   hjust = 0,
 	  #   vjust = 0,
@@ -1821,7 +1806,7 @@ snippet ggbubble
 	
 	  # Point labels - drawn before geom_point so bubbles render on top
 	  # commented out until nudge values determined
-	  # geom_label(
+	  # cwr_label(
 	  #   data = nudge_data,
 	  #   aes(
 	  #     x = `${6:x_variable}` + nudge_x,
@@ -1829,23 +1814,22 @@ snippet ggbubble
 	  #     label = `${9:label_variable}`
 	  #   ),
 	  #   size = 3.2,
-	  #   fill = "white",
-	  #   linewidth = 0,
 	  #   inherit.aes = FALSE
 	  # ) +
 	
 	  geom_point(alpha = 0.7, colour = dodgerblue) +
 	
 	  # Bubble size legend - uncomment after initial render
-	  ## legend title uses annotate("label") for white background with no border
+	  ## legend title uses annotate("shadowtext") for the house halo
 	  # annotate(
-	  #   "label",
+	  #   "shadowtext",
 	  #   x = legend_x, y = legend_y_title,
 	  #   label = "legend_title",
 	  #   hjust = 0.5,
 	  #   vjust = 0.0,
-	  #   fill = "white",
-	  #   linewidth = 0,
+	  #   colour = "grey30",
+	  #   bg.colour = "white",
+	  #   bg.r = 0.15,
 	  #   fontface = "bold",
 	  #   size = 3.2
 	  # ) +
@@ -1866,13 +1850,11 @@ snippet ggbubble
 	  #   linewidth = 0.3,
 	  #   inherit.aes = FALSE
 	  # ) +
-	  # geom_label(
+	  # cwr_label(
 	  #   data = size_legend,
 	  #   aes(x = x + label_x_nudge, y = y + label_y_nudge, label = label),
 	  #   hjust = 0,
 	  #   size = 3.2,
-	  #   fill = "white",
-	  #   linewidth = 0,
 	  #   inherit.aes = FALSE
 	  # ) +
 	
@@ -2463,16 +2445,14 @@ snippet ggdumbbellrect
 	    shape = 19, size = 4
 	  ) +
 	
-	  # The series names, on the top row only. geom_label() rather than
-	  # geom_text() so each sits on white rather than on the line it overlaps;
-	  # linewidth = 0 drops the box's border, and grey30 is the colour
-	  # theme_cwr() gives the axis labels.
-	  geom_label(
+	  # The series names, on the top row only. cwr_label() rather than
+	  # geom_text() so the halo clears the line each name sits over; grey30 is
+	  # the colour theme_cwr() gives the axis labels.
+	  cwr_label(
 	    data = top_row,
 	    aes(x = value + nudge * cwr_gap(), y = ${5:y_column}, label = series, hjust = hjust),
 	    vjust = 0, nudge_y = 0.1,
-	    colour = "grey30", fill = "white", linewidth = 0,
-	    label.padding = unit(0.08, "lines"),
+	    colour = "grey30",
 	    size = label_size * 0.8, fontface = "bold"
 	  ) +
 	
@@ -2598,12 +2578,13 @@ snippet ggarrowrect
 	  ) +
 	
 	  annotate(
-	    "label",
+	    "shadowtext",
 	    x = ${9:label_x},
 	    y = ${10:label_y},
 	    label = "${11:annotation_text}",
-	    fill = "white",
-	    linewidth = 0,
+	    colour = "grey30",
+	    bg.colour = "white",   # the halo cwr_label() puts behind every in-plot label
+	    bg.r = 0.15,
 	    size = 3.2
 	  ) +
 	
@@ -2698,7 +2679,8 @@ snippet ggmap
 		# instead (colour = "white", linewidth = 0.6), which separate neighbours
 		# without drawing a second thing to look at.
 		geom_sf(data = shapes, fill = NA, colour = cowboysilver, linewidth = 0.4) +
-		geom_text(
+		# cwr_label(): the halo keeps a name readable where it crosses a border
+		cwr_label(
 			data = labels,
 			# cwr_short_name(): the house short form of a long municipal name
 			aes(x, y, label = paste0(cwr_short_name(name), "\n", ${3:value_label})),

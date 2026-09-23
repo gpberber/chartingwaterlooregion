@@ -27,6 +27,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_caption(source, credit = FALSE, notes = NULL)` | builds the caption (rule 1a); `credit = TRUE` adds the CWR byline (rule 6); every note is written out in `notes` in the chunk, stock ones included (rule 1d) |
 | `cwr_ci_widest(estimate, lower, upper)` | the widest 95% interval on a chart, in points, for the `{widest}` placeholder in the stock interval note (rules 1d, 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
+| `cwr_label(...)` | the house label for text inside the plot area: `geom_text()` with a halo behind the letters, so it stays readable over a gridline, a line or a point (rule 3e) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 | `cwr_gap()` | multiplies a sideways nudge written in data units; 1 on the desktop and `phone_gap` while `cwr_figure()` draws the phone version (rule 11) |
@@ -204,18 +205,18 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    closest to its own line, placing the `bold` focus first. **Use automatic placement by
    default**, and always when one function draws many charts (the globe-csi post draws
    eighteen that way); give `at` only to override a spot that reads badly. Use
-   `aes(vjust = vjust)` and `hjust = 0.5` in the `geom_label()`. Check the phone version,
+   `aes(vjust = vjust)` and `hjust = 0.5` in the `cwr_label()`. Check the phone version,
    where the label covers about twice as many x units; labels count as overlapping within
    `span * label_spacing` (1.25) so phone labels do not touch.
-3b. **A line label never blots out a gridline when it can avoid it.** The label's white box
-   hides any gridline it covers. `side` is a preference: `cwr_line_labels()` checks both sides
+3b. **A line label never blots out a gridline when it can avoid it.** The label's halo breaks
+   every gridline it crosses. `side` is a preference: `cwr_line_labels()` checks both sides
    and switches when the preferred side would cover a gridline and the other would not. It
    never switches onto another group's line, which counts for more than a gridline. For the
    check it needs the y scale's `limits` (pass the same vector as `scale_y_continuous()`,
    `NA` where the data decide) or explicit `breaks` if the chart sets its own. Its returned
    `side` column says where each label ended up. If a label still covers a gridline, both
    sides were blocked: move its `at` rather than accept it. Example: the globe-csi violent CSI
-   chart asks for Canada above its line at 2003, where the box would hide the 100 gridline,
+   chart asks for Canada above its line at 2003, where the label would break the 100 gridline,
    so the helper puts it below.
 3c. **Hover layers: dots first, squares on top.** An interactive line chart
    (`cwr_interactive()`) draws two invisible `geom_point_interactive()` layers sharing a
@@ -234,6 +235,23 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    beside the first name). The chart stacks with `position_stack(reverse = TRUE)`, turns the legend
    off, and reserves a row above and below with `scale_y_discrete(expand = expansion(add = c(1.1,
    0.9)))`. Worked case: `fig-commuting` in the commuting post.
+3e. **Every label inside the plot area is a `cwr_label()`** (Greg, 2026-09-23). It is
+   `geom_text()` with a halo of the background colour drawn around each letter (the
+   `shadowtext` package), so a value beside a dot, a year above a dumbbell, a series name on a
+   line chart or a place name on a borders-only map stays readable wherever it lands. It
+   replaces the old idiom of `geom_label(fill = "white", linewidth = 0)`, which blotted out a
+   whole rectangle rather than the letters and shoved the text off the point it marked with its
+   padding; no `label.padding` to tune, and the label sits exactly where `geom_text()` would
+   have put it. `bg.colour` (white) and `bg.r` (0.15, a share of the text size, so it shrinks
+   with the label on the phone) are the house defaults and are not usually passed. Two
+   exceptions: text **inside** a filled bar, tile or map polygon stays `geom_text()`, because
+   the fill is already its background and a white halo around white text would eat it; and a
+   boxed second column (`gglollipoprect`, `gghorbarrect`) keeps its grey `geom_label()` box,
+   which is a design element and not a fix for a busy background. A one-off note on the panel is
+   `annotate("shadowtext", ..., bg.colour = "white", bg.r = 0.15)`, which is what the
+   `ggannotate` block does. `cwr_figure()` shrinks these labels for the phone exactly as it
+   shrinks `geom_text()` ones. Worked case: the change labels under
+   `fig-work-at-home-industry-2021` in the commuting post, which is where Greg found the package.
 4. **Drop what the data makes redundant.** If bars carry value labels, remove the value
    axis text, ticks, and gridlines. Horizontal charts swap gridlines to vertical (the
    templates include this `theme()` block).
@@ -449,7 +467,7 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
 11. **Phones.** The phone render is the same ggplot drawn 4.2 in wide with the same text
     sizes, so text is twice as large relative to the chart. `cwr_figure()` already wraps
     the title and subtitle, moves right-hand axis labels outside the panel, and scales
-    `geom_text`/`geom_label` sizes by 0.8. Anything else the phone version needs goes in
+    `geom_text`/`cwr_label` sizes by 0.8. Anything else the phone version needs goes in
     the `phone = list(...)` argument, ggplot pieces added only to that version: a coarser
     scale (`scale_x_date(date_breaks = "2 years")`), a dropped legend, a wider expansion.
     Design for half the width from the start: one idea per chart, few categories, short

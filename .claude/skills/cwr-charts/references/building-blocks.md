@@ -208,8 +208,11 @@ annotate() text at a data position.
 
 ```r
 # fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
+# "shadowtext" is the house text annotation: the same halo cwr_label() puts
+# behind every label inside the plot area, so the note stays readable over a
+# gridline or a line. Plain "text" is for a note with nothing behind it.
 annotate(
-	"<text>",
+	"<shadowtext>",
 	x = <x_position>, 
 	y = <y_position>,  
 	# If have discrete y labels but a continuous y axis, use line below
@@ -219,17 +222,26 @@ annotate(
 	label = "<Annotation text>",
 	size = <3.2>,
 	fontface = "bold",
-	color = "<grey30>"
+	color = "<grey30>",
+	bg.colour = "white",   # the halo; drop both bg. lines for "text"
+	bg.r = 0.15
 ) +
 ```
 
-## gggeom_text
+## cwrlabel
 
-geom_text() with every positioning argument spelled out.
+cwr_label(): the house in-plot text label, haloed, with every positioning argument spelled out.
 
 ```r
 # fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
-geom_text(
+# The house way to label anything inside the plot area (R/theme_cwr.R):
+# geom_text() with a halo of the background colour around every letter, so
+# the label stays readable where it crosses a gridline, a line or a point.
+# A one-off annotation is annotate("shadowtext", x = , y = , label = ,
+# bg.colour = "white", bg.r = 0.15). Text drawn inside a filled bar or tile
+# keeps geom_text(): the fill is its background, and a white halo around
+# white text would eat it.
+cwr_label(
   aes(
     x = <x_variable>,
     y = <y_variable>,
@@ -244,34 +256,8 @@ geom_text(
   nudge_y = <0>,
   angle = <0>,
   lineheight = <1.2>,       # for multi-line labels via \n
-  na.rm = TRUE,
-  inherit.aes = <FALSE>
-) +
-```
-
-## gglabel
-
-geom_label() (boxed text) with every positioning argument spelled out.
-
-```r
-# fix fig.height=5, fig.width=7 (or whatever dimensions you need) in cell header before tweaking positioning
-geom_label(
-  aes(
-    x = <x_variable>,
-    y = <y_variable>,
-    label = <label_variable>
-  ),
-  colour = "<grey30>",        # text colour
-  fill = "<white>",          # box background colour
-  linewidth = <0>,           # box border width; 0 = no border
-  size = <3.2>,
-  fontface = "<plain>",      # plain, bold, italic, bold.italic
-  hjust = <0.5>,             # 0 = left, 0.5 = centre, 1 = right
-  vjust = <0.5>,            # 0 = bottom, 0.5 = centre, 1 = top
-  nudge_x = <0>,
-  nudge_y = <0>,
-  label.padding = unit(<0.25>, "lines"),  # internal padding around text
-  label.r = unit(<0.15>, "lines"),        # corner radius; 0 = square corners
+  bg.colour = "<white>",    # the halo's colour; NA draws no halo
+  bg.r = <0.15>,            # its thickness, as a share of the text size
   na.rm = TRUE,
   inherit.aes = <FALSE>
 ) +

@@ -65,7 +65,7 @@ label_data <- cwr_line_labels(
 ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_variable>)) +
 
 	# line-name labels, positioned by cwr_line_labels() above
-	geom_label(
+	cwr_label(
 	  data = label_data,
 	  aes(
 	    x = x,
@@ -75,8 +75,6 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_varia
 	    vjust = vjust    # set by cwr_line_labels(): 0 above the line, 1 below
 	  ),
 	  colour = "grey30",
-	  fill = "white", 
-	  linewidth = 0,
 	  size = 3.2,
 	  hjust = 0.5,     # centred on the label's x
 	  inherit.aes = FALSE
@@ -295,7 +293,7 @@ plot_data |>
   ) +
   
   # line labels - commented out until label placements determined
-  # geom_label(
+  # cwr_label(
   #   data = label_data,
   #   aes(
   #     x = x,
@@ -304,8 +302,6 @@ plot_data |>
   #     fontface = fontface   
   #   ),
   #   colour = "grey30",
-  #   fill = "white",
-  #   linewidth = 0,
   #   size = 3.2,
   #   hjust = 0,
   #   vjust = 0,
@@ -420,7 +416,7 @@ group_colours <- set_names(manual_5_colours, renamed_groups)  # adjust for numbe
 ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_var>, group = <group_var>)) +
 
   # commented out until label placements determined
-	#geom_label(
+	#cwr_label(
 	#  data = label_data,
 	#  aes(
 	#    x = x,
@@ -429,8 +425,6 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_var>,
 	#    fontface = fontface
 	#  ),
 	#	 colour = "grey30",
-	#  fill = "white", 
-	#  linewidth = 0,
 	#  size = 3.2,
 	#  hjust = 0,       # 0 left, 1 right, 0.5 default centered
 	#	 vjust = 0,				# 0 bottom, 1 top, 0.5 default centered

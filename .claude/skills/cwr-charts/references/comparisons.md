@@ -81,16 +81,14 @@ plot_data |>
     shape = 19, size = 4
   ) +
 
-  # The series names, on the top row only. geom_label() rather than
-  # geom_text() so each sits on white rather than on the line it overlaps;
-  # linewidth = 0 drops the box's border, and grey30 is the colour
-  # theme_cwr() gives the axis labels.
-  geom_label(
+  # The series names, on the top row only. cwr_label() rather than
+  # geom_text() so the halo clears the line each name sits over; grey30 is
+  # the colour theme_cwr() gives the axis labels.
+  cwr_label(
     data = top_row,
     aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
-    colour = "grey30", fill = "white", linewidth = 0,
-    label.padding = unit(0.08, "lines"),
+    colour = "grey30",
     size = label_size * 0.8, fontface = "bold"
   ) +
 
@@ -218,16 +216,14 @@ plot_data |>
     shape = 19, size = 4
   ) +
 
-  # The series names, on the top row only. geom_label() rather than
-  # geom_text() so each sits on white rather than on the line it overlaps;
-  # linewidth = 0 drops the box's border, and grey30 is the colour
-  # theme_cwr() gives the axis labels.
-  geom_label(
+  # The series names, on the top row only. cwr_label() rather than
+  # geom_text() so the halo clears the line each name sits over; grey30 is
+  # the colour theme_cwr() gives the axis labels.
+  cwr_label(
     data = top_row,
     aes(x = value + nudge * cwr_gap(), y = <y_column>, label = series, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
-    colour = "grey30", fill = "white", linewidth = 0,
-    label.padding = unit(0.08, "lines"),
+    colour = "grey30",
     size = label_size * 0.8, fontface = "bold"
   ) +
 
@@ -505,13 +501,13 @@ plot_data |>
   ) +
 
   annotate(
-    "label",
+    "shadowtext",
     x = <label_x>,
     y = <label_y>,
     label = "<annotation_text>",
-    fill = "white",
     color = "grey30",
-    linewidth = 0,
+    bg.colour = "white",   # the halo cwr_label() puts behind every in-plot label
+    bg.r = 0.15,
     size = 3.2
   ) +
 
@@ -590,12 +586,13 @@ plot_data |>
   ) +
 
   annotate(
-    "label",
+    "shadowtext",
     x = <label_x>,
     y = <label_y>,
     label = "<annotation_text>",
-    fill = "white",
-    linewidth = 0,
+    colour = "grey30",
+    bg.colour = "white",   # the halo cwr_label() puts behind every in-plot label
+    bg.r = 0.15,
     size = 3.2
   ) +
 

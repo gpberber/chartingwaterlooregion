@@ -178,7 +178,7 @@ ggplot(plot_data, aes(x = year, y = officers_per_100k, colour = comparison_group
 
   geom_point(size = 3.0) +
 
-  geom_label(
+  cwr_label(
     data = label_data,
     aes(
       x = x,
@@ -188,8 +188,6 @@ ggplot(plot_data, aes(x = year, y = officers_per_100k, colour = comparison_group
       hjust = hjust
     ),
     colour = "grey30",
-    fill = "white",
-    linewidth = 0,
     size = 3.2,
     vjust = 0.5,
     inherit.aes = FALSE

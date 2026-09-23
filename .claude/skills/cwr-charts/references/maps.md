@@ -40,7 +40,8 @@ p <- ggplot() +
 	# instead (colour = "white", linewidth = 0.6), which separate neighbours
 	# without drawing a second thing to look at.
 	geom_sf(data = shapes, fill = NA, colour = cowboysilver, linewidth = 0.4) +
-	geom_text(
+	# cwr_label(): the halo keeps a name readable where it crosses a border
+	cwr_label(
 		data = labels,
 		# cwr_short_name(): the house short form of a long municipal name
 		aes(x, y, label = paste0(cwr_short_name(name), "\n", <value_label>)),

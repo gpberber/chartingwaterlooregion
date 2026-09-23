@@ -22,7 +22,9 @@ Vertical bars, one value per category, right-hand y axis; optional direct labels
 
   # OPTION: direct bar labels - if using, see notes below
   # threshold controls inside/outside split - set to min(y_variable) for all inside,
-  # Inf for all outside
+  # Inf for all outside. Inside the bar is geom_text() (the bar is the label's
+  # background); past the end it is cwr_label(), whose halo clears any
+  # gridline the label crosses
   # geom_text(
   #   data = <plot_data> |> filter(<y_variable> >= <threshold>),
   #   aes(x = <x_variable>, y = <y_variable>,
@@ -32,7 +34,7 @@ Vertical bars, one value per category, right-hand y axis; optional direct labels
   #   size = 3.2,
   #   colour = "white"
   # ) +
-  # geom_text(
+  # cwr_label(
   #   data = <plot_data> |> filter(<y_variable> < <threshold>),
   #   aes(x = <x_variable>, y = <y_variable>,
   #       label = label_number(big.mark = ",", scale = <1>, suffix = "<>")(<y_variable>)),
@@ -115,7 +117,9 @@ plot_data |>
 
   # OPTION: direct bar labels - if using, see notes below
   # threshold controls inside/outside split - set to min(x_variable) for all inside,
-  # -Inf for all outside
+  # -Inf for all outside. Inside the bar is geom_text() (the bar is the label's
+  # background); past the end it is cwr_label(), whose halo clears any
+  # gridline the label crosses
   # geom_text(
   #   data = plot_data |> filter(<x_variable> >= <threshold>),
   #   aes(x = <x_variable>, y = <y_variable>,
@@ -126,7 +130,7 @@ plot_data |>
   #   size = 3.2,
   #   colour = "white"
   # ) +
-  # geom_text(
+  # cwr_label(
   #   data = plot_data |> filter(<x_variable> < <threshold>),
   #   aes(x = <x_variable>, y = <y_variable>,
   #       label = label_number(big.mark = ",", scale = <1>, suffix = "<>")(<x_variable>)),

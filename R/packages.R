@@ -13,7 +13,7 @@
 
 cwr_packages <- c(
   # House stack, loaded by R/theme_cwr.R
-  "tidyverse", "scales", "ggtext", "patchwork", "gt", "gtExtras", "here",
+  "tidyverse", "scales", "ggtext", "shadowtext", "patchwork", "gt", "gtExtras", "here",
   "janitor", "conflicted", "prismatic", "systemfonts", "ragg", "png",
   "ggiraph", "htmltools",   # interactive charts, cwr_interactive()
 

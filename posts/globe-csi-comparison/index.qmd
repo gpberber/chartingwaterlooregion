@@ -221,12 +221,10 @@ label_data <- cwr_line_labels(
 
 p <- ggplot(csi_plot_data, aes(x = year, y = csi, colour = region)) +
 
-  geom_label(
+  cwr_label(
     data = label_data,
     aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
     colour = "grey30",
-    fill = "white",
-    linewidth = 0,
     size = 3.2,
     hjust = 0.5,     # centred on the year given in `at`
     inherit.aes = FALSE
@@ -317,12 +315,10 @@ label_data <- cwr_line_labels(
 
 p <- ggplot(csi_plot_data, aes(x = year, y = csi_violent, colour = region)) +
 
-  geom_label(
+  cwr_label(
     data = label_data,
     aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
     colour = "grey30",
-    fill = "white",
-    linewidth = 0,
     size = 3.2,
     hjust = 0.5,     # centred on the year given in `at`
     inherit.aes = FALSE
@@ -471,12 +467,10 @@ crime_chart <- function(code, measure = c("incidents", "index")) {
 
   p <- ggplot(plot_data, aes(x = year, y = value, colour = region)) +
 
-    geom_label(
+    cwr_label(
       data = label_data,
       aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust),
       colour = "grey30",
-      fill = "white",
-      linewidth = 0,
       size = 3.2,
       hjust = 0.5,
       inherit.aes = FALSE

@@ -24,6 +24,7 @@
 library(tidyverse)   # dplyr, ggplot2, tidyr, readr, purrr, stringr, forcats, lubridate
 library(scales)      # label_number(), label_percent(), alpha(), rescale()
 library(ggtext)      # element_markdown(): lets titles and axis labels use **bold** markdown
+library(shadowtext)  # geom_shadowtext(): the halo behind every in-plot label, cwr_label()
 library(patchwork)   # combine plots (small multiples)
 library(grid)        # textGrob() and gpar() used by the scatter/bubble templates
 library(gt)          # tables
@@ -316,6 +317,39 @@ cwr_ci_widest <- function(estimate, lower, upper) {
 # Worked case: the year labels on fig-work-at-home in the commuting post.
 cwr_gap <- function() getOption("cwr.gap", 1)
 
+# A text label inside the plot area: the house version of geom_text()
+# (Greg, 2026-09-23).
+#
+# Anything drawn over the panel - a value beside a dot, a year above a dumbbell,
+# a series name on a line chart, a place name on a map - sooner or later lands
+# on a gridline, a line or another point, and plain text is unreadable there.
+# The old fix was geom_label() with fill = "white" and linewidth = 0, but a
+# label is a box: it blots out a rectangle rather than the letters, its padding
+# shoves the text off the point it marks, and the padding has to be tuned chart
+# by chart. shadowtext draws a halo of the background colour around each glyph
+# instead, so only the letters clear their own space and the label sits exactly
+# where geom_text() would have put it.
+#
+# Takes everything geom_text() takes - aes(), data, size, colour, fontface,
+# hjust, vjust, nudge_x, nudge_y, lineheight - plus the halo:
+#   bg.colour  its colour: white, to match the chart background. Pass the fill
+#              behind the text where that is not white, or NA for no halo.
+#   bg.r       its thickness, as a share of the text size, so it shrinks with
+#              the label on the phone version.
+#
+#   cwr_label(
+#     data = top_row,
+#     aes(x = percent, y = district, label = year),
+#     colour = "grey30", size = label_size * 0.8, fontface = "bold"
+#   )
+#
+# Text drawn inside a filled bar stays geom_text(): the bar is its background,
+# and a white halo around white text would eat it. cwr_figure() shrinks these
+# labels for the phone exactly as it shrinks geom_text() ones.
+cwr_label <- function(..., bg.colour = "white", bg.r = 0.15) {
+  geom_shadowtext(..., bg.colour = bg.colour, bg.r = bg.r)
+}
+
 # Standard caption: "Source: Statistics Canada, Table 35-10-0177-01".
 #
 # The caption names whoever published the numbers, and nothing else. A chart that
@@ -498,11 +532,11 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 # height from the data instead. A label is placed against the highest (above)
 # or lowest (below) point its line reaches across `span` x units around the x
 # it is centred on, so a line that slopes under the label does not cut
-# through it. geom_label()'s own padding already leaves a sliver of air, so
-# `gap` (extra space, as a share of the y range) is 0 unless a chart needs
-# more. `span` should be about the label's width on the phone version, which
-# is the wider of the two in x units: 3 suits a short name over 25 to 30
-# years.
+# through it. The label is a cwr_label(), whose halo keeps the letters legible
+# where they land, so `gap` (extra space, as a share of the y range) is 0
+# unless a chart needs more. `span` should be about the label's width on the
+# phone version, which is the wider of the two in x units: 3 suits a short name
+# over 25 to 30 years.
 #
 # Where each label goes along the line:
 #   - `at` names a group and the x to centre its label on - a stretch where
@@ -524,9 +558,9 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 #
 # Which side of the line:
 #   `side` ("above"/"below", one for all or one per group) is a preference,
-#   not an order. A label's white box blots out any gridline it covers, so
-#   both sides are checked, and the other side is taken when it is clear and
-#   the preferred side is not. A side where another group's line runs
+#   not an order. A label's halo breaks every gridline it crosses, so both
+#   sides are checked, and the other side is taken when it is clear and the
+#   preferred side is not. A side where another group's line runs
 #   through the label, or where the label would cover one already placed, is
 #   ruled out first, whatever the gridlines do. Ties go to the preferred
 #   side. For these checks the helper needs:
@@ -534,13 +568,13 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 #                  (NA for a limit the data set). The gridlines are the
 #                  breaks ggplot2 draws for that range.
 #   `breaks`       the gridlines themselves, if the chart sets its own.
-#   `label_height` the label box's height as a share of the y range. 0.05
+#   `label_height` the label's height as a share of the y range. 0.05
 #                  fits the templates' 3.2 mm label on a 5 in line chart,
 #                  desktop and phone alike; raise it for a shorter chart.
 #   Set `avoid_gridlines = FALSE` to ignore gridlines altogether.
 #
 # Returns one row per label with x, y, label, vjust, side and fontface, for
-# the templates' geom_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
+# the templates' cwr_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
 # x must be numeric (years); for a date axis pass as.numeric(date) and `at`
 # as numbers too. For a faceted chart, call it once per panel (the checks
 # should only see that panel's lines) and add the facet column to each result
@@ -674,7 +708,7 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
   list_rbind(result)
 }
 
-# ggplot2 text sizes for geom_text/geom_label are in mm, not points.
+# ggplot2 text sizes for geom_text/geom_label/cwr_label are in mm, not points.
 # 4 mm is roughly 11 pt, the standard label size used across the templates
 # (scaled up with base_size so direct labels stay readable on a phone).
 label_size <- 4
@@ -968,7 +1002,7 @@ cwr_phone_theme <- function(width = 4.2) {
 # with the data on a narrow panel); category names longer than
 # `phone_label_width` characters wrap, with deeper rows to hold them (see
 # cwr_wrap_category_labels(); the desktop does the same past `label_width`);
-# and text drawn with geom_text/geom_label is scaled
+# and text drawn with geom_text/geom_label/cwr_label is scaled
 # by phone_text_scale so value labels stay narrower than bars.
 # Anything else that only the phone version needs goes in `phone`, a list of
 # ggplot pieces added to it with `+`, for example:
@@ -1098,7 +1132,9 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # desktop PNG is saved first (above), the sizes are changed in place for the
   # phone PNG, and then put back so the caller's plot is left as it was.
   text_layers <- keep(phone_plot$layers, function(layer) {
-    (inherits(layer$geom, "GeomText") || inherits(layer$geom, "GeomLabel")) &&
+    # GeomShadowText (cwr_label()) is its own geom, not a kind of GeomText, so
+    # it has to be named here or a haloed label would keep its desktop size
+    inherits(layer$geom, c("GeomText", "GeomLabel", "GeomShadowText")) &&
       !is.null(layer$aes_params$size)
   })
   original_sizes <- map(text_layers, \(layer) layer$aes_params$size)
@@ -1296,10 +1332,12 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
 
   desktop_widget <- make_widget(plot, width, height)
 
-  # geom_text/geom_label sizes are shrunk for the phone exactly as in
+  # geom_text/geom_label/cwr_label sizes are shrunk for the phone exactly as in
   # cwr_figure(): changed in place, drawn, then put back.
   text_layers <- keep(phone_plot$layers, function(layer) {
-    (inherits(layer$geom, "GeomText") || inherits(layer$geom, "GeomLabel")) &&
+    # GeomShadowText (cwr_label()) is its own geom, not a kind of GeomText, so
+    # it has to be named here or a haloed label would keep its desktop size
+    inherits(layer$geom, c("GeomText", "GeomLabel", "GeomShadowText")) &&
       !is.null(layer$aes_params$size)
   })
   original_sizes <- map(text_layers, \(layer) layer$aes_params$size)

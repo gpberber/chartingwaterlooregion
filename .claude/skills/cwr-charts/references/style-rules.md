@@ -57,6 +57,13 @@ the same call in a situation the templates do not cover.
 
 - Direct labels first. Place them with `label_data` tibbles (line charts) or `nudge_*`
   columns (scatter) after the first render. Bold the focus label.
+- Every label inside the plot area is a `cwr_label()`: `geom_text()` with a halo of the
+  background colour around each letter (`shadowtext`), so it stays readable where it crosses a
+  gridline, a line or a point. It replaced `geom_label(fill = "white", linewidth = 0)` on
+  2026-09-23: a box blots out a rectangle rather than the letters, and its padding pushes the
+  text off the thing it labels. Text inside a filled bar, tile or map polygon stays
+  `geom_text()` - the fill is its background - and the grey boxed column of `gglollipoprect`
+  stays a `geom_label()`, since that box is a design element.
 - Bar value labels go inside the bar in white when the bar is long enough, outside in
   grey30 otherwise; the templates use a `threshold` to split them.
 - A horizontal stacked bar names its segments on the bars, not in a legend: first and last above

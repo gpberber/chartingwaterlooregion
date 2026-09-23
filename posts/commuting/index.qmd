@@ -162,16 +162,13 @@ p <- plot_data |>
   ) +
 
   # The years, on the top row only, just above the line. grey30 is the colour
-  # theme_cwr() gives the axis labels. geom_label() rather than geom_text() so
-  # each sits on white rather than on the line it overlaps; linewidth = 0
-  # drops the box's border, and the padding is tight so the white is only as
-  # wide as the year.
-  geom_label(
+  # theme_cwr() gives the axis labels. cwr_label() rather than geom_text() so
+  # the halo behind the letters clears the line each year sits over.
+  cwr_label(
     data = top_row,
     aes(x = percent + nudge * cwr_gap(), y = district, label = year, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
-    colour = "grey30", fill = "white", linewidth = 0,
-    label.padding = unit(0.08, "lines"),
+    colour = "grey30",
     size = label_size * 0.8, fontface = "bold"
   ) +
 
@@ -380,16 +377,14 @@ industry_dumbbell <- function(with_2021 = FALSE) {
       ),
 
       # The years, on the top row only, just above the line. grey30 is the
-      # colour theme_cwr() gives the axis labels. geom_label() rather than
-      # geom_text() so each sits on white rather than on the line it overlaps;
-      # linewidth = 0 drops the box's border, and the padding is tight so the
-      # white is only as wide as the year.
-      geom_label(
+      # colour theme_cwr() gives the axis labels. cwr_label() rather than
+      # geom_text() so the halo behind the letters clears the line each year
+      # sits over.
+      cwr_label(
         data = top_row,
         aes(x = percent + nudge * cwr_gap(), y = industry, label = year, hjust = hjust),
         vjust = 0, nudge_y = 0.1,
-        colour = "grey30", fill = "white", linewidth = 0,
-        label.padding = unit(0.08, "lines"),
+        colour = "grey30",
         size = label_size * 0.8, fontface = "bold"
       ),
 
@@ -399,7 +394,7 @@ industry_dumbbell <- function(with_2021 = FALSE) {
       # what the 2016 table's random rounding can shift. The nudge clears the
       # dots on the row where the two nearly touch (agriculture); a row is
       # about as deep on a phone as on a desktop, so it needs no cwr_gap().
-      shadowtext::geom_shadowtext(
+      cwr_label(
         aes(
           x = (`2016` + `2021`) / 2,
           y = industry,
@@ -407,8 +402,6 @@ industry_dumbbell <- function(with_2021 = FALSE) {
         ),
         vjust = 1, nudge_y = -0.19,
         colour = dodgerblue,
-        bg.colour = "white",   # halo colour; match your plot background
-        bg.r = 0.15,           # halo thickness
         size = label_size * 0.8, fontface = "bold"
       )
     )) +
