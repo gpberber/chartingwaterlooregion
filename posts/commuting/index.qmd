@@ -301,7 +301,10 @@ industry_data <- work_at_home_industry |>
     industry = reorder(industry, `2016`),
     # The axis draws the short form of the longest sector names, which
     # 02_clean_data.R works out; the data file keeps the published name
-    y_label = industry_short
+    y_label = industry_short,
+    # How far the share moved between the censuses, for the label under each
+    # dumbbell on the second tab
+    change = `2021` - `2016`
   )
 
 # Pre-compute labels to avoid data masking issue in scale_y_discrete
@@ -388,6 +391,23 @@ industry_dumbbell <- function(with_2021 = FALSE) {
         colour = "grey30", fill = "white", linewidth = 0,
         label.padding = unit(0.08, "lines"),
         size = label_size * 0.8, fontface = "bold"
+      ),
+
+      # How much the share moved since 2016, in percentage points, centred
+      # under each dumbbell and in the 2021 colour, since it is the 2021 dot
+      # that moved. Rounded to whole points: a tenth of a point is well inside
+      # what the 2016 table's random rounding can shift. The nudge clears the
+      # dots on the row where the two nearly touch (agriculture); a row is
+      # about as deep on a phone as on a desktop, so it needs no cwr_gap().
+      geom_text(
+        aes(
+          x = (`2016` + `2021`) / 2,
+          y = industry,
+          label = label_number(accuracy = 1, style_positive = "plus")(change)
+        ),
+        vjust = 1, nudge_y = -0.19,
+        colour = dodgerblue,
+        size = label_size * 0.8
       )
     )) +
 
