@@ -488,7 +488,7 @@ cwr_figure(
 )
 ```
 
-### 2016 and 2021
+### vs 2021
 
 ```{r}
 #| label: work-at-home-industry-2021
