@@ -299,6 +299,44 @@ gnr_2016 <- home_2016_raw |>
   select(geo_uid, gnr_long_2016 = gnr) |>
   mutate(gnr_long_2016 = as.numeric(gnr_long_2016))
 
+# ---- Working in agriculture, 2021 ------------------------------------------
+# The share of each district's workers whose industry is agriculture, forestry,
+# fishing and hunting - the first NAICS sector, fetched for the districts by
+# 01_get_data.R. This is about the industry people work in, not where they work
+# from, so both the sector and the district total are taken at the table's
+# place-of-work total. The Region's own row is not charted, so it is left out
+# here as well.
+#
+# The member id is not trusted on its own: 01_get_data.R asks for member 2, and
+# this checks that member 2 really is the agriculture sector before the share
+# is built.
+agriculture_name <- industry_names |>
+  filter(industry_member == 2L) |>
+  pull(industry)
+stopifnot(str_starts(agriculture_name, "Agriculture"))
+
+agriculture <- pow_2021 |>
+  filter(
+    geo_uid %in% municipalities$geo_uid,
+    str_starts(place_of_work_status_5, "Total"),
+    industry_member %in% c(1L, 2L)
+  ) |>
+  figure_per_row(c("geo_uid", "industry_member")) |>
+  mutate(
+    total = value[industry_member == 1L],
+    se_total = se[industry_member == 1L],
+    percent = value / total * 100,
+    .by = geo_uid
+  ) |>
+  filter(industry_member == 2L) |>
+  mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
+  cwr_add_share_ci(value) |>
+  inner_join(municipalities, join_by(geo_uid)) |>
+  mutate(industry = agriculture_name) |>
+  select(district, district_type, industry, workers = value, total, percent,
+         percent_lower, percent_upper, cv, quality) |>
+  arrange(desc(percent))
+
 # ---- Worked at home by industry, 2016 and 2021 ------------------------------
 # The share of each industry's own workers who worked at home, for the Region
 # as a whole (census division 3530), for the chart that ranks industries. Both
@@ -349,7 +387,9 @@ work_at_home_industry <- bind_rows(industry_2016, industry_2021) |>
     # a phone, so the chart draws a shorter form of them (Greg, 2026-09-22) and
     # `industry` keeps the published name for the data file. Shortening belongs
     # here rather than in the chart (cwr-charts rule 8).
-    industry_short = case_match(
+    # recode_values() replaced case_match() in dplyr 1.2.0; `default` takes the
+    # published name, so the fourteen sectors not named here keep theirs.
+    industry_short = recode_values(
       industry,
       "Agriculture, forestry, fishing and hunting" ~ "Agriculture",
       "Real estate and rental and leasing" ~ "Real estate",
@@ -357,7 +397,7 @@ work_at_home_industry <- bind_rows(industry_2016, industry_2021) |>
       "Management of companies and enterprises" ~ "Management",
       "Other services (except public administration)" ~ "Other services",
       "Administrative and support, waste management and remediation services" ~ "Administrative and support",
-      .default = industry
+      default = industry
     )
   ) |>
   arrange(industry, year) |>
@@ -535,6 +575,7 @@ write_csv(commuting, file.path(data_dir, "commuting.csv"))
 write_csv(commuting_mode, file.path(data_dir, "commuting_mode.csv"))
 write_csv(work_at_home, file.path(data_dir, "work_at_home.csv"))
 write_csv(work_at_home_industry, file.path(data_dir, "work_at_home_industry.csv"))
+write_csv(agriculture, file.path(data_dir, "agriculture.csv"))
 write_csv(census_quality, file.path(data_dir, "census_quality.csv"))
 write_csv(flows, file.path(data_dir, "commuting_flows.csv"))
 write_csv(inbound, file.path(data_dir, "commuting_inbound.csv"))

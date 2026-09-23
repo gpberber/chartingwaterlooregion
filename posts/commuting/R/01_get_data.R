@@ -161,12 +161,16 @@ mode_cells |>
 # share differs by a tenth of a point - and none of its three variables is used
 # in the post, so one table now serves both charts.)
 #
-# The table has 42 million cells, so like 98-10-0464 only the 168 needed are
+# The table has 42 million cells, so like 98-10-0464 only the 189 needed are
 # fetched by coordinate: the Region and its seven districts at the table's own
 # industry total, for the chart by district, and the Region at each of the 20
 # sectors, for the industry chart; each of those 28 combinations as 2 statuses
 # (the total and "Worked at home") x 3 statistics (the count and its 95%
-# confidence interval bounds), with occupation and gender at their totals.
+# confidence interval bounds), with occupation and gender at their totals. The
+# last 21 are for the agriculture chart: the seven districts at the first NAICS
+# sector, in the place-of-work total only (the chart is about who works in
+# agriculture, not where they work from), x the same 3 statistics. Their
+# denominator is each district's industry total, already fetched above.
 # Coordinate: place . occupation . gender . statistic . industry . place of
 # work status, then four zeros - the same shape as 98-10-0464, whose dimensions
 # are in the same order. Member ids from the table's metadata
@@ -178,13 +182,22 @@ home_statuses <- tribble(
 )
 
 home_cells <- bind_rows(
-  # Every place, at the industry total
-  mode_places |> mutate(industry_member = 1),
-  # The Region, at each of the 20 sectors
-  mode_places |> filter(GeoUID == "3530") |> cross_join(tibble(industry_member = 2:21))
+  # Every place, at the industry total, in both place-of-work groups
+  mode_places |> mutate(industry_member = 1) |> cross_join(home_statuses),
+  # The Region, at each of the 20 sectors, in both groups
+  mode_places |>
+    filter(GeoUID == "3530") |>
+    cross_join(tibble(industry_member = 2:21)) |>
+    cross_join(home_statuses),
+  # The seven districts at agriculture, forestry, fishing and hunting - member
+  # 2, the first NAICS sector - at the place-of-work total only. 02_clean_data.R
+  # checks that name against the member list rather than trusting the id.
+  mode_places |>
+    filter(GeoUID != "3530") |>
+    mutate(industry_member = 2) |>
+    cross_join(home_statuses |> filter(status_member == 1))
 ) |>
   cross_join(mode_statistics) |>
-  cross_join(home_statuses) |>
   mutate(COORDINATE = str_glue(
     "{place_member}.1.1.{statistic_member}.{industry_member}.{status_member}.0.0.0.0"
   ))
