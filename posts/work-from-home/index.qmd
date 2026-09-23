@@ -1,0 +1,943 @@
+---
+title: "Working from home in Waterloo Region"
+description: "One sentence for the listing card: the question and the answer."
+date: "2026-09-23"
+categories: [Snapshot]   # first entry is the post type: Snapshot (under 5 min) or Deep dive; then 2 to 3 topics
+image: images/thumbnail.png
+# share-figure: fig-name   # chart used for link previews (1200 x 630); default is the first chart; none keeps the thumbnail
+draft: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/work-from-home/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
+# Post-specific packages go here, and in R/packages.R
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+# The share of workers who worked at home, 2016 and 2021 censuses: one row per
+# district per year, plus the Region's own two rows. Built by 02_clean_data.R
+# from tables 98-400-X2016321 (2016) and 98-10-0456 (2021).
+work_at_home <- read_csv(
+  here("posts", "work-from-home", "data", "work_at_home.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The share of each district's employed residents whose industry is
+# agriculture, forestry, fishing and hunting, 2021 census. One row per district.
+# Built by 02_clean_data.R from table 98-10-0456.
+agriculture <- read_csv(
+  here("posts", "work-from-home", "data", "agriculture.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The share of the Region's workers who worked at home in each industry, 2016
+# and 2021 censuses: one row per NAICS sector per year. Built by 02_clean_data.R
+# from data table 98-400-X2016321 (2016) and table 98-10-0456 (2021).
+work_at_home_industry <- read_csv(
+  here("posts", "work-from-home", "data", "work_at_home_industry.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The Region's share in each year, ready to drop into a sentence with
+# `r home_region_2016` and `r home_region_2021` (they print as "6.8%" and
+# "29.0%"). The 2021 figure's 95% interval is a fraction of a point.
+home_region <- work_at_home |>
+  filter(district == cwr_region) |>
+  mutate(label = label_number(accuracy = 0.1, suffix = "%")(percent))
+home_region_2016 <- home_region |> filter(year == 2016) |> pull(label)
+home_region_2021 <- home_region |> filter(year == 2021) |> pull(label)
+```
+
+<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+
+## No place like home
+
+<!-- One or two paragraphs, then one chart. -->
+
+::: panel-tabset
+### Ranked
+
+```{r}
+#| label: work-at-home-2016
+#| output: asis
+
+# The 2016 shares on their own, ranked: one blue bar per district, each
+# carrying its own number. The two tabs draw exactly the same chart; the only
+# difference is the colour of the district names, white on this tab and the
+# theme's own grey on the next, so the names are invisible here while still
+# taking up their room. That keeps the bars in the same place on both tabs, so
+# clicking between them only brings the names in. work_at_home is read in the
+# load-data chunk; the Region's own row is left out, because the chart is by
+# district.
+home_2016 <- work_at_home |>
+  filter(year == 2016, district != cwr_region)
+
+# Roughly how many characters fit across the panel at this font size, read off
+# a render; it decides whether a bar is long enough to hold its own label.
+# (The destinations chart further down uses the same figure for the same job.)
+panel_chars_home <- 40
+
+home_2016 <- home_2016 |>
+  mutate(
+    # reorder() sorts ascending and a horizontal chart draws the first level at
+    # the bottom, so the district where most people worked at home ends up on top
+    district = fct_reorder(district, percent),
+    share_label = label_number(accuracy = 0.1, suffix = "%")(percent),
+    # Whether a bar can hold its own label
+    inside = percent >= (nchar(share_label) + 1.5) * (max(percent) * 1.05 / panel_chars_home)
+  )
+
+# Built once and called by both tabs, which add their own titles.
+# `show_names` is the whole difference between them.
+home_2016_bars <- function(show_names) {
+  ggplot(home_2016, aes(x = percent, y = district)) +
+    geom_col(width = 0.7, fill = dodgerblue) +
+    # The baseline the bars grow from, stopping just past the end bars
+    annotate("segment", x = 0, xend = 0, y = 0.5, yend = nrow(home_2016) + 0.5,
+             colour = "black", linewidth = 0.5) +
+    # White inside a bar that can hold its label, black just past one that cannot
+    geom_text(
+      aes(
+        label = share_label,
+        hjust = if_else(inside, 1.15, -0.15),
+        colour = if_else(inside, "white", "black")
+      ),
+      size = label_size * 0.8
+    ) +
+    scale_colour_identity() +
+    # Room on the right for a label that sits outside its bar
+    scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+    # The house short form of a long district name
+    scale_y_discrete(labels = cwr_short_name) +
+    coord_cartesian(clip = "off") +
+    # Every bar carries its number, so the value axis and its gridlines are gone
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank()
+    ) +
+    # The names in white on the first tab: drawn, measured and laid out as
+    # usual, but the same colour as the page, so nothing moves when they appear
+    (if (show_names) NULL else theme(axis.text.y.left = element_markdown(colour = "white")))
+}
+
+# The rows of an alt text, read top to bottom in the order the bars are drawn
+home_2016_lines <- home_2016 |>
+  arrange(desc(percent)) |>
+  mutate(line = paste0(district, " ", share_label)) |>
+  pull(line)
+
+# ---- This tab ------------------------------------------------------------
+p <- home_2016_bars(show_names = FALSE) +
+  labs(
+    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+cwr_figure(
+  p, "fig-work-at-home-2016",
+  alt = paste0(
+    "Horizontal bars ranking the Region's seven districts by the share of ",
+    "employed people who worked at home in 2016, with the district names left ",
+    "off. The shares, longest bar first: ",
+    paste(
+      home_2016 |> arrange(desc(percent)) |> pull(share_label),
+      collapse = ", "
+    ), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+### Named
+
+```{r}
+#| label: work-at-home-2016-named
+#| output: asis
+
+# The same chart with the district names in the theme's own colour. Everything
+# else - the rows, their order, the bars and their labels - comes from the tab
+# above unchanged.
+p <- home_2016_bars(show_names = TRUE) +
+  labs(
+    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+cwr_figure(
+  p, "fig-work-at-home-2016-named",
+  alt = paste0(
+    "The same bars as above, now with the district names. ",
+    paste(home_2016_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+:::
+
+```{r}
+#| label: agriculture
+#| output: asis
+
+# How farming districts the seven districts are: the share of each one's
+# employed residents whose industry is agriculture, forestry, fishing and
+# hunting, the first of the 20 NAICS sectors. Both the sector and the district
+# total are taken at the table's place-of-work total, so this counts everyone
+# who works in the industry wherever they work from. agriculture is read in the
+# load-data chunk.
+#
+# The gghorbar template (the cwr-charts skill), with each bar carrying its own
+# number, so the value axis and its gridlines come off (style rule 4).
+
+# Roughly how many characters fit across the panel at this font size, read off
+# a render; it decides whether a bar is long enough to hold its own label.
+agriculture_panel_chars <- 40
+
+agriculture_bars <- agriculture |>
+  mutate(
+    # Ranked on the share, with the district whose share is not reported at the
+    # bottom: fct_reorder() sorts ascending and a horizontal chart draws the
+    # first level at the bottom, so -1 parks it there rather than above the
+    # largest share.
+    district = fct_reorder(district, replace_na(percent, -1)),
+    # A share is missing where 02_clean_data.R blanked it: its sampling error
+    # is so large that Statistics Canada's scale rates it E ("use with
+    # caution"), and this site uses neither E nor F. The row stays, named
+    # "Not reported" with the key to note 1, rather than drawn as a zero.
+    # geom_text() draws plain text, so the key is the Unicode superscript,
+    # not <sup>.
+    label = if_else(
+      is.na(percent),
+      "Not reported¹",
+      label_number(accuracy = 0.1, suffix = "%")(percent)
+    )
+  ) |>
+  mutate(
+    # Whether a bar can hold its own label: the longest bar sets the scale, and
+    # the axis runs to about 1.2 times that
+    inside = !is.na(percent) &
+      percent >= (nchar(label) + 1.5) *
+        (max(percent, na.rm = TRUE) * 1.2 / agriculture_panel_chars)
+  )
+
+p <- ggplot(agriculture_bars, aes(x = percent, y = district)) +
+  geom_col(
+    data = agriculture_bars |> filter(!is.na(percent)),
+    width = 0.7, fill = dodgerblue
+  ) +
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+  geom_text(
+    aes(
+      # A missing share's text starts at the baseline, in grey
+      x = coalesce(percent, 0),
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = case_when(inside ~ "white", is.na(percent) ~ "grey30", .default = "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  scale_colour_identity() +
+  # Room on the right for the labels that sit outside their bars
+  scale_x_continuous(expand = expansion(mult = c(0, 0.20))) +
+  # The house short form of a long district name. The rows are named in `limits`
+  # as well: the bars are drawn from the rows that have a share, so the row
+  # without one is missing from that layer and the scale would otherwise hang it
+  # on the end of the axis, above the longest bar instead of below the shortest.
+  scale_y_discrete(
+    limits = levels(agriculture_bars$district),
+    labels = cwr_short_name
+  ) +
+  # Stops a label that overhangs the panel edge from being cut off
+  coord_cartesian(clip = "off") +
+  # Every bar carries its number, so the value axis and its gridlines are gone
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+  labs(
+    title = "Share of workers whose industry is agriculture, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-10-0456-01",
+      credit = TRUE,
+      notes = c(
+        # Keyed ¹ on the share not reported; drops out on its own if none is
+        if (any(is.na(pull(agriculture_bars, percent)))) {
+          "The sampling error exceeds 16.6%, so the value is too unreliable to report."
+        },
+        # The intervals are narrow next to the differences the chart shows, so
+        # the widest is stated rather than drawn (rule 9b); {widest} is filled
+        # from the data
+        str_glue(
+          "95% confidence intervals are within ±{widest} percentage points",
+          widest = with(agriculture, cwr_ci_widest(percent, percent_lower, percent_upper))
+        )
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first. The superscript
+# key means nothing read aloud, so the reason is said in words instead.
+agriculture_lines <- agriculture_bars |>
+  arrange(desc(district)) |>
+  mutate(line = paste0(
+    district, " ",
+    str_replace(label, "Not reported¹", "not reported, sampling error too large")
+  )) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-agriculture",
+  alt = paste0(
+    "Horizontal bars ranking the Region's seven districts by the share of ",
+    "their employed residents who work in agriculture, forestry, fishing and ",
+    "hunting. ",
+    paste(agriculture_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: work-at-home-industry
+#| output: asis
+
+# The ten industries whose workers most often worked at home, for the Region as
+# a whole: the top ten of the 20 NAICS sectors in 2016, ranked by the share of
+# the sector's workers whose place of work status was "worked at home".
+# work_at_home_industry is read in the load-data chunk. The same ten rows, in
+# the same order, are drawn again further down with their 2021 dots, so the
+# rows and the ranking are worked out here and used by both charts.
+#
+# The gglollipop template (the cwr-charts skill): a dot at the end of a thin
+# segment, read against the axis, and no number beside it (style rule 4a). No
+# row is bolded, since every row is an industry and none of them is the focus
+# the way the Region is on a chart of places.
+industry_rows <- work_at_home_industry |>
+  filter(year == 2016) |>
+  slice_max(percent, n = 10) |>
+  pull(industry)
+
+industry_data <- work_at_home_industry |>
+  filter(industry %in% industry_rows) |>
+  pivot_wider(
+    id_cols = c(industry, industry_short),
+    names_from = year,
+    values_from = percent
+  ) |>
+  mutate(
+    # Ordered on the 2016 share: reorder() sorts ascending and a horizontal
+    # chart draws the first level at the bottom, so the industry with the most
+    # people working at home in 2016 ends up on top
+    industry = reorder(industry, `2016`),
+    # The axis draws the short form of the longest sector names, which
+    # 02_clean_data.R works out; the data file keeps the published name
+    y_label = industry_short,
+    # How far the share moved between the censuses, for the label under each
+    # dumbbell on the 2021 chart below
+    change = `2021` - `2016`
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete. The name
+# says whose labels they are: the chart of districts between these two chunks
+# builds its own set, so a shared name would leave the 2021 chart below drawing
+# the district labels - which match no industry, so the axis would fall back to
+# the full sector names.
+industry_y_labels <- industry_data |> select(industry, y_label) |> deframe()
+
+# The right end of this chart's axis: just past the largest 2016 share, rounded
+# up to the next 10. The 2021 chart below runs further, to hold its own dots.
+max_x_2016 <- ceiling(max(industry_data$`2016`) / 10) * 10
+
+p <- ggplot(industry_data, aes(x = `2016`, y = industry)) +
+
+  geom_segment(
+    aes(x = 0, xend = `2016`, y = industry, yend = industry),
+    colour = "grey50", linewidth = 0.7
+  ) +
+
+  geom_point(shape = 19, size = 4, colour = dodgerblue) +
+
+  geom_vline(xintercept = 0, colour = "black", linewidth = 0.5) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x_2016),
+    breaks = seq(0, max_x_2016, by = 10),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  scale_y_discrete(position = "left", labels = industry_y_labels) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "Pre-pandemic, farmers were by far the most likely to work at home",
+    subtitle = "Waterloo Region, share of workers who worked at home, by industry^1^, 2016, %^2^",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      credit = TRUE,
+      notes = c(
+        "Top 10 industries only",
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first, with the
+# published sector names rather than the short forms the axis draws
+industry_lines_2016 <- industry_data |>
+  arrange(desc(`2016`)) |>
+  mutate(line = paste0(industry, " ", label_number(accuracy = 0.1)(`2016`), " per cent")) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-work-at-home-industry",
+  alt = paste0(
+    "Lollipop chart with one row per industry, each a dot at the end of a line ",
+    "from zero, placed along a scale of the percentage of the industry's ",
+    "workers in Waterloo Region who worked at home in 2016. ",
+    paste(industry_lines_2016, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: work-at-home
+#| output: asis
+
+# The share of each district's workers who worked at home, in the 2016 and 2021
+# censuses: two dots per row, 2016 in silver and 2021 in blue. work_at_home is
+# read in the load-data chunk.
+#
+# The ggdumbbell template (the cwr-charts skill), with the year dots named on
+# the top row instead of in its legend, and no highlighted row. The Region's
+# own rows are left out: the chart is by district.
+plot_data <- work_at_home |>
+  filter(year %in% c(2016, 2021), district != cwr_region) |>
+  pivot_wider(
+    id_cols = district,
+    names_from = year,
+    values_from = percent
+  ) |>
+  mutate(
+    # Ordered on the 2016 share: reorder() sorts ascending and a horizontal
+    # chart draws the first level at the bottom, so the district with the most
+    # people working at home ends up on top
+    district = reorder(district, `2016`),
+    # No row is highlighted; cwr_short_name() gives the house short form of a
+    # long district name
+    y_label = cwr_short_name(as.character(district)),
+    # How far the share moved between the two censuses, for the label under
+    # each dumbbell
+    change = `2021` - `2016`
+  )
+
+# Pre-compute labels to avoid data masking issue in scale_y_discrete
+y_labels <- plot_data |> select(district, y_label) |> deframe()
+
+# The right end of the background segments and of the x axis: just past the
+# largest share, rounded up to the next 5
+max_x <- ceiling(max(plot_data$`2021`) / 5) * 5
+
+# The top row's two dots are named with their year instead of the template's
+# legend: above the joining line and beside each dot, on the side facing the
+# other dot - 2016 to its right, 2021 to its left. hjust sets which side of its
+# anchor the text sits on (0 starts it there, 1 ends it there), and `nudge`
+# moves the anchor off the dot, in percentage points. The nudge is multiplied
+# by cwr_gap(), which cwr_figure() sets to `phone_gap` while it draws the phone
+# version, where a percentage point is half as wide.
+top_row <- plot_data |>
+  filter(district == last(levels(district))) |>
+  pivot_longer(c(`2016`, `2021`), names_to = "year", values_to = "percent") |>
+  mutate(
+    hjust = if_else(year == "2016", 0, 1),
+    nudge = if_else(year == "2016", 0.6, -0.6)
+  )
+
+p <- plot_data |>
+  ggplot() +
+
+  # Background reference segment spanning full x range
+  geom_segment(aes(
+    x = 0,
+    xend = max_x,
+    y = district,
+    yend = district
+    ),
+    color = "grey80",
+    linewidth = 0.3
+  ) +
+
+  # Dumbbell segment connecting x1 to x2
+  geom_segment(aes(
+    x = `2016`,
+    xend = `2021`,
+    y = district,
+    yend = district
+    ),
+    color = "grey50",
+    linewidth = 0.7
+  ) +
+
+  geom_point(aes(
+    x = `2016`,
+    y = district,
+    color = "2016"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  geom_point(aes(
+    x = `2021`,
+    y = district,
+    color = "2021"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  # The years, on the top row only, just above the line. grey30 is the colour
+  # theme_cwr() gives the axis labels. cwr_label() rather than geom_text() so
+  # the halo behind the letters clears the line each year sits over.
+  cwr_label(
+    data = top_row,
+    aes(x = percent + nudge * cwr_gap(), y = district, label = year, hjust = hjust),
+    vjust = 0, nudge_y = 0.1,
+    colour = "grey30",
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  # How much the share moved since 2016, in percentage points, centred under
+  # each dumbbell and in the 2021 colour, since it is the 2021 dot that moved.
+  # Rounded to whole points: a tenth of a point is well inside what the 2016
+  # table's random rounding can shift. The label sits closer to its line than
+  # the industry chart's does, where it had to clear two dots that nearly touch
+  # on the top row; no row here is that tight. A vertical nudge needs no
+  # cwr_gap(): a row is about as deep on a phone as on a desktop.
+  cwr_label(
+    aes(
+      x = (`2016` + `2021`) / 2,
+      y = district,
+      label = label_number(accuracy = 1, style_positive = "plus")(change)
+    ),
+    vjust = 1, nudge_y = -0.13,
+    colour = dodgerblue,
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "2016" = cowboysilver,
+      "2021" = dodgerblue
+    ),
+    name = NULL,
+    breaks = c("2016", "2021"),
+    guide = "none"
+  ) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x),
+    breaks = seq(0, max_x, by = 10),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  # Room above the top row for the year labels
+  scale_y_discrete(
+    position = "left",
+    labels = y_labels,
+    expand = expansion(add = c(0.6, 1))
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "A year into the pandemic, the share of people working at home was still much higher than in 2016",
+    subtitle = "Share^1^ of employed people who worked from home, 2016 and 2021, %",
+    caption = cwr_caption(
+      c("Statistics Canada Tables 98-10-0456-01", "98-400-X2016321"),
+      credit = TRUE,
+      notes = c(
+        # The 2021 intervals are narrow next to the change the chart shows, so
+        # they are stated rather than drawn (rule 9b); {widest} is filled from
+        # the data. The 2016 table publishes none.
+        str_glue(
+          "95% confidence intervals for 2021 are within ±{widest} percentage points; none available for 2016",
+          widest = with(
+            filter(work_at_home, district != cwr_region),
+            cwr_ci_widest(percent, percent_lower, percent_upper)
+          )
+        )
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first
+alt_lines <- plot_data |>
+  arrange(desc(district)) |>
+  mutate(line = paste0(
+    district, ": 2016 ", label_number(accuracy = 0.1)(`2016`), " per cent, 2021 ",
+    label_number(accuracy = 0.1)(`2021`), " per cent"
+  )) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-work-at-home",
+  # The year labels sit a percentage point or so off their dots, which is half
+  # the distance on a phone unless it is doubled
+  phone_gap = 2,
+  alt = paste0(
+    "Dot plot with one row per district and two dots on each row, grey for ",
+    "2016 and blue for 2021, joined by a line, placed along a scale of the percentage of ",
+    "employed people who worked at home. ",
+    paste(alt_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: work-at-home-industry-2021
+#| output: asis
+
+# The same ten industries as the lollipop above, ranked the same way, with each
+# sector's 2021 dot added: 2016 in silver, 2021 in blue, joined by a line, and
+# the change between them under each row. industry_data, industry_y_labels and the
+# ranking come from that chunk.
+#
+# The ggdumbbell template (the cwr-charts skill); no row is bolded, since every
+# row is an industry and none of them is the focus the way the Region is on a
+# chart of places.
+
+# The right end of the background segments and of the x axis: just past the
+# largest share in either year, rounded up to the next 10
+max_x <- ceiling(max(industry_data$`2021`) / 10) * 10
+
+# The top row's dots are named with their year, above the line joining them.
+# The top row here is the one industry whose share barely moved between the
+# censuses, so its two dots nearly touch: each label therefore sits on the
+# outer side of its own dot - the lower value's to its left, the higher
+# value's to its right - rather than facing inwards as on the chart of
+# districts, where the two dots are far apart. `nudge` moves the label off its
+# dot in percentage points and is multiplied by cwr_gap(), which cwr_figure()
+# sets to `phone_gap` while it draws the phone version, where a percentage
+# point is half as wide.
+top_row <- industry_data |>
+  filter(industry == last(levels(industry))) |>
+  pivot_longer(c(`2016`, `2021`), names_to = "year", values_to = "percent") |>
+  mutate(
+    hjust = if_else(percent == min(percent), 1, 0),
+    nudge = if_else(percent == min(percent), -0.9, 0.9)
+  )
+
+p <- ggplot(industry_data) +
+
+  # Background reference segment spanning full x range
+  geom_segment(aes(
+    x = 0,
+    xend = max_x,
+    y = industry,
+    yend = industry
+    ),
+    color = "grey80",
+    linewidth = 0.3
+  ) +
+
+  # Dumbbell segment connecting x1 to x2
+  geom_segment(aes(
+    x = `2016`,
+    xend = `2021`,
+    y = industry,
+    yend = industry
+    ),
+    color = "grey50",
+    linewidth = 0.7
+  ) +
+
+  geom_point(aes(
+    x = `2016`,
+    y = industry,
+    color = "2016"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  geom_point(aes(
+    x = `2021`,
+    y = industry,
+    color = "2021"
+    ),
+    shape = 19, size = 4
+  ) +
+
+  # The years, on the top row only, just above the line. grey30 is the colour
+  # theme_cwr() gives the axis labels. cwr_label() rather than geom_text() so
+  # the halo behind the letters clears the line each year sits over.
+  cwr_label(
+    data = top_row,
+    aes(x = percent + nudge * cwr_gap(), y = industry, label = year, hjust = hjust),
+    vjust = 0, nudge_y = 0.1,
+    colour = "grey30",
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  # How much the share moved since 2016, in percentage points, centred under
+  # each dumbbell and in the 2021 colour, since it is the 2021 dot that moved.
+  # Rounded to whole points: a tenth of a point is well inside what the 2016
+  # table's random rounding can shift. The nudge clears the dots on the row
+  # where the two nearly touch (agriculture); a row is about as deep on a phone
+  # as on a desktop, so it needs no cwr_gap().
+  cwr_label(
+    aes(
+      x = (`2016` + `2021`) / 2,
+      y = industry,
+      label = label_number(accuracy = 1, style_positive = "plus")(change)
+    ),
+    vjust = 1, nudge_y = -0.19,
+    colour = dodgerblue,
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  geom_vline(
+    xintercept = 0,
+    color = "black",
+    linewidth = 0.5
+  ) +
+
+  scale_color_manual(
+    values = c(
+      "2016" = cowboysilver,
+      "2021" = dodgerblue
+    ),
+    name = NULL,
+    breaks = c("2016", "2021"),
+    guide = "none"
+  ) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x),
+    breaks = seq(0, max_x, by = 10),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  # Room above the top row for the year labels
+  scale_y_discrete(
+    position = "left",
+    labels = industry_y_labels,
+    expand = expansion(add = c(0.6, 1))
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.text.y.left = element_markdown(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "A year into the pandemic, white-collar professions leaped into the top three while the farmers' share didn't budge",
+    subtitle = "Waterloo Region, share of workers who worked at home, by industry^1^, %^2^ and percentage point change",
+    caption = cwr_caption(
+      c("Statistics Canada Tables 98-10-0456-01", "98-400-X2016321"),
+      credit = TRUE,
+      notes = c(
+        "Top 10 industries only",
+        # 2021 publishes interval bounds and 2016 does not, so the widest 2021
+        # interval is stated rather than drawn (rule 9b); {widest} is filled
+        # from the data
+        str_glue(
+          "95% confidence intervals for 2021 are within ±{widest} percentage points; none available for 2016",
+          widest = with(
+            filter(work_at_home_industry, year == 2021, industry %in% industry_rows),
+            cwr_ci_widest(percent, percent_lower, percent_upper)
+          )
+        )
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first, with the
+# published sector names rather than the short forms the axis draws
+industry_lines_2021 <- industry_data |>
+  arrange(desc(`2016`)) |>
+  mutate(line = paste0(
+    industry, ": 2016 ", label_number(accuracy = 0.1)(`2016`),
+    " per cent, 2021 ", label_number(accuracy = 0.1)(`2021`), " per cent"
+  )) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-work-at-home-industry-2021",
+  # The year labels sit a percentage point or so off their dots, which is half
+  # the distance on a phone unless it is doubled
+  phone_gap = 2,
+  alt = paste0(
+    "Dot plot with one row per industry and two dots on each row, grey for ",
+    "2016 and blue for 2021, joined by a line, placed along a scale of the ",
+    "percentage of the industry's workers in Waterloo Region who worked at home. ",
+    paste(industry_lines_2021, collapse = ". "), "."
+  )
+)
+```
+
+::: {#key-terms .callout-note collapse="true"}
+## Key terms
+
+<!-- The terms a reader needs to read the charts correctly, each with its official
+     definition. The table is not written here: the chunk below prints it from the
+     "Key terms" table in this post's README.md, so there is only ever one copy. Edit
+     the definitions there. A term whose Definition cell is still empty is left out of
+     the post, and the render warns until it is defined or deleted.
+
+     This section is a folded box (a collapsed callout). Keep its id,
+     #key-terms: _includes/like.html puts the "Like this post" button immediately
+     above it, since the analysis ends here and everything below is reference
+     material. The heading inside the box can be reworded freely. -->
+
+```{r}
+#| label: key-terms
+#| output: asis
+
+# Prints the key terms from this post's README.md - edit them there, not here
+cwr_key_terms_table("work-from-home")
+```
+
+:::
+
+::: {#data-sources-and-reliability .callout-note collapse="true"}
+## Data sources and reliability
+
+<!-- Where the data came from, what was excluded and why, and any caveat a careful
+     reader should know: write that here, above the tables. If any of it is sample data
+     (the census long form, a survey), say so here, how big the sample is, and whether
+     the charts show confidence intervals. Neither table is written here - the chunks
+     below print both straight out of this post's README.md, so there is only ever one
+     copy of each.
+
+     This section is a folded box (a collapsed callout), like the ones
+     around it. Keep its id, #data-sources-and-reliability: in a post with no Key
+     terms box, _includes/like.html puts the "Like this post" button above it. The
+     heading inside the box can be reworded freely. -->
+
+### Sources
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("work-from-home")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this post's
+# README.md - edit them there, not here. To leave an issue out of the post, do
+# not delete its row: write why in its "Left out of the post because" column,
+# and it drops out of the post while the README keeps the record.
+cwr_reliability_table("work-from-home")
+```
+
+:::
+
+::: {#other-sources .callout-note collapse="true"}
+## Other sources
+
+<!-- Anything cited that is not data: reports, articles, books, a method borrowed
+     from someone else. Quoted material stays under its owner's terms, never this
+     site's CC BY - see WORKFLOW.md section 9. Delete this box, from its ::: line to the
+     closing :::, if unused. -->
+
+:::
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+**Reproduce the post**: get the code and data for this post from [`posts/work-from-home/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/work-from-home) on GitHub.
+
+**Download the data:** `r cwr_bundle_link("work-from-home", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/work-from-home#data-dictionary).
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

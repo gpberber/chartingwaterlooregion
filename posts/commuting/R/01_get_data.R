@@ -63,7 +63,7 @@ get_cansim("98-10-0462") |>
 # the data-quality check needs. A cell the service does not return at all is a
 # zero - census tables leave zeros out - and is written with no value and no
 # status for 02_clean_data.R to fill in. wds_cells() below does the fetching,
-# for this table and for 98-10-0456 further down.
+# for this table.
 
 # What each status code means, from Statistics Canada's own code list. Code 0
 # is "normal", which has no symbol.
@@ -98,7 +98,8 @@ wds_cells <- function(product_id, coordinates) {
 
 # The Region and its seven districts, with their member ids in the Geography
 # dimension. The ids are the same in every 2021 census table with this
-# geography (checked in 98-10-0464 and 98-10-0456).
+# geography (checked in 98-10-0464, and in 98-10-0456 in the work-from-home
+# post).
 mode_places <- tribble(
   ~GeoUID,    ~GEO,              ~place_member,
   "3530",     "Waterloo Region", 2439,
@@ -143,153 +144,6 @@ mode_cells |>
   select(GeoUID, GEO, starts_with("Occupation"), `Gender (3)`, `Statistics (3)`,
          starts_with("Industry"), `Main mode of commuting (11A)`, VALUE, STATUS, COORDINATE) |>
   write_csv(file.path(raw_dir, "table_98100464.csv"))
-
-# ---- Place of work status, 2021 census --------------------------------------
-# Table 98-10-0456, "Place of work status by industry sectors, occupation broad
-# category and gender", for both of the post's charts of working at home: the
-# one by district and the one that ranks industries. Place of work status sorts
-# every employed person into one of four groups - worked at home, worked
-# outside Canada, no fixed workplace address, and usual place of work - and its
-# total is everyone employed in the census week.
-#
-# It is also the 2021 counterpart of the 2016 data table below, which crosses
-# the same place of work status with the same 20 NAICS sectors, so the two
-# years can be compared by district and ranked by industry from tables built
-# the same way. (98-10-0467 crosses place of work status with education, age
-# and gender instead and was used here at first; it gives the same figures for
-# the districts, give or take Statistics Canada's random rounding - Wilmot's
-# share differs by a tenth of a point - and none of its three variables is used
-# in the post, so one table now serves both charts.)
-#
-# The table has 42 million cells, so like 98-10-0464 only the 189 needed are
-# fetched by coordinate: the Region and its seven districts at the table's own
-# industry total, for the chart by district, and the Region at each of the 20
-# sectors, for the industry chart; each of those 28 combinations as 2 statuses
-# (the total and "Worked at home") x 3 statistics (the count and its 95%
-# confidence interval bounds), with occupation and gender at their totals. The
-# last 21 are for the agriculture chart: the seven districts at the first NAICS
-# sector, in the place-of-work total only (the chart is about who works in
-# agriculture, not where they work from), x the same 3 statistics. Their
-# denominator is each district's industry total, already fetched above.
-# Coordinate: place . occupation . gender . statistic . industry . place of
-# work status, then four zeros - the same shape as 98-10-0464, whose dimensions
-# are in the same order. Member ids from the table's metadata
-# (getCubeMetadata); 2439 is the Region.
-home_statuses <- tribble(
-  ~`Place of work status (5)`,       ~status_member,
-  "Total - Place of work status",    1,
-  "Worked at home",                  2
-)
-
-home_cells <- bind_rows(
-  # Every place, at the industry total, in both place-of-work groups
-  mode_places |> mutate(industry_member = 1) |> cross_join(home_statuses),
-  # The Region, at each of the 20 sectors, in both groups
-  mode_places |>
-    filter(GeoUID == "3530") |>
-    cross_join(tibble(industry_member = 2:21)) |>
-    cross_join(home_statuses),
-  # The seven districts at agriculture, forestry, fishing and hunting - member
-  # 2, the first NAICS sector - at the place-of-work total only. 02_clean_data.R
-  # checks that name against the member list rather than trusting the id.
-  mode_places |>
-    filter(GeoUID != "3530") |>
-    mutate(industry_member = 2) |>
-    cross_join(home_statuses |> filter(status_member == 1))
-) |>
-  cross_join(mode_statistics) |>
-  mutate(COORDINATE = str_glue(
-    "{place_member}.1.1.{statistic_member}.{industry_member}.{status_member}.0.0.0.0"
-  ))
-
-home_cells |>
-  left_join(wds_cells(98100456, home_cells$COORDINATE), join_by(COORDINATE)) |>
-  mutate(
-    `Occupation - Broad category - National Occupational Classification (NOC) 2021 (11)` =
-      "Total - Occupation - Broad category - National Occupational Classification (NOC) 2021",
-    `Gender (3)` = "Total - Gender"
-  ) |>
-  select(GeoUID, GEO, starts_with("Occupation"), `Gender (3)`, `Statistics (3)`,
-         industry_member, `Place of work status (5)`, VALUE, STATUS, COORDINATE) |>
-  write_csv(file.path(raw_dir, "table_98100456.csv"))
-
-# The industry dimension's member names, so 02_clean_data.R can put a name to
-# each `industry_member` above (and match them to the 2016 table's sectors).
-# They come from the table's metadata rather than being typed out here.
-httr2::request("https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata") |>
-  httr2::req_body_json(list(list(productId = 98100456))) |>
-  httr2::req_perform() |>
-  httr2::resp_body_json() |>
-  pluck(1, "object", "dimension") |>
-  keep(\(dimension) str_starts(dimension$dimensionNameEn, "Industry")) |>
-  pluck(1, "member") |>
-  map(\(member) tibble(
-    industry_member = as.integer(member$memberId),
-    industry = member$memberNameEn
-  )) |>
-  list_rbind() |>
-  write_csv(file.path(raw_dir, "table_98100456_members.csv"))
-
-# ---- Place of work status, 2016 census --------------------------------------
-# The 2016 census equivalent is data table 98-400-X2016321, "Place of Work
-# Status (5), Industry (21), Occupation (11) and Sex (3) for the Employed
-# Labour Force Aged 15 Years and Over in Private Households", the only 2016
-# table of place of work status for census subdivisions. (2016 tables were not
-# put into Statistics Canada's table database, so it has no 98-10 number and
-# cansim cannot fetch it.) Its total is the same group as 2021's - everyone
-# employed in the census week, in all four place-of-work groups - so the two
-# years compare directly. It publishes no confidence intervals.
-#
-# The file is one zip holding a 640 MB CSV for every census subdivision in
-# Canada, so like the flows it goes to the temporary download folder and only
-# the Region's rows are kept: its eight geographies at every one of the 21
-# industry members (the table's own total, plus the 20 NAICS sectors), with
-# occupation and sex at their totals. The total-industry rows are what the
-# work-at-home chart compares with 2021; the sector rows are what the industry
-# chart ranks. The file is wide: one column per place of work status. GNR is
-# each area's long-form global non-response rate, which 02_clean_data.R checks
-# like the 2021 rates below.
-pow_2016_zip <- file.path(download_dir, "98-400-X2016321.zip")
-if (!file.exists(pow_2016_zip)) {
-  options(timeout = 1200)
-  download.file(
-    "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110710&OFT=CSV",
-    destfile = pow_2016_zip,
-    mode = "wb"
-  )
-}
-
-read_csv_chunked(
-  unz(pow_2016_zip, "98-400-X2016321_English_CSV_data.csv"),
-  callback = DataFrameCallback$new(\(chunk, pos) {
-    filter(
-      chunk,
-      str_starts(`GEO_CODE (POR)`, "3530"),
-      str_starts(`DIM: Occupation - National Occupational Classification (NOC) 2016 (11)`, "Total"),
-      `DIM: Sex (3)` == "Total - Sex"
-    )
-  }),
-  chunk_size = 1e6,
-  col_types = cols(.default = col_character())
-) |>
-  write_csv(file.path(raw_dir, "table_2016321_region.csv"))
-
-# The table's notes, in the same shape as the footnotes saved for the 98-10
-# tables below, so 02_clean_data.R can check them the same way. They are read
-# from the metadata file in the zip; the two kept are the note on data quality
-# (which applies to the whole table) and the footnote on the place of work
-# status total.
-pow_2016_meta <- read_lines(unz(pow_2016_zip, "98-400-X2016321_English_meta.txt"))
-tibble(
-  `Note ID` = c("quality", "3"),
-  Note = c(
-    pow_2016_meta[str_which(pow_2016_meta, "^For information on data quality")],
-    pow_2016_meta[str_which(pow_2016_meta, "^Footnote 3$") + 1]
-  ),
-  `Dimension name` = c(NA, "Place of work status (5)"),
-  `Member Name` = c(NA, "Total - Place of work status")
-) |>
-  write_csv(file.path(raw_dir, "table_2016321_notes.csv"))
 
 # ---- Commuting flows, 2021 census ------------------------------------------
 # Table 98-10-0459, "Commuting flow from geography of residence to geography of
@@ -441,7 +295,7 @@ get_cansim("98-10-0572") |>
 # quality or comparability of the figures. They are saved beside the tables so
 # that 02_clean_data.R can report the ones that apply to the rows this post
 # keeps (cwr_quality_flags() in R/data_quality.R) without going back online.
-c("98-10-0462", "98-10-0464", "98-10-0456", "98-10-0459") |>
+c("98-10-0462", "98-10-0464", "98-10-0459") |>
   walk(\(table_number) {
     get_cansim_table_notes(table_number) |>
       write_csv(file.path(
