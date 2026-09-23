@@ -234,7 +234,10 @@ plot_data <- work_at_home |>
     district = reorder(district, `2016`),
     # No row is highlighted; cwr_short_name() gives the house short form of a
     # long district name
-    y_label = cwr_short_name(as.character(district))
+    y_label = cwr_short_name(as.character(district)),
+    # How far the share moved between the two censuses, for the label under
+    # each dumbbell
+    change = `2021` - `2016`
   )
 
 # Pre-compute labels to avoid data masking issue in scale_y_discrete
@@ -308,6 +311,24 @@ p <- plot_data |>
     aes(x = percent + nudge * cwr_gap(), y = district, label = year, hjust = hjust),
     vjust = 0, nudge_y = 0.1,
     colour = "grey30",
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  # How much the share moved since 2016, in percentage points, centred under
+  # each dumbbell and in the 2021 colour, since it is the 2021 dot that moved.
+  # Rounded to whole points: a tenth of a point is well inside what the 2016
+  # table's random rounding can shift. The label sits closer to its line than
+  # the industry chart's does, where it had to clear two dots that nearly touch
+  # on the top row; no row here is that tight. A vertical nudge needs no
+  # cwr_gap(): a row is about as deep on a phone as on a desktop.
+  cwr_label(
+    aes(
+      x = (`2016` + `2021`) / 2,
+      y = district,
+      label = label_number(accuracy = 1, style_positive = "plus")(change)
+    ),
+    vjust = 1, nudge_y = -0.13,
+    colour = dodgerblue,
     size = label_size * 0.8, fontface = "bold"
   ) +
 
