@@ -228,10 +228,10 @@ plot_data <- work_at_home |>
     values_from = percent
   ) |>
   mutate(
-    # Ordered on the 2021 share: reorder() sorts ascending and a horizontal
+    # Ordered on the 2016 share: reorder() sorts ascending and a horizontal
     # chart draws the first level at the bottom, so the district with the most
     # people working at home ends up on top
-    district = reorder(district, `2021`),
+    district = reorder(district, `2016`),
     # No row is highlighted; cwr_short_name() gives the house short form of a
     # long district name
     y_label = cwr_short_name(as.character(district))
