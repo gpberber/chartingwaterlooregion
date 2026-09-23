@@ -1,21 +1,41 @@
-industry,industry_short,year,workers,total,percent
-"Agriculture, forestry, fishing and hunting",Agriculture,2016,1925,3875,49.67741935483871
-Real estate and rental and leasing,Real estate,2016,1030,4635,22.22222222222222
-"Professional, scientific and technical services","Professional, scientific, technical",2016,4010,21075,19.027283511269278
-"Arts, entertainment and recreation","Arts, entertainment and recreation",2016,610,4165,14.645858343337334
-Management of companies and enterprises,Management,2016,55,465,11.827956989247312
-Other services (except public administration),Other services,2016,1055,10475,10.071599045346062
-"Administrative and support, waste management and remediation services",Administrative and support,2016,900,11180,8.050089445438283
-Finance and insurance,Finance and insurance,2016,1365,17480,7.808924485125858
-Wholesale trade,Wholesale trade,2016,910,11685,7.787762088147197
-Health care and social assistance,Health care and social assistance,2016,1945,27330,7.116721551408708
-Information and cultural industries,Information and cultural industries,2016,545,7820,6.969309462915602
-"Mining, quarrying, and oil and gas extraction","Mining, quarrying, and oil and gas extraction",2016,20,375,5.333333333333334
-Construction,Construction,2016,820,18585,4.412160344363734
-Educational services,Educational services,2016,910,23845,3.816313692598029
-Retail trade,Retail trade,2016,1020,29955,3.4051076614922384
-Transportation and warehousing,Transportation and warehousing,2016,380,11625,3.2688172043010755
-Manufacturing,Manufacturing,2016,985,44975,2.1901056142301276
-Accommodation and food services,Accommodation and food services,2016,225,17340,1.2975778546712802
-Public administration,Public administration,2016,120,9855,1.21765601217656
-Utilities,Utilities,2016,0,1045,0
+industry,industry_short,year,workers,total,percent,percent_lower,percent_upper,cv,quality
+Accommodation and food services,Accommodation and food services,2016,225,17340,1.2975778546712802,NA,NA,NA,NA
+Accommodation and food services,Accommodation and food services,2021,655,12210,5.364455364455364,4.612134872146405,6.231475780094933,0.07395930735745165,NA
+"Administrative and support, waste management and remediation services",Administrative and support,2016,900,11180,8.050089445438283,NA,NA,NA,NA
+"Administrative and support, waste management and remediation services",Administrative and support,2021,2965,11525,25.726681127982648,24.44893461730944,27.047298710459966,0.024799455968430535,NA
+"Agriculture, forestry, fishing and hunting",Agriculture,2016,1925,3875,49.67741935483871,NA,NA,NA,NA
+"Agriculture, forestry, fishing and hunting",Agriculture,2021,2050,4200,48.80952380952381,45.4926596038395,52.13690490215724,0.03348844747067766,NA
+"Arts, entertainment and recreation","Arts, entertainment and recreation",2016,610,4165,14.645858343337334,NA,NA,NA,NA
+"Arts, entertainment and recreation","Arts, entertainment and recreation",2021,1130,2685,42.08566108007449,37.82224800684006,46.470478233769796,0.0506308703428119,NA
+Construction,Construction,2016,820,18585,4.412160344363734,NA,NA,NA,NA
+Construction,Construction,2021,2290,20905,10.954317149007414,10.01142084177628,11.97420081304786,0.04397029104629604,NA
+Educational services,Educational services,2016,910,23845,3.816313692598029,NA,NA,NA,NA
+Educational services,Educational services,2021,12520,24980,50.120096076861486,48.56358665192549,51.676372767772285,0.015252501566031036,NA
+Finance and insurance,Finance and insurance,2016,1365,17480,7.808924485125858,NA,NA,NA,NA
+Finance and insurance,Finance and insurance,2021,11785,17410,67.6909821941413,66.15688790540256,69.18792429238366,0.010996361935093957,NA
+Health care and social assistance,Health care and social assistance,2016,1945,27330,7.116721551408708,NA,NA,NA,NA
+Health care and social assistance,Health care and social assistance,2021,4710,30350,15.518945634266887,14.644451963842547,16.43560442805535,0.028331917623841622,NA
+Information and cultural industries,Information and cultural industries,2016,545,7820,6.969309462915602,NA,NA,NA,NA
+Information and cultural industries,Information and cultural industries,2021,5390,7835,68.79387364390556,65.88572710637202,71.5611171507087,0.020282467409539724,NA
+Management of companies and enterprises,Management,2016,55,465,11.827956989247312,NA,NA,NA,NA
+Management of companies and enterprises,Management,2021,735,1110,66.21621621621621,61.46572266816792,70.66061320358601,0.03422896553487962,NA
+Manufacturing,Manufacturing,2016,985,44975,2.1901056142301276,NA,NA,NA,NA
+Manufacturing,Manufacturing,2021,4410,44810,9.841553224726624,9.333992067040663,10.373556540833782,0.02592549092938245,NA
+"Mining, quarrying, and oil and gas extraction","Mining, quarrying, and oil and gas extraction",2016,20,375,5.333333333333334,NA,NA,NA,NA
+"Mining, quarrying, and oil and gas extraction","Mining, quarrying, and oil and gas extraction",2021,85,340,25,17.677250923799697,34.09967216864483,0.1632264994868896,NA
+Other services (except public administration),Other services,2016,1055,10475,10.071599045346062,NA,NA,NA,NA
+Other services (except public administration),Other services,2021,2350,8770,26.795895096921324,24.68779336501303,29.014657547070527,0.039671124176322764,NA
+"Professional, scientific and technical services","Professional, scientific, technical",2016,4010,21075,19.027283511269278,NA,NA,NA,NA
+"Professional, scientific and technical services","Professional, scientific, technical",2021,17960,27795,64.61593811836661,63.88950159818913,65.3356898185046,0.0054944392574427054,NA
+Public administration,Public administration,2016,120,9855,1.21765601217656,NA,NA,NA,NA
+Public administration,Public administration,2021,3625,9705,37.35188047398248,35.264107081104534,39.48786154380133,0.02778211522254164,NA
+Real estate and rental and leasing,Real estate,2016,1030,4635,22.22222222222222,NA,NA,NA,NA
+Real estate and rental and leasing,Real estate,2021,1895,4595,41.240478781284004,38.218245133449514,44.33022096614129,0.03644710208192661,NA
+Retail trade,Retail trade,2016,1020,29955,3.4051076614922384,NA,NA,NA,NA
+Retail trade,Retail trade,2021,3095,28515,10.853936524636158,10.0311722098711,11.735382122896633,0.03853312239468685,NA
+Transportation and warehousing,Transportation and warehousing,2016,380,11625,3.2688172043010755,NA,NA,NA,NA
+Transportation and warehousing,Transportation and warehousing,2021,1365,13810,9.884141926140478,9.024806964013404,10.81557430409761,0.0444566092242284,NA
+Utilities,Utilities,2016,0,1045,0,NA,NA,NA,NA
+Utilities,Utilities,2021,390,1465,26.621160409556317,22.447899479107665,31.257560578729375,0.081524100114991,NA
+Wholesale trade,Wholesale trade,2016,910,11685,7.787762088147197,NA,NA,NA,NA
+Wholesale trade,Wholesale trade,2021,2815,10805,26.052753354928278,24.434849041951754,27.738460023830207,0.03114186359533812,NA

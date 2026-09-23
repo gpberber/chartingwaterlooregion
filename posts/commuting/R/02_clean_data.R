@@ -201,21 +201,35 @@ commuting_mode <- read_csv(
 # The Region's own rows are kept beside the seven districts, for the post to
 # quote; the chart draws only the districts.
 #
-# 2021, table 98-10-0467: the count and its interval bounds, fetched cell by
-# cell by 01_get_data.R, turned into a share with its interval like the modes
-# above.
-home_2021 <- read_csv(
-  file.path(raw_dir, "table_98100467.csv"),
-  col_types = cols(.default = col_character(), VALUE = col_double())
+# 2021, table 98-10-0456: the count and its interval bounds, fetched cell by
+# cell by 01_get_data.R. One table serves both charts of working at home - the
+# districts here, and the Region's industries further down - so it is read and
+# checked for quality flags once, here, and split afterwards. The sector names
+# are in the table's own member list, with the NAICS code in front of each.
+industry_names <- read_csv(
+  file.path(raw_dir, "table_98100456_members.csv"),
+  col_types = cols(industry_member = col_integer(), industry = col_character())
+) |>
+  mutate(industry = str_squish(str_remove(industry, "^[0-9-]+ ")))
+
+pow_2021 <- read_csv(
+  file.path(raw_dir, "table_98100456.csv"),
+  col_types = cols(.default = col_character(), VALUE = col_double(),
+                   industry_member = col_integer())
 ) |>
   clean_names() |>
-  filter(geo_uid %in% c("3530", municipalities$geo_uid)) |>
+  left_join(industry_names, join_by(industry_member)) |>
   # A count the web service did not return is a zero, as for 98-10-0464 (none
   # is missing in 2021)
   mutate(value = if_else(
     is.na(value) & is.na(status) & statistics_3 == "Count", 0, value
   )) |>
-  cwr_quality_flags("98-10-0467", notes = table_notes("table_98100467"), log = quality_log) |>
+  cwr_quality_flags("98-10-0456", notes = table_notes("table_98100456"), log = quality_log)
+
+# The share of each place's workers who worked at home, at the table's own
+# industry total, turned into a share with its interval like the modes above
+home_2021 <- pow_2021 |>
+  filter(industry_member == 1L, geo_uid %in% c("3530", municipalities$geo_uid)) |>
   figure_per_row(c("geo_uid", "place_of_work_status_5")) |>
   mutate(
     total = value[str_starts(place_of_work_status_5, "Total")],
@@ -285,18 +299,19 @@ gnr_2016 <- home_2016_raw |>
   select(geo_uid, gnr_long_2016 = gnr) |>
   mutate(gnr_long_2016 = as.numeric(gnr_long_2016))
 
-# ---- Worked at home by industry, 2016 ---------------------------------------
-# The same 2016 table, read across its 20 NAICS sectors for the Region as a
-# whole (census division 3530), for the chart that ranks industries by the
-# share of their workers who worked at home. The table's own industry total is
-# dropped: it is the Region-wide share the chart above already shows.
+# ---- Worked at home by industry, 2016 and 2021 ------------------------------
+# The share of each industry's own workers who worked at home, for the Region
+# as a whole (census division 3530), for the chart that ranks industries. Both
+# years cover the same 20 NAICS sectors; the tables' own industry totals are
+# dropped, being the Region-wide share the chart above already shows.
 #
-# 2016 publishes no confidence intervals, so these shares have none and no CV
-# to rate them by; the chart carries the note that says so. Counts are also
-# randomly rounded to a multiple of 5, which matters most for the smallest
-# sectors: management of companies and enterprises is 55 workers out of 465, so
-# rounding alone moves its share by about half a point either way.
-work_at_home_industry <- home_2016_raw |>
+# 2016, the same data table as above. It publishes no confidence intervals, so
+# these shares have none and no CV to rate them by; the chart carries the note
+# that says so. Counts are also randomly rounded to a multiple of 5, which
+# matters most for the smallest sectors: management of companies and
+# enterprises is 55 workers out of 465, so rounding alone moves its share by
+# about half a point either way.
+industry_2016 <- home_2016_raw |>
   filter(geo_uid == "3530", !str_starts(industry_2016, "Total")) |>
   select(
     industry = industry_2016,
@@ -306,7 +321,30 @@ work_at_home_industry <- home_2016_raw |>
   mutate(
     across(c(total, workers), as.numeric),
     percent = workers / total * 100,
-    year = 2016L,
+    year = 2016L
+  )
+
+# 2021, table 98-10-0456 again, this time the Region's 20 sectors. It publishes
+# each count's interval bounds, so these shares do get intervals (the same
+# method as the mode chart's).
+industry_2021 <- pow_2021 |>
+  filter(geo_uid == "3530", industry_member != 1L) |>
+  figure_per_row(c("industry", "place_of_work_status_5")) |>
+  mutate(
+    total = value[str_starts(place_of_work_status_5, "Total")],
+    se_total = se[str_starts(place_of_work_status_5, "Total")],
+    percent = value / total * 100,
+    .by = industry
+  ) |>
+  filter(place_of_work_status_5 == "Worked at home", !str_starts(industry, "Total")) |>
+  mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
+  cwr_add_share_ci(value) |>
+  mutate(year = 2021L) |>
+  select(industry, year, workers = value, total, percent,
+         percent_lower, percent_upper, cv, quality)
+
+work_at_home_industry <- bind_rows(industry_2016, industry_2021) |>
+  mutate(
     # Six of the sector names are far too long for a chart axis, most of all on
     # a phone, so the chart draws a shorter form of them (Greg, 2026-09-22) and
     # `industry` keeps the published name for the data file. Shortening belongs
@@ -322,8 +360,9 @@ work_at_home_industry <- home_2016_raw |>
       .default = industry
     )
   ) |>
-  arrange(desc(percent)) |>
-  select(industry, industry_short, year, workers, total, percent)
+  arrange(industry, year) |>
+  select(industry, industry_short, year, workers, total, percent,
+         percent_lower, percent_upper, cv, quality)
 
 # ---- Commuting flows --------------------------------------------------------
 # Table 98-10-0459, already cut to people who live in the Region. One row per
