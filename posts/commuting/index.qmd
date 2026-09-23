@@ -399,7 +399,7 @@ industry_dumbbell <- function(with_2021 = FALSE) {
       # what the 2016 table's random rounding can shift. The nudge clears the
       # dots on the row where the two nearly touch (agriculture); a row is
       # about as deep on a phone as on a desktop, so it needs no cwr_gap().
-      geom_text(
+      shadowtext::geom_shadowtext(
         aes(
           x = (`2016` + `2021`) / 2,
           y = industry,
@@ -407,7 +407,9 @@ industry_dumbbell <- function(with_2021 = FALSE) {
         ),
         vjust = 1, nudge_y = -0.19,
         colour = dodgerblue,
-        size = label_size * 0.8
+        bg.colour = "white",   # halo colour; match your plot background
+        bg.r = 0.15,           # halo thickness
+        size = label_size * 0.8, fontface = "bold"
       )
     )) +
 
@@ -488,12 +490,13 @@ industry_alt <- function(with_2021 = FALSE) {
 # ---- This tab ------------------------------------------------------------
 p <- industry_dumbbell() +
   labs(
-    title = "The ten industries with the most people working at home, 2016",  # working title, descriptive only
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "Pre-pandemic, farmers were by far the most likely to work at home",
+    subtitle = "Waterloo Region, share of workers who worked at home, by industry^1^, 2016, %^2^",
     caption = cwr_caption(
       "Statistics Canada Table 98-400-X2016321",
       credit = TRUE,
       notes = c(
+        "Top 10 industries only",
         # The 2016 tables publish no interval for any count, so none can be
         # worked out for these shares (rule 9b)
         "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
@@ -516,12 +519,13 @@ cwr_figure(
 
 p <- industry_dumbbell(with_2021 = TRUE) +
   labs(
-    title = "The ten industries with the most people working at home, 2016 and 2021",  # working title, descriptive only
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "A year into the pandemic, white-collar professions leaped into the top three while the farmers' share didn't budge",
+    subtitle = "Waterloo Region, share of workers who worked at home, by industry^1^, %^2^ and percentage point change",
     caption = cwr_caption(
       c("Statistics Canada Tables 98-10-0456-01", "98-400-X2016321"),
       credit = TRUE,
       notes = c(
+        "Top 10 industries only",
         # 2021 publishes interval bounds and 2016 does not, so the widest 2021
         # interval is stated rather than drawn (rule 9b); {widest} is filled
         # from the data
