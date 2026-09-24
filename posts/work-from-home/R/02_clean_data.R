@@ -190,43 +190,38 @@ gnr_2016 <- home_2016_raw |>
   select(geo_uid, gnr_long_2016 = gnr) |>
   mutate(gnr_long_2016 = as.numeric(gnr_long_2016))
 
-# ---- Working in agriculture, 2021 ------------------------------------------
+# ---- Working in agriculture, 2016 ------------------------------------------
 # The share of each district's workers whose industry is agriculture, forestry,
-# fishing and hunting - the first NAICS sector, fetched for the districts by
-# 01_get_data.R. This is about the industry people work in, not where they work
-# from, so both the sector and the district total are taken at the table's
-# place-of-work total. The Region's own row is not charted, so it is left out
-# here as well.
-#
-# The member id is not trusted on its own: 01_get_data.R asks for member 2, and
-# this checks that member 2 really is the agriculture sector before the share
-# is built.
-agriculture_name <- industry_names |>
-  filter(industry_member == 2L) |>
-  pull(industry)
-stopifnot(str_starts(agriculture_name, "Agriculture"))
-
-agriculture <- pow_2021 |>
+# fishing and hunting - the first NAICS sector - from the same 2016 data table
+# as the work-at-home shares above, which already carries every district at
+# every industry. This is about the industry people work in, not where they
+# work from, so both the sector and the district total are taken from the
+# table's place-of-work total column. The Region's own row is not charted, so
+# it is left out here as well. Like the other 2016 shares, these have no
+# confidence intervals and no CV.
+agriculture <- home_2016_raw |>
   filter(
     geo_uid %in% municipalities$geo_uid,
-    str_starts(place_of_work_status_5, "Total"),
-    industry_member %in% c(1L, 2L)
+    str_starts(industry_2016, "Total") | str_starts(industry_2016, "Agriculture")
   ) |>
-  figure_per_row(c("geo_uid", "industry_member")) |>
+  select(
+    geo_uid, industry = industry_2016,
+    workers = matches("place_of_work_status_5.*total_place_of_work_status")
+  ) |>
   mutate(
-    total = value[industry_member == 1L],
-    se_total = se[industry_member == 1L],
-    percent = value / total * 100,
+    workers = as.numeric(workers),
+    # Each district's own industry total is the denominator
+    total = workers[str_starts(industry, "Total")],
     .by = geo_uid
   ) |>
-  filter(industry_member == 2L) |>
-  mutate(se_p = cwr_share_se(value, se, total, se_total)) |>
-  cwr_add_share_ci(value) |>
+  filter(str_starts(industry, "Agriculture")) |>
+  mutate(percent = workers / total * 100) |>
   inner_join(municipalities, join_by(geo_uid)) |>
-  mutate(industry = agriculture_name) |>
-  select(district, district_type, industry, workers = value, total, percent,
-         percent_lower, percent_upper, cv, quality) |>
+  select(district, district_type, industry, workers, total, percent) |>
   arrange(desc(percent))
+
+# One row per district, or the industry names did not match as expected
+stopifnot(nrow(agriculture) == nrow(municipalities))
 
 # ---- Worked at home by industry, 2016 and 2021 ------------------------------
 # The share of each industry's own workers who worked at home, for the Region

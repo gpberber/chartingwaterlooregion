@@ -1,8 +1,8 @@
-district,district_type,industry,workers,total,percent,percent_lower,percent_upper,cv,quality
-Wellesley,Township,"Agriculture, forestry, fishing and hunting",1015,5840,17.38013698630137,15.740694466184168,19.15152165075616,0.04818525178934851,NA
-Woolwich,Township,"Agriculture, forestry, fishing and hunting",900,13700,6.569343065693431,5.80424303922338,7.427344256495451,0.06058103166072322,NA
-Wilmot,Township,"Agriculture, forestry, fishing and hunting",510,10495,4.859456884230586,3.9797091661448083,5.921686592507632,0.09776042973599099,NA
-Cambridge,City,"Agriculture, forestry, fishing and hunting",565,65845,0.8580757840382716,0.7296440182237605,1.008884328512469,0.07963356940388434,NA
-Waterloo,City,"Agriculture, forestry, fishing and hunting",335,58050,0.5770887166236004,0.45286541674690134,0.7351354653391872,0.11922003103529404,NA
-Kitchener,City,"Agriculture, forestry, fishing and hunting",675,124325,0.542931831892218,0.4739663090079284,0.6218696350169148,0.06672034840889352,NA
-North Dumfries,Township,"Agriculture, forestry, fishing and hunting",NA,5555,NA,NA,NA,0.19455508579223593,E
+district,district_type,industry,workers,total,percent
+Wellesley,Township,"Agriculture, forestry, fishing and hunting",920,5910,15.5668358714044
+Woolwich,Township,"Agriculture, forestry, fishing and hunting",1195,13505,8.84857460199926
+Wilmot,Township,"Agriculture, forestry, fishing and hunting",450,10865,4.1417395306028535
+North Dumfries,Township,"Agriculture, forestry, fishing and hunting",175,5680,3.080985915492958
+Cambridge,City,"Agriculture, forestry, fishing and hunting",460,67305,0.6834559096649581
+Waterloo,City,"Agriculture, forestry, fishing and hunting",215,53330,0.40315019688730547
+Kitchener,City,"Agriculture, forestry, fishing and hunting",445,121195,0.36717686373200215

@@ -89,7 +89,7 @@ census_statistics <- tribble(
 # ---- Place of work status, 2021 census --------------------------------------
 # Table 98-10-0456, "Place of work status by industry sectors, occupation broad
 # category and gender", for the post's 2021 figures: the charts of working at
-# home by district and by industry, and the chart of who works in agriculture. Place of work status sorts
+# home by district and by industry. Place of work status sorts
 # every employed person into one of four groups - worked at home, worked
 # outside Canada, no fixed workplace address, and usual place of work - and its
 # total is everyone employed in the census week.
@@ -103,16 +103,13 @@ census_statistics <- tribble(
 # share differs by a tenth of a point - and none of its three variables is used
 # in the post, so one table now serves both charts.)
 #
-# The table has 42 million cells, so only the 189 needed are fetched by
+# The table has 42 million cells, so only the 168 needed are fetched by
 # coordinate: the Region and its seven districts at the table's own
 # industry total, for the chart by district, and the Region at each of the 20
 # sectors, for the industry chart; each of those 28 combinations as 2 statuses
 # (the total and "Worked at home") x 3 statistics (the count and its 95%
-# confidence interval bounds), with occupation and gender at their totals. The
-# last 21 are for the agriculture chart: the seven districts at the first NAICS
-# sector, in the place-of-work total only (the chart is about who works in
-# agriculture, not where they work from), x the same 3 statistics. Their
-# denominator is each district's industry total, already fetched above.
+# confidence interval bounds), with occupation and gender at their totals.
+# (The agriculture chart is 2016's, from the data table below.)
 # Coordinate: place . occupation . gender . statistic . industry . place of
 # work status, then four zeros for the dimensions the table does not have. Member ids from the table's metadata
 # (getCubeMetadata); 2439 is the Region.
@@ -129,14 +126,7 @@ home_cells <- bind_rows(
   census_places |>
     filter(GeoUID == "3530") |>
     cross_join(tibble(industry_member = 2:21)) |>
-    cross_join(home_statuses),
-  # The seven districts at agriculture, forestry, fishing and hunting - member
-  # 2, the first NAICS sector - at the place-of-work total only. 02_clean_data.R
-  # checks that name against the member list rather than trusting the id.
-  census_places |>
-    filter(GeoUID != "3530") |>
-    mutate(industry_member = 2) |>
-    cross_join(home_statuses |> filter(status_member == 1))
+    cross_join(home_statuses)
 ) |>
   cross_join(census_statistics) |>
   mutate(COORDINATE = str_glue(
@@ -187,7 +177,8 @@ httr2::request("https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata") |>
 # industry members (the table's own total, plus the 20 NAICS sectors), with
 # occupation and sex at their totals. The total-industry rows are what the
 # work-at-home chart compares with 2021; the sector rows are what the industry
-# chart ranks. The file is wide: one column per place of work status. GNR is
+# chart ranks, and the districts' agriculture rows are the agriculture chart.
+# The file is wide: one column per place of work status. GNR is
 # each area's long-form global non-response rate, which 02_clean_data.R checks
 # like the 2021 rates further down.
 pow_2016_zip <- file.path(download_dir, "98-400-X2016321.zip")

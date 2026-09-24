@@ -40,8 +40,8 @@ work_at_home <- read_csv(
   clean_names()
 
 # The share of each district's employed residents whose industry is
-# agriculture, forestry, fishing and hunting, 2021 census. One row per district.
-# Built by 02_clean_data.R from table 98-10-0456.
+# agriculture, forestry, fishing and hunting, 2016 census. One row per district.
+# Built by 02_clean_data.R from data table 98-400-X2016321.
 agriculture <- read_csv(
   here("posts", "work-from-home", "data", "agriculture.csv"),
   show_col_types = FALSE
@@ -304,20 +304,16 @@ p <- ggplot(agriculture_bars, aes(x = percent, y = district)) +
     title = "Share of workers whose industry is agriculture, by district",  
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
-      "Statistics Canada Table 98-10-0456-01",
+      "Statistics Canada Table 98-400-X2016321",
       credit = TRUE,
       notes = c(
         # Keyed ¹ on the share not reported; drops out on its own if none is
         if (any(is.na(pull(agriculture_bars, percent)))) {
           "The sampling error exceeds 16.6%, so the value is too unreliable to report."
         },
-        # The intervals are narrow next to the differences the chart shows, so
-        # the widest is stated rather than drawn (rule 9b); {widest} is filled
-        # from the data
-        str_glue(
-          "95% confidence intervals are within ±{widest} percentage points",
-          widest = with(agriculture, cwr_ci_widest(percent, percent_lower, percent_upper))
-        )
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
       )
     )
   )
