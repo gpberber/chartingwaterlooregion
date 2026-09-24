@@ -67,14 +67,14 @@ home_region_2016 <- home_region |> filter(year == 2016) |> pull(label)
 home_region_2021 <- home_region |> filter(year == 2021) |> pull(label)
 ```
 
-<!-- Opening paragraph: the question this post asks and the one-line answer. -->
+ 
 
 ## No place like home
 
-<!-- One or two paragraphs, then one chart. -->
+Post-pandemic, the stereotypical work-from-home type is a person in athleisurewear, greasy hair tucked under a ball cap, sitting at a desk with a giant mug of coffee to help them endure a day full of video meetings, often with kids and pets roaming in the background. But cast your mind back to the olden days, way back to 2016, when Zoom, Slack, and Teams weren't yet proper nouns. Back in those golden days, which of the Region's cities and townships do you think had the highest share of workers who worked at home? I'll give you a hint: think outside the office!
 
 ::: panel-tabset
-### Ranked
+### Guess who's #1
 
 ```{r}
 #| label: work-at-home-2016
@@ -151,15 +151,15 @@ home_2016_lines <- home_2016 |>
 # ---- This tab ------------------------------------------------------------
 p <- home_2016_bars(show_names = FALSE) +
   labs(
-    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "Not a close horse race",  
+    subtitle = "Cities and townships, share of workers who worked at home, 2016 census^1^, %",
     caption = cwr_caption(
       "Statistics Canada Table 98-400-X2016321",
       credit = TRUE,
       notes = c(
         # The 2016 tables publish no interval for any count, so none can be
         # worked out for these shares (rule 9b)
-        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+        "Based on 25% sample; no confidence intervals available; shares close together may differ only by sampling error"
       )
     )
   )
@@ -179,7 +179,7 @@ cwr_figure(
 )
 ```
 
-### Named
+### See who's #1
 
 ```{r}
 #| label: work-at-home-2016-named
@@ -190,13 +190,13 @@ cwr_figure(
 # above unchanged.
 p <- home_2016_bars(show_names = TRUE) +
   labs(
-    title = "Share of employed people who worked at home in 2016, by district",  # working title, descriptive only
-    subtitle = "Subtitle: what is measured, for whom, and when",
+    title = "Wellesley wins by a mile",  
+    subtitle = "Cities and townships, share of workers who worked at home, 2016 census^1^, %",
     caption = cwr_caption(
       "Statistics Canada Table 98-400-X2016321",
       credit = TRUE,
       notes = c(
-        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+        "Based on 25% sample; no confidence intervals available; shares close together may differ only by sampling error"
       )
     )
   )
@@ -211,6 +211,10 @@ cwr_figure(
 )
 ```
 :::
+
+How can Wellesley and Woolwich be the districts with the highest share of people who worked at home? This is one of those findings that at first is startling---or at least it was to me---but that after a bit of thought makes perfect sense. Having spent my career working within the confines of an office or academic building, I have a pretty blinkered view of what a person who works at home does for a living, a view that fits the stereotype noted above. After I removed my blinkers and remembered that [the townships have more cows than people](/posts/welcome/index.qmd), it dawned on me that Wellesley and Woolwich are full of farms, and that farmers are the original work-at-home types, so that must explain the initially puzzling results. To confirm my suspicion 
+
+Pre-pandemic then, the stereotypical work-from-home type is a person in overalls, greasy hair tucked under a straw hat, sitting on a tractor with a giant Thermos of coffee to help them endure a day full of plowing, often with kids and cows roaming in the background.
 
 ```{r}
 #| label: agriculture
@@ -297,7 +301,7 @@ p <- ggplot(agriculture_bars, aes(x = percent, y = district)) +
     panel.grid.major.y = element_blank()
   ) +
   labs(
-    title = "Share of workers whose industry is agriculture, by district",  # working title, descriptive only
+    title = "Share of workers whose industry is agriculture, by district",  
     subtitle = "Subtitle: what is measured, for whom, and when",
     caption = cwr_caption(
       "Statistics Canada Table 98-10-0456-01",
@@ -857,6 +861,7 @@ cwr_figure(
 ::: {#key-terms .callout-note collapse="true"}
 ## Key terms
 
+```{=html}
 <!-- The terms a reader needs to read the charts correctly, each with its official
      definition. The table is not written here: the chunk below prints it from the
      "Key terms" table in this post's README.md, so there is only ever one copy. Edit
@@ -867,6 +872,7 @@ cwr_figure(
      #key-terms: _includes/like.html puts the "Like this post" button immediately
      above it, since the analysis ends here and everything below is reference
      material. The heading inside the box can be reworded freely. -->
+```
 
 ```{r}
 #| label: key-terms
@@ -875,12 +881,12 @@ cwr_figure(
 # Prints the key terms from this post's README.md - edit them there, not here
 cwr_key_terms_table("work-from-home")
 ```
-
 :::
 
 ::: {#data-sources-and-reliability .callout-note collapse="true"}
 ## Data sources and reliability
 
+```{=html}
 <!-- Where the data came from, what was excluded and why, and any caveat a careful
      reader should know: write that here, above the tables. If any of it is sample data
      (the census long form, a survey), say so here, how big the sample is, and whether
@@ -892,6 +898,7 @@ cwr_key_terms_table("work-from-home")
      around it. Keep its id, #data-sources-and-reliability: in a post with no Key
      terms box, _includes/like.html puts the "Like this post" button above it. The
      heading inside the box can be reworded freely. -->
+```
 
 ### Sources
 
@@ -915,17 +922,17 @@ cwr_sources_table("work-from-home")
 # and it drops out of the post while the README keeps the record.
 cwr_reliability_table("work-from-home")
 ```
-
 :::
 
 ::: {#other-sources .callout-note collapse="true"}
 ## Other sources
 
+```{=html}
 <!-- Anything cited that is not data: reports, articles, books, a method borrowed
      from someone else. Quoted material stays under its owner's terms, never this
      site's CC BY - see WORKFLOW.md section 9. Delete this box, from its ::: line to the
      closing :::, if unused. -->
-
+```
 :::
 
 ::: {.callout-note collapse="true"}

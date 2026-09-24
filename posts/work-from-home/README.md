@@ -2,16 +2,14 @@
 
 Post: https://chartingwaterlooregion.ca/posts/work-from-home/
 
-Split off the commuting post on 2026-09-23: the charts of who worked at home, in which
-industries and in which districts moved here, and the commuting post kept the charts of where
-people travel to work and how.
+Split off the commuting post on 2026-09-23: the charts of who worked at home, in which industries and in which districts moved here, and the commuting post kept the charts of where people travel to work and how.
 
 ## Key terms
 
 | Term | Definition |
 |------------------------------------|------------------------------------|
-| Worked at home | "Worked at home (including farms) - Persons whose job is located in the same building as their place of residence, persons who live and work on the same farm and teleworkers who spend most of their work week working at home." One category of place of work status, which "refers to whether a person worked at home, worked outside Canada, had no fixed workplace address, or worked at a specific address (usual place of work)". (Statistics Canada, Dictionary, Census of Population, 2021, "Place of work status"; the same wording is the footnote on the Place of work status dimension of table 98-10-0456-01) |
-| Industry | "'Industry' refers to a generally homogeneous group of economic producing units, primarily engaged in a specific set of activities." A person who held more than one job between January 1, 2015 and May 2016 is counted in "the job held the longest during that period". The categories charted are the 20 sectors of the North American Industry Classification System (NAICS), 2012 in 2016 and 2017 in 2021; the 20 sectors are the same in both. (Statistics Canada, Dictionary, Census of Population, 2016, "Industry (based on the North American Industry Classification System [NAICS] 2012)") |
+| Worked at home | "Worked at home (including farms) - Persons whose job is located in the same building as their place of residence, persons who live and work on the same farm and teleworkers who spend most of their work week working at home." One category of place of work status, which "refers to whether a person worked at home, worked outside Canada, had no fixed workplace address, or worked at a specific address (usual place of work)". "Teleworkers who spend less than one-half of their workweek working at their home office are asked to report the full address of their employer." (Statistics Canada, Dictionary, Census of Population, 2021, "Place of work status"; the same wording is the footnote on the Place of work status dimension of table 98-10-0456-01) |
+| Industry | "'Industry' refers to a generally homogeneous group of economic producing units, primarily engaged in a specific set of activities." A person who held more than one job between January 1, 2015 and May 2016 is counted in "the job held the longest during that period". The categories charted are the 20 sectors of the North American Industry Classification System (NAICS), 2012 in 2016 and 2017 in 2021; the 20 sectors are the same in both. (Statistics Canada, Dictionary, Census of Population, 2016, "Industry (based on the North American Industry Classification System \[NAICS\] 2012)") |
 | Agriculture, forestry, fishing and hunting | "This sector comprises establishments primarily engaged in growing crops, raising animals, harvesting timber, harvesting fish and other animals from their natural habitats and providing related support activities." Establishments "primarily engaged in agricultural research or that supply veterinary services are not included in this sector". The first of the 20 NAICS sectors. (Statistics Canada, North American Industry Classification System (NAICS) Canada 2017 Version 3.0, "11 - Agriculture, forestry, fishing and hunting") |
 
 ```{=html}
