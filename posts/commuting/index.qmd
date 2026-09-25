@@ -7,6 +7,9 @@ image: images/thumbnail.png
 draft: true
 ---
 
+# main mode of commmuting - 2025 LFS Kitchener CMA
+# https://www150.statcan.gc.ca/n1/daily-quotidien/250826/t002a-eng.htm 
+
 ```{r}
 #| label: setup
 #| include: false
