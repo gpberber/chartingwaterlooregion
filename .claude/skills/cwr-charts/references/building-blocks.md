@@ -35,18 +35,19 @@ labs(
 
 ## ggscalex_cont
 
-Continuous x scale with minor ticks.
+Continuous x scale; minor ticks only where the data have a figure.
 
 ```r
 scale_x_continuous(
   #limits = c(min, max),
   #breaks = c(min, max, by), end_max),
   labels = label_number(scale = <1>, suffix = "<>", big.mark = ""),
-  #minor_breaks = seq(min, max, 1),
+  minor_breaks = NULL,   # or seq(min, max, 1): one per period in the data, then minor.ticks = TRUE below
   expand = expansion(mult = c(0.02, 0.05)),
   position = "<bottom>"
 ) +
-guides(x = guide_axis(minor.ticks = TRUE)) +
+# minor ticks only where the data have a figure (cwr-charts rule 4b)
+guides(x = guide_axis(minor.ticks = FALSE)) +
 ```
 
 ## ggscaley_cont
@@ -82,7 +83,8 @@ scale_x_date(
   #     by = "<5> years"
   # )),
   date_labels = "<%Y>",
-  # Option 1: automatic breaks
+  # Option 1: automatic breaks. Minor ticks only where the data have a figure (cwr-charts rule 4b):
+  # "1 year" suits annual or monthly data; never finer than the data
   date_minor_breaks = "<1 year>",
   # Option 2: manual breaks anchored to desired start - comment out date_breaks above
   #minor_breaks = seq.Date(
@@ -284,6 +286,8 @@ theme(
 Minor ticks on the x axis.
 
 ```r
+# minor ticks only where the data have a figure (cwr-charts rule 4b); the scale's
+# minor_breaks must be the periods in the data, or set minor.ticks = FALSE
 guides(x = guide_axis(minor.ticks = TRUE)) +
 ```
 

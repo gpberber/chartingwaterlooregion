@@ -71,7 +71,7 @@ plot_data |>
     #limits = c(min, max),
     #breaks = seq(min, max, by),
     labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-    #minor_breaks = seq(min, max, by),
+    minor_breaks = NULL,   # minor ticks only where the data have a figure (cwr-charts rule 4b)
     expand = expansion(mult = c(0.02, 0.05)),
     position = "bottom"
   ) +
@@ -84,7 +84,7 @@ plot_data |>
     expand = expansion(mult = c(0, 0.05))
   ) +
 
-  guides(x = guide_axis(minor.ticks = TRUE)) +
+  guides(x = guide_axis(minor.ticks = FALSE)) +
 
   # place y axis title above y axis, aligned with labels
   annotation_custom(
@@ -244,7 +244,7 @@ plot_data |>
     #limits = c(min, max),
     #breaks = seq(x_min, x_max, by),
     labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-    minor_breaks = seq(x_min, x_max, <1>),    # set by = based on x scale
+    minor_breaks = seq(x_min, x_max, <1>),    # by = one period of the data: minor ticks only where the data have a figure (cwr-charts rule 4b)
     expand = expansion(mult = c(0.02, 0.05)),
     position = "bottom"
   ) +

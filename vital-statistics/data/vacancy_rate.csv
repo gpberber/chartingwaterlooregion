@@ -1,0 +1,16 @@
+geo,year,bedroom_type,value,quality
+Canada,2021,Total,3.1,Excellent
+Canada,2022,Total,1.9,Excellent
+Canada,2023,Total,1.5,Excellent
+Canada,2024,Total,2.2,Excellent
+Canada,2025,Total,3.1,Excellent
+Ontario,2021,Total,3.4,Excellent
+Ontario,2022,Total,1.8,Excellent
+Ontario,2023,Total,1.7,Excellent
+Ontario,2024,Total,2.7,Excellent
+Ontario,2025,Total,3.2,Excellent
+Region,2021,Total,2,Excellent
+Region,2022,Total,1.2,Excellent
+Region,2023,Total,2.1,Excellent
+Region,2024,Total,3.5,Very good
+Region,2025,Total,4,Very good

@@ -688,10 +688,16 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
     xs <- if (fixed) at[[g]] else auto_xs(g)
     options <- map(xs, \(x_c) list_rbind(map(c("above", "below"), \(w) score(g, x_c, w)))) |>
       list_rbind()
+    # A label on top of another label is never readable, so staying clear of
+    # the labels already placed comes first, then staying off other lines.
+    # (It was the other way round until 2026-09-25, when the Vital
+    # Statistics page printed "Region" over "Canada": a spot clear of the
+    # lines beat one clear of the labels. Where a clear spot for both exists
+    # the choice is the same either way.)
     options <- if (fixed) {
-      arrange(options, hits_line, hits_label, outside, hits_grid, desc(preferred))
+      arrange(options, hits_label, hits_line, outside, hits_grid, desc(preferred))
     } else {
-      arrange(options, hits_line, hits_label, outside, hits_grid, float, desc(preferred), x)
+      arrange(options, hits_label, hits_line, outside, hits_grid, float, desc(preferred), x)
     }
     pick <- slice(options, 1)
     placed <- bind_rows(placed, select(pick, x, bottom, top))

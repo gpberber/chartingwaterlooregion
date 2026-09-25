@@ -44,7 +44,7 @@ the same call in a situation the templates do not cover.
 ## Axes and gridlines
 
 - Vertical charts: y axis on the right, labels raised above their gridline
-  (`vjust = -0.5`, negative left margin), x axis line black at the bottom, minor ticks yearly.
+  (`vjust = -0.5`, negative left margin), x axis line black at the bottom, minor ticks yearly on annual data, and only where the data have a figure (rule 4b).
 - Horizontal charts: x axis on top, vertical gridlines, no x axis line, y axis text
   left-aligned (`hjust = 0`) and markdown-capable so one row can be bold.
 - Ranked charts start the value axis at zero with `geom_vline(xintercept = 0)` as the baseline.

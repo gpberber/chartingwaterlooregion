@@ -153,6 +153,8 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    | Not reported | keyed on each row whose share was blanked as E or F (rule 9b); only if one was | "The sampling error exceeds 16.6%, so the value is too unreliable to report." |
    | No intervals published | a ranking or comparison from a table without bounds (rule 9b) | "No confidence intervals are published for these figures; shares close together may differ only by sampling error" |
    | Liaison Strategies 2025 | the globe-csi perception survey | "Estimates from an October 2025 Liaison Strategies phone survey of 800 residents per city" |
+   | Labour Force Survey | any chart drawn from LFS estimates (the Vital Statistics page) | "Estimates from the Labour Force Survey, a monthly sample of about 65,000 households" (size from Statistics Canada's survey description, IMDB 3701, checked 2026-09-25) |
+   | CMHC Rental Market Survey | vacancy rates and rents (the Vital Statistics page) | "Estimates from CMHC's October Rental Market Survey, a sample of privately initiated rental buildings of three or more units" |
 
    **A note that says who or what is counted is taken from the official definition, never from
    memory or from the look of the data.** Read the table's own notes and the census dictionary's
@@ -263,6 +265,19 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    day the rule was set. A second number per row still goes in the boxed column of
    `gglollipoprect`, which keeps its axis too. Labelled bars are unaffected - rule 4 is
    about bars.
+4b. **An x axis gets minor ticks only where the chart has data** (Greg, 2026-09-25, a stock
+   rule for the site). A minor tick marks a period the chart reports: yearly minor ticks
+   under labels every five years of annual data, or quarterly ticks on a monthly series
+   (each lands on a month with a figure). A tick where there is no figure - the half-year
+   that ggplot puts between two yearly breaks by default - suggests data that do not
+   exist, so it goes: `minor_breaks = NULL` on the scale and
+   `guides(x = guide_axis(minor.ticks = FALSE))`. Minor ticks switched on with no
+   `minor_breaks` draw exactly those default in-between ticks. The templates follow the rule
+   (fixed 2026-09-25): the time-axis ones set one minor break per year of data, and
+   `ggscalex_cont` and `ggscatter` have them off. When a template is adapted to other data,
+   make `minor_breaks` the periods in that data - not yearly on a series every two years.
+   Worked case: `vs_line()` in the Vital Statistics page keeps quarterly ticks on
+   its monthly charts and has none on its annual ones.
 5. **Bold the focus row** with the `y_label` trick (`**Region**`, from `cwr_region`, via `element_markdown`).
 6. **Value axis on the right** for vertical charts, labels sitting above gridlines
    (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the

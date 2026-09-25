@@ -23,6 +23,7 @@ cwr_packages <- c(
 
   # Data sources and file formats
   "cansim", "arrow", "readxl", "openxlsx", "writexl", "pdftools",
+  "cmhc",   # CMHC's Housing Market Information Portal (Vital Statistics page)
 
   # Spatial and maps
   "sf", "units", "farver",   # farver: cwr_text_on_fill() in R/maps.R

@@ -70,7 +70,7 @@ ggplot(plot_data, aes(x = <x_var>, y = row_factor, fill = <ranking_var>)) +
   scale_x_continuous(
     #limits = c(min, max),
     #breaks = seq(min, max, by),
-    #minor_breaks = seq(x_min, x_max, 1),
+    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
     labels = label_number(big.mark = "", scale = 1, suffix = ""),
     expand = expansion(mult = c(0.0, 0.0)),
     position = "bottom"
@@ -166,7 +166,7 @@ ggplot(plot_data, aes(x = <x_var>, y = row_factor, fill = <value_var>)) +
   scale_x_continuous(
     #limits = c(min, max),
     #breaks = seq(min, max, by),
-    #minor_breaks = seq(x_min, x_max, 1),
+    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
     labels = label_number(big.mark = "", scale = 1, suffix = ""),
     expand = expansion(mult = c(0.0, 0.0)),
     position = "bottom"

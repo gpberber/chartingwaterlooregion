@@ -25,11 +25,12 @@ snippet ggscalex_cont
 	  #limits = c(min, max),
 	  #breaks = c(min, max, by), end_max),
 	  labels = label_number(scale = ${4:1}, suffix = "${5:}", big.mark = ""),
-	  #minor_breaks = seq(min, max, 1),
+	  minor_breaks = NULL,   # or seq(min, max, 1): one per period in the data, then minor.ticks = TRUE below
 	  expand = expansion(mult = c(0.02, 0.05)),
 	  position = "${7:bottom}"
 	) +
-	guides(x = guide_axis(minor.ticks = TRUE)) +
+	# minor ticks only where the data have a figure (cwr-charts rule 4b)
+	guides(x = guide_axis(minor.ticks = FALSE)) +
 
 snippet ggscaley_cont
 	scale_y_continuous(
@@ -55,7 +56,8 @@ snippet ggscalex_date
 	  #     by = "${2:5} years"
 	  # )),
 	  date_labels = "${3:%Y}",
-	  # Option 1: automatic breaks
+	  # Option 1: automatic breaks. Minor ticks only where the data have a figure (cwr-charts rule 4b):
+	  # "1 year" suits annual or monthly data; never finer than the data
 	  date_minor_breaks = "${4:1 year}",
 	  # Option 2: manual breaks anchored to desired start - comment out date_breaks above
 	  #minor_breaks = seq.Date(
@@ -184,6 +186,8 @@ snippet gggridx
 	) +
 	
 snippet ggguides
+	# minor ticks only where the data have a figure (cwr-charts rule 4b); the scale's
+	# minor_breaks must be the periods in the data, or set minor.ticks = FALSE
 	guides(x = guide_axis(minor.ticks = TRUE)) +
 
 snippet cwrfigure
@@ -530,7 +534,7 @@ snippet ggline
 		  #limits = c(min, max),
 		  #breaks = seq(min, max, by),
 		  labels = label_number(big.mark = "", scale = 1, suffix = ""),
-		  minor_breaks = seq(x_min, x_max, 1),
+		  minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 		  expand = expansion(mult = c(0.02, 0.05)),
 		  position = "bottom"
 		) +
@@ -1146,7 +1150,7 @@ snippet ggscatter
 	    #limits = c(min, max),
 	    #breaks = seq(min, max, by),
 	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-	    #minor_breaks = seq(min, max, by),
+	    minor_breaks = NULL,   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	    expand = expansion(mult = c(0.02, 0.05)),
 	    position = "bottom"
 	  ) +
@@ -1159,7 +1163,7 @@ snippet ggscatter
 	    expand = expansion(mult = c(0, 0.05))
 	  ) +
 	
-	  guides(x = guide_axis(minor.ticks = TRUE)) +
+	  guides(x = guide_axis(minor.ticks = FALSE)) +
 	
 	  # place y axis title above y axis, aligned with labels
 	  annotation_custom(
@@ -1348,7 +1352,7 @@ snippet ggheatrank
 	  scale_x_continuous(
 	    #limits = c(min, max),
 	    #breaks = seq(min, max, by),
-	    #minor_breaks = seq(x_min, x_max, 1),
+	    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
 	    expand = expansion(mult = c(0.0, 0.0)),
 	    position = "bottom"
@@ -1439,7 +1443,7 @@ snippet ggheatraw
 	  scale_x_continuous(
 	    #limits = c(min, max),
 	    #breaks = seq(min, max, by),
-	    #minor_breaks = seq(x_min, x_max, 1),
+	    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
 	    expand = expansion(mult = c(0.0, 0.0)),
 	    position = "bottom"
@@ -1715,7 +1719,7 @@ snippet ggribbon
 	    #limits = c(min, max),
 	    position = "bottom",
 	    #breaks = seq(x_min, x_max, by),
-	    minor_breaks = seq(x_min, x_max, 1),
+	    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	    labels = label_number(big.mark = "", scale = 1, suffix = ""),
 	    expand = expansion(mult = c(0.02, 0.05))
 	  ) +
@@ -1867,7 +1871,7 @@ snippet ggbubble
 	    #limits = c(min, max),
 	    #breaks = seq(x_min, x_max, by),
 	    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
-	    minor_breaks = seq(x_min, x_max, ${11:1}),    # set by = based on x scale
+	    minor_breaks = seq(x_min, x_max, ${11:1}),    # by = one period of the data: minor ticks only where the data have a figure (cwr-charts rule 4b)
 	    expand = expansion(mult = c(0.02, 0.05)),
 	    position = "bottom"
 	  ) +
@@ -2136,7 +2140,7 @@ snippet ggarea
 		  #limits = c(min, max),
 		  #breaks = seq(min, max, by),
 		  labels = label_number(big.mark = "", scale = 1, suffix = ""),
-		  minor_breaks = seq(x_min, x_max, 1),
+		  minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 		  expand = expansion(mult = c(0.02, 0.05)),
 		  position = "bottom"
 		) +

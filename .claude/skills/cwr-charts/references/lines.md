@@ -86,7 +86,7 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_varia
 	  #limits = c(min, max),
 	  #breaks = seq(min, max, by),
 	  labels = label_number(big.mark = "", scale = 1, suffix = ""),
-	  minor_breaks = seq(x_min, x_max, 1),
+	  minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	  expand = expansion(mult = c(0.02, 0.05)),
 	  position = "bottom"
 	) +
@@ -200,7 +200,7 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, fill = <colour_variabl
 	  #limits = c(min, max),
 	  #breaks = seq(min, max, by),
 	  labels = label_number(big.mark = "", scale = 1, suffix = ""),
-	  minor_breaks = seq(x_min, x_max, 1),
+	  minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
 	  expand = expansion(mult = c(0.02, 0.05)),
 	  position = "bottom"
 	) +
@@ -341,7 +341,7 @@ plot_data |>
     #limits = c(min, max),
     position = "bottom",
     #breaks = seq(x_min, x_max, by),
-    minor_breaks = seq(x_min, x_max, 1),
+    minor_breaks = seq(x_min, x_max, 1),   # minor ticks only where the data have a figure (cwr-charts rule 4b)
     labels = label_number(big.mark = "", scale = 1, suffix = ""),
     expand = expansion(mult = c(0.02, 0.05))
   ) +

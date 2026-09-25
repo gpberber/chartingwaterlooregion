@@ -12,6 +12,7 @@ project:
     - "!_dev/"
     - "!_templates/"
     - "!datasets/"      # shared data pipelines and exploration notebooks
+    - "!vital-statistics/R/"   # the Vital Statistics page's data scripts
   resources:
     # A leading slash anchors a pattern to the project root. Without it Quarto
     # matches the folder name at any depth, so "images/" also copied the
