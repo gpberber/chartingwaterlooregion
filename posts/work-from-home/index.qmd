@@ -48,6 +48,26 @@ agriculture <- read_csv(
 ) |>
   clean_names()
 
+# The share of each district's workers who worked at home, 2016 census, with
+# everyone in agriculture, forestry, fishing and hunting left out. One row per
+# district. Built by 02_clean_data.R from data table 98-400-X2016321.
+work_at_home_no_agriculture <- read_csv(
+  here("posts", "work-from-home", "data", "work_at_home_no_agriculture.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
+# The share of each industry's workers who were self-employed, Wellesley and
+# the rest of the Region, 2016 census: one row per NAICS sector per area, plus
+# each area's all-industry total. Built by 02_clean_data.R from data tables
+# 98-400-X2016292 (the Region) and 98-400-X2016290 (the Kitchener CMA, which
+# is the rest of the Region); Wellesley is the one less the other.
+self_employed_industry <- read_csv(
+  here("posts", "work-from-home", "data", "self_employed_industry.csv"),
+  show_col_types = FALSE
+) |>
+  clean_names()
+
 # The share of the Region's workers who worked at home in each industry, 2016
 # and 2021 censuses: one row per NAICS sector per year. Built by 02_clean_data.R
 # from data table 98-400-X2016321 (2016) and table 98-10-0456 (2021).
@@ -335,6 +355,242 @@ cwr_figure(
     "their employed residents who work in agriculture, forestry, fishing and ",
     "hunting. ",
     paste(agriculture_lines, collapse = ". "), "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: work-at-home-2016-no-agriculture
+#| output: asis
+
+# The 2016 work-at-home shares by district again, with everyone in agriculture,
+# forestry, fishing and hunting left out of both the people who worked at home
+# and each district's total. work_at_home_no_agriculture is read in the
+# load-data chunk. The same bars as the 2016 tabs above, built the same way.
+
+# Roughly how many characters fit across the panel at this font size, read off
+# a render; it decides whether a bar is long enough to hold its own label.
+panel_chars_no_agriculture <- 40
+
+no_agriculture_bars <- work_at_home_no_agriculture |>
+  mutate(
+    # reorder() sorts ascending and a horizontal chart draws the first level at
+    # the bottom, so the district where most people worked at home ends up on top
+    district = fct_reorder(district, percent),
+    share_label = label_number(accuracy = 0.1, suffix = "%")(percent),
+    # Whether a bar can hold its own label
+    inside = percent >= (nchar(share_label) + 1.5) *
+      (max(percent) * 1.05 / panel_chars_no_agriculture)
+  )
+
+p <- ggplot(no_agriculture_bars, aes(x = percent, y = district)) +
+  geom_col(width = 0.7, fill = dodgerblue) +
+  # The baseline the bars grow from, stopping just past the end bars
+  annotate("segment", x = 0, xend = 0, y = 0.5, yend = nrow(no_agriculture_bars) + 0.5,
+           colour = "black", linewidth = 0.5) +
+  # White inside a bar that can hold its label, black just past one that cannot
+  geom_text(
+    aes(
+      label = share_label,
+      hjust = if_else(inside, 1.15, -0.15),
+      colour = if_else(inside, "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  scale_colour_identity() +
+  # Room on the right for a label that sits outside its bar
+  scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+  # The house short form of a long district name
+  scale_y_discrete(labels = cwr_short_name) +
+  coord_cartesian(clip = "off") +
+  # Every bar carries its number, so the value axis and its gridlines are gone
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  ) +
+  labs(
+    title = "Share of workers outside agriculture who worked at home in 2016, by district",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      "Statistics Canada Table 98-400-X2016321",
+      # The shares are worked out here, with one industry taken out
+      credit = TRUE,
+      notes = c(
+        "Excludes workers in agriculture, forestry, fishing and hunting",
+        # The 2016 tables publish no interval for any count, so none can be
+        # worked out for these shares (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+cwr_figure(
+  p, "fig-work-at-home-2016-no-agriculture",
+  alt = paste0(
+    "Horizontal bars ranking the Region's seven districts by the share of ",
+    "employed people who worked at home in 2016, leaving out everyone who works ",
+    "in agriculture, forestry, fishing and hunting. ",
+    no_agriculture_bars |>
+      arrange(desc(percent)) |>
+      mutate(line = paste0(district, " ", share_label)) |>
+      pull(line) |>
+      paste(collapse = ". "),
+    "."
+  )
+  # No height given: cwr_figure() sets it from the number of rows.
+)
+```
+
+```{r}
+#| label: self-employed-industry
+#| output: asis
+
+# The share of each industry's workers who were self-employed, in Wellesley and
+# in the rest of the Region together, for Wellesley's ten largest industries by
+# number of employed residents. self_employed_industry is read in the
+# load-data chunk; 02_clean_data.R explains how Wellesley's figures are worked
+# out (the Region less the Kitchener CMA).
+#
+# The ggdumbbell template (the cwr-charts skill): two dots per row, the rest of
+# the Region in silver and Wellesley in blue, with the two named on the top row
+# instead of in a legend.
+rest_label <- str_glue("Rest of {cwr_region}")
+
+# Wellesley's ten largest sectors, by its own employed total
+self_employed_rows <- self_employed_industry |>
+  filter(area == "Wellesley", !str_starts(industry, "Total")) |>
+  slice_max(total, n = 10) |>
+  pull(industry)
+
+self_employed_data <- self_employed_industry |>
+  filter(industry %in% self_employed_rows) |>
+  mutate(area = if_else(area == "Wellesley", "wellesley", "rest")) |>
+  pivot_wider(
+    id_cols = c(industry, industry_short),
+    names_from = area,
+    values_from = percent
+  ) |>
+  mutate(
+    # Ordered on Wellesley's share: reorder() sorts ascending and a horizontal
+    # chart draws the first level at the bottom, so the highest ends up on top
+    industry = reorder(industry, wellesley)
+  )
+
+# The axis draws the short form of the longest sector names
+self_employed_y_labels <- self_employed_data |> select(industry, industry_short) |> deframe()
+
+# The right end of the background segments and of the x axis: just past the
+# largest share, rounded up to the next 20
+max_x_self <- ceiling(max(self_employed_data$wellesley) / 20) * 20
+
+# The top row's two dots are named, each label ending just left of its own dot
+# (hjust = 1), so the two cannot run into each other on a phone. `nudge` moves
+# the label off its dot in percentage points and is multiplied by cwr_gap(),
+# which cwr_figure() sets to `phone_gap` while it draws the phone version.
+self_employed_top <- self_employed_data |>
+  filter(industry == last(levels(industry))) |>
+  pivot_longer(c(rest, wellesley), names_to = "area", values_to = "percent") |>
+  mutate(
+    label = if_else(area == "rest", rest_label, "Wellesley"),
+    nudge = -1.5
+  )
+
+p <- ggplot(self_employed_data) +
+
+  # Background reference segment spanning full x range
+  geom_segment(aes(x = 0, xend = max_x_self, y = industry, yend = industry),
+               color = "grey80", linewidth = 0.3) +
+
+  # Dumbbell segment connecting the two areas
+  geom_segment(aes(x = rest, xend = wellesley, y = industry, yend = industry),
+               color = "grey50", linewidth = 0.7) +
+
+  geom_point(aes(x = rest, y = industry, color = "rest"), shape = 19, size = 4) +
+
+  geom_point(aes(x = wellesley, y = industry, color = "wellesley"), shape = 19, size = 4) +
+
+  # The two areas, on the top row only, just above the line. grey30 is the
+  # colour theme_cwr() gives the axis labels.
+  cwr_label(
+    data = self_employed_top,
+    aes(x = percent + nudge * cwr_gap(), y = industry, label = label),
+    hjust = 1, vjust = 0, nudge_y = 0.1,
+    colour = "grey30",
+    size = label_size * 0.8, fontface = "bold"
+  ) +
+
+  geom_vline(xintercept = 0, color = "black", linewidth = 0.5) +
+
+  scale_color_manual(
+    values = c(rest = cowboysilver, wellesley = dodgerblue),
+    guide = "none"
+  ) +
+
+  # Bare numbers on the axis; the subtitle says they are percentages (rule 1c)
+  scale_x_continuous(
+    limits = c(0, max_x_self),
+    breaks = seq(0, max_x_self, by = 20),
+    labels = label_number(big.mark = ",", scale = 1, suffix = ""),
+    expand = expansion(mult = c(0.02, 0.05)),
+    position = "top"
+  ) +
+
+  # Room above the top row for the area labels
+  scale_y_discrete(
+    position = "left",
+    labels = self_employed_y_labels,
+    expand = expansion(add = c(0.6, 1))
+  ) +
+
+  # Horizontal chart: swap tufte's default grid orientation
+  theme(
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.3),
+    panel.grid.major.y = element_blank()
+  ) +
+
+  labs(
+    title = "Share of workers who are self-employed, Wellesley and the rest of the Region, by industry",  # working title, descriptive only
+    subtitle = "Subtitle: what is measured, for whom, and when",
+    caption = cwr_caption(
+      c("Statistics Canada Tables 98-400-X2016292", "98-400-X2016290"),
+      # Wellesley's figures are worked out here from two tables
+      credit = TRUE,
+      notes = c(
+        "Wellesley's ten largest industries by number of employed residents",
+        str_glue("Wellesley is Waterloo Region less the Kitchener - Cambridge - Waterloo CMA; the rest of the {cwr_region} is the CMA"),
+        # The 2016 tables publish no interval for any count (rule 9b)
+        "No confidence intervals are published for these figures; shares close together may differ only by sampling error"
+      )
+    )
+  )
+
+# Built from the plotted rows rather than typed, top row first, with the
+# published sector names rather than the short forms the axis draws
+self_employed_lines <- self_employed_data |>
+  arrange(desc(wellesley)) |>
+  mutate(line = paste0(
+    industry, ": Wellesley ", label_number(accuracy = 0.1)(wellesley),
+    " per cent, rest of the Region ", label_number(accuracy = 0.1)(rest), " per cent"
+  )) |>
+  pull(line)
+
+cwr_figure(
+  p, "fig-self-employed-industry",
+  # The area labels sit a percentage point or so off their dots, which is half
+  # the distance on a phone unless it is doubled
+  phone_gap = 2,
+  alt = paste0(
+    "Dot plot with one row per industry and two dots on each row, grey for the ",
+    "rest of Waterloo Region and blue for Wellesley, joined by a line, placed ",
+    "along a scale of the percentage of the industry's workers who were ",
+    "self-employed in 2016. ",
+    paste(self_employed_lines, collapse = ". "), "."
   )
   # No height given: cwr_figure() sets it from the number of rows.
 )

@@ -1,0 +1,43 @@
+industry,industry_short,area,self_employed,total,percent
+Accommodation and food services,Accommodation and food services,Rest of Region,875,17155,5.100553774409793
+Accommodation and food services,Accommodation and food services,Wellesley,20,185,10.81081081081081
+"Administrative and support, waste management and remediation services",Administrative and support,Rest of Region,2145,10975,19.544419134396353
+"Administrative and support, waste management and remediation services",Administrative and support,Wellesley,70,210,33.33333333333333
+"Agriculture, forestry, fishing and hunting",Agriculture,Rest of Region,1205,2950,40.847457627118644
+"Agriculture, forestry, fishing and hunting",Agriculture,Wellesley,705,925,76.21621621621621
+"Arts, entertainment and recreation","Arts, entertainment and recreation",Rest of Region,890,4115,21.628189550425272
+"Arts, entertainment and recreation","Arts, entertainment and recreation",Wellesley,15,50,30
+Construction,Construction,Rest of Region,3740,17915,20.876360591682946
+Construction,Construction,Wellesley,180,670,26.865671641791046
+Educational services,Educational services,Rest of Region,825,23495,3.5113854011491807
+Educational services,Educational services,Wellesley,30,350,8.571428571428571
+Finance and insurance,Finance and insurance,Rest of Region,755,17180,4.39464493597206
+Finance and insurance,Finance and insurance,Wellesley,10,300,3.3333333333333335
+Health care and social assistance,Health care and social assistance,Rest of Region,3345,26970,12.402669632925473
+Health care and social assistance,Health care and social assistance,Wellesley,65,360,18.055555555555554
+Information and cultural industries,Information and cultural industries,Rest of Region,360,7710,4.669260700389105
+Information and cultural industries,Information and cultural industries,Wellesley,5,110,4.545454545454546
+Management of companies and enterprises,Management,Rest of Region,40,455,8.791208791208792
+Management of companies and enterprises,Management,Wellesley,5,10,50
+Manufacturing,Manufacturing,Rest of Region,1015,44035,2.3049846712842057
+Manufacturing,Manufacturing,Wellesley,195,940,20.74468085106383
+"Mining, quarrying, and oil and gas extraction","Mining, quarrying, and oil and gas extraction",Rest of Region,10,350,2.857142857142857
+"Mining, quarrying, and oil and gas extraction","Mining, quarrying, and oil and gas extraction",Wellesley,0,25,0
+Other services (except public administration),Other services,Rest of Region,2105,10170,20.698131760078663
+Other services (except public administration),Other services,Wellesley,110,305,36.0655737704918
+"Professional, scientific and technical services","Professional, scientific, technical",Rest of Region,4490,20800,21.586538461538463
+"Professional, scientific and technical services","Professional, scientific, technical",Wellesley,80,280,28.57142857142857
+Public administration,Public administration,Rest of Region,0,9660,0
+Public administration,Public administration,Wellesley,0,195,0
+Real estate and rental and leasing,Real estate,Rest of Region,1055,4570,23.085339168490155
+Real estate and rental and leasing,Real estate,Wellesley,5,65,7.6923076923076925
+Retail trade,Retail trade,Rest of Region,1995,29460,6.771894093686355
+Retail trade,Retail trade,Wellesley,80,495,16.161616161616163
+Total - Industry - North American Industry Classification System (NAICS) 2012,Total - Industry - North American Industry Classification System (NAICS) 2012,Rest of Region,27150,271875,9.986206896551725
+Total - Industry - North American Industry Classification System (NAICS) 2012,Total - Industry - North American Industry Classification System (NAICS) 2012,Wellesley,1660,5910,28.08798646362098
+Transportation and warehousing,Transportation and warehousing,Rest of Region,1590,11445,13.892529488859765
+Transportation and warehousing,Transportation and warehousing,Wellesley,45,180,25
+Utilities,Utilities,Rest of Region,10,1045,0.9569377990430622
+Utilities,Utilities,Wellesley,0,0,NA
+Wholesale trade,Wholesale trade,Rest of Region,715,11415,6.263688129653964
+Wholesale trade,Wholesale trade,Wellesley,20,270,7.4074074074074066

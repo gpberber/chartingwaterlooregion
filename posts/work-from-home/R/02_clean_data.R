@@ -223,6 +223,39 @@ agriculture <- home_2016_raw |>
 # One row per district, or the industry names did not match as expected
 stopifnot(nrow(agriculture) == nrow(municipalities))
 
+# ---- Worked at home outside agriculture, 2016 ------------------------------
+# The same shares as the 2016 work-at-home chart, with everyone in
+# agriculture, forestry, fishing and hunting taken out of both the workers who
+# worked at home and the district's total: each district's industry total less
+# its agriculture row, from the same data table. Like the other 2016 shares,
+# these have no confidence intervals.
+work_at_home_no_agriculture <- home_2016_raw |>
+  filter(
+    geo_uid %in% municipalities$geo_uid,
+    str_starts(industry_2016, "Total") | str_starts(industry_2016, "Agriculture")
+  ) |>
+  select(
+    geo_uid, industry_2016,
+    total = matches("place_of_work_status_5.*total_place_of_work_status"),
+    workers = matches("place_of_work_status_5.*worked_at_home")
+  ) |>
+  mutate(
+    across(c(total, workers), as.numeric),
+    part = if_else(str_starts(industry_2016, "Total"), "all", "agriculture")
+  ) |>
+  # One row per district, the all-industry and agriculture figures side by side
+  pivot_wider(id_cols = geo_uid, names_from = part, values_from = c(total, workers)) |>
+  mutate(
+    total = total_all - total_agriculture,
+    workers = workers_all - workers_agriculture,
+    percent = workers / total * 100
+  ) |>
+  inner_join(municipalities, join_by(geo_uid)) |>
+  select(district, district_type, workers, total, percent) |>
+  arrange(desc(percent))
+
+stopifnot(nrow(work_at_home_no_agriculture) == nrow(municipalities))
+
 # ---- Worked at home by industry, 2016 and 2021 ------------------------------
 # The share of each industry's own workers who worked at home, for the Region
 # as a whole (census division 3530), for the chart that ranks industries. Both
@@ -290,6 +323,91 @@ work_at_home_industry <- bind_rows(industry_2016, industry_2021) |>
   select(industry, industry_short, year, workers, total, percent,
          percent_lower, percent_upper, cv, quality)
 
+# ---- Self-employed by industry, Wellesley and the rest of the Region, 2016 --
+# The share of each sector's employed workers who were self-employed (with or
+# without a business, and unpaid family workers), in Wellesley and in the
+# Region's other six districts together. No 2016 table crosses class of worker
+# with industry for a single district, so 01_get_data.R saved two that go as
+# far down as the Region: 98-400-X2016292 for the Region as a whole (census
+# division 3530) and 98-400-X2016290 for the Kitchener - Cambridge - Waterloo
+# CMA, which is exactly the other six districts. The CMA is the rest of the
+# Region as published, and the Region less the CMA is Wellesley.
+#
+# Subtracting is sound because both tables are the same census long-form
+# answers, weighted the same way. What it does not undo is rounding: each table
+# rounds its counts to a multiple of 5 on its own, so a Wellesley count can be
+# off by a few people, which matters only for the smallest sectors. Neither
+# table publishes confidence intervals.
+#
+# In both tables "Self-employed" is class-of-worker member 5, which counts
+# unpaid family workers in (98-400-X2016292 also splits it into members 6 and
+# 7, which are not used).
+read_class_of_worker <- function(file_stem, table) {
+  read_csv(
+    file.path(raw_dir, str_c(file_stem, ".csv")),
+    col_types = cols(.default = col_character())
+  ) |>
+    clean_names() |>
+    cwr_quality_flags(table, notes = table_notes(file_stem), log = quality_log) |>
+    select(
+      industry = starts_with("dim_industry"),
+      total = matches("member_id_3_all_classes_of_workers"),
+      self_employed = matches("member_id_5_self_employed")
+    ) |>
+    mutate(across(c(total, self_employed), as.numeric))
+}
+
+class_of_worker <- bind_rows(
+  region = read_class_of_worker("table_2016292_region", "98-400-X2016292"),
+  cma = read_class_of_worker("table_2016290_cma", "98-400-X2016290"),
+  .id = "area"
+) |>
+  # The table's own total and the 20 sectors, whose NAICS codes have two digits
+  # ("11", "31-33"); the 427 industries also include every subsector and
+  # industry group, some of them named exactly like their sector ("22
+  # Utilities" and "221 Utilities"), so the code is what tells them apart. It
+  # is dropped from the name once the sectors are picked out.
+  filter(str_starts(industry, "Total") | str_detect(industry, "^[0-9]{2}(-[0-9]{2})? ")) |>
+  mutate(industry = str_squish(str_remove(industry, "^[0-9-]+ "))) |>
+  pivot_wider(id_cols = industry, names_from = area, values_from = c(total, self_employed))
+
+# The subtraction is checked against Wellesley's employed total in the
+# place-of-work table, which counts the same people: the two should agree to
+# within the rounding of the three tables involved.
+wellesley_total <- class_of_worker |>
+  filter(str_starts(industry, "Total")) |>
+  mutate(wellesley = total_region - total_cma) |>
+  pull(wellesley)
+wellesley_total_pow <- home_2016 |> filter(geo_uid == "3530027") |> pull(total)
+if (abs(wellesley_total - wellesley_total_pow) > 15) {
+  stop("Wellesley's employed total from the Region less the CMA is ", wellesley_total,
+       " but ", wellesley_total_pow, " in 98-400-X2016321.", call. = FALSE)
+}
+
+self_employed_industry <- class_of_worker |>
+  mutate(
+    total_wellesley = total_region - total_cma,
+    self_employed_wellesley = self_employed_region - self_employed_cma
+  ) |>
+  select(industry, total_wellesley, self_employed_wellesley,
+         total_rest = total_cma, self_employed_rest = self_employed_cma) |>
+  pivot_longer(
+    -industry,
+    names_to = c(".value", "area"),
+    names_pattern = "(total|self_employed)_(wellesley|rest)"
+  ) |>
+  mutate(
+    # "Region" is what the charts call Waterloo Region (cwr_region in R/theme_cwr.R)
+    area = if_else(area == "wellesley", "Wellesley", "Rest of Region"),
+    percent = self_employed / total * 100
+  ) |>
+  # The short sector names the industry charts draw, from the table above,
+  # whose 2016 sector names are the same as these
+  left_join(work_at_home_industry |> distinct(industry, industry_short), join_by(industry)) |>
+  mutate(industry_short = coalesce(industry_short, industry)) |>
+  select(industry, industry_short, area, self_employed, total, percent) |>
+  arrange(industry, area)
+
 # ---- Census response rates -------------------------------------------------
 # How completely the long form was answered, for the README's Reliability
 # table (cwr-charts rule 9b; R/data_quality.R explains both measures). One row
@@ -338,8 +456,12 @@ if (length(high_non_response) > 0) {
 write_csv(work_at_home, file.path(data_dir, "work_at_home.csv"))
 write_csv(work_at_home_industry, file.path(data_dir, "work_at_home_industry.csv"))
 write_csv(agriculture, file.path(data_dir, "agriculture.csv"))
+write_csv(work_at_home_no_agriculture, file.path(data_dir, "work_at_home_no_agriculture.csv"))
+write_csv(self_employed_industry, file.path(data_dir, "self_employed_industry.csv"))
 write_csv(census_quality, file.path(data_dir, "census_quality.csv"))
 
 message("Wrote ", nrow(work_at_home), " work-at-home rows, ",
-        nrow(work_at_home_industry), " industry rows and ", nrow(agriculture),
-        " agriculture rows to ", data_dir)
+        nrow(work_at_home_industry), " industry rows, ", nrow(agriculture),
+        " agriculture rows, ", nrow(work_at_home_no_agriculture),
+        " rows outside agriculture and ", nrow(self_employed_industry),
+        " self-employment rows to ", data_dir)

@@ -222,6 +222,80 @@ tibble(
 ) |>
   write_csv(file.path(raw_dir, "table_2016321_notes.csv"))
 
+# ---- Class of worker by industry, 2016 census --------------------------------
+# For the chart of self-employment by industry, Wellesley against the rest of
+# the Region. No 2016 table crosses class of worker (employee or self-employed)
+# with industry for census subdivisions, so Wellesley's figures are worked out
+# in 02_clean_data.R from two tables that do go that far down:
+#   - 98-400-X2016292, for census divisions: Waterloo Region as a whole
+#     (census division 3530)
+#   - 98-400-X2016290, for census metropolitan areas: the Kitchener - Cambridge
+#     - Waterloo CMA (541), which is the Region's other six districts and
+#     nothing outside the Region
+# The Region less the CMA is Wellesley. Both are "Industry (427A), Class of
+# Worker, Labour Force Status (3), Age (13A) and Sex (3) for the Labour Force
+# Aged 15 Years and Over in Private Households", and neither publishes
+# confidence intervals.
+#
+# The zips hold 2.6 GB and 1.4 GB CSVs for every area in Canada, so they go to
+# the temporary download folder and only the one area's rows are kept, for the
+# employed (to match the work-at-home charts, whose total is everyone employed
+# in the census week), with age and sex at their totals. Every industry row is
+# kept; 02_clean_data.R picks out the 20 sectors.
+class_of_worker_tables <- tribble(
+  ~table,              ~pid,     ~geo_code, ~file_stem,
+  "98-400-X2016292",   111853,   "3530",    "table_2016292_region",
+  "98-400-X2016290",   110695,   "541",     "table_2016290_cma"
+)
+
+class_of_worker_tables |>
+  pwalk(\(table, pid, geo_code, file_stem) {
+    zip_file <- file.path(download_dir, str_c(table, ".zip"))
+    if (!file.exists(zip_file)) {
+      options(timeout = 1800)
+      download.file(
+        str_c("https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=",
+              pid, "&OFT=CSV"),
+        destfile = zip_file,
+        mode = "wb"
+      )
+    }
+
+    # The rows for the one area, read in chunks so the whole file never has to
+    # sit in memory at once
+    read_csv_chunked(
+      unz(zip_file, str_c(table, "_English_CSV_data.csv")),
+      callback = DataFrameCallback$new(\(chunk, pos) {
+        filter(
+          chunk,
+          `GEO_CODE (POR)` == geo_code,
+          `DIM: Labour Force Status (3)` == "Employed",
+          `DIM: Age (13A)` == "Total - Age",
+          `DIM: Sex (3)` == "Total - Sex"
+        )
+      }),
+      chunk_size = 1e6,
+      col_types = cols(.default = col_character())
+    ) |>
+      write_csv(file.path(raw_dir, str_c(file_stem, ".csv")))
+
+    # The table's note on data quality, which applies to the whole table, in
+    # the same shape as 98-400-X2016321's notes above. (Its footnotes are
+    # definitions. Footnote 16 is not the same in the two tables - in
+    # 98-400-X2016292 it belongs to a column that leaves out unpaid family
+    # workers - so the definition of self-employed is taken from the tables'
+    # own class of worker entry, which is worded the same in both, and quoted
+    # in the README's Key terms.)
+    meta <- read_lines(unz(zip_file, str_c(table, "_English_meta.txt")))
+    tibble(
+      `Note ID` = "quality",
+      Note = meta[str_which(meta, "^For information on data quality")],
+      `Dimension name` = NA,
+      `Member Name` = NA
+    ) |>
+      write_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")))
+  })
+
 # ---- Census response rates -------------------------------------------------
 # How completely the long form was answered in each area (cwr-charts rule 9b;
 # the helpers are in R/data_quality.R, which explains both measures).
