@@ -1,16 +1,46 @@
 geo,year,bedroom_type,value,quality
+Canada,2021,1 Bedroom,2.9,Excellent
 Canada,2021,2 Bedroom,3,Excellent
+Canada,2021,Total,3,Excellent
+Canada,2022,1 Bedroom,5.3,Excellent
 Canada,2022,2 Bedroom,5.5,Excellent
+Canada,2022,Total,5.4,Excellent
+Canada,2023,1 Bedroom,8.1,Excellent
 Canada,2023,2 Bedroom,7.9,Excellent
+Canada,2023,Total,7.9,Excellent
+Canada,2024,1 Bedroom,5.8,Excellent
 Canada,2024,2 Bedroom,5.4,Excellent
+Canada,2024,Total,5.5,Excellent
+Canada,2025,1 Bedroom,5,Excellent
 Canada,2025,2 Bedroom,5.1,Excellent
+Canada,2025,Total,5.2,Excellent
+Ontario,2021,1 Bedroom,2.8,Excellent
 Ontario,2021,2 Bedroom,2.7,Excellent
+Ontario,2021,Total,2.8,Excellent
+Ontario,2022,1 Bedroom,5.8,Excellent
 Ontario,2022,2 Bedroom,6.3,Excellent
+Ontario,2022,Total,6,Excellent
+Ontario,2023,1 Bedroom,8.3,Excellent
 Ontario,2023,2 Bedroom,8,Excellent
+Ontario,2023,Total,8.1,Excellent
+Ontario,2024,1 Bedroom,4.8,Excellent
 Ontario,2024,2 Bedroom,4,Excellent
+Ontario,2024,Total,4,Excellent
+Ontario,2025,1 Bedroom,3.5,Excellent
 Ontario,2025,2 Bedroom,3.8,Excellent
+Ontario,2025,Total,3.8,Excellent
+Region,2021,1 Bedroom,4.5,Very good
 Region,2021,2 Bedroom,3.3,Very good
+Region,2021,Total,NA,Fair (Use with Caution)
+Region,2022,1 Bedroom,7,Very good
 Region,2022,2 Bedroom,7,Very good
+Region,2022,Total,7.2,Very good
+Region,2023,1 Bedroom,9,Very good
 Region,2023,2 Bedroom,7.4,Very good
+Region,2023,Total,8.8,Very good
+Region,2024,1 Bedroom,NA,Fair (Use with Caution)
 Region,2024,2 Bedroom,4.3,Very good
+Region,2024,Total,3.5,Good
+Region,2025,1 Bedroom,3.1,Very good
 Region,2025,2 Bedroom,3.4,Very good
+Region,2025,Total,3.3,Very good

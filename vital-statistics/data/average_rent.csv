@@ -1,16 +1,76 @@
 geo,year,bedroom_type,value,quality
+Canada,2021,1 Bedroom,1071,Excellent
 Canada,2021,2 Bedroom,1169,Excellent
+Canada,2021,3 Bedroom +,1310,Excellent
+Canada,2021,Studio,887,Excellent
+Canada,2021,Total,1134,Excellent
+Canada,2022,1 Bedroom,1147,Excellent
 Canada,2022,2 Bedroom,1259,Excellent
+Canada,2022,3 Bedroom +,1389,Excellent
+Canada,2022,Studio,949,Excellent
+Canada,2022,Total,1214,Excellent
+Canada,2023,1 Bedroom,1246,Excellent
 Canada,2023,2 Bedroom,1360,Excellent
+Canada,2023,3 Bedroom +,1479,Excellent
+Canada,2023,Studio,1019,Excellent
+Canada,2023,Total,1314,Excellent
+Canada,2024,1 Bedroom,1323,Excellent
 Canada,2024,2 Bedroom,1447,Excellent
+Canada,2024,3 Bedroom +,1608,Excellent
+Canada,2024,Studio,1089,Excellent
+Canada,2024,Total,1402,Excellent
+Canada,2025,1 Bedroom,1382,Excellent
 Canada,2025,2 Bedroom,1550,Excellent
+Canada,2025,3 Bedroom +,1729,Excellent
+Canada,2025,Studio,1159,Excellent
+Canada,2025,Total,1488,Excellent
+Ontario,2021,1 Bedroom,1273,Excellent
 Ontario,2021,2 Bedroom,1461,Excellent
+Ontario,2021,3 Bedroom +,1719,Excellent
+Ontario,2021,Studio,1106,Excellent
+Ontario,2021,Total,1395,Excellent
+Ontario,2022,1 Bedroom,1350,Excellent
 Ontario,2022,2 Bedroom,1550,Excellent
+Ontario,2022,3 Bedroom +,1776,Excellent
+Ontario,2022,Studio,1179,Excellent
+Ontario,2022,Total,1474,Excellent
+Ontario,2023,1 Bedroom,1480,Excellent
 Ontario,2023,2 Bedroom,1689,Excellent
+Ontario,2023,3 Bedroom +,1921,Excellent
+Ontario,2023,Studio,1270,Excellent
+Ontario,2023,Total,1609,Excellent
+Ontario,2024,1 Bedroom,1540,Excellent
 Ontario,2024,2 Bedroom,1749,Excellent
+Ontario,2024,3 Bedroom +,1966,Excellent
+Ontario,2024,Studio,1307,Excellent
+Ontario,2024,Total,1666,Excellent
+Ontario,2025,1 Bedroom,1589,Excellent
 Ontario,2025,2 Bedroom,1821,Excellent
+Ontario,2025,3 Bedroom +,2075,Excellent
+Ontario,2025,Studio,1357,Excellent
+Ontario,2025,Total,1730,Excellent
+Region,2021,1 Bedroom,1131,Excellent
 Region,2021,2 Bedroom,1349,Excellent
+Region,2021,3 Bedroom +,1742,Good
+Region,2021,Studio,948,Excellent
+Region,2021,Total,1305,Excellent
+Region,2022,1 Bedroom,1240,Excellent
 Region,2022,2 Bedroom,1454,Excellent
+Region,2022,3 Bedroom +,1590,Very good
+Region,2022,Studio,1063,Very good
+Region,2022,Total,1390,Excellent
+Region,2023,1 Bedroom,1342,Excellent
 Region,2023,2 Bedroom,1637,Excellent
+Region,2023,3 Bedroom +,1935,Very good
+Region,2023,Studio,1157,Very good
+Region,2023,Total,1561,Excellent
+Region,2024,1 Bedroom,1499,Excellent
 Region,2024,2 Bedroom,1747,Excellent
+Region,2024,3 Bedroom +,1789,Very good
+Region,2024,Studio,1250,Very good
+Region,2024,Total,1658,Excellent
+Region,2025,1 Bedroom,1546,Excellent
 Region,2025,2 Bedroom,1816,Excellent
+Region,2025,3 Bedroom +,1861,Very good
+Region,2025,Studio,1255,Very good
+Region,2025,Total,1716,Excellent

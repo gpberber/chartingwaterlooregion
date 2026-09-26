@@ -305,7 +305,7 @@ vs_bar <- function(plot_data,
         breaks = seq(ceiling_date(x_min, "year"), x_max, by = "1 year"),
         date_labels = "%Y",
         minor_breaks = keep(sort(unique(pull(plot_data, x))), \(d) month(d) %in% c(1, 4, 7, 10)),
-        expand = expansion(mult = c(0.02, 0.06))
+        expand = expansion(mult = c(0.02, 0.07))
       )
   } else {
     p <- p +
@@ -1393,94 +1393,355 @@ cwr_interactive(
 
 ## Rental market
 
+### Vacancy rate
+
+::: panel-tabset
+### All units
+
 ```{r}
 #| label: vacancy-rate
 
-plot_data <- vacancy_rate |>
-  rename(x = year, y = value)
-
-# The survey is taken each October
+# Shared by the twelve rental charts: three measures from CMHC's October
+# Rental Market Survey - the vacancy rate, the average rent and the
+# same-sample rent change - each for all units and then by unit size, one
+# size a tab. A size is charted only where the Region has at least four usable
+# figures of the five (Greg, 2026-09-26), which leaves out the studio vacancy
+# rate and the studio and 3+ bedroom rent changes; rms_size() prints a warning
+# while the page renders if a refresh leaves a charted size below that.
 october <- \(x) str_c("October ", x)
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA),
+# How each unit size is named in alt text; the data use CMHC's own names
+unit_words <- c(
+  "Total" = "all units",
+  "Studio" = "studios",
+  "1 Bedroom" = "one-bedroom units",
+  "2 Bedroom" = "two-bedroom units",
+  "3 Bedroom +" = "units with three or more bedrooms"
+)
+
+rms_size <- function(data, size) {
+  plot_data <- data |>
+    filter(bedroom_type == size) |>
+    rename(x = year, y = value)
+  usable <- plot_data |>
+    filter(geo == cwr_region, !is.na(y)) |>
+    nrow()
+  if (usable < 4) {
+    cat("WARNING - rental charts: the Region has only ", usable, " usable figures for ", size,
+        " (", deparse(substitute(data)), "); the page charts a unit size only with four or more.\n",
+        sep = "", file = stderr())
+  }
+  plot_data
+}
+
+# Names each October the Region's line skips, and why: CMHC rated the figure
+# "Fair (Use with Caution)", which the site never uses (it is blanked in
+# 02_clean_data.R), or did not publish it. Returns nothing when there is no
+# gap, which cwr_caption() treats as no note.
+rms_gap_note <- function(plot_data) {
+  gaps <- plot_data |>
+    filter(geo == cwr_region, is.na(y)) |>
+    mutate(why = if_else(is.na(quality), "not published", "rated for use with caution"))
+  if (nrow(gaps) > 0) {
+    reasons <- gaps |>
+      summarise(years = str_flatten_comma(october(x), " and "), .by = why) |>
+      mutate(text = str_c(years, " (", why, ")")) |>
+      pull(text)
+    str_glue("{cwr_region} not shown for {str_flatten(reasons, '; ')}: CMHC's sample of these units is small")
+  }
+}
+
+rms_caption <- function(plot_data) {
+  cwr_caption("CMHC Rental Market Survey", notes = c(rms_gap_note(plot_data), rms_note))
+}
+
+rms_alt <- function(plot_data, size, measure_words, fmt) {
+  str_glue(
+    "Line chart of {measure_words} {unit_words[[size]]} in purpose-built rental apartments and ",
+    "rows each October, {vs_span(plot_data, as.character)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, fmt, october)}"
+  )
+}
+
+# The axis numbers are rounded finely (0.1, or $10 on the rent charts), since
+# the gridlines can fall on halves or quarters; cwr_right_axis() then drops
+# the zeros the numbers all share, so whole steps still read "1, 2, 3".
+# The rent changes start their axis at zero unless one goes below it
+from_zero <- \(plot_data) c(min(0, pull(plot_data, y), na.rm = TRUE), NA)
+dollars_1 <- label_dollar(accuracy = 1)
+
+plot_data <- rms_size(vacancy_rate, "Total")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
              tip = percent_1, when = october) +
   labs(
-    title = "Rental vacancy rate",                                    # working title, descriptive only
+    title = "Rental vacancy rate, all units",   # working title, descriptive only
     subtitle = "Per cent of rental units · Annual, each October",
-    caption = cwr_caption(
-      "CMHC Rental Market Survey",
-      notes = rms_note
-    )
+    caption = rms_caption(plot_data)
   )
 
 cwr_interactive(
   p, "fig-vacancy-rate",
-  alt = str_glue(
-    "Line chart of the vacancy rate in purpose-built rental apartments and rows each October, ",
-    "{vs_span(plot_data, as.character)}, for {cma_words}, Ontario and Canada. ",
-    "{vs_latest(plot_data, percent_1, october)}"
-  ),
+  alt = rms_alt(plot_data, "Total", "the vacancy rate in", percent_1),
   height = 5, phone_height = 4.5
 )
 ```
+
+### 1 bedroom
+
+```{r}
+#| label: vacancy-rate-1-bedroom
+
+plot_data <- rms_size(vacancy_rate, "1 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "Rental vacancy rate, one-bedroom units",   # working title, descriptive only
+    subtitle = "Per cent of rental units · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 2 bedrooms
+
+```{r}
+#| label: vacancy-rate-2-bedroom
+
+plot_data <- rms_size(vacancy_rate, "2 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "Rental vacancy rate, two-bedroom units",   # working title, descriptive only
+    subtitle = "Per cent of rental units · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 3+ bedrooms
+
+```{r}
+#| label: vacancy-rate-3-bedroom
+
+plot_data <- rms_size(vacancy_rate, "3 Bedroom +")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "Rental vacancy rate, units with three or more bedrooms",   # working title, descriptive only
+    subtitle = "Per cent of rental units · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-3-bedroom",
+  alt = rms_alt(plot_data, "3 Bedroom +", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Average rent
+
+::: panel-tabset
+### All units
 
 ```{r}
 #| label: average-rent
 
-plot_data <- average_rent |>
-  rename(x = year, y = value)
-
-fmt <- label_dollar(accuracy = 1)
+plot_data <- rms_size(average_rent, "Total")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = fmt, when = october) +
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
   labs(
-    title = "Average rent of a two-bedroom unit",                     # working title, descriptive only
+    title = "Average monthly rent, all units",   # working title, descriptive only
     subtitle = "Thousands of dollars per month · Annual, each October",
-    caption = cwr_caption(
-      "CMHC Rental Market Survey",
-      notes = rms_note
-    )
+    caption = rms_caption(plot_data)
   )
 
 cwr_interactive(
   p, "fig-average-rent",
-  alt = str_glue(
-    "Line chart of the average monthly rent of a two-bedroom unit in purpose-built rental ",
-    "apartments and rows each October, {vs_span(plot_data, as.character)}, for {cma_words}, ",
-    "Ontario and Canada. {vs_latest(plot_data, fmt, october)}"
-  ),
+  alt = rms_alt(plot_data, "Total", "the average monthly rent of", dollars_1),
   height = 5, phone_height = 4.5
 )
 ```
+
+### Studio
+
+```{r}
+#| label: average-rent-studio
+
+plot_data <- rms_size(average_rent, "Studio")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "Average monthly rent, studios",   # working title, descriptive only
+    subtitle = "Thousands of dollars per month · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-studio",
+  alt = rms_alt(plot_data, "Studio", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 1 bedroom
+
+```{r}
+#| label: average-rent-1-bedroom
+
+plot_data <- rms_size(average_rent, "1 Bedroom")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "Average monthly rent, one-bedroom units",   # working title, descriptive only
+    subtitle = "Thousands of dollars per month · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 2 bedrooms
+
+```{r}
+#| label: average-rent-2-bedroom
+
+plot_data <- rms_size(average_rent, "2 Bedroom")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "Average monthly rent, two-bedroom units",   # working title, descriptive only
+    subtitle = "Thousands of dollars per month · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 3+ bedrooms
+
+```{r}
+#| label: average-rent-3-bedroom
+
+plot_data <- rms_size(average_rent, "3 Bedroom +")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "Average monthly rent, units with three or more bedrooms",   # working title, descriptive only
+    subtitle = "Thousands of dollars per month · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-3-bedroom",
+  alt = rms_alt(plot_data, "3 Bedroom +", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Same-sample rent change
+
+::: panel-tabset
+### All units
 
 ```{r}
 #| label: rent-change
 
-plot_data <- rent_change |>
-  rename(x = year, y = value)
+plot_data <- rms_size(rent_change, "Total")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
              tip = percent_change, when = october) +
   labs(
-    title = "Same-sample change in average two-bedroom rent",         # working title, descriptive only
+    title = "Same-sample change in average rent, all units",   # working title, descriptive only
     subtitle = "Per cent change from the October before · Annual, each October",
-    caption = cwr_caption(
-      "CMHC Rental Market Survey",
-      notes = rms_note
-    )
+    caption = rms_caption(plot_data)
   )
 
 cwr_interactive(
   p, "fig-rent-change",
-  alt = str_glue(
-    "Line chart of the percentage change in the average rent of two-bedroom units from one October ",
-    "to the next, in rental buildings surveyed in both years, {vs_span(plot_data, as.character)}, for ",
-    "{cma_words}, Ontario and Canada. {vs_latest(plot_data, percent_change, october)}"
-  ),
+  alt = rms_alt(plot_data, "Total", "the same-sample percentage change in the average rent from the October before, for", percent_change),
   height = 5, phone_height = 4.5
 )
 ```
+
+### 1 bedroom
+
+```{r}
+#| label: rent-change-1-bedroom
+
+plot_data <- rms_size(rent_change, "1 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+             tip = percent_change, when = october) +
+  labs(
+    title = "Same-sample change in average rent, one-bedroom units",   # working title, descriptive only
+    subtitle = "Per cent change from the October before · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-rent-change-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the same-sample percentage change in the average rent from the October before, for", percent_change),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 2 bedrooms
+
+```{r}
+#| label: rent-change-2-bedroom
+
+plot_data <- rms_size(rent_change, "2 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+             tip = percent_change, when = october) +
+  labs(
+    title = "Same-sample change in average rent, two-bedroom units",   # working title, descriptive only
+    subtitle = "Per cent change from the October before · Annual, each October",
+    caption = rms_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-rent-change-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the same-sample percentage change in the average rent from the October before, for", percent_change),
+  height = 5, phone_height = 4.5
+)
+```
+:::
 
 ## Population
 

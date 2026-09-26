@@ -1479,6 +1479,17 @@ ggplot_add.cwr_right_axis <- function(object, plot, ...) {
     map(\(panel) panel$y$get_labels()) |>
     unlist() |>
     purrr::discard(is.na)   # purrr::, since scales has a discard() too
+  # Two gridlines with the same number means the labels are rounded more
+  # coarsely than the gridlines are spaced ("2, 2, 2" for 1.5, 2.0 and 2.5):
+  # the chunk needs a finer `accuracy`, whose shared zeros are dropped anyway
+  if (anyDuplicated(numbers) > 0) {
+    cat(
+      "WARNING - cwr_right_axis(): two gridlines share a number (", str_flatten_comma(numbers), "). ",
+      "Give the axis labels a finer accuracy.\n",
+      sep = "", file = stderr()
+    )
+  }
+
   number_width <- max(systemfonts::string_width(
     numbers, family = cwr_font(), size = base_size * 0.8, res = 72
   ))

@@ -350,26 +350,34 @@ write_csv(starts_intended_market, file.path(data_dir, "starts_intended_market.cs
 
 # ---- 10 to 12. Rental Market Survey -------------------------------------------------------
 # One figure a year, from the October survey, for purpose-built rental
-# apartments and rows. The quality check runs on the rows kept - the latest
-# five surveys, for the one bedroom type each chart uses.
+# apartments and rows, for all units ("Total") and by unit size. The quality
+# check runs on the rows kept - the latest five surveys, for the unit sizes the
+# page charts. A size is charted only where the Region has at least four usable
+# figures of the five (Greg, 2026-09-26): its smaller samples leave studio
+# vacancy rates, and studio and 3+ bedroom rent changes, mostly rated "Fair"
+# or unpublished, so those are not kept.
 read_rms <- function(file, bedrooms, table) {
   read_cmhc(file) |>
-    filter(bedroom_type == bedrooms) |>
+    filter(bedroom_type %in% bedrooms) |>
     mutate(year = year(date)) |>
+    group_by(bedroom_type) |>   # five surveys for each unit size
     latest(5, year) |>
     cwr_quality_flags(table, flag_cols = "quality", legend = cmhc_legend, log = quality_log) |>
     select(geo, year, bedroom_type, value, quality)
 }
 
-vacancy_rate <- read_rms("cmhc_vacancy_rate.csv", "Total", "CMHC RMS vacancy rate")
+vacancy_rate <- read_rms("cmhc_vacancy_rate.csv", c("Total", "1 Bedroom", "2 Bedroom", "3 Bedroom +"),
+                         "CMHC RMS vacancy rate")
 write_csv(vacancy_rate, file.path(data_dir, "vacancy_rate.csv"))
 
-average_rent <- read_rms("cmhc_average_rent.csv", "2 Bedroom", "CMHC RMS average rent")
+average_rent <- read_rms("cmhc_average_rent.csv", c("Total", "Studio", "1 Bedroom", "2 Bedroom", "3 Bedroom +"),
+                         "CMHC RMS average rent")
 write_csv(average_rent, file.path(data_dir, "average_rent.csv"))
 
 # The same-sample change: the rise in average rent in units surveyed in both
 # years, so new buildings entering the survey at higher rents do not inflate it
-rent_change <- read_rms("cmhc_average_rent_change.csv", "2 Bedroom", "CMHC RMS rent change")
+rent_change <- read_rms("cmhc_average_rent_change.csv", c("Total", "1 Bedroom", "2 Bedroom"),
+                        "CMHC RMS rent change")
 write_csv(rent_change, file.path(data_dir, "rent_change.csv"))
 
 # ---- 13. Population growth -----------------------------------------------------------------
