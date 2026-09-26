@@ -28,7 +28,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_ci_widest(estimate, lower, upper)` | the widest 95% interval on a chart, in points, for the `{widest}` placeholder in the stock interval note (rules 1d, 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_label(...)` | the house label for text inside the plot area: `geom_text()` with a halo behind the letters, so it stays readable over a gridline, a line or a point (rule 3e) |
-| `cwr_right_axis()` | the right-axis numbers above their gridlines, right-aligned with the gridlines' ends; zero labelled, or a zig-zag and a short baseline when the axis does not reach it; a render-time warning when the numbers are too wide to clear the data (rules 6, 6a) |
+| `cwr_right_axis()` | the right-axis numbers above their gridlines, right-aligned with the gridlines' ends, without zeros they all share (`cwr_trim_zeros()`, rule 9); zero labelled, or a zig-zag and a short baseline when the axis does not reach it; a render-time warning when the numbers are too wide to clear the data (rules 6, 6a) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 | `cwr_gap()` | multiplies a sideways nudge written in data units; 1 on the desktop and `phone_gap` while `cwr_figure()` draws the phone version (rule 11) |
@@ -366,7 +366,14 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    the post's `02_clean_data.R`, not in the chart: a name wrapped to four lines on a phone
    deepens every row of that chart.
 9. **Numbers**: `label_number(big.mark = ",")` on axes, `accuracy` chosen so labels
-   have no more digits than the story needs. Percentages via `label_percent()`.
+   have no more digits than the story needs. Percentages via `label_percent()`. **No axis
+   shows zeros every number shares** (Greg, 2026-09-25): "0.0, 1.0, 2.0" is "0, 1, 2". An
+   `accuracy` finer than the breaks need makes them, often only after the data (and so the
+   breaks) change, so `cwr_right_axis()` wraps the y scale's labels in `cwr_trim_zeros()`,
+   which drops the trailing zeros all the numbers have in common. "0.50, 1.00" becomes
+   "0.5, 1.0", and "1.0, 1.5, 2.0" is left alone, since the .5 needs its decimal. An axis the
+   helper does not handle (a horizontal chart's x axis, say) passes its labeller through
+   `cwr_trim_zeros()` by hand: `labels = \(x) cwr_trim_zeros(label_number(accuracy = 0.1)(x))`.
 9a. **Long-form census data is charted as shares or rates by default; a count only rounded and with
    its interval.** Before drafting any chart from a census table, check which questionnaire the
    variable comes from. The 2021 long form went to one private household in four. Each responding

@@ -43,7 +43,8 @@ Then commit with `/save`. Each chart shows its own latest five years, so the cha
 | Natural increase | |
 | Immigrants | |
 | Net non-permanent residents | "A non-permanent resident refers to a person from another country with a usual place of residence in Canada and who has a work or study permit or who has claimed refugee status (asylum claimant, protected person or member of related groups). Family members living with work or study permit holders are also included unless these family members are already Canadian citizens, landed immigrants (permanent residents), or non-permanent residents themselves." (Statistics Canada, table 17-10-0153-01, footnote 13) |
-| Net migration within Canada | |
+| Net interprovincial migration | |
+| Net intraprovincial migration | |
 | Crime Severity Index | "The Crime Severity Index (CSI) measures changes in the level of severity of crime in Canada from year to year. In the index, all crimes are assigned a weight based on their seriousness. The level of seriousness is based on actual sentences handed down by the courts in all provinces and territories. More serious crimes are assigned higher weights, less serious offences lower weights." "The crime severity index includes all Criminal Code violations including traffic, as well as drug violations and all Federal Statutes." (Statistics Canada, table 35-10-0026-01, footnotes 20 and 16) |
 | Violent crime | "The violent crime severity index includes all Incident-based Uniform Crime Reporting Survey (UCR2) violent violations." (Statistics Canada, table 35-10-0026-01, footnote 18) |
 | Non-violent crime | "The non-violent crime severity index includes all non-violent Criminal Code violations including traffic, as well as drug violations and all Federal Statutes." (Statistics Canada, table 35-10-0026-01, footnote 19) |
@@ -55,8 +56,8 @@ Then commit with `/save`. Each chart shows its own latest five years, so the cha
      statistical terms, never census geography terms, never a term used only in a note or the
      prose. Quote the source's own definition and name the source in brackets. A term with no
      official definition found is Greg's to define: its Definition cell is left empty (Closures,
-     Natural increase, Immigrants and Net migration within Canada, which is interprovincial plus
-     intraprovincial migration as worked out in 02_clean_data.R; Police-reported incidents, which
+     Natural increase, Immigrants, and Net interprovincial and Net intraprovincial migration, which
+     table 17-10-0153-01 names but does not define; Police-reported incidents, which
      table 35-10-0177-01's footnotes use but do not define). The page prints every row that
      has a definition, and the render warns about any that does not. -->
 ```

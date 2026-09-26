@@ -44,13 +44,18 @@ Region,2021,Net non-permanent residents,12788,614268,20.818274759551205
 Region,2022,Net non-permanent residents,28283,639293,44.24106004601959
 Region,2023,Net non-permanent residents,27451,675438,40.641776151178945
 Region,2024,Net non-permanent residents,-7353,709974,-10.356717288238725
-Ontario,2020,Net migration within Canada,-18405,14761811,-1.2467982417604453
-Ontario,2021,Net migration within Canada,-31018,14842488,-2.0898113577723625
-Ontario,2022,Net migration within Canada,-29730,15155836,-1.9616205928858033
-Ontario,2023,Net migration within Canada,-42689,15632481,-2.730788542138641
-Ontario,2024,Net migration within Canada,-17779,16144797,-1.1012216505416574
-Region,2020,Net migration within Canada,1613,606912,2.657716439945165
-Region,2021,Net migration within Canada,693,614268,1.1281720682177812
-Region,2022,Net migration within Canada,-1877,639293,-2.9360559242788518
-Region,2023,Net migration within Canada,-3046,675438,-4.509666320224802
-Region,2024,Net migration within Canada,-1827,709974,-2.5733336713738812
+Ontario,2020,Net interprovincial migration,-18405,14761811,-1.2467982417604453
+Ontario,2021,Net interprovincial migration,-31018,14842488,-2.0898113577723625
+Ontario,2022,Net interprovincial migration,-29730,15155836,-1.9616205928858033
+Ontario,2023,Net interprovincial migration,-42689,15632481,-2.730788542138641
+Ontario,2024,Net interprovincial migration,-17779,16144797,-1.1012216505416574
+Region,2020,Net interprovincial migration,-751,606912,-1.2374116840662237
+Region,2021,Net interprovincial migration,-1944,614268,-3.1647424251303993
+Region,2022,Net interprovincial migration,-2327,639293,-3.639958516673888
+Region,2023,Net interprovincial migration,-3000,675438,-4.441562363977153
+Region,2024,Net interprovincial migration,-1659,709974,-2.3367052877992713
+Region,2020,Net intraprovincial migration,2364,606912,3.895128124011389
+Region,2021,Net intraprovincial migration,2637,614268,4.29291449334818
+Region,2022,Net intraprovincial migration,450,639293,0.7039025923950364
+Region,2023,Net intraprovincial migration,-46,675438,-0.06810395624764967
+Region,2024,Net intraprovincial migration,-168,709974,-0.23662838357460977

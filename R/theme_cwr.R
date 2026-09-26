@@ -1263,6 +1263,9 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 #    device needed) in the axis font, base_size * 0.8 points of cwr_font().
 #    The phone version (cwr_phone_theme()) still moves them outside the panel.
 #
+#    Numbers that all end in the same zeros ("0.0, 1.0, 2.0") lose them
+#    (rule 9, cwr_trim_zeros()).
+#
 # 2. Zero and the baseline (rule 6a). What the chart's own data decide:
 #    - The values start at zero (none below it, and the scale reaches it, as
 #      `limits = c(0, NA)` or a bar chart does): the scale is made to start
@@ -1320,6 +1323,27 @@ cwr_data_bottom <- function(built) {
     min(na.rm = TRUE)
 }
 
+# Drops the zeros every axis number shares at the end of its decimals
+# (cwr-charts rule 9, Greg 2026-09-25): "0.0, 1.0, 2.0" becomes "0, 1, 2"
+# and "0.50, 1.00, 1.50" becomes "0.5, 1.0, 1.5", but "1.0, 1.5, 2.0" is left
+# alone, since the .5 needs its decimal and the others keep it to match. An
+# `accuracy` that is finer than the breaks need is what makes such zeros, and
+# it is easy to miss when the breaks change with the data. Prefixes and
+# suffixes ("$1.0", "5.0%") are kept; a set of labels where any has no
+# decimal point, or that is not text, is returned as it is.
+cwr_trim_zeros <- function(labels) {
+  if (!is.character(labels)) return(labels)
+  shown <- labels[!is.na(labels) & labels != ""]
+  fractions <- str_match(shown, "\\.(\\d+)")[, 2]
+  if (length(shown) == 0 || anyNA(fractions)) return(labels)
+  zeros <- min(str_length(fractions) - str_length(str_remove(fractions, "0+$")))
+  if (zeros == 0) return(labels)
+  str_replace(labels, "\\.\\d+", \(point) {
+    digits <- str_sub(point, 2, -1 - zeros)
+    if_else(digits == "", "", str_c(".", digits))
+  })
+}
+
 # ggplot2 calls this when `+ cwr_right_axis()` is added to a plot, handing it
 # the plot built so far; it returns that plot with the axis changes added.
 # (This is how ggplot2 lets a package add something that depends on the plot
@@ -1337,6 +1361,10 @@ ggplot_add.cwr_right_axis <- function(object, plot, ...) {
 
   if (continuous) {
     y_scale <- y_scale$clone()
+
+    # Numbers without zeros they all share at the end (cwr_trim_zeros() above)
+    labeller <- y_scale$labels
+    if (is.function(labeller)) y_scale$labels <- \(x) cwr_trim_zeros(labeller(x))
     y_range <- panel$y$continuous_range
     breaks <- panel$y$breaks
     breaks <- breaks[!is.na(breaks)]

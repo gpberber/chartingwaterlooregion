@@ -391,26 +391,30 @@ write_csv(population_growth, file.path(data_dir, "population_growth.csv"))
 # ---- 14. Components of population change ---------------------------------------------------
 # Each component per 1,000 people, the population being the July 1 estimate
 # at the start of the twelve months. `year` is the year the twelve months
-# start: 2024 is July 1, 2024 to June 30, 2025. Migration within Canada is
-# interprovincial plus intraprovincial (moves between Ontario's census
-# divisions); for Canada as a whole it is zero by definition, so Canada has
-# no line in that panel. Emigration is left out: it is small and the same
-# story everywhere.
+# start: 2024 is July 1, 2024 to June 30, 2025. Migration is split as
+# Statistics Canada publishes it: interprovincial (moves between provinces)
+# and intraprovincial (moves between census divisions of one province). Both
+# net to zero by definition where every move starts and ends inside the
+# area - interprovincial for Canada, intraprovincial for Ontario and Canada -
+# so those are left out (NA) rather than drawn as a line at zero. Emigration
+# is left out: it is small and the same story everywhere.
 population_components <- read_table("table_17100153") |>
   mutate(geo = recode_geo(geo), year = year(ref_date), component = components_of_population_growth, value, .keep = "none") |>
   pivot_wider(names_from = component, values_from = value) |>
   mutate(
     `Natural increase` = Births - Deaths,
-    `Net migration within Canada` = if_else(geo == "Canada", NA, `Net interprovincial migration` + `Net intraprovincial migration`)
+    `Net interprovincial migration` = if_else(geo == "Canada", NA, `Net interprovincial migration`),
+    `Net intraprovincial migration` = if_else(geo == "Region", `Net intraprovincial migration`, NA)
   ) |>
-  select(geo, year, `Natural increase`, Immigrants, `Net non-permanent residents`, `Net migration within Canada`) |>
+  select(geo, year, `Natural increase`, Immigrants, `Net non-permanent residents`,
+         `Net interprovincial migration`, `Net intraprovincial migration`) |>
   pivot_longer(-c(geo, year), names_to = "component", values_to = "people") |>
   filter(!is.na(people)) |>
   left_join(population, join_by(geo, year)) |>
   mutate(
     per_1000 = people / population * 1000,
-    component = factor(component, levels = c("Natural increase", "Immigrants",
-                                             "Net non-permanent residents", "Net migration within Canada"))
+    component = factor(component, levels = c("Natural increase", "Immigrants", "Net non-permanent residents",
+                                             "Net interprovincial migration", "Net intraprovincial migration"))
   ) |>
   arrange(component, geo, year)
 write_csv(population_components, file.path(data_dir, "population_components.csv"))
