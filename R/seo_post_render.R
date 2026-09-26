@@ -238,6 +238,27 @@ pages <- list.files(site_dir, pattern = "\\.html$", recursive = TRUE) |>
 
 counts <- c(pages = 0, share = 0, dataset = 0)
 
+# Every page that should be in the sitemap, as url = when it was last built.
+#
+# The date comes from Quarto's own sitemap wherever it has one, because that is
+# when the page was last rendered. Reading it back rather than taking the
+# file's timestamp matters: this script rewrites every page it tags, so a
+# timestamp would move each time the script ran and tell a search engine a page
+# had changed when nothing had. A page Quarto has no entry for - the first time
+# one is published - falls back to when it was built.
+sitemap <- file.path(site_dir, "sitemap.xml")
+quarto_dates <- c()
+if (file.exists(sitemap)) {
+  xml <- read_file(sitemap)
+  locs <- str_match_all(xml, "<loc>([^<]*)</loc>\\s*<lastmod>([^<]*)</lastmod>")[[1]]
+  if (nrow(locs) > 0) {
+    urls <- str_remove(locs[, 2], "index\\.html$")
+    quarto_dates <- tapply(locs[, 3], urls, max)   # newest entry wins
+  }
+}
+
+listed <- c()
+
 walk(pages, function(path) {
   file <- file.path(site_dir, path)
   html <- read_file(file)
@@ -254,10 +275,20 @@ walk(pages, function(path) {
   is_post <- str_detect(path, "^posts/[^/]+/index\\.html$")
   added <- character()
 
+  # A draft rendered with the draft profile carries Quarto's draft banner. It
+  # is kept out of the sitemap below, so a preview never writes an unfinished
+  # page into the list handed to search engines.
+  is_draft <- str_detect(html, fixed("quarto-draft-alert"))
+
   if (path == "404.html") {
     added <- '<meta name="robots" content="noindex">'
   } else {
     added <- str_c('<link rel="canonical" href="', url, '">')
+    if (!is_draft) {
+      known <- unname(quarto_dates[url])
+      built <- format(as.POSIXct(file.mtime(file), tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ")
+      listed <<- c(listed, set_names(if (is.na(known)) built else known, url))
+    }
   }
 
   # 4. The sharing picture, before the structured data so both use it
@@ -336,15 +367,36 @@ walk(pages, function(path) {
   counts[["pages"]] <<- counts[["pages"]] + 1
 })
 
-# 1, continued. The sitemap lists the short addresses the canonical links use.
-sitemap <- file.path(site_dir, "sitemap.xml")
-if (file.exists(sitemap)) {
-  read_file(sitemap) |>
-    str_replace_all("/index\\.html</loc>", "/</loc>") |>
+# 1, continued. The sitemap is written out fresh from the pages tagged above,
+# so it holds exactly the addresses the canonical links name - each once, with
+# no draft and no 404 page.
+#
+# It used to be a search and replace over Quarto's own file, turning
+# ".../index.html" into ".../". That left Quarto unable to recognise its own
+# entries afterwards, and a local sitemap grew to 273 entries for 10 pages, the
+# home page 149 times over, with a draft among them. A full render rewrites the
+# file from scratch, so the published sitemap was never wrong - but it only
+# takes one publish that skips the full render for it to be. Writing the list
+# here rather than editing it takes that possibility away: whatever Quarto
+# leaves behind, what ships is this.
+if (length(listed) > 0) {
+  entries <- listed[!duplicated(names(listed))]
+  entries <- entries[order(names(entries))]
+  str_c(
+    '<?xml version="1.0" encoding="UTF-8"?>\n',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
+    str_c(
+      "  <url>\n    <loc>", names(entries), "</loc>\n    <lastmod>", entries,
+      "</lastmod>\n  </url>",
+      collapse = "\n"
+    ),
+    "\n</urlset>\n"
+  ) |>
     write_file(sitemap)
 }
 
 message(str_glue(
   "seo_post_render.R: {counts[['pages']]} pages tagged, ",
-  "{counts[['share']]} sharing pictures, {counts[['dataset']]} dataset blocks."
+  "{counts[['share']]} sharing pictures, {counts[['dataset']]} dataset blocks, ",
+  "{length(unique(names(listed)))} in the sitemap."
 ))

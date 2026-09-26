@@ -1672,15 +1672,49 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   font_set <- gdtools::font_set(sans = cwr_font())
   font_set$dependencies <- list()
 
-  make_widget <- function(p, w, h) {
-    ggiraph::girafe(
+  # Every id in the widget is named after the chart, not drawn at random.
+  #
+  # ggiraph gives each SVG a random id and names its CSS classes after it, and
+  # htmlwidgets gives the <div> around it another one. Left alone, both change
+  # every time the page runs - so re-rendering a page whose charts are
+  # identical rewrites every one of them. On the Vital Statistics page that is
+  # a 7 MB `_freeze/` file replaced in full for no change at all, and a diff
+  # nobody can read. Seeding the random numbers from the chart's own id makes
+  # ggiraph's ids repeat, and `elementId` sets the outer one outright, so an
+  # unchanged chart comes out byte for byte the same and a real change shows up
+  # as itself. The two versions seed differently so their ids never collide.
+  #
+  # The seed is restored afterwards: a post may use random numbers of its own,
+  # and a chart must not quietly move its sequence along.
+  seed_from_id <- function(text) {
+    codes <- utf8ToInt(text)
+    as.integer(sum(codes * seq_along(codes)) %% 100000L)
+  }
+
+  make_widget <- function(p, w, h, version) {
+    had_seed <- exists(".Random.seed", envir = globalenv(), inherits = FALSE)
+    if (had_seed) old_seed <- get(".Random.seed", envir = globalenv())
+    on.exit({
+      if (had_seed) {
+        assign(".Random.seed", old_seed, envir = globalenv())
+      } else {
+        rm(".Random.seed", envir = globalenv())
+      }
+    }, add = TRUE)
+
+    set.seed(seed_from_id(str_c(id, "-", version)))
+    widget <- ggiraph::girafe(
       ggobj = p, width_svg = w, height_svg = h,
       bg = "white", options = widget_options,
       font_set = font_set
     )
+    # girafe() passes its ... to the SVG device, so the element id is set on
+    # the widget afterwards rather than through the call above.
+    widget$elementId <- str_c("cwr-", id, "-", version)
+    widget
   }
 
-  desktop_widget <- make_widget(plot, width, height)
+  desktop_widget <- make_widget(plot, width, height, "desktop")
 
   # geom_text/geom_label/cwr_label sizes are shrunk for the phone exactly as in
   # cwr_figure(): changed in place, drawn, then put back.
@@ -1692,7 +1726,7 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   })
   original_sizes <- map(text_layers, \(layer) layer$aes_params$size)
   walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
-  phone_widget <- make_widget(phone_plot, phone_width, phone_height)
+  phone_widget <- make_widget(phone_plot, phone_width, phone_height, "phone")
   walk2(text_layers, original_sizes, \(layer, size) layer$aes_params$size <- size)
 
   drafting <- !isTRUE(getOption("knitr.in.progress")) ||
