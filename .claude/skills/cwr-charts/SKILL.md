@@ -11,7 +11,11 @@ are not negotiable, and how to iterate on a chart until labels sit right.
 
 ## Setup that every post already has
 
-The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which provides:
+The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`. That file holds the packages,
+the colours and the theme, and sources the rest of the house style beside it - `chart_helpers.R`,
+`figures.R`, `right_axis.R`, `interactive.R`, `post_sections.R` - so one line still provides
+everything below. Colours and the theme are changed in `theme_cwr.R` itself; a chart helper is
+changed in the file that defines it (`grep -rn "<name> <- function" R/` finds it).
 
 | Object | What it is |
 |---|---|
@@ -353,8 +357,8 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    Room asked for with `scale_y_discrete(expand = )` counts as rows too. Only a chart with
    no category axis - a line chart, vertical bars, a map - passes `height` (5 for a line
    chart) and `phone_height` (a little squarer). Never type a height onto a category chart
-   to make it "look right"; if its rows look wrong, the fix is to the constants in
-   `R/theme_cwr.R`, for every chart at once. Never use knitr's `fig-width`/`fig-cap` chunk
+   to make it "look right"; if its rows look wrong, the fix is to the constants at the top of
+   `R/figures.R`, for every chart at once. Never use knitr's `fig-width`/`fig-cap` chunk
    options for a chart.
 7a. **Labels and captions follow the post type; do not set them by hand.** A **Deep dive**
    gets a plain "Figure 1" under each chart, so prose far below can say "as @fig-<slug>

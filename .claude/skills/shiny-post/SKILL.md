@@ -22,8 +22,11 @@ posts/<slug>/
 
 The app reads only files inside `app/` (use `file.path("data", "x.csv")`, not `here()`): the
 deployed app has no access to the rest of the repo. Keep app data small; it is uploaded on every deploy.
-Apply the house style: `source("theme_cwr.R")` from a copy placed in `app/` (copy `R/theme_cwr.R`
-there in `02_clean_data.R` so it stays in sync), or at minimum use the palette hex values.
+Apply the house style by copying the files into `app/` and sourcing the copy: `R/theme_cwr.R` sources
+its siblings by name, so `theme_cwr.R` alone is not enough - `chart_helpers.R`, `figures.R`,
+`right_axis.R`, `interactive.R`, `post_sections.R` and `maps.R` go with it, all six named in
+`02_clean_data.R` so the copies stay in sync. An app needing only colours can use the palette hex
+values instead, and say in a comment that they mirror `R/theme_cwr.R`.
 
 ## Build and test locally
 

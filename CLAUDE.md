@@ -15,7 +15,12 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `README.md`. Two-layer rule: a dataset is tidy, complete, and general (every year, every region);
   a post filters and summarises for its story. A derived table two posts need moves into the dataset.
   `datasets/crime/` is the worked example.
-- `R/theme_cwr.R` is the house chart style (colours, `theme_cwr()`, helpers). Every post sources it.
+- `R/theme_cwr.R` is the house chart style (packages, colours, `theme_cwr()`). Every post sources it,
+  and it sources the rest of the style in turn, so a post still names only this file:
+  `chart_helpers.R` (captions, `cwr_label()`, stack keys, line labels), `figures.R` (`cwr_figure()`),
+  `right_axis.R` (`cwr_right_axis()`), `interactive.R` (`cwr_interactive()`) and `post_sections.R`
+  (the key terms, sources and reliability tables a post prints from its README, and session info).
+  Add a new chart helper to the file it belongs in, never back into `theme_cwr.R`.
   `R/data_helpers.R` moves big files to and from GitHub Releases. `R/packages.R` lists every package.
   `R/seo_post_render.R` runs after every render (`post-render:` in `_quarto.yml`) and edits only
   `_site/`: canonical links, clean sitemap addresses, JSON-LD (BlogPosting, a Dataset for posts with

@@ -41,6 +41,11 @@ suppressPackageStartupMessages({
   library(here)
 })
 
+# cwr_readme_table(): the same reader a post uses for the tables in its README.
+# Sourced on its own rather than through R/theme_cwr.R, which would load
+# ggplot2 and register fonts this script has no use for.
+source(here("R", "post_sections.R"))
+
 site_dir <- here("_site")
 config <- yaml::read_yaml(here("_quarto.yml"))
 site_url <- str_remove(config$website[["site-url"]], "/$")
@@ -87,15 +92,17 @@ canonical_url <- function(path) {
 
 # Reads one markdown table out of a README, under the given ## heading, as a
 # tibble of the raw cell text (links left in). NULL if the heading is missing.
-readme_table <- function(readme, heading) {
-  if (!file.exists(readme)) return(NULL)
-  lines <- read_lines(readme)
-  start <- which(str_trim(lines) == paste("##", heading))
-  if (length(start) == 0) return(NULL)
-  after <- lines[(start[[1]] + 1):length(lines)]
-  next_heading <- which(str_starts(after, "## "))
-  if (length(next_heading) > 0) after <- after[seq_len(next_heading[[1]] - 1)]
-  rows <- after[str_starts(str_trim(after), "\\|")]
+# One table out of a README, as a tibble of its cells with the markdown links
+# left in them.
+#
+# Finding the table is cwr_readme_table()'s job (R/post_sections.R), which is
+# what a post itself uses to print the same tables - so the two cannot disagree
+# about what counts as the table under a heading. It stops when a README or a
+# heading is missing, because a post that cannot print its sources should not
+# render; here a missing one only means there is nothing to describe, so the
+# error is caught and turned into NULL.
+readme_table <- function(slug, heading, readme) {
+  rows <- tryCatch(cwr_readme_table(slug, heading, readme), error = function(e) NULL)
   if (length(rows) < 3) return(NULL)
   cells <- rows |>
     str_trim() |>
@@ -198,7 +205,7 @@ page_json_ld <- function(page, html, url, slug, is_post) {
     } else {
       tibble(column = character(), description = character(), units = character())
     }
-    sources <- readme_table(file.path(folder, "README.md"), "Data sources")
+    sources <- readme_table(slug, "Data sources", file.path(folder, "README.md"))
     licence_col <- names(sources)[str_detect(str_to_lower(names(sources)), "licen")][1]
     source_col <- names(sources)[str_detect(str_to_lower(names(sources)), "^source")][1]
     licences <- if (!is.null(sources) && !is.na(licence_col)) link_urls(sources[[licence_col]]) else character()

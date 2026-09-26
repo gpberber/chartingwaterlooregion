@@ -16,7 +16,7 @@ good for.
 |---|---|
 | `posts/<slug>/` | One folder per post: `index.qmd` (the post), `R/` (data scripts), `data/` (small tidy data), `README.md` (sources and licences) |
 | `datasets/<slug>/` | Shared data used by several posts: download and cleaning scripts, `load.R` for posts, tidy `data/`, `README.md` (sources, licences, versions) |
-| `R/theme_cwr.R` | House chart style: colours, the ggplot2 theme used on every chart, and the helpers that save each chart at desktop and phone size |
+| `R/theme_cwr.R` | House chart style: packages, colours and the ggplot2 theme used on every chart. Sourcing it also brings in `chart_helpers.R`, `figures.R` (saves each chart at desktop and phone size), `right_axis.R`, `interactive.R` and `post_sections.R` |
 | `R/data_quality.R` | Finds the quality flags and footnotes on the figures a post uses, and blanks the ones this site never publishes |
 | `R/census_ci.R` | Confidence intervals for shares worked out from the census long form |
 | `R/data_bundle.R` | Builds each post's downloadable data zip and its data dictionary |

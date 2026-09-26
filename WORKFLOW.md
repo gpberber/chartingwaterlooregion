@@ -33,7 +33,14 @@ chartingwaterlooregion/
   WORKFLOW.md            this guide
   LICENSE  LICENSE-CONTENT.md
   R/
-    theme_cwr.R          house chart style: colours, theme_cwr(), cwr_caption(), cwr_session_info()
+    theme_cwr.R          house chart style: packages, colours, theme_cwr() - and it sources the
+                         five files below, so a post still sources only this one
+    chart_helpers.R      cwr_caption(), cwr_label(), cwr_stack_keys(), cwr_line_labels()
+    figures.R            cwr_figure(): the desktop and phone PNG of every chart
+    right_axis.R         cwr_right_axis(): the value-axis numbers and the baseline
+    interactive.R        cwr_interactive(): hover charts drawn with ggiraph
+    post_sections.R      the key terms, sources and reliability tables a post prints from its
+                         README, and cwr_session_info()
     data_helpers.R       move big files to and from GitHub Releases
     data_bundle.R        build each post's downloadable data zip and data dictionary
     data_quality.R       cwr_quality_flags(): finds the data-quality flags on a post's data,
