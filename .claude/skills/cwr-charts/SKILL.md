@@ -28,7 +28,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_ci_widest(estimate, lower, upper)` | the widest 95% interval on a chart, in points, for the `{widest}` placeholder in the stock interval note (rules 1d, 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_label(...)` | the house label for text inside the plot area: `geom_text()` with a halo behind the letters, so it stays readable over a gridline, a line or a point (rule 3e) |
-| `cwr_right_axis()` | the right-axis numbers above their gridlines, right-aligned with the gridlines' ends, without zeros they all share (`cwr_trim_zeros()`, rule 9); zero labelled, or a zig-zag and a short baseline when the axis does not reach it; a render-time warning when the numbers are too wide to clear the data (rules 6, 6a) |
+| `cwr_right_axis()` | the right-axis numbers above their gridlines, right-aligned with the gridlines' ends, without zeros they all share (`cwr_trim_zeros()`, rule 9); zero labelled, or a zig-zag and a short baseline when the axis does not reach it; `index = 100` on an index chart makes 100 play zero's part, its gridline black; a render-time warning when the numbers are too wide to clear the data (rules 6, 6a) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 | `cwr_gap()` | multiplies a sideways nudge written in data units; 1 on the desktop and `phone_gap` while `cwr_figure()` draws the phone version (rule 11) |
@@ -308,11 +308,32 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
      the numbers, and the black baseline stops at the last data point while the gridlines
      run on to the numbers. The breaks are fixed and the panel reaches at least half a
      gridline step below the lowest one, so the zig-zag has room and no new gridline appears.
+   - **An index chart: its base is its zero** (Greg, 2026-09-26). Pass the base -
+     `cwr_right_axis(index = 100)` - on every index chart. When the axis reaches 100 there is
+     no zig-zag, the baseline runs the full length of the gridlines, 100 is labelled, and the
+     100 gridline is drawn in the baseline's colour (black), not the gridlines' grey, beneath
+     the data. When it does not reach 100 (a published index based on a year long before the
+     chart, such as a Crime Severity Index of 50 to 80 with 2006 = 100), the axis is cut like
+     any other.
 
    A chart should reach zero whenever zero is meaningful to the reading: bars always, and rates
    compared by size. Truncate when the change is the story. Worked case: the Vital Statistics
    page, where the EI, vacancy and growth charts start at zero and the unemployment, rent and
    index charts are cut.
+
+6b. **An index based on the chart's own first period - only when Greg asks for one**
+   (2026-09-26). A per-person comparison stays a rate by default: Greg tried indexing the
+   Vital Statistics page's per-xxx charts and moved them back, finding the rates more
+   intuitive. An index of a count would also build in each place's population growth, and an
+   index of a rate is one step further from anything a reader recognizes. When an index is
+   wanted, divide each line by its own figure in
+   the chart's earliest period and multiply by 100, so every line starts at 100. The base is
+   the earliest period in which every line has a figure (a blanked first month moves it on, and
+   the periods before it are dropped), and the subtitle names it from the data with
+   `str_glue()` ("Index, July 2021 = 100"). A series whose base figure is zero or negative, or
+   that changes sign (net migration), cannot be indexed: a ratio to a negative base turns
+   rises into falls. Such a chart stays a rate, and the hand-off says why. The chart is worked
+   out here, so `credit = TRUE`, and it passes `cwr_right_axis(index = 100)` (rule 6a).
 7. **One chart per chunk, through `cwr_figure()`.** Build the plot as `p`, then call
    `cwr_figure(p, "fig-<slug>", alt = )` in a chunk
    with `#| output: asis` (chunk label without the `fig-` prefix; the id passed to the

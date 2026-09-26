@@ -126,12 +126,29 @@ wds_table <- function(table, members, periods) {
     mutate(table = table, .before = 1)
 }
 
-# Saves a table's figures and its footnotes side by side in data-raw/, the
-# footnotes for the data-quality check in 02_clean_data.R
+# When Statistics Canada last released a table (its metadata's releaseTime,
+# "2026-09-04T08:30", Eastern time), for the "updated" date in the charts'
+# subtitles
+wds_release <- function(table) {
+  product_id <- as.numeric(str_remove_all(str_sub(table, 1, 10), "-"))
+  request(str_c(wds, "getCubeMetadata")) |>
+    req_body_json(list(list(productId = product_id))) |>
+    req_perform() |>
+    resp_body_json() |>
+    pluck(1, "object", "releaseTime")
+}
+
+# Saves a table's figures, its footnotes and its release date side by side in
+# data-raw/: the footnotes for the data-quality check in 02_clean_data.R, the
+# release date for the page. The date is fetched with the figures, so it is
+# the release they came from.
 save_table <- function(data, file_stem) {
+  table <- first(pull(data, table))
   write_csv(data, file.path(raw_dir, str_c(file_stem, ".csv")))
-  get_cansim_table_notes(first(pull(data, table))) |>
+  get_cansim_table_notes(table) |>
     write_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")))
+  tibble(table = table, released = wds_release(table)) |>
+    write_csv(file.path(raw_dir, str_c(file_stem, "_release.csv")))
   message("Saved ", file_stem, ": ", nrow(data), " figures")
 }
 

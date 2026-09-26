@@ -9,7 +9,7 @@ A standing page, not a post: fifteen line charts of key figures about Waterloo R
 Run from the project root, in this order:
 
 1. `Rscript vital-statistics/R/01_get_data.R` fetches the latest figures from Statistics Canada and CMHC into `data-raw/` (a minute or two).
-2. `Rscript vital-statistics/R/02_clean_data.R` rebuilds the tidy files in `data/` and `data/quality_flags.csv`. Read what it prints: a new flag or footnote needs a row in the Reliability table below before the page will render.
+2. `Rscript vital-statistics/R/02_clean_data.R` rebuilds the tidy files in `data/`, `data/quality_flags.csv`, and `data/releases.csv` (each Statistics Canada table's release date, for the "Updated" date in the subtitles). Read what it prints: a new flag or footnote needs a row in the Reliability table below before the page will render.
 3. `quarto render vital-statistics/index.qmd` redraws the charts. Rendering the page on its own always re-runs its code; a full-site `quarto render` would reuse the frozen results until `index.qmd` itself changes.
 
 Then commit with `/save`. Each chart shows its own latest five years, so the charts end in different months: each source publishes on its own timetable.

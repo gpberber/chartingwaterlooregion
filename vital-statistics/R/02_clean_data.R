@@ -458,4 +458,17 @@ crime_rate <- read_table("table_35100177") |>
   arrange(kind, geo, year)
 write_csv(crime_rate, file.path(data_dir, "crime_rate.csv"))
 
+# ---- 17. When each table was last released -------------------------------------------------
+# One row per Statistics Canada table, with the date of the release the page's
+# figures came from, for the "updated" date in each chart's subtitle.
+# 01_get_data.R saves one small file per table beside its figures. CMHC's
+# portal gives no release date, so its charts' subtitles carry none.
+releases <- list.files(raw_dir, pattern = "_release\\.csv$", full.names = TRUE) |>
+  map(\(file) read_csv(file, col_types = cols(.default = col_character()))) |>
+  list_rbind() |>
+  clean_names() |>
+  mutate(released = as_date(ymd_hm(released))) |>
+  arrange(table)
+write_csv(releases, file.path(data_dir, "releases.csv"))
+
 message("Done. Tidy files are in ", data_dir)

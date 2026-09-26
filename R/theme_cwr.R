@@ -1279,6 +1279,13 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 #      run on to the numbers. To leave the zig-zag room, the panel reaches at
 #      least half a gridline step below the lowest gridline; the breaks are
 #      fixed first, so that extra room cannot grow a new gridline.
+#    - An index chart (`index = 100`, or whatever its base is) whose axis
+#      reaches the base: the base does the job zero does on other charts
+#      (Greg, 2026-09-26), so there is no zig-zag, the baseline runs the full
+#      length of the gridlines, the base is labelled, and its gridline is drawn
+#      in the baseline's colour rather than the gridlines' grey. An index chart
+#      whose axis does not reach its base (a Crime Severity Index of 50 to 80,
+#      2006 = 100) is cut like any other, zig-zag and all.
 #
 # 3. It checks the numbers clear the data. The room between the right end of
 #    the data (the last point of a line, the edge of the last bar) and the
@@ -1293,8 +1300,11 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
 #    sits close to the edge, say) call for more room, through the x scale's
 #    `expand`. `width` is the desktop image width in inches (cwr_figure()'s
 #    default), used to turn that share into points.
-cwr_right_axis <- function(width = 8.3) {
-  structure(list(width = width), class = "cwr_right_axis")
+#
+# `index` is an index chart's base - 100 - and is left NULL on every other
+# chart: cwr_right_axis(index = 100).
+cwr_right_axis <- function(width = 8.3, index = NULL) {
+  structure(list(width = width, index = index), class = "cwr_right_axis")
 }
 
 # The rightmost x any layer draws at: the last point of a line, or the right
@@ -1370,8 +1380,22 @@ ggplot_add.cwr_right_axis <- function(object, plot, ...) {
     breaks <- breaks[!is.na(breaks)]
     bottom <- cwr_data_bottom(built)
     expand <- if (inherits(y_scale$expand, "waiver")) expansion(mult = 0.05) else y_scale$expand
+    base <- object$index
+    indexed <- !is.null(base) && y_range[1] <= base && y_range[2] >= base
 
-    if (bottom >= 0 && y_range[1] <= 0) {
+    if (indexed) {
+      # An index whose axis reaches its base: the base is labelled, and its
+      # gridline is drawn in the baseline's colour, under the data (so it is
+      # put first among the layers). The gridline's own width is kept.
+      if (!base %in% breaks) y_scale$breaks <- sort(c(base, breaks))
+      base_line <- geom_hline(
+        yintercept = base,
+        colour = calc_element("axis.line.x.bottom", theme_now)$colour,
+        linewidth = calc_element("panel.grid.major.y", theme_now)$linewidth
+      )
+      plot$layers <- c(list(base_line), plot$layers)
+      cut_axis <- FALSE
+    } else if (bottom >= 0 && y_range[1] <= 0) {
       # Starts at zero: begin exactly at 0, no room below, 0 among the breaks
       limits <- y_scale$limits
       y_scale$limits <- if (is.numeric(limits)) c(0, limits[2]) else c(0, NA)

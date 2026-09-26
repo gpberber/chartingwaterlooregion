@@ -55,7 +55,8 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
   `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. A vertical
   chart adds `cwr_right_axis()` after its scales: the value numbers end where the gridlines end
   (phone too) and drop zeros they all share ("1.0, 2.0" is "1, 2"), 0 is labelled when the axis reaches zero, and a cut axis gets a zig-zag under
-  its lowest gridline and a baseline stopping at the last data point; numbers too wide to clear
+  its lowest gridline and a baseline stopping at the last data point; an index chart passes
+  `index = 100`, and 100 then plays zero's part (no zig-zag, full baseline, a black 100 gridline); numbers too wide to clear
   the data are rescaled (thousands, said in the subtitle). X-axis minor ticks only where the
   data have a figure (`cwr-charts` rules 4b, 6, 6a). Figure
   numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get

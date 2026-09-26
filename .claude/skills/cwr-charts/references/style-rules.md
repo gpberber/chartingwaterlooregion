@@ -44,7 +44,7 @@ the same call in a situation the templates do not cover.
 ## Axes and gridlines
 
 - Vertical charts: y axis on the right, labels raised above their gridline and right-aligned
-  with its end, through `cwr_right_axis()` (rule 6); x axis line black at the bottom, full length and on 0 when the axis reaches zero (0 labelled), stopping at the last data point with a zig-zag under the lowest gridline when it does not (rule 6a); minor ticks yearly on annual data, and only where the data have a figure (rule 4b).
+  with its end, through `cwr_right_axis()` (rule 6); x axis line black at the bottom, full length and on 0 when the axis reaches zero (0 labelled), stopping at the last data point with a zig-zag under the lowest gridline when it does not, and on an index chart 100 in zero's place, its gridline black (rule 6a); minor ticks yearly on annual data, and only where the data have a figure (rule 4b).
 - Horizontal charts: x axis on top, vertical gridlines, no x axis line, y axis text
   left-aligned (`hjust = 0`) and markdown-capable so one row can be bold.
 - Ranked charts start the value axis at zero with `geom_vline(xintercept = 0)` as the baseline.
