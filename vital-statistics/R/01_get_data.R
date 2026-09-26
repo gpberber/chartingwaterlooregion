@@ -144,33 +144,39 @@ months <- 84
 # moving average, seasonally adjusted. Publishes Canada and Ontario on the same
 # basis as the CMA, and a standard error beside every estimate.
 #   Geography: 1 Canada, 18 Ontario, 29 Kitchener-Cambridge-Waterloo, Ontario
-#   Labour force characteristics: 2 Labour force, 3 Employment, 5 Unemployment rate
+#   Labour force characteristics: 2 Labour force, 3 Employment, 5 Unemployment rate,
+#                                 6 Participation rate
 #   Statistics: 1 Estimate, 2 Standard error of estimate,
 #               4 Standard error of year-over-year change
 #   Data type: 1 Seasonally adjusted
 wds_table(
   "14-10-0459-01",
-  list(c(1, 18, 29), c(2, 3, 5), c(1, 2, 4), 1),
+  list(c(1, 18, 29), c(2, 3, 5, 6), c(1, 2, 4), 1),
   periods = months
 ) |>
   save_table("table_14100459")
 
 # 14-10-0458-01: the same survey by CMA, three-month moving average, NOT
 # seasonally adjusted, but split by age. Only CMAs: Canada and Ontario come
-# from 14-10-0017-01 below.
+# from 14-10-0017-01 below. The CMA table has no ten-year age groups; these
+# three cover 15 to 64 without a gap or an overlap. (It also has 25 to 44,
+# 45 and over, 55 and over, and 65 and over.)
 #   Geography: 22 Kitchener-Cambridge-Waterloo, Ontario
-#   Labour force characteristics: 8 Unemployment rate
-#   Gender: 1 Total - Gender;  Age group: 2 15 to 24 years
-wds_table("14-10-0458-01", list(22, 8, 1, 2), periods = months) |>
+#   Labour force characteristics: 8 Unemployment rate, 9 Participation rate
+#   Gender: 1 Total - Gender
+#   Age group: 2 15 to 24 years, 6 25 to 54 years, 8 55 to 64 years
+wds_table("14-10-0458-01", list(22, c(8, 9), 1, c(2, 6, 8)), periods = months) |>
   save_table("table_14100458")
 
 # 14-10-0017-01: the survey by province, monthly, not seasonally adjusted, by
 # age. 02_clean_data.R turns these into three-month moving averages so they
-# match the CMA table above.
+# match the CMA table above. This table has no 55 to 64 group, so its two
+# five-year halves are fetched and added together.
 #   Geography: 1 Canada, 7 Ontario
-#   Labour force characteristics: 2 Labour force, 6 Unemployment
-#   Gender: 1 Total - Gender;  Age group: 2 15 to 24 years
-wds_table("14-10-0017-01", list(c(1, 7), c(2, 6), 1, 2), periods = months) |>
+#   Labour force characteristics: 1 Population, 2 Labour force, 6 Unemployment
+#   Gender: 1 Total - Gender
+#   Age group: 2 15 to 24 years, 6 25 to 54 years, 17 55 to 59 years, 18 60 to 64 years
+wds_table("14-10-0017-01", list(c(1, 7), c(1, 2, 6), 1, c(2, 6, 17, 18)), periods = months) |>
   save_table("table_14100017")
 
 # 14-10-0454-01: Employment Insurance regular beneficiaries by census

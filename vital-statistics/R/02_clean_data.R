@@ -87,21 +87,28 @@ sum_12 <- function(x) slider::slide_dbl(x, sum, .before = 11, .complete = TRUE)
 # A 95% confidence interval is the estimate plus or minus 1.96 standard errors
 z_95 <- qnorm(0.975)
 
-# ---- 1. Unemployment rate ----------------------------------------------------------
+# ---- 1. Unemployment and participation rates ----------------------------------------
 # Labour Force Survey, three-month moving average, seasonally adjusted: the
 # published rate and its published standard error, turned into a 95% interval.
 lfs <- read_table("table_14100459") |>
   mutate(geo = recode_geo(geo)) |>
   select(geo, date = ref_date, measure = labour_force_characteristics, statistics, value)
 
-unemployment_rate <- lfs |>
-  filter(measure == "Unemployment rate", statistics %in% c("Estimate", "Standard error of estimate")) |>
-  pivot_wider(names_from = statistics, values_from = value) |>
-  rename(percent = Estimate, se = `Standard error of estimate`) |>
-  mutate(percent_lower = percent - z_95 * se, percent_upper = percent + z_95 * se) |>
-  select(geo, date, percent, percent_lower, percent_upper) |>
-  latest(60)
+lfs_rate <- function(which) {
+  lfs |>
+    filter(measure == which, statistics %in% c("Estimate", "Standard error of estimate")) |>
+    pivot_wider(names_from = statistics, values_from = value) |>
+    rename(percent = Estimate, se = `Standard error of estimate`) |>
+    mutate(percent_lower = percent - z_95 * se, percent_upper = percent + z_95 * se) |>
+    select(geo, date, percent, percent_lower, percent_upper) |>
+    latest(60)
+}
+
+unemployment_rate <- lfs_rate("Unemployment rate")
 write_csv(unemployment_rate, file.path(data_dir, "unemployment_rate.csv"))
+
+participation_rate <- lfs_rate("Participation rate")
+write_csv(participation_rate, file.path(data_dir, "participation_rate.csv"))
 
 # ---- 2. Employment, change from a year earlier ------------------------------------
 # The percentage change in employment from the same month a year before. The
@@ -126,37 +133,57 @@ employment_change <- lfs |>
   latest(60)
 write_csv(employment_change, file.path(data_dir, "employment_change.csv"))
 
-# ---- 3. Youth unemployment rate ------------------------------------------------------
-# For the CMA the survey publishes a three-month moving average not adjusted
-# for the seasons (14-10-0458). Ontario and Canada are published monthly
-# (14-10-0017), so their three-month averages are worked out here the way
-# Statistics Canada works out its own: the unemployed in the three months over
-# the labour force in the same three months. All three lines rise and fall
-# with the seasons (students looking for summer jobs), so they are compared
-# with each other, not month to month.
-youth_cma <- read_table("table_14100458") |>
-  mutate(geo = recode_geo(geo), date = ref_date, percent = value, .keep = "none")
+# ---- 3. Unemployment and participation rates by age -----------------------------------
+# For the CMA the survey publishes three-month moving averages not adjusted
+# for the seasons, by age (14-10-0458). It has no ten-year age groups; 15 to
+# 24, 25 to 54 and 55 to 64 cover 15 to 64 without a gap or an overlap.
+# Ontario and Canada are published monthly (14-10-0017), so their three-month
+# averages are worked out here the way Statistics Canada works out its own:
+# the unemployed in the three months over the labour force in the same three
+# months, and the labour force over the population for participation. That
+# table has no 55 to 64 group, so its 55 to 59 and 60 to 64 counts are added
+# together first. The lines rise and fall with the seasons (students looking
+# for summer jobs, above all), so they are compared with each other, not
+# month to month.
+age_levels <- c("15 to 24 years", "25 to 54 years", "55 to 64 years")
 
-youth_provinces <- read_table("table_14100017") |>
-  mutate(geo = recode_geo(geo), date = ref_date, measure = labour_force_characteristics, value, .keep = "none") |>
-  pivot_wider(names_from = measure, values_from = value) |>
-  arrange(geo, date) |>
-  group_by(geo) |>
+by_age_cma <- read_table("table_14100458") |>
   mutate(
-    percent = round(
-      slider::slide_dbl(Unemployment, sum, .before = 2, .complete = TRUE) /
-        slider::slide_dbl(`Labour force`, sum, .before = 2, .complete = TRUE) * 100,
-      1
-    )
+    geo = recode_geo(geo), date = ref_date, age = age_group,
+    measure = labour_force_characteristics, percent = value,
+    .keep = "none"
+  )
+
+# The sum over the three months ending in each month; NA until three are in
+sum_3 <- function(x) slider::slide_dbl(x, sum, .before = 2, .complete = TRUE)
+
+by_age_provinces <- read_table("table_14100017") |>
+  mutate(
+    geo = recode_geo(geo), date = ref_date,
+    age = if_else(age_group %in% c("55 to 59 years", "60 to 64 years"), "55 to 64 years", age_group),
+    characteristic = labour_force_characteristics, value,
+    .keep = "none"
+  ) |>
+  group_by(geo, date, age, characteristic) |>
+  summarise(value = sum(value), .groups = "drop") |>
+  pivot_wider(names_from = characteristic, values_from = value) |>
+  arrange(geo, age, date) |>
+  group_by(geo, age) |>
+  mutate(
+    `Unemployment rate` = round(sum_3(Unemployment) / sum_3(`Labour force`) * 100, 1),
+    `Participation rate` = round(sum_3(`Labour force`) / sum_3(Population) * 100, 1)
   ) |>
   ungroup() |>
+  pivot_longer(c(`Unemployment rate`, `Participation rate`), names_to = "measure", values_to = "percent") |>
   filter(!is.na(percent)) |>
-  select(geo, date, percent)
+  select(geo, date, age, measure, percent)
 
-youth_unemployment_rate <- bind_rows(youth_cma, youth_provinces) |>
-  mutate(geo = factor(geo, levels = places)) |>
-  latest(60)
-write_csv(youth_unemployment_rate, file.path(data_dir, "youth_unemployment_rate.csv"))
+rates_by_age <- bind_rows(by_age_cma, by_age_provinces) |>
+  mutate(geo = factor(geo, levels = places), age = factor(age, levels = age_levels)) |>
+  group_by(measure, age) |>
+  latest(60) |>
+  arrange(measure, age, geo, date)
+write_csv(rates_by_age, file.path(data_dir, "rates_by_age.csv"))
 
 # ---- 4. Employment Insurance regular beneficiaries -----------------------------------
 # Beneficiaries per 100 people in the labour force, so the three places can

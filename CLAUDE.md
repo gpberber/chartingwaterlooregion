@@ -52,7 +52,12 @@ R user, new to blogging and to git. Explain git and publishing steps in plain wo
 - Charts: never a pie or a donut - the About page makes that a promise to readers, so parts of a
   whole go in a bar chart. Source `R/theme_cwr.R`, pick a template from the `cwr-charts` skill, one
   chart or table per chunk. Every chart goes through `cwr_figure()` (desktop and phone PNGs in the post's
-  `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. Figure
+  `figures/`, committed) with `alt` filled in; source line through `cwr_caption()`. A vertical
+  chart adds `cwr_right_axis()` after its scales: the value numbers end where the gridlines end
+  (phone too), 0 is labelled when the axis reaches zero, and a cut axis gets a zig-zag under
+  its lowest gridline and a baseline stopping at the last data point; numbers too wide to clear
+  the data are rescaled (thousands, said in the subtitle). X-axis minor ticks only where the
+  data have a figure (`cwr-charts` rules 4b, 6, 6a). Figure
   numbers follow the post type: Deep dives get "Figure N" and `@fig-` references, Snapshots get
   no label. Captions are optional and usually omitted. Tables are gt only. Every note Claude puts
   on a chart - sample, intervals, CMA, data quality - is a plain string written out in the chunk's

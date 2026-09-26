@@ -76,6 +76,12 @@ For every `ggplot` chunk:
   The About page promises readers there are none; this is the check that keeps that true.
 - Numbers written into a chart's `alt` text are computed from the data, not typed. Typed figures go
   stale silently, and only for readers who cannot see the chart to check them.
+- Every vertical chart with a value axis on the right adds `cwr_right_axis()` after its scales
+  (style rules 6, 6a). Flag:
+  - a hand-typed `axis.text.y.right` margin block, the style before 2026-09-25;
+  - any "WARNING - cwr_right_axis()" in the render output (numbers too wide to clear the
+    data: rescale them and say so in the subtitle);
+  - x-axis minor ticks that fall between the periods the data report (style rule 4b).
 - The chart goes through `cwr_figure(p, "fig-<slug>", alt = )` in a chunk with
   `#| output: asis`, and `alt` is filled in with what the chart shows. Flag any chart that uses
   knitr's `fig-cap`/`fig-width` options instead (it would have no phone version). Flag a chart

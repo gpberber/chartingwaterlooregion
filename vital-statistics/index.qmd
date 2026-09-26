@@ -35,7 +35,8 @@ read_vs <- function(file) {
 
 unemployment_rate <- read_vs("unemployment_rate.csv")
 employment_change <- read_vs("employment_change.csv")
-youth_unemployment_rate <- read_vs("youth_unemployment_rate.csv")
+participation_rate <- read_vs("participation_rate.csv")
+rates_by_age <- read_vs("rates_by_age.csv")
 ei_beneficiaries <- read_vs("ei_beneficiaries.csv")
 business_dynamics <- read_vs("business_dynamics.csv")
 building_permits <- read_vs("building_permits.csv")
@@ -94,14 +95,16 @@ vs_line <- function(plot_data,
       tooltip = str_glue("<b>{geo}</b><br>{when(x)}<br>{tip(y)}")
     )
 
-  # Room on the right for the axis numbers. theme_cwr() sits them above their
-  # gridlines, and its negative left margin (the theme() block below) starts
-  # every number the same 20 points inside the panel's right edge, however
-  # many digits it has. So the lines stop short by that much plus a sliver:
-  # 6% of the x range on a full-width monthly chart, 7% on an annual one to
-  # clear its end dots. (The phone version moves the numbers outside the
-  # panel, where they need no room.)
+  # Room on the right for the axis numbers, which sit above their gridlines
+  # and end where the gridlines end (the theme() block at the bottom). The
+  # lines stop short of the panel's right edge by the same share of the x
+  # range on every chart - 6% on a monthly chart, 7% on an annual one to
+  # clear its end dots - which holds a number about three digits wide. A
+  # chart whose numbers are wider rescales them (to thousands, say) rather
+  # than widening the room; cwr_right_axis() at the bottom says when. (The phone
+  # version moves the numbers outside the panel, where they need no room.)
   right_room <- if (dated) 0.06 else 0.07
+  left_room <- if (dated) 0.02 else 0.06
 
   p <- ggplot(plot_data, aes(x = x, y = y, colour = geo))
 
@@ -141,7 +144,7 @@ vs_line <- function(plot_data,
         # each quarter's first month that is in the data, so no minor tick
         # falls where there is no figure (cwr-charts rule 4b)
         minor_breaks = keep(sort(unique(pull(plot_data, x))), \(d) month(d) %in% c(1, 4, 7, 10)),
-        expand = expansion(mult = c(0.02, right_room))
+        expand = expansion(mult = c(left_room, right_room))
       )
   } else {
     p <- p +
@@ -150,7 +153,7 @@ vs_line <- function(plot_data,
         breaks = sort(unique(pull(plot_data, x))),
         minor_breaks = NULL,
         labels = x_labels,
-        expand = expansion(mult = c(0.06, right_room))
+        expand = expansion(mult = c(left_room, right_room))
       )
   }
 
@@ -180,17 +183,16 @@ vs_line <- function(plot_data,
     # No legend: the key at the top of the page covers every chart
     scale_colour_manual(values = vs_colours, guide = "none") +
 
-    guides(x = guide_axis(minor.ticks = dated)) +
+    guides(x = guide_axis(minor.ticks = dated))
 
-    # Right-axis label positioning: sit labels above gridlines
-    theme(
-      axis.text.y.right = element_text(
-        size = rel(1),
-        hjust = 1.0,
-        vjust = -0.5,
-        margin = margin(r = 12, l = -20)
-      )
-    )
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # (cwr-charts rule 6), with 0 labelled, or a zig-zag and a baseline stopping
+  # at the last point when the axis does not reach zero (rule 6a).
+  # cwr_right_axis() measures the numbers, and prints a
+  # warning while the page renders if they are too wide to clear the ends of
+  # the lines; that chart's chunk then rescales its axis (to thousands, say)
+  # and says so in the subtitle.
+  p <- p + cwr_right_axis()
   p
 }
 
@@ -230,7 +232,10 @@ percent_change <- label_percent(accuracy = 0.1, scale = 1, style_positive = "plu
 
 # The stock notes, written out once here because many charts carry them
 # (cwr-charts rule 1d); edit the wording here and every chart follows
-cma_note <- str_glue("{cwr_region} excluding Wellesley Township")
+# Most figures are for the Kitchener - Cambridge - Waterloo CMA, which leaves
+# out Wellesley Township; the note above the charts says so once for the
+# page. The charts that are for the whole Region say so with this note.
+whole_region_note <- str_glue("{cwr_region} includes Wellesley Township")
 lfs_note <- "Estimates from the Labour Force Survey, a monthly sample of about 65,000 households"
 rms_note <- "Estimates from CMHC's October Rental Market Survey, a sample of privately initiated rental buildings of three or more units"
 centres_note <- "Ontario and Canada: centres of 10,000 people or more, the areas CMHC counts every month"
@@ -268,7 +273,16 @@ cat(
 )
 ```
 
+<!-- A note on the Region's figures for the whole page; Greg's to reword. -->
+
+Region figures exclude Wellesley Township because it is not part of the Kitchener - Cambridge - Waterloo census metropolitan area (CMA).
+
 ## Labour market
+
+### Unemployment rate
+
+::: panel-tabset
+### Overall
 
 ```{r}
 #| label: unemployment-rate
@@ -284,8 +298,8 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) 
       "Statistics Canada Table 14-10-0459-01",
       credit = TRUE,   # the band is worked out here from the published standard errors
       notes = c(
-        cma_note,
         str_glue("The band shows the {cwr_region}'s 95% confidence interval"),
+        "Three-month moving averages, adjusted for the seasons",
         lfs_note
       )
     )
@@ -302,6 +316,214 @@ cwr_interactive(
 )
 ```
 
+### 15 to 24
+
+```{r}
+#| label: unemployment-rate-15-24
+
+# Shared by the six age tabs, three for the unemployment rate and three for
+# the participation rate. The CMA publishes these by age only without
+# seasonal adjustment, so, unlike the Overall tabs, every line rises and falls
+# with the seasons. Ten-year age groups are not published for the CMA; these
+# three cover 15 to 64. unpublished_note() names any month Statistics Canada
+# rates too unreliable to publish (F), which leaves a gap in the Region's line,
+# and returns nothing when there is none, which cwr_caption() treats as no note.
+by_age <- function(which_measure, which_age) {
+  rates_by_age |>
+    filter(measure == which_measure, age == which_age) |>
+    rename(x = date, y = percent)
+}
+unpublished_note <- function(plot_data) {
+  blanked <- plot_data |>
+    filter(geo == cwr_region, is.na(y)) |>
+    pull(x) |>
+    format("%B %Y")
+  if (length(blanked) > 0) {
+    str_glue("{cwr_region} not shown for {str_flatten_comma(blanked, ' and ')}: too unreliable to be published")
+  }
+}
+age_caption <- function(plot_data) {
+  cwr_caption(
+    c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+    credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+    notes = c(
+      unpublished_note(plot_data),
+      "Three-month moving averages, not adjusted for the seasons",
+      "No confidence intervals are published for these figures; rates close together may differ only by sampling error",
+      lfs_note
+    )
+  )
+}
+age_alt <- function(plot_data, rate_words, age_words) {
+  str_glue(
+    "Line chart of the {rate_words} of people aged {age_words}, a three-month moving average not ",
+    "adjusted for the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, percent_1)}"
+  )
+}
+
+plot_data <- by_age("Unemployment rate", "15 to 24 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate of people aged 15 to 24",              # working title, descriptive only
+    subtitle = "Per cent of the labour force aged 15 to 24",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-15-24",
+  alt = age_alt(plot_data, "unemployment rate", "15 to 24"),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 25 to 54
+
+```{r}
+#| label: unemployment-rate-25-54
+
+plot_data <- by_age("Unemployment rate", "25 to 54 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate of people aged 25 to 54",              # working title, descriptive only
+    subtitle = "Per cent of the labour force aged 25 to 54",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-25-54",
+  alt = age_alt(plot_data, "unemployment rate", "25 to 54"),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 55 to 64
+
+```{r}
+#| label: unemployment-rate-55-64
+
+plot_data <- by_age("Unemployment rate", "55 to 64 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate of people aged 55 to 64",              # working title, descriptive only
+    subtitle = "Per cent of the labour force aged 55 to 64",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-55-64",
+  alt = age_alt(plot_data, "unemployment rate", "55 to 64"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Labour force participation rate
+
+::: panel-tabset
+### Overall
+
+```{r}
+#| label: participation-rate
+
+plot_data <- participation_rate |>
+  rename(x = date, y = percent, lower = percent_lower, upper = percent_upper)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate",                        # working title, descriptive only
+    subtitle = "Per cent of the population aged 15 and over",
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0459-01",
+      credit = TRUE,   # the band is worked out here from the published standard errors
+      notes = c(
+        str_glue("The band shows the {cwr_region}'s 95% confidence interval"),
+        "Three-month moving averages, adjusted for the seasons",
+        lfs_note
+      )
+    )
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate",
+  alt = str_glue(
+    "Line chart of the labour force participation rate, a three-month moving average adjusted for ",
+    "the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada, with a band showing ",
+    "the Region's 95% confidence interval. {vs_latest(plot_data, percent_1)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 15 to 24
+
+```{r}
+#| label: participation-rate-15-24
+
+plot_data <- by_age("Participation rate", "15 to 24 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate of people aged 15 to 24",   # working title, descriptive only
+    subtitle = "Per cent of the population aged 15 to 24",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-15-24",
+  alt = age_alt(plot_data, "labour force participation rate", "15 to 24"),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 25 to 54
+
+```{r}
+#| label: participation-rate-25-54
+
+plot_data <- by_age("Participation rate", "25 to 54 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate of people aged 25 to 54",   # working title, descriptive only
+    subtitle = "Per cent of the population aged 25 to 54",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-25-54",
+  alt = age_alt(plot_data, "labour force participation rate", "25 to 54"),
+  height = 5, phone_height = 4.5
+)
+```
+
+### 55 to 64
+
+```{r}
+#| label: participation-rate-55-64
+
+plot_data <- by_age("Participation rate", "55 to 64 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate of people aged 55 to 64",   # working title, descriptive only
+    subtitle = "Per cent of the population aged 55 to 64",
+    caption = age_caption(plot_data)
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-55-64",
+  alt = age_alt(plot_data, "labour force participation rate", "55 to 64"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Employment
+
 ```{r}
 #| label: employment-change
 
@@ -316,7 +538,6 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), zero_line = TRUE,
       "Statistics Canada Table 14-10-0459-01",
       credit = TRUE,   # the change and its band are worked out here
       notes = c(
-        cma_note,
         str_glue("The band shows the {cwr_region}'s 95% confidence interval"),
         lfs_note
       )
@@ -334,37 +555,7 @@ cwr_interactive(
 )
 ```
 
-```{r}
-#| label: youth-unemployment-rate
-
-plot_data <- youth_unemployment_rate |>
-  rename(x = date, y = percent)
-
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
-  labs(
-    title = "Unemployment rate of people aged 15 to 24",              # working title, descriptive only
-    subtitle = "Per cent of the labour force aged 15 to 24",
-    caption = cwr_caption(
-      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
-      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
-      notes = c(
-        cma_note,
-        "No confidence intervals are published for these figures; rates close together may differ only by sampling error",
-        lfs_note
-      )
-    )
-  )
-
-cwr_interactive(
-  p, "fig-youth-unemployment-rate",
-  alt = str_glue(
-    "Line chart of the unemployment rate of people aged 15 to 24, a three-month moving average not ",
-    "adjusted for the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada. All three ",
-    "rise and fall with the seasons. {vs_latest(plot_data, percent_1)}"
-  ),
-  height = 5, phone_height = 4.5
-)
-```
+### Employment Insurance
 
 ::: panel-tabset
 ### Region
@@ -382,8 +573,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1)) +
     title = "Employment Insurance regular beneficiaries in the Region",   # working title, descriptive only
     subtitle = "Thousands of beneficiaries",
     caption = cwr_caption(
-      "Statistics Canada Table 14-10-0454-01",
-      notes = cma_note
+      "Statistics Canada Table 14-10-0454-01"
     )
   )
 
@@ -416,7 +606,6 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA)
       c("Statistics Canada Tables 14-10-0454-01", "14-10-0459-01"),
       credit = TRUE,   # the rate is worked out here from two tables
       notes = c(
-        cma_note,
         "The labour force is estimated from the Labour Force Survey, a monthly sample of about 65,000 households"
       )
     )
@@ -478,7 +667,7 @@ p <- vs_line(plot_data) +
     subtitle = "Businesses opening each month",
     caption = cwr_caption(
       "Statistics Canada Table 33-10-0270-01",
-      notes = c(cma_note, business_gap_note(plot_data))
+      notes = business_gap_note(plot_data)
     )
   )
 
@@ -506,7 +695,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_
     caption = cwr_caption(
       "Statistics Canada Table 33-10-0270-01",
       credit = TRUE,   # the rates are worked out here
-      notes = c(cma_note, business_gap_note(plot_data))
+      notes = business_gap_note(plot_data)
     )
   )
 
@@ -536,7 +725,7 @@ p <- vs_line(plot_data) +
     subtitle = "Businesses closing each month",
     caption = cwr_caption(
       "Statistics Canada Table 33-10-0270-01",
-      notes = c(cma_note, business_gap_note(plot_data))
+      notes = business_gap_note(plot_data)
     )
   )
 
@@ -564,7 +753,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_
     caption = cwr_caption(
       "Statistics Canada Table 33-10-0270-01",
       credit = TRUE,   # the rates are worked out here
-      notes = c(cma_note, business_gap_note(plot_data))
+      notes = business_gap_note(plot_data)
     )
   )
 
@@ -612,8 +801,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-9, accuracy = 0.1), t
     subtitle = "Billions of dollars, current dollars",
     caption = cwr_caption(
       "Statistics Canada Table 34-10-0292-01",
-      credit = TRUE,   # the 12-month totals are worked out here
-      notes = cma_note
+      credit = TRUE   # the 12-month totals are worked out here
     )
   )
 
@@ -634,14 +822,14 @@ cwr_interactive(
 
 plot_data <- permits_per_person("Residential")
 
-p <- vs_line(plot_data, tip = dollars) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = dollars) +
   labs(
     title = "Value of residential building permits over the past 12 months, per person",   # working title, descriptive only
-    subtitle = "Dollars per person, current dollars",
+    subtitle = "Thousands of dollars per person, current dollars",
     caption = cwr_caption(
       c("Statistics Canada Tables 34-10-0292-01", "17-10-0148-01", "17-10-0005-01"),
-      credit = TRUE,   # the 12-month totals per person are worked out here
-      notes = cma_note
+      credit = TRUE   # the 12-month totals per person are worked out here
     )
   )
 
@@ -672,8 +860,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-9, accuracy = 0.1), t
     subtitle = "Billions of dollars, current dollars",
     caption = cwr_caption(
       "Statistics Canada Table 34-10-0292-01",
-      credit = TRUE,   # the 12-month totals are worked out here
-      notes = cma_note
+      credit = TRUE   # the 12-month totals are worked out here
     )
   )
 
@@ -694,14 +881,14 @@ cwr_interactive(
 
 plot_data <- permits_per_person("Non-residential")
 
-p <- vs_line(plot_data, tip = dollars) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = dollars) +
   labs(
     title = "Value of non-residential building permits over the past 12 months, per person",   # working title, descriptive only
-    subtitle = "Dollars per person, current dollars",
+    subtitle = "Thousands of dollars per person, current dollars",
     caption = cwr_caption(
       c("Statistics Canada Tables 34-10-0292-01", "17-10-0148-01", "17-10-0005-01"),
-      credit = TRUE,   # the 12-month totals per person are worked out here
-      notes = cma_note
+      credit = TRUE   # the 12-month totals per person are worked out here
     )
   )
 
@@ -730,8 +917,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = fmt) +
     title = "New Housing Price Index",                                # working title, descriptive only
     subtitle = "Index, December 2016 = 100",
     caption = cwr_caption(
-      "Statistics Canada Table 18-10-0205-01",
-      notes = cma_note
+      "Statistics Canada Table 18-10-0205-01"
     )
   )
 
@@ -770,13 +956,12 @@ starts_per_1000 <- function(which) {
 }
 starts_total_caption <- cwr_caption(
   "CMHC Starts and Completions Survey",
-  credit = TRUE,   # the 12-month totals are worked out here
-  notes = cma_note
+  credit = TRUE   # the 12-month totals are worked out here
 )
 starts_rate_caption <- cwr_caption(
   c("CMHC Starts and Completions Survey", "Statistics Canada Table 17-10-0148-01"),
   credit = TRUE,   # the 12-month totals per 1,000 people are worked out here
-  notes = c(cma_note, centres_note)
+  notes = centres_note
 )
 starts_rate_fmt <- label_number(accuracy = 0.01)
 starts_total_alt <- function(plot_data, type_words) {
@@ -795,10 +980,11 @@ starts_rate_alt <- function(plot_data, type_words) {
 
 plot_data <- starts_total("Single")
 
-p <- vs_line(plot_data) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1)) +
   labs(
     title = "Single-detached housing starts in the Region over the past 12 months",   # working title, descriptive only
-    subtitle = "Housing starts",
+    subtitle = "Thousands of housing starts",
     caption = starts_total_caption
   )
 
@@ -860,7 +1046,7 @@ cwr_interactive(
 
 plot_data <- starts_per_1000("Semi-detached")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.05), tip = starts_rate_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), tip = starts_rate_fmt) +
   labs(
     title = "Semi-detached housing starts over the past 12 months per 1,000 people",   # working title, descriptive only
     subtitle = "Housing starts per 1,000 people",
@@ -883,10 +1069,11 @@ cwr_interactive(
 
 plot_data <- starts_total("Row")
 
-p <- vs_line(plot_data) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), breaks = breaks_width(500)) +
   labs(
     title = "Row housing starts in the Region over the past 12 months",   # working title, descriptive only
-    subtitle = "Housing starts",
+    subtitle = "Thousands of housing starts",
     caption = starts_total_caption
   )
 
@@ -981,7 +1168,6 @@ market_caption <- cwr_caption(
   "CMHC Starts and Completions Survey",
   credit = TRUE,   # the 12-month shares are worked out here
   notes = c(
-    cma_note,
     centres_note,
     "Co-operatives are not shown, so the three shares do not quite add to 100"
   )
@@ -1072,7 +1258,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA)
     subtitle = "Per cent of rental units",
     caption = cwr_caption(
       "CMHC Rental Market Survey",
-      notes = c(cma_note, rms_note)
+      notes = rms_note
     )
   )
 
@@ -1095,13 +1281,14 @@ plot_data <- average_rent |>
 
 fmt <- label_dollar(accuracy = 1)
 
-p <- vs_line(plot_data, tip = fmt, when = october) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = fmt, when = october) +
   labs(
     title = "Average rent of a two-bedroom unit",                     # working title, descriptive only
-    subtitle = "Dollars per month",
+    subtitle = "Thousands of dollars per month",
     caption = cwr_caption(
       "CMHC Rental Market Survey",
-      notes = c(cma_note, rms_note)
+      notes = rms_note
     )
   )
 
@@ -1129,7 +1316,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA)
     subtitle = "Per cent change from the October before",
     caption = cwr_caption(
       "CMHC Rental Market Survey",
-      notes = c(cma_note, rms_note)
+      notes = rms_note
     )
   )
 
@@ -1154,7 +1341,7 @@ cwr_interactive(
 
 # The Region's population on July 1 of each year, the figure the growth rates
 # in the next tab are worked out from. The whole Region (the census-division
-# table), so there is no CMA note.
+# table), so it carries whole_region_note.
 plot_data <- population_growth |>
   filter(geo == cwr_region) |>
   rename(x = year, y = population)
@@ -1166,7 +1353,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), whe
   labs(
     title = "Population of the Region",                               # working title, descriptive only
     subtitle = "Thousands of people",
-    caption = cwr_caption("Statistics Canada Table 17-10-0152-01")
+    caption = cwr_caption("Statistics Canada Table 17-10-0152-01", notes = whole_region_note)
   )
 
 cwr_interactive(
@@ -1196,7 +1383,8 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), limits = c(0, N
     subtitle = "Per cent change from July 1 a year earlier",
     caption = cwr_caption(
       "Statistics Canada Table 17-10-0152-01",
-      credit = TRUE   # the growth rates are worked out here
+      credit = TRUE,   # the growth rates are worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1223,7 +1411,7 @@ cwr_interactive(
 # Shared by the eight component charts: for each component, the Region's
 # number of people over the twelve months from July to June, then the same
 # per 1,000 people beside Ontario and Canada. These are the whole Region (the
-# census-division table), so there is no CMA note.
+# census-division table), so they carry whole_region_note.
 components_people <- function(which) {
   population_components |>
     filter(geo == cwr_region, component == which) |>
@@ -1266,7 +1454,8 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), x
     subtitle = "Thousands of people",
     caption = cwr_caption(
       "Statistics Canada Table 17-10-0153-01",
-      credit = TRUE   # births less deaths is worked out here
+      credit = TRUE,   # births less deaths is worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1291,7 +1480,8 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_s
     subtitle = "People per 1,000 residents",
     caption = cwr_caption(
       c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
-      credit = TRUE   # the rates per 1,000 are worked out here
+      credit = TRUE,   # the rates per 1,000 are worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1317,7 +1507,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_l
   labs(
     title = "Immigrants to the Region",                               # working title, descriptive only
     subtitle = "Thousands of people",
-    caption = cwr_caption("Statistics Canada Table 17-10-0153-01")
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01", notes = whole_region_note)
   )
 
 cwr_interactive(
@@ -1341,7 +1531,8 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_s
     subtitle = "People per 1,000 residents",
     caption = cwr_caption(
       c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
-      credit = TRUE   # the rates per 1,000 are worked out here
+      credit = TRUE,   # the rates per 1,000 are worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1367,7 +1558,7 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_l
   labs(
     title = "Net non-permanent residents in the Region",              # working title, descriptive only
     subtitle = "Thousands of people",
-    caption = cwr_caption("Statistics Canada Table 17-10-0153-01")
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01", notes = whole_region_note)
   )
 
 cwr_interactive(
@@ -1391,7 +1582,8 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_s
     subtitle = "People per 1,000 residents",
     caption = cwr_caption(
       c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
-      credit = TRUE   # the rates per 1,000 are worked out here
+      credit = TRUE,   # the rates per 1,000 are worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1419,7 +1611,8 @@ p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_l
     subtitle = "Thousands of people",
     caption = cwr_caption(
       "Statistics Canada Table 17-10-0153-01",
-      credit = TRUE   # interprovincial plus intraprovincial migration is worked out here
+      credit = TRUE,   # interprovincial plus intraprovincial migration is worked out here
+      notes = whole_region_note
     )
   )
 
@@ -1445,7 +1638,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_s
     caption = cwr_caption(
       c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
       credit = TRUE,   # the rates per 1,000 are worked out here
-      notes = "Migration within Canada nets to zero for Canada as a whole, which has no line"
+      notes = c(whole_region_note, "Migration within Canada nets to zero for Canada as a whole, which has no line")
     )
   )
 
@@ -1527,10 +1720,11 @@ cwr_interactive(
 
 plot_data <- crime_per_100k("All crime")
 
-p <- vs_line(plot_data, tip = rate_fmt) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
   labs(
     title = "Police-reported incidents per 100,000 people",           # working title, descriptive only
-    subtitle = "Incidents per 100,000 people",
+    subtitle = "Thousands of incidents per 100,000 people",
     caption = crime_rate_caption
   )
 
@@ -1571,10 +1765,11 @@ cwr_interactive(
 
 plot_data <- crime_per_100k("Violent crime")
 
-p <- vs_line(plot_data, tip = rate_fmt) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
   labs(
     title = "Police-reported violent incidents per 100,000 people",   # working title, descriptive only
-    subtitle = "Incidents per 100,000 people",
+    subtitle = "Thousands of incidents per 100,000 people",
     caption = crime_rate_caption
   )
 
@@ -1615,10 +1810,11 @@ cwr_interactive(
 
 plot_data <- crime_per_100k("Non-violent crime")
 
-p <- vs_line(plot_data, tip = rate_fmt) +
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
   labs(
     title = "Police-reported non-violent incidents per 100,000 people",   # working title, descriptive only
-    subtitle = "Incidents per 100,000 people",
+    subtitle = "Thousands of incidents per 100,000 people",
     caption = cwr_caption(
       "Statistics Canada Table 35-10-0177-01",
       credit = TRUE,   # all violations less violent ones is worked out here

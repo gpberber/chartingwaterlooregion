@@ -46,7 +46,7 @@ Vertical bars, one value per category, right-hand y axis; optional direct labels
   # Notes if using direct labels:
   # - comment out scale_y_continuous below and replace with:
   #   scale_y_continuous(expand = expansion(mult = c(0, 0.05)))
-  # - comment out axis.text.y.right in theme() below
+  # - remove cwr_right_axis() below
   # - add to theme(): panel.grid.major.y = element_blank()
   # - consider removing right margin from plot.margin in theme() below
 
@@ -68,18 +68,15 @@ Vertical bars, one value per category, right-hand y axis; optional direct labels
 
   guides(x = guide_axis(minor.ticks = FALSE)) +
 
-  # Right-axis label positioning: sit labels above gridlines
   theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -12)
-    ),
     plot.margin = margin(t = 13, l = 13, b = 13, r = 200),
     axis.ticks.x = element_blank()
   ) +
 
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     title = "Title",
     subtitle = "Subtitle",
@@ -411,14 +408,13 @@ Two vertical bars per category (wide focus bar + narrow comparison bar or tick).
     legend.justification = c(0, 1),                      # anchor: left edge, top edge
     legend.direction = "vertical",
     legend.background = element_rect(fill = "white", color = NA),
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -13)
-    ),
 		axis.ticks.x = element_blank()
   ) +
+
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     title = "Title",
     subtitle = "Subtitle",

@@ -106,15 +106,9 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_varia
 	
 	guides(x = guide_axis(minor.ticks = TRUE)) +
 	
-	# Right-axis label positioning: sit labels above gridlines
-	theme(
-	    axis.text.y.right = element_text(
-	      size = rel(1),
-	      hjust = 1.0,
-	      vjust = -0.5,
-	      margin = margin(r = 12, l = -20)
-	    )
-	  ) +
+	# Right-axis numbers above their gridlines, ending where the gridlines end
+	# and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+	cwr_right_axis() +
 	
 	labs(
 	  title = "Title",
@@ -220,15 +214,9 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, fill = <colour_variabl
 	
 	guides(x = guide_axis(minor.ticks = TRUE)) +
 	
-	# Right-axis label positioning: sit labels above gridlines
-	theme(
-	    axis.text.y.right = element_text(
-	      size = rel(1),
-	      hjust = 1.0,
-	      vjust = -0.5,
-	      margin = margin(r = 12, l = -20)
-	    )
-	  ) +
+	# Right-axis numbers above their gridlines, ending where the gridlines end
+	# and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+	cwr_right_axis() +
 	
 	labs(
 	  title = "Title",
@@ -359,16 +347,10 @@ plot_data |>
   
   guides(x = guide_axis(minor.ticks = TRUE)) +
 
-  # Right-axis label positioning: sit labels above gridlines
-  theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -20)
-    )
-  ) +
-
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     title = "Title",
     subtitle = "Subtitle",
@@ -455,17 +437,14 @@ ggplot(plot_data, aes(x = <x_variable>, y = <y_variable>, colour = <colour_var>,
     guide = "none"
   ) +
 
-  # Right-axis label positioning: sit labels above gridlines
   theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -20)
-    ),
     plot.margin = margin(t = 13, l = 13, b = 13, r = 200)   # make plot area thinner
   ) +
 
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     title = "Title",
     subtitle = "Subtitle",

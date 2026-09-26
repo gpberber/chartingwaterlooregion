@@ -99,14 +99,7 @@ plot_data |>
 
   coord_cartesian(clip = "off") +
 
-  # Right-axis label positioning: sit labels above gridlines
   theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -15)
-    ),
     axis.title.x = element_text(
       size = base_size * 0.8,
       face = "bold",
@@ -114,6 +107,10 @@ plot_data |>
     )
   ) +
 
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     x = "<x_title>",
     title = "Title",
@@ -272,14 +269,7 @@ plot_data |>
 
   coord_cartesian(clip = "off") +
 
-  # Right-axis label positioning: sit labels above gridlines
   theme(
-    axis.text.y.right = element_text(
-      size = rel(1),
-      hjust = 1.0,
-      vjust = -0.5,
-      margin = margin(r = 12, l = -15)
-    ),
     axis.title.x = element_text(
       size = base_size * 0.8,
       face = "bold",
@@ -287,6 +277,10 @@ plot_data |>
     )
   ) +
 
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # and zero labelled or the cut axis marked (cwr-charts rules 6, 6a); after the scales
+  cwr_right_axis() +
+  
   labs(
     x = "<x_title>",
     title = "Title",

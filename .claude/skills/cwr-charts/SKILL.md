@@ -28,6 +28,7 @@ The post's setup chunk runs `source(here::here("R", "theme_cwr.R"))`, which prov
 | `cwr_ci_widest(estimate, lower, upper)` | the widest 95% interval on a chart, in points, for the `{widest}` placeholder in the stock interval note (rules 1d, 9b) |
 | `cwr_wrap(x, width = 22)` | breaks a long category label over two lines for a discrete axis (rule 11) |
 | `cwr_label(...)` | the house label for text inside the plot area: `geom_text()` with a halo behind the letters, so it stays readable over a gridline, a line or a point (rule 3e) |
+| `cwr_right_axis()` | the right-axis numbers above their gridlines, right-aligned with the gridlines' ends; zero labelled, or a zig-zag and a short baseline when the axis does not reach it; a render-time warning when the numbers are too wide to clear the data (rules 6, 6a) |
 | `cwr_line_labels(data, x, y, group, at, side, limits, bold)` | label positions that sit just above or below each line, off the gridlines (rule 3a) |
 | `cwr_figure(p, "fig-id", alt)` (plus `height`, `phone_height` when y is not categories) | saves desktop and phone PNGs to `figures/` and writes the figure (rule 7) |
 | `cwr_gap()` | multiplies a sideways nudge written in data units; 1 on the desktop and `phone_gap` while `cwr_figure()` draws the phone version (rule 11) |
@@ -279,9 +280,39 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    Worked case: `vs_line()` in the Vital Statistics page keeps quarterly ticks on
    its monthly charts and has none on its annual ones.
 5. **Bold the focus row** with the `y_label` trick (`**Region**`, from `cwr_region`, via `element_markdown`).
-6. **Value axis on the right** for vertical charts, labels sitting above gridlines
-   (the `axis.text.y.right` block in the templates). Ranked horizontal charts put the
-   x axis on top.
+6. **Value axis on the right** for vertical charts, numbers sitting just above their gridlines
+   and **right-aligned with the ends of the gridlines** (Greg, 2026-09-25, a stock rule for
+   the site). `+ cwr_right_axis()` does it: added after the scales (last before `labs()`),
+   it measures the widest number and pulls the numbers inside the panel by exactly that
+   much. Never hand-type the old `margin(r = 12, l = -20)` block. The numbers must clear the
+   right end of the data. If the widest is too wide for the room the x scale leaves on the
+   right, `cwr_right_axis()` prints a warning while the post renders. The fix is to rescale
+   the axis - thousands, with the subtitle saying so (rule 1c) - not to widen the room, which
+   stays the same share on every chart of a kind. Only numbers already short (a bar chart
+   whose last bar sits close to the edge) call for more `expand` on the x scale. The phone
+   version does the same (Greg, 2026-09-25): numbers inside the panel, right-aligned, and
+   `cwr_figure()` / `cwr_interactive()` widen the x scale's right-hand room on the phone only
+   when the half-width panel leaves too little. Worked case: `vs_line()` on the Vital
+   Statistics page, where four-digit axes (rent, crime rates, permits per person) went to
+   thousands. Ranked horizontal charts put the x axis on top.
+6a. **A value axis that does not reach zero says so; one that does labels it** (Greg,
+   2026-09-25, a stock rule for the site). `cwr_right_axis()` decides from the chart's own
+   data, so nothing is set by hand:
+   - **Starts at zero** (nothing below it, and the scale reaches it - `limits = c(0, NA)`, or
+     a bar chart): the scale starts exactly at 0, so the black baseline lies on the zero
+     gridline, the full length of the gridlines, and 0 is labelled.
+   - **Crosses zero:** the baseline stays full length and 0 is labelled (a zero break is
+     added if the scale skipped it).
+   - **Does not reach zero:** a small upright zig-zag - three short strokes running down - sits beneath the
+     lowest gridline, right-aligned with
+     the numbers, and the black baseline stops at the last data point while the gridlines
+     run on to the numbers. The breaks are fixed and the panel reaches at least half a
+     gridline step below the lowest one, so the zig-zag has room and no new gridline appears.
+
+   A chart should reach zero whenever zero is meaningful to the reading: bars always, and rates
+   compared by size. Truncate when the change is the story. Worked case: the Vital Statistics
+   page, where the EI, vacancy and growth charts start at zero and the unemployment, rent and
+   index charts are cut.
 7. **One chart per chunk, through `cwr_figure()`.** Build the plot as `p`, then call
    `cwr_figure(p, "fig-<slug>", alt = )` in a chunk
    with `#| output: asis` (chunk label without the `fig-` prefix; the id passed to the

@@ -4,6 +4,9 @@ Finished charts from the crime post, exactly as written with the templates. Use 
 ground truth for how a template looks once placeholders are filled and positions tuned.
 Data objects (`incident_summary`, `big_12`, `csi`, ...) are that post's cleaned tables.
 
+The right-axis `theme(axis.text.y.right = ...)` blocks below predate rule 6: a chart written now
+drops them and adds `cwr_right_axis()` after its scales instead.
+
 ## Line chart: the Region vs Canada vs Ontario (ggline + comp_colours)
 
 `comp_colours` is keyed by `cwr_region` ("Region"), so the data's "WRPS" is recoded to it.
