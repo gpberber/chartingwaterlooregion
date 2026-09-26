@@ -260,46 +260,73 @@ vs_line <- function(plot_data,
 # gridline and labels 0 (rule 6a); where a count goes below zero, a darker
 # line marks zero and the bars hang from it. The hover names the Region, the
 # period and the value; the bar under the mouse does not change colour.
+#
+# The Region's net business openings use it too, a bar a month: a date `x`
+# gets the monthly charts' axis (a year label each January, a minor tick each
+# quarter), and `signed = TRUE` colours each bar by its sign - blue above
+# zero, red below - instead of all blue. `colours` gives the two fills.
 vs_bar <- function(plot_data,
                    y_labels = label_number(big.mark = ","),
                    breaks = waiver(),    # y breaks
                    x_labels = waiver(),
                    tip = label_number(big.mark = ","),
-                   when = as.character) {
+                   when = as.character,
+                   signed = FALSE,       # red bars below zero
+                   colours = c(positive = dodgerblue, negative = habsred)) {
+  dated <- inherits(pull(plot_data, x), "Date")
   plot_data <- plot_data |>
     filter(!is.na(y)) |>
     mutate(
+      sign = if_else(signed & y < 0, "negative", "positive"),
       hover_id = str_c(geo, "-", x),
       tooltip = str_glue("<b>{geo}</b><br>{when(x)}<br>{tip(y)}")
     )
 
   p <- ggplot(plot_data, aes(x = x, y = y)) +
     geom_col_interactive(
-      aes(tooltip = tooltip, data_id = hover_id),
-      fill = dodgerblue,
-      width = 0.7
-    )
+      aes(tooltip = tooltip, data_id = hover_id, fill = sign),
+      # a month's bar is 20 days wide, leaving a gap between months
+      width = if (dated) 20 else 0.7
+    ) +
+    scale_fill_manual(values = colours, guide = "none")
 
   if (any(pull(plot_data, y) < 0)) {
     p <- p + geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.4)
   }
 
+  if (dated) {
+    # As vs_line()'s monthly charts: a label each January inside the data,
+    # and minor ticks only on the quarters' first months that have a bar
+    # (cwr-charts rule 4b)
+    x_min <- min(pull(plot_data, x))
+    x_max <- max(pull(plot_data, x))
+    p <- p +
+      scale_x_date(
+        breaks = seq(ceiling_date(x_min, "year"), x_max, by = "1 year"),
+        date_labels = "%Y",
+        minor_breaks = keep(sort(unique(pull(plot_data, x))), \(d) month(d) %in% c(1, 4, 7, 10)),
+        expand = expansion(mult = c(0.02, 0.06))
+      )
+  } else {
+    p <- p +
+      scale_x_continuous(
+        breaks = sort(unique(pull(plot_data, x))),
+        minor_breaks = NULL,
+        labels = x_labels,
+        # the same room on the right as the page's annual line charts, for the
+        # axis numbers
+        expand = expansion(mult = c(0.02, 0.07))
+      )
+  }
+
   p +
-    scale_x_continuous(
-      breaks = sort(unique(pull(plot_data, x))),
-      minor_breaks = NULL,
-      labels = x_labels,
-      # the same room on the right as the page's annual line charts, for the
-      # axis numbers
-      expand = expansion(mult = c(0.02, 0.07))
-    ) +
     scale_y_continuous(
       breaks = breaks,
       position = "right",
       labels = y_labels,
       expand = expansion(mult = c(0.02, 0.08))
     ) +
-    guides(x = guide_axis(minor.ticks = FALSE)) +
+    guides(x = guide_axis(minor.ticks = dated)) +
     # Numbers right-aligned with the gridlines, 0 labelled (rules 6, 6a)
     cwr_right_axis()
 }
@@ -741,8 +768,8 @@ cwr_interactive(
 ```{r}
 #| label: business-region
 
-# Shared by the three business charts: the Region's openings and closures
-# together, then each per 100 active businesses beside Ontario and Canada.
+# Shared by the three business charts: the Region's net openings (openings
+# less closures), then each per 100 active businesses beside Ontario and Canada.
 # business_gap_note() names any months left blank because Statistics Canada
 # flags a figure behind them for use with caution (E), and returns nothing
 # when there are none, which cwr_caption() treats as no note.
@@ -762,37 +789,73 @@ business_gap_note <- function(plot_data) {
 }
 business_rate_fmt <- label_number(accuracy = 0.01)
 
-# The Region's openings and closures on one chart. The two lines are the two
-# measures, not places, so `geo` holds the measure (which is what the hover
-# names) and they get their own colours - openings blue, closures red - and
-# their names on the lines, since the page's colour key does not cover them.
+# The Region's net openings each month: businesses opening less businesses
+# closing, as bars - light blue in a month with more openings, light red in one
+# with more closures - with the 12-month moving average over them as a black
+# line. Neither count is flagged, so no month is missing. The hover names the
+# Region, the month and the net figure, signed.
+net_fmt <- label_number(big.mark = ",", style_positive = "plus")
+
 plot_data <- business_dynamics |>
   filter(geo == cwr_region) |>
-  mutate(geo = measure) |>
-  rename(x = date, y = businesses)
+  select(geo, date, measure, businesses) |>
+  pivot_wider(names_from = measure, values_from = businesses) |>
+  mutate(y = Openings - Closures) |>
+  rename(x = date) |>
+  arrange(x) |>
+  # The average of each month and the eleven before it. slider::slide_dbl()
+  # runs mean() over that window; `.complete = TRUE` leaves the first eleven
+  # months without one (NA), since they have no full year behind them.
+  mutate(average = slider::slide_dbl(y, mean, .before = 11, .complete = TRUE))
 
-p <- vs_line(
-  plot_data,
-  colours = c(Openings = dodgerblue, Closures = habsred),
-  label_lines = TRUE
-) +
+# A key for the average line, inside the plot: a short black line and its
+# name, a fifth of the way along the months and four-fifths of the way up to
+# the tallest bar, where the bars (tallest at the very start) leave room. Its
+# spot comes from the data, so it moves with them; if a new month ever puts a
+# tall bar under it, move `key_x` or `key_y`.
+x_range <- range(pull(plot_data, x))
+key_x <- x_range[1] + 0.2 * as.numeric(diff(x_range))
+key_y <- 0.8 * max(pull(plot_data, y))
+
+p <- vs_bar(plot_data, y_labels = label_number(big.mark = ","), tip = net_fmt,
+            when = \(x) format(x, "%B %Y"), signed = TRUE,
+            colours = c(positive = dodgerblue50, negative = habsred50)) +
+  # The 12-month moving average, over the bars (from the first full year on)
+  geom_line(
+    data = filter(plot_data, !is.na(average)),
+    aes(x = x, y = average),
+    colour = "black",
+    linewidth = 0.8
+  ) +
+  annotate("segment", x = key_x, xend = key_x + 90, y = key_y, yend = key_y,
+           colour = "black", linewidth = 0.8) +
+  cwr_label(
+    data = tibble(x = key_x + 110, y = key_y, label = "12-month moving average"),
+    aes(x = x, y = y, label = label),
+    colour = "black", size = 3.2, hjust = 0,
+    inherit.aes = FALSE
+  ) +
   labs(
-    title = "Business openings and closures in the Region",           # working title, descriptive only
-    subtitle = str_glue("Businesses opening and closing · Monthly · Updated {updated('33-10-0270-01')}"),
-    caption = cwr_caption("Statistics Canada Table 33-10-0270-01")
+    title = "Net business openings in the Region",                    # working title, descriptive only
+    subtitle = str_glue("Businesses opening less businesses closing · Monthly · Updated {updated('33-10-0270-01')}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 33-10-0270-01",
+      credit = TRUE   # openings less closures, and its average, are worked out here
+    )
   )
 
-latest_counts <- plot_data |>
-  filter(x == max(x)) |>
-  mutate(text = str_c(str_to_lower(geo), " ", label_number(big.mark = ",")(y))) |>
-  pull(text)
+months_net_closing <- plot_data |>
+  filter(y < 0) |>
+  nrow()
 
 cwr_interactive(
   p, "fig-business-region",
   alt = str_glue(
-    "Line chart of the number of businesses opening and the number closing each month, seasonally ",
-    "adjusted, {vs_span(plot_data)}, in {cma_words}. In {format(max(pull(plot_data, x)), '%B %Y')}: ",
-    "{str_flatten_comma(latest_counts, ' and ')}."
+    "Bar chart of the number of businesses opening less the number closing each month, seasonally ",
+    "adjusted, {vs_span(plot_data)}, in {cma_words}. More businesses closed than opened in ",
+    "{months_net_closing} of the {nrow(plot_data)} months. A line shows the 12-month moving average. ",
+    "In {format(max(pull(plot_data, x)), '%B %Y')}: {net_fmt(last(pull(plot_data, y)))}, and a ",
+    "12-month average of {net_fmt(round(last(pull(plot_data, average)), 1))} a month."
   ),
   height = 5, phone_height = 4.5
 )
