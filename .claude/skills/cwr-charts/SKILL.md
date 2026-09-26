@@ -246,7 +246,12 @@ in `ggvertbar` or `gghorbar`; if a reader needs to compare shares, bars are what
    whole rectangle rather than the letters and shoved the text off the point it marked with its
    padding; no `label.padding` to tune, and the label sits exactly where `geom_text()` would
    have put it. `bg.colour` (white) and `bg.r` (0.15, a share of the text size, so it shrinks
-   with the label on the phone) are the house defaults and are not usually passed. Two
+   with the label on the phone) are the house defaults and are not usually passed. All text in
+   the plot area is Inter, like the rest of the chart (Greg, 2026-09-26): `geom_text()` and
+   `geom_label()` take it from the theme, and `theme_cwr.R` sets it as the default for
+   `geom_shadowtext()` and ggtext's `geom_richtext()`, which otherwise fall back to Arial. So
+   never pass `family` in a chart; a new text geom from another package gets its default set
+   there, beside those two. Two
    exceptions: text **inside** a filled bar, tile or map polygon stays `geom_text()`, because
    the fill is already its background and a white halo around white text would eat it; and a
    boxed second column (`gglollipoprect`, `gghorbarrect`) keeps its grey `geom_label()` box,

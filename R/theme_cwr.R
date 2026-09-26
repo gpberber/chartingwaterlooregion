@@ -283,6 +283,15 @@ theme_cwr <- function(base_size = 15, base_family = cwr_font(), width = 8.3) {
 # Make it the default for every ggplot in the session
 theme_set(theme_cwr(base_size = 15))
 
+# Text drawn inside the plot is Inter too (Greg, 2026-09-26). geom_text(),
+# geom_label() and annotate("text") already get it from the theme set above:
+# ggplot2 hands the theme's font to those geoms. geom_shadowtext() - behind
+# cwr_label() and annotate("shadowtext") - and ggtext's geom_richtext() carry
+# their own fixed default instead, the graphics device's plain sans font
+# (Arial on Windows), so their default is changed here, once, for every chart.
+update_geom_defaults(GeomShadowText, aes(family = cwr_font()))
+update_geom_defaults(GeomRichText, aes(family = cwr_font()))
+
 # The templates refer to base_size for text sizes inside geoms and annotations
 base_size <- 15
 
