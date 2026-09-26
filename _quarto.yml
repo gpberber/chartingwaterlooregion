@@ -7,7 +7,8 @@ project:
   output-dir: _site
   render:
     - "*.qmd"
-    - "!posts/*/R/"      # exploration notebooks and scripts are not site pages
+    - "!**/R/"           # data scripts and exploration notebooks are not site pages,
+                         # wherever they live: posts/, a standing page's folder, anywhere
     - "!posts/*/app/"    # Shiny apps are deployed separately, never rendered here
     - "!_dev/"
     - "!_templates/"

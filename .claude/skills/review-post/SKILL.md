@@ -153,7 +153,8 @@ For every `ggplot` chunk:
 - The post ends with the "Reproducibility and data download" callout (download link, session
   info) and its setup chunk sources `R/data_bundle.R` and sets `data_bundle_version`. The callout
   must NOT print the data dictionary: it belongs in the post's README and the download zip only.
-  Flag any `cwr_dictionary_table()` call or `tbl-dictionary` chunk left in a post.
+  Flag any chunk that prints it - a `tbl-dictionary` chunk, or a `gt()` built from
+  `data/dictionary.csv`.
 - `data/tables.csv` lists every table the post reads (including any from `datasets/`), with
   description, source, licence and `sample` filled in; `data/dictionary.csv` describes every column,
   and names any confidence bound as one. The README's Data sources table has its Sample column filled

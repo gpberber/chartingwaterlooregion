@@ -314,6 +314,34 @@ cwr_quality_flags <- function(data, table, notes = NULL, log = NULL,
   invisible(original)
 }
 
+# Reads back the footnotes a post's 01_get_data.R saved for one table, ready to
+# hand to cwr_quality_flags(notes = ). `01_get_data.R` writes them next to the
+# raw table it downloaded, as "<file stem>_notes.csv":
+#
+#   get_cansim_table_notes("35-10-0177-01") |>
+#     write_csv(file.path(raw_dir, "table_35100177_notes.csv"))
+#
+# so a cleaning script reads them back with
+#
+#   notes = cwr_table_notes("table_35100177", raw_dir)
+#
+# Every column is read as text on purpose. A note number is an identifier, not
+# a quantity, and read_csv() would otherwise guess a type per file - so the
+# same note could arrive as "36" from one table and 36 from another, and the
+# join to the README's hidden flag codes would silently miss.
+#
+# `dir` defaults to `raw_dir`, which every cleaning script sets near the top.
+# Four posts had this same three-line reader copied into them before it moved
+# here (2026-09-26).
+cwr_table_notes <- function(file_stem, dir = get0("raw_dir", envir = parent.frame())) {
+  if (is.null(dir)) {
+    stop("cwr_table_notes(): no raw_dir in this script, so say where the notes are: ",
+         "cwr_table_notes(\"", file_stem, "\", dir = here(...))", call. = FALSE)
+  }
+  read_csv(file.path(dir, str_c(file_stem, "_notes.csv")),
+           col_types = cols(.default = col_character()))
+}
+
 # Footnote rows in the same shape as symbol rows. `flag` is the note number,
 # `meaning` the note text, and `columns` says what the note is attached to.
 cwr_note_rows <- function(notes) {

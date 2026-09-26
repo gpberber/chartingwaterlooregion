@@ -130,11 +130,21 @@ make_share_image <- function(chart_png, share_png) {
   invisible()
 }
 
-# ---- Structured data for a post -------------------------------------------------
+# ---- Structured data for a post or a standing page ------------------------------
 
-post_json_ld <- function(page, html, path, url) {
-  slug <- str_match(path, "^posts/([^/]+)/index\\.html$")[, 2]
-  qmd <- here("posts", slug, "index.qmd")
+# Posts live in posts/<slug>/; a standing page such as vital-statistics/ sits at
+# the top of the project. Both are a folder holding an index.qmd, a README and a
+# data/ folder, so both are described here - a post as a BlogPosting (written
+# once, on a date) and a page as a WebPage (kept up to date). Without this a
+# standing page going live would carry a canonical link and nothing else.
+page_folder <- function(slug) {
+  post_dir <- here("posts", slug)
+  if (dir.exists(post_dir)) post_dir else here(slug)
+}
+
+page_json_ld <- function(page, html, url, slug, is_post) {
+  folder <- page_folder(slug)
+  qmd <- file.path(folder, "index.qmd")
   yaml <- if (file.exists(qmd)) rmarkdown::yaml_front_matter(qmd) else list()
 
   # The title without the " – Charting Waterloo Region" Quarto adds for the tab
@@ -150,9 +160,14 @@ post_json_ld <- function(page, html, path, url) {
     setdiff(c("Snapshot", "Deep dive"))   # the post type is not a topic
   image <- meta_content(page, "og:image")
 
+  # A post is an article and takes `headline`; a standing page is a page and
+  # takes `name`. A page also has no publication date to give - it is kept up
+  # to date rather than written on a day - so it carries a date only when its
+  # YAML sets `date-modified:`, and says nothing when it does not.
   article <- compact(list(
-    `@type` = "BlogPosting",
-    headline = title,
+    `@type` = if (is_post) "BlogPosting" else "WebPage",
+    headline = if (is_post) title else NULL,
+    name = if (is_post) NULL else title,
     description = description,
     datePublished = published,
     dateModified = modified %||% published,
@@ -169,13 +184,13 @@ post_json_ld <- function(page, html, path, url) {
 
   graph <- list(article)
 
-  # A Dataset block when the post links to its data bundle on GitHub Releases
+  # A Dataset block when the page links to its data bundle on GitHub Releases
   bundle <- str_match(html, "https://github\\.com/[^\"]+/releases/download/[^\"]+\\.zip")[, 1]
-  tables_csv <- here("posts", slug, "data", "tables.csv")
+  tables_csv <- file.path(folder, "data", "tables.csv")
   if (!is.na(bundle) && file.exists(tables_csv)) {
     tables <- read_csv(tables_csv, col_types = cols(.default = col_character())) |>
       janitor::clean_names()
-    dictionary_csv <- here("posts", slug, "data", "dictionary.csv")
+    dictionary_csv <- file.path(folder, "data", "dictionary.csv")
     dictionary <- if (file.exists(dictionary_csv)) {
       read_csv(dictionary_csv, col_types = cols(.default = col_character())) |>
         janitor::clean_names() |>
@@ -183,7 +198,7 @@ post_json_ld <- function(page, html, path, url) {
     } else {
       tibble(column = character(), description = character(), units = character())
     }
-    sources <- readme_table(here("posts", slug, "README.md"), "Data sources")
+    sources <- readme_table(file.path(folder, "README.md"), "Data sources")
     licence_col <- names(sources)[str_detect(str_to_lower(names(sources)), "licen")][1]
     source_col <- names(sources)[str_detect(str_to_lower(names(sources)), "^source")][1]
     licences <- if (!is.null(sources) && !is.na(licence_col)) link_urls(sources[[licence_col]]) else character()
@@ -191,7 +206,8 @@ post_json_ld <- function(page, html, path, url) {
     based_on <- if (!is.null(sources) && !is.na(source_col)) link_urls(sources[[source_col]]) else character()
 
     dataset_description <- str_c(
-      "The tables behind the Charting Waterloo Region post “", title, "”, cleaned and ",
+      "The tables behind the Charting Waterloo Region ", if (is_post) "post" else "page",
+      " “", title, "”, cleaned and ",
       "ready to use, in CSV, Parquet and Excel with a data dictionary. ",
       str_c(tables$table, ": ", tables$description, collapse = " ")
     ) |> str_trunc(5000)
@@ -272,7 +288,20 @@ walk(pages, function(path) {
 
   page <- xml2::read_html(html)
   url <- canonical_url(path)
+
+  # Two shapes get described in full: a post at posts/<slug>/index.html, and a
+  # standing page in a folder of its own at <slug>/index.html (vital-statistics
+  # today). The home page is index.html with no folder, so it matches neither
+  # and gets its own WebSite block further down.
   is_post <- str_detect(path, "^posts/[^/]+/index\\.html$")
+  is_standing_page <- str_detect(path, "^[^/]+/index\\.html$") && !str_starts(path, "posts/")
+  slug <- if (is_post) {
+    str_match(path, "^posts/([^/]+)/")[, 2]
+  } else if (is_standing_page) {
+    str_match(path, "^([^/]+)/")[, 2]
+  } else {
+    NA_character_
+  }
   added <- character()
 
   # A draft rendered with the draft profile carries Quarto's draft banner. It
@@ -292,19 +321,21 @@ walk(pages, function(path) {
   }
 
   # 4. The sharing picture, before the structured data so both use it
-  if (is_post) {
-    slug <- str_match(path, "^posts/([^/]+)/")[, 2]
-    qmd <- here("posts", slug, "index.qmd")
+  if (is_post || is_standing_page) {
+    built_dir <- str_remove(path, "index\\.html$")     # "posts/welcome/" or "vital-statistics/"
+    qmd <- file.path(page_folder(slug), "index.qmd")
     choice <- if (file.exists(qmd)) rmarkdown::yaml_front_matter(qmd)$`share-figure` else NULL
     if (!identical(choice, "none")) {
+      # A page drawn entirely with cwr_interactive() has no PNG to use, and
+      # keeps whatever its `image:` names - the site card, usually.
       charts <- str_match_all(html, 'src="figures/(fig-[^"]+?)\\.png"')[[1]][, 2]
       charts <- charts[!str_ends(charts, "-phone")]
       figure <- choice %||% charts[1]
-      chart_png <- file.path(site_dir, "posts", slug, "figures", paste0(figure, ".png"))
+      chart_png <- file.path(site_dir, built_dir, "figures", paste0(figure, ".png"))
       if (length(figure) == 1 && !is.na(figure) && file.exists(chart_png)) {
-        share_png <- file.path(site_dir, "posts", slug, "figures", "share.png")
+        share_png <- file.path(site_dir, built_dir, "figures", "share.png")
         make_share_image(chart_png, share_png)
-        share_url <- str_c(site_url, "/posts/", slug, "/figures/share.png")
+        share_url <- str_c(site_url, "/", built_dir, "figures/share.png")
         # Quarto writes og: tags with property= and twitter: tags with name=.
         # The lookbehinds match the text before each value without capturing it.
         html <- html |>
@@ -317,15 +348,15 @@ walk(pages, function(path) {
         page <- xml2::read_html(html)
         counts[["share"]] <<- counts[["share"]] + 1
       } else if (!is.null(choice)) {
-        warning("share-figure: ", choice, " in posts/", slug, " has no PNG in figures/; ",
-                "the post keeps its thumbnail as its sharing picture.", call. = FALSE)
+        warning("share-figure: ", choice, " in ", built_dir, " has no PNG in figures/; ",
+                "the page keeps its thumbnail as its sharing picture.", call. = FALSE)
       }
     }
   }
 
   # 2 and 3. Structured data
-  if (is_post) {
-    data <- post_json_ld(page, html, path, url)
+  if (is_post || is_standing_page) {
+    data <- page_json_ld(page, html, url, slug, is_post)
     if (length(data$`@graph`) > 1) counts[["dataset"]] <<- counts[["dataset"]] + 1
     added <- c(added, json_ld(data))
   } else if (path == "index.html") {

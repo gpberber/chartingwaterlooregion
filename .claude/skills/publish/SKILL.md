@@ -11,9 +11,25 @@ site as it is, e.g. after fixing a typo or changing the design).
 
 Explain each step in one plain sentence as you go; the user is new to git and publishing.
 
+**Posts and standing pages.** A slug is usually a post at `posts/<slug>/`, but it can also be a
+standing page in a folder of its own at `<slug>/` - `vital-statistics/`, a page of charts kept up
+to date rather than written once. Work out which it is before step 1 (`ls posts/<slug>` then
+`ls <slug>`) and read `<folder>` below as whichever it is. The differences, all in the pre-flight:
+
+- **Dates (step 1).** A page has no publication date and takes no "Modified" date either: it is
+  never finished. Set `draft: false` and leave dates alone unless Greg asks for one.
+- **The data bundle (step 2).** Bundles are per post. A standing page gets one only if it has
+  `data/tables.csv`, `data/dictionary.csv` and a `data_bundle_version` in its setup chunk; if it
+  has none of those, skip step 2 and say so rather than building a bundle nobody links to.
+- **The listing.** A page is not in the post listing, so the "does the home page show it" part of
+  step 3 does not apply; check the page's own address instead.
+- **Its sharing picture (step 3).** A page drawn entirely with `cwr_interactive()` has no chart
+  PNG, so `R/seo_post_render.R` leaves the picture its `image:` names. That is expected - but say
+  so, because a link to it will preview with the site card rather than a chart.
+
 ## Pre-flight
 
-1. If a slug is given: confirm with the user that `posts/<slug>` should go public, then set
+1. If a slug is given: confirm with the user that `<folder>` should go public, then set
    `draft: false` in its YAML. Suggest running `/review-post <slug>` first if it has not been done.
    **Dates.** A post's `date:` is its publication date, so set it to today when flipping
    `draft: false` - whatever date the scaffold put there is the day drafting started, not the day
@@ -38,8 +54,8 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    `R/data_bundle.R`); if they are not, stop and ask the user to complete them (Claude can
    draft descriptions from the cleaning script for the user to check).
 3. Stop any running preview server (it renders with the draft profile and writes draft posts,
-   and a listing that includes them, into `_site/`). **First render each post going live on its
-   own** - `quarto render posts/<slug>` - and likewise any live post whose `README.md` changed since
+   and a listing that includes them, into `_site/`). **First render each post or page going live on its
+   own** - `quarto render <folder>` - and likewise any live post whose `README.md` changed since
    it was last rendered (`git diff --name-only` since the last publish). A full render reuses each
    post's saved results in `_freeze/`, which only refresh when the `.qmd` changes, so without this a
    README edit would never reach the post: its Sources and Reliability tables would go out stale,
@@ -47,7 +63,7 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
    single post always re-runs its code, so both are current. It must finish without errors; a
    stop from `cwr_reliability_table()` means a flag in `data/quality_flags.csv` has no row, and
    is fixed in the README, never worked around. Then `quarto render` (no profile) from the project
-   root. It must finish without errors. Check that `_site/posts/<slug>/index.html`
+   root. It must finish without errors. Check that `_site/<folder>/index.html`
    exists, that `_site/index.html` does not mention any draft slug, and that no draft post
    appears in `_site/posts/`; a public render does not delete a draft's folder left behind by
    an earlier draft render, so `rm -rf _site/posts/<draft-slug>` for any that remain. Never
@@ -60,7 +76,8 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
 
    Check that the search tidying ran (`R/seo_post_render.R`, run by Quarto after every render):
    the render output ends with a `seo_post_render.R: ... pages tagged` line, and
-   `grep -c 'rel="canonical"' _site/posts/<slug>/index.html` prints 1. If not, run
+   `grep -c 'rel="canonical"' _site/<folder>/index.html` prints 1. A post also carries a
+   `BlogPosting` block and a page a `WebPage` one (`grep -c 'application/ld+json'`). If not, run
    `Rscript R/seo_post_render.R` and read its error. Never publish without it: the sitemap would
    go back to listing `index.html` addresses.
 
@@ -96,9 +113,9 @@ Explain each step in one plain sentence as you go; the user is new to git and pu
 8. `quarto publish gh-pages --no-render --no-prompt`. This pushes the already-rendered `_site/` to
    the `gh-pages` branch, which GitHub Pages serves. First time only: it creates the branch, and
    the user may need to set Settings → Pages → Source to the `gh-pages` branch on GitHub.
-9. Wait about a minute, then open `https://chartingwaterlooregion.ca/posts/<slug>/`
-   (or the home page) in the Browser pane. Confirm the page loads, the listing shows the post with
-   its thumbnail, and charts display. Screenshot it for the user.
+9. Wait about a minute, then open `https://chartingwaterlooregion.ca/<folder>/`
+   (or the home page) in the Browser pane. Confirm the page loads, charts display, and - for a
+   post - that the listing shows it with its thumbnail. Screenshot it for the user.
 
 ## After
 

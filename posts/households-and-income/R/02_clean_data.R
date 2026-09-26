@@ -25,12 +25,6 @@ source(here("R", "data_quality.R"))
 quality_log <- file.path(data_dir, "quality_flags.csv")
 unlink(quality_log)
 
-# The footnotes 01_get_data.R saved beside each table
-table_notes <- function(file_stem) {
-  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
-           col_types = cols(.default = col_character()))
-}
-
 # ---- The seven municipalities ----------------------------------------------
 # The census tables name each place but not what kind of place it is, and name
 # two of them "Waterloo" - the city and the Region. So the seven are listed here
@@ -77,7 +71,7 @@ cpi_monthly <- read_csv(
 # Only the months of the two years compared feed the figures
 cpi_monthly <- cpi_monthly |>
   filter(year %in% c(income_year, dollar_year)) |>
-  cwr_quality_flags("18-10-0004-01", notes = table_notes("table_18100004"), log = quality_log)
+  cwr_quality_flags("18-10-0004-01", notes = cwr_table_notes("table_18100004"), log = quality_log)
 
 cpi <- cpi_monthly |>
   summarise(index = mean(value), months = n(), .by = year)
@@ -104,7 +98,7 @@ household_income <- read_csv(
   )
 
 household_income <- cwr_quality_flags(household_income, "98-10-0057-01",
-                                      notes = table_notes("table_98100057"), log = quality_log)
+                                      notes = cwr_table_notes("table_98100057"), log = quality_log)
 
 household_income <- household_income |>
   select(geo_uid, household_income = value)
@@ -124,7 +118,7 @@ individual_income <- read_csv(
   )
 
 individual_income <- cwr_quality_flags(individual_income, "98-10-0070-01",
-                                       notes = table_notes("table_98100070"), log = quality_log)
+                                       notes = cwr_table_notes("table_98100070"), log = quality_log)
 
 individual_income <- individual_income |>
   select(geo_uid, individual_income = value)
@@ -179,7 +173,7 @@ household_dwellings <- read_csv(
          (structural_type_of_dwelling_9 == "Single-detached house" |
             str_starts(structural_type_of_dwelling_9, "Total")))
   ) |>
-  cwr_quality_flags("98-10-0041", notes = table_notes("table_98100041"), log = quality_log)
+  cwr_quality_flags("98-10-0041", notes = cwr_table_notes("table_98100041"), log = quality_log)
 
 # Statistics Canada publishes the average itself, so it is read rather than
 # worked out here: the size categories stop at "5 or more persons", and an

@@ -37,7 +37,7 @@ dir.create(data_dir, showWarnings = FALSE)
 # kept <- kept |>
 #   cwr_quality_flags(
 #     "35-10-0177-01",
-#     notes = read_csv(file.path(raw_dir, "table_35100177_notes.csv")),
+#     notes = cwr_table_notes("table_35100177"),   # footnotes saved by 01_get_data.R
 #     log   = file.path(data_dir, "quality_flags.csv")
 #   )
 

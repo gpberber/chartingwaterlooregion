@@ -26,12 +26,6 @@ source(here("R", "data_quality.R"))
 quality_log <- file.path(data_dir, "quality_flags.csv")
 unlink(quality_log)
 
-# The footnotes 01_get_data.R saved beside each table
-table_notes <- function(file_stem) {
-  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
-           col_types = cols(.default = col_character()))
-}
-
 # ---- Confidence intervals for shares ---------------------------------------
 # Place of work status is a long-form question, asked of one private household
 # in four, so every count is a weighted estimate for everyone in private
@@ -115,7 +109,7 @@ pow_2021 <- read_csv(
   mutate(value = if_else(
     is.na(value) & is.na(status) & statistics_3 == "Count", 0, value
   )) |>
-  cwr_quality_flags("98-10-0456", notes = table_notes("table_98100456"), log = quality_log)
+  cwr_quality_flags("98-10-0456", notes = cwr_table_notes("table_98100456"), log = quality_log)
 
 # The share of each place's workers who worked at home, at the table's own
 # industry total, turned into a share with its interval like the modes above
@@ -154,7 +148,7 @@ home_2016_raw <- read_csv(
       "^[0-9-]+ "
     ))
   ) |>
-  cwr_quality_flags("98-400-X2016321", notes = table_notes("table_2016321"), log = quality_log)
+  cwr_quality_flags("98-400-X2016321", notes = cwr_table_notes("table_2016321"), log = quality_log)
 
 home_2016 <- home_2016_raw |>
   # The file now carries a row per industry as well (see the industry section
@@ -348,7 +342,7 @@ read_class_of_worker <- function(file_stem, table) {
     col_types = cols(.default = col_character())
   ) |>
     clean_names() |>
-    cwr_quality_flags(table, notes = table_notes(file_stem), log = quality_log) |>
+    cwr_quality_flags(table, notes = cwr_table_notes(file_stem), log = quality_log) |>
     select(
       industry = starts_with("dim_industry"),
       total = matches("member_id_3_all_classes_of_workers"),

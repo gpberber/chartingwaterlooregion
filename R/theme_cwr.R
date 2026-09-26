@@ -1794,7 +1794,20 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
 # exactly what the README says. Call it from a chunk with `#| output: asis`.
 # The run of table lines under one "## " heading of a post's README. Shared by
 # the two tables the post prints from its README: sources and reliability.
-cwr_readme_table <- function(slug, heading, readme = here::here("posts", slug, "README.md")) {
+# Where a slug's README lives. Almost always `posts/<slug>/README.md`, but a
+# standing page such as `vital-statistics/` sits at the top of the project
+# instead, and used to have to say so at every call
+# (`cwr_sources_table("vital-statistics", readme = here(...))`, three times a
+# page). Looking in both places removes that. A `readme =` argument still wins,
+# and a slug with no README anywhere returns the post path so the error names
+# the file a post is expected to have.
+cwr_page_readme <- function(slug) {
+  candidates <- c(here::here("posts", slug, "README.md"), here::here(slug, "README.md"))
+  found <- candidates[file.exists(candidates)]
+  if (length(found) == 0) candidates[[1]] else found[[1]]
+}
+
+cwr_readme_table <- function(slug, heading, readme = cwr_page_readme(slug)) {
   if (!file.exists(readme)) {
     stop("No README.md for post '", slug, "' at ", readme, call. = FALSE)
   }
@@ -1817,7 +1830,7 @@ cwr_readme_table <- function(slug, heading, readme = here::here("posts", slug, "
   table_lines
 }
 
-cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+cwr_sources_table <- function(slug, readme = cwr_page_readme(slug)) {
   table_lines <- cwr_readme_table(slug, "Data sources", readme)
   cat(table_lines, sep = "\n")
   cat("\n")
@@ -1844,7 +1857,7 @@ cwr_sources_table <- function(slug, readme = here::here("posts", slug, "README.m
 #
 # Printed as a markdown table, like the sources table, so the post says exactly
 # what the README says. Call it from a chunk with `#| output: asis`.
-cwr_key_terms_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+cwr_key_terms_table <- function(slug, readme = cwr_page_readme(slug)) {
   table_lines <- cwr_readme_table(slug, "Key terms", readme)
 
   # Split each row into its cells; the first two lines are the header and the
@@ -1904,7 +1917,7 @@ cwr_key_terms_table <- function(slug, readme = here::here("posts", slug, "README
 # by cwr_quality_flags() in R/02_clean_data.R) has no row carrying its code,
 # so a flag cannot reach the published post without being dealt with. A row
 # left out of the post with a reason still counts: the flag was considered.
-cwr_reliability_table <- function(slug, readme = here::here("posts", slug, "README.md")) {
+cwr_reliability_table <- function(slug, readme = cwr_page_readme(slug)) {
   table_lines <- cwr_readme_table(slug, "Reliability", readme)
 
   # ---- Every recorded flag has a row -----------------------------------------

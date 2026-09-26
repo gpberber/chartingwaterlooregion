@@ -27,12 +27,6 @@ source(here("R", "data_quality.R"))
 quality_log <- file.path(data_dir, "quality_flags.csv")
 unlink(quality_log)
 
-# The footnotes 01_get_data.R saved beside each table
-table_notes <- function(file_stem) {
-  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
-           col_types = cols(.default = col_character()))
-}
-
 # ---- 1. The seven municipal polygons ---------------------------------------
 # The shapefile holds every census subdivision in Canada, about 5,000 polygons
 # and 300 MB of geometry, so it is filtered while it is being read rather than
@@ -104,7 +98,7 @@ population_kept <- read_csv(file.path(raw_dir, "table_17100155.csv"),
   filter(ref_date == "2025", geo_uid %in% districts$csduid)
 
 population_kept <- cwr_quality_flags(population_kept, "17-10-0155-01",
-                                     notes = table_notes("table_17100155"), log = quality_log)
+                                     notes = cwr_table_notes("table_17100155"), log = quality_log)
 
 population <- population_kept |>
   select(csduid = geo_uid, population = value)
@@ -216,7 +210,7 @@ cattle_kept <- read_csv(
 # (acceptable), or E, F or x; the check reports them and blanks any this site
 # never uses.
 cattle_kept <- cattle_kept |>
-  cwr_quality_flags("32-10-0370-01", notes = table_notes("table_32100370"), log = quality_log)
+  cwr_quality_flags("32-10-0370-01", notes = cwr_table_notes("table_32100370"), log = quality_log)
 
 # People on the same day, from the 2021 census count
 census_population_kept <- read_csv(
@@ -230,7 +224,7 @@ census_population_kept <- read_csv(
   )
 
 census_population_kept <- census_population_kept |>
-  cwr_quality_flags("98-10-0002-01", notes = table_notes("table_98100002"), log = quality_log)
+  cwr_quality_flags("98-10-0002-01", notes = cwr_table_notes("table_98100002"), log = quality_log)
 
 # One row per township. The chart adds them up; the file keeps them apart so a
 # reader downloading the data can see each township's figures.

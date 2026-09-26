@@ -32,12 +32,6 @@ source(here("R", "data_quality.R"))
 quality_log <- file.path(data_dir, "quality_flags.csv")
 unlink(quality_log)
 
-# The footnotes 01_get_data.R saved beside each table
-table_notes <- function(file_stem) {
-  read_csv(file.path(raw_dir, str_c(file_stem, "_notes.csv")),
-           col_types = cols(.default = col_character()))
-}
-
 # ---- Confidence intervals for shares ---------------------------------------
 # Commuting is a long-form question, asked of one private household in four, so
 # every count is a weighted estimate for everyone in private households.
@@ -105,7 +99,7 @@ commuting_raw <- read_csv(
     str_starts(gender_3, "Total"),
     str_starts(main_mode_of_commuting_11a, "Total")
   ) |>
-  cwr_quality_flags("98-10-0462", notes = table_notes("table_98100462"), log = quality_log) |>
+  cwr_quality_flags("98-10-0462", notes = cwr_table_notes("table_98100462"), log = quality_log) |>
   figure_per_row(c("geo_uid", "commuting_destination_5"))
 
 # ---- Tidy ------------------------------------------------------------------
@@ -172,7 +166,7 @@ commuting_mode <- read_csv(
   mutate(value = if_else(
     is.na(value) & is.na(status) & statistics_3 == "Count", 0, value
   )) |>
-  cwr_quality_flags("98-10-0464", notes = table_notes("table_98100464"), log = quality_log) |>
+  cwr_quality_flags("98-10-0464", notes = cwr_table_notes("table_98100464"), log = quality_log) |>
   figure_per_row(c("geo_uid", "main_mode_of_commuting_11a")) |>
   # Each mode's share of all commuters in the district. The total row is
   # picked out as the denominator before the other modes are dropped.
@@ -227,7 +221,7 @@ commutes_raw <- read_csv(
 commutes_raw <- commutes_raw |>
   filter(as.numeric(gender_3_total_gender_1) > 0) |>
   cwr_quality_flags("98-10-0459", values = "gender_3_total_gender_1",
-                    notes = table_notes("table_98100459"), log = quality_log)
+                    notes = cwr_table_notes("table_98100459"), log = quality_log)
 
 commutes <- commutes_raw |>
   mutate(
