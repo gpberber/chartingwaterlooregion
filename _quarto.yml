@@ -1,0 +1,137 @@
+# Site configuration for Charting Waterloo Region.
+# Post-level defaults live in posts/_metadata.yml. House colours live in custom.scss
+# (and, for charts, in R/theme_cwr.R). Keep the two palettes in sync.
+
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "!**/R/"           # data scripts and exploration notebooks are not site pages,
+                         # wherever they live: posts/, a standing page's folder, anywhere
+    - "!posts/*/app/"    # Shiny apps are deployed separately, never rendered here
+    - "!_dev/"
+    - "!_templates/"
+    - "!datasets/"      # shared data pipelines and exploration notebooks
+    - "!vital-statistics/R/"   # the Vital Statistics page's data scripts
+  resources:
+    # A leading slash anchors a pattern to the project root. Without it Quarto
+    # matches the folder name at any depth, so "images/" also copied the
+    # exploration notebooks' screenshots under datasets/ on to the public site.
+    - /images/          # favicon, logo, placeholder thumbnail, social card
+    - /fonts/           # self-hosted Inter; custom.scss points at these by path
+    - favicon.ico       # browsers request /favicon.ico whether or not a page names it
+    - posts/*/figures/  # chart PNGs from cwr_figure(); the phone versions sit in
+                        # <source srcset>, which Quarto does not scan for resources
+    - CNAME             # tells GitHub Pages the custom domain; must be republished every
+                        # time, because publishing overwrites the whole gh-pages branch
+  # Search-engine tidying of the built pages in _site/ after every render:
+  # canonical links, structured data, a Dataset block for posts with a data
+  # download, a 1200 x 630 sharing picture and lazy-loaded images. The script
+  # explains each one; it never touches a .qmd or _freeze/.
+  post-render: R/seo_post_render.R
+
+execute:
+  freeze: auto           # re-run R only when a post source changes; results cached in _freeze/
+
+website:
+  title: "Charting Waterloo Region"
+  description: "Learning about life in Waterloo Region, one chart at a time."
+  site-url: https://chartingwaterlooregion.ca
+  repo-url: https://github.com/gpberber/chartingwaterlooregion
+  repo-branch: master             # Quarto assumes "main" unless told otherwise
+  repo-actions: [source]          # "view source" link on every page; issues are not used
+  favicon: images/favicon.svg
+  image: images/social-card.png   # default preview image when a link is shared
+  open-graph: true
+  twitter-card: true
+  draft-mode: gone                # posts with draft: true are not rendered at all
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    # The full-colour mark, and the site name as ordinary text beside it.
+    #
+    # It used to be images/logo.svg, a single picture holding both the glyph and
+    # the name. That is why the navbar kept coming out misaligned on one device or
+    # another: a picture of text has its baseline frozen where the drawing put it,
+    # while the links beside it get theirs from the browser, out of the font's
+    # metrics. The two only ever agreed by coincidence, and the coincidence did not
+    # survive a change of browser, of platform, or of which copy of Inter was in
+    # use. As real text the name is laid out by the same engine, in the same font,
+    # on the same line as the links - so it lines up by construction rather than by
+    # tuning. images/logo.svg is no longer used by the site; make_logo.R still
+    # builds it for anywhere a lock-up of glyph and name is wanted.
+    #
+    # logo-alt is empty because the logo is now decorative: the name is right
+    # beside it in text, and alt text would have a screen reader say it twice.
+    logo: images/logo-mark.svg
+    logo-alt: ""
+    # No "Posts" item: the site name and mark on the left are already a link to
+    # the home page, which is the post listing, so a second control pointing at
+    # the same page would just be a duplicate. The worded links sit at the head of the
+    # right-hand group, ahead of the icons, so they
+    # read as part of that cluster rather than floating on their own.
+    right:
+      # The standing page of regularly updated charts, ahead of About
+      - text: Vital Statistics
+        href: vital-statistics/index.qmd
+      - text: About
+        href: about.qmd
+      - icon: github
+        href: https://github.com/gpberber/chartingwaterlooregion
+        aria-label: GitHub repository
+      - icon: rss
+        href: index.xml
+        aria-label: RSS feed
+      - icon: envelope
+        href: "mailto:greg@chartingwaterlooregion.ca"
+        aria-label: Email the author
+  page-footer:
+    left: "© 2026 Greg Berberich · Charting Waterloo Region"
+    center: "Text and charts [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Code [MIT](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE) · Data as credited in each post"
+    right: "Built with [Quarto](https://quarto.org)"
+
+# Rename the appendix heading Quarto adds for the post licence (default "Reuse")
+language:
+  section-title-reuse: "Reusing this post"
+format:
+  html:
+    theme:
+      - litera
+      - custom.scss
+    toc: true
+    toc-depth: 2
+    toc-location: right
+    toc-title: "On this page"
+    lightbox: true                 # click a chart to enlarge it
+    link-external-newwindow: true
+    grid:
+      body-width: 800px            # a reading-width column; charts span most of it
+    # Charts display at their drawn size (fig-width inches x 96 px) and shrink only on
+    # narrow screens. fig.retina 3 stores a 288 dpi copy for sharpness and the lightbox.
+    # (fig-dpi 300 without retina made every chart stretch to the full column width.)
+    fig-dpi: 96
+    # Page-view counting (GoatCounter). No cookies, so no consent banner is needed.
+    include-in-header:
+      - _includes/analytics.html
+      - _includes/icons.html
+    # "Share" button in each post's header (copy link, email). Site-wide, but the
+    # script only acts on pages that have a category row, which means posts only.
+    include-after-body:
+      - _includes/share.html
+      # "Like this post" under a post's author row: one GoatCounter event, no
+      # count shown. Same gate as the share button, so posts only.
+      - _includes/like.html
+      # Contents list as a tap-to-open strip on a phone, where Quarto drops the
+      # margin column that normally holds it. Only on a page whose YAML asks for
+      # it (About today), so posts are untouched.
+      - _includes/phone-toc.html
+    df-print: paged
+    code-copy: true
+    knitr:
+      opts_chunk:
+        dev: ragg_png              # crisp text rendering with ragg
+        fig.retina: 3
+
+editor: source

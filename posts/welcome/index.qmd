@@ -1,0 +1,621 @@
+---
+title: "Welcome to Charting Waterloo Region!"
+description: "An introduction to the municipality that's a little bit country, a little bit rock 'n' roll."
+date: "2026-09-21"
+categories: [Snapshot, Agriculture, Population, Geography]
+image: images/thumbnail.png
+draft: false
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this post so paths work no matter where R starts
+here::i_am("posts/welcome/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+# Data download bundle helpers; data_bundle_version is the release version linked at the end.
+# Bump it when the data changes and /publish rebuilds the bundle.
+source(here::here("R", "data_bundle.R"))
+data_bundle_version <- 1
+
+# Post-specific packages go here, and in R/packages.R
+library(sf)        # spatial data held as a data frame with a geometry column
+```
+
+```{r}
+#| label: load-data
+
+# Small tidy files produced by R/02_clean_data.R live in data/
+districts <- read_sf(here("posts", "welcome", "data", "districts.geojson"))
+
+# Cattle and people in each of the four townships on 11 May 2021, from the
+# Census of Agriculture and the census population count. Four rows.
+cattle <- read_csv(
+  here("posts", "welcome", "data", "cattle.csv"),
+  show_col_types = FALSE
+)
+```
+
+![My brother and I with our family's first Mercury Montego, circa 1974.](images/montego-1974.jpg){.cwr-photo fig-align="center" fig-alt="A faded colour snapshot of two small boys in brown jackets standing on either side of the front of a red Mercury Montego parked in a wet driveway, with two-storey houses and a newly built street behind them."}
+
+As a kid, one of my favourite family activities was "going for a drive." That is literally what we called it. Mom or Dad would announce that we were "going for a drive" and the five of us would pile into the Montego and go for a drive. A drive never had a destination, unless we ended up in Hespeler, where we'd get ice cream cones at a convenience store on Cooper Street. Almost all of them meandered through one or more of the Region's townships. I particularly liked it when Dad drove through the Paradise Lake area in Wellesley Township. I thought it was neat that we had a little cottage-y area so close to home. These drives gave me an early appreciation for the Region's vastness and variety, and for the contrasts between its rock 'n' roll heart and its country soul. In CWR's inaugural post, we'll start exploring some of these contrasts and, in the process, answer the burning question: "What do the townships have more of, cows or people?"
+
+## An urban island in a sea of farmland
+
+```{r}
+#| label: district-inline-objects
+#| include: false
+
+# Population, land area and density, with the seven municipalities collapsed
+# into Cities and Townships and into Region overall.
+#
+# Population and land area are sums. Density is not: averaging seven densities
+# would give Wellesley the same weight as Kitchener and come out far too low.
+# It has to be the group's people divided by the group's land, which is why it
+# is worked out after the summarise() rather than carried through it.
+grouped_land_pop_figures <- districts |>
+  st_drop_geometry() |>
+  summarise(
+    city_pop         = sum(population[district_type == "City"]),
+    city_area        = sum(area_sq_km[district_type == "City"]),
+    township_pop     = sum(population[district_type == "Township"]),
+    township_area    = sum(area_sq_km[district_type == "Township"]),
+    region_pop       = sum(population),
+    region_area      = sum(area_sq_km),
+    city_density     = city_pop / city_area,
+    township_density = township_pop / township_area,
+    region_density   = region_pop / region_area,
+    density_ratio    = city_density / township_density,
+    city_pop_share   = city_pop / region_pop,
+    township_pop_share = township_pop / region_pop,
+    township_area_share = township_area / region_area
+  ) |>
+  mutate(
+    across(ends_with("share"), \(x) percent(x, accuracy = 1)),  # 15%
+    across(ends_with("ratio"), \(x) comma(x, accuracy = 0.1)),  # 2.7
+    across(where(is.numeric), \(x) comma(x, accuracy = 1))        # 631,721
+  )
+
+# Turn each column into its own object (city_pop, region_density, etc.)
+list2env(grouped_land_pop_figures, environment()) |> invisible()
+
+```
+
+If you haven't gone for many drives through the townships, you may have no idea how vast they are compared to the cities in the Region's heart. On a map, they look like a giant jaw chomping the urban core they nearly surround. Collectively, the townships cover `r township_area` square km, or `r township_area_share` of the Region's `r region_area` square km. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city.
+
+```{r}
+#| label: land-mass
+#| output: asis
+
+# The seven municipal polygons, moved into EPSG:3161 - a projection made for
+# Ontario, on which shapes this size keep their true proportions. The data is
+# stored in plain latitude and longitude, which is convenient but draws a map
+# slightly stretched, so the projection is chosen here rather than in the data.
+districts_3161 <- st_transform(districts, 3161)
+
+# Three labels need moving off the anchor stored in the data. It is the point
+# furthest from any border, which is the roomiest spot but not always the one
+# that looks centred once the words are drawn: Waterloo's sat half over its
+# western border, Cambridge's ran past its eastern one, and once each name
+# gained a line of land area underneath it and moved up to make room, North
+# Dumfries' ran into the tongue of Cambridge that reaches into it. Metres east
+# and north in EPSG:3161, arrived at by rendering the map and looking at it -
+# the phone version especially, where the words are larger against the shapes.
+# Waterloo's was measured rather than judged: its name is shifted until the
+# nearest border point on its left is as far away as the nearest on its right,
+# which on its slanting north-west edge is further east than it looks.
+nudge <- tribble(
+  ~district,         ~dx,    ~dy,
+  "Waterloo",        2000,   1200,
+  "Cambridge",        350,  -2200,
+  "North Dumfries", -1000,   -300
+)
+
+# Label positions. 02_clean_data.R worked out where each label should sit and
+# stored it as a longitude and latitude; here that becomes a point, moves into
+# the map's projection, and is turned back into plain x and y columns so the
+# nudges above can simply be added to it.
+#
+# "Township" goes on a second line rather than after the name, so that even
+# "N. Dumfries Township" stays narrow enough to sit inside its own boundary.
+# cwr_short_name() gives the house short form of a long municipal name; the
+# nudges above are still keyed by the full name.
+labels <- districts |>
+  st_drop_geometry() |>
+  st_as_sf(coords = c("label_lon", "label_lat"), crs = 4326) |>
+  st_transform(3161) |>
+  (\(points) bind_cols(
+    st_drop_geometry(points),
+    st_coordinates(points) |> as_tibble() |> set_names(c("x", "y"))
+  ))() |>
+  left_join(nudge, join_by(district)) |>
+  mutate(
+    # Every district that needs no nudge has no row in the table above
+    x = x + replace_na(dx, 0),
+    y = y + replace_na(dy, 0),
+    label = if_else(
+      district_type == "Township",
+      paste0(cwr_short_name(district), "\nTownship"),
+      cwr_short_name(district)
+    ),
+    # Land area, on its own line under the name. Whole square kilometres: the
+    # boundary file gives four decimal places, which no one reading a map needs.
+    area_label = paste0(label_comma(accuracy = 1)(area_sq_km), " km\u00b2"),
+    # White on the dark city blue, black on the light township blue, where
+    # white would be too faint to read
+    text_colour = if_else(district_type == "City", "white", "black")
+  )
+
+p <- ggplot() +
+  # Filled in the same two colours the bar chart uses, so a reader who has seen
+  # one chart already knows which shapes are cities and which are townships.
+  # The borders are white rather than a darker line: against filled shapes they
+  # separate neighbours without drawing a second thing to look at, and around
+  # the outside they disappear into the page, which leaves the Region as a
+  # silhouette rather than a boxed-in diagram.
+  geom_sf(
+    data = districts_3161, aes(fill = district_type),
+    colour = "white", linewidth = 0.6
+  ) +
+  # The name sits just above the label point and the area just below it, so the
+  # pair is centred where the name alone used to be. vjust = 0 puts a label's
+  # bottom edge on its point and vjust = 1 puts its top edge there; the nudges
+  # open a small gap between the two, in metres, because that is the unit of
+  # the map's projection.
+  geom_text(
+    data = labels, aes(x = x, y = y, label = label, colour = text_colour),
+    size = label_size, lineheight = 1.05, fontface = "bold",
+    vjust = 0, nudge_y = 250
+  ) +
+  # Plain rather than bold, and a little smaller, so the name still reads first
+  # and the figure reads as a note on it. No box behind it: the text colour is
+  # already chosen to read on its fill, and a box would cover the shape.
+  geom_text(
+    data = labels, aes(x = x, y = y, label = area_label, colour = text_colour),
+    size = label_size * 0.85,
+    vjust = 1, nudge_y = -250
+  ) +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = dodgerblue50),
+    guide = "none"   # the labels on the shapes say which is which
+  ) +
+  # text_colour holds literal colour names: use them as they are
+  scale_colour_identity() +
+  # datum = NA drops the graticule - the faint grid of latitude and longitude
+  # lines coord_sf() draws by default - which this map has no use for.
+  coord_sf(datum = NA) +
+  labs(
+    title = "The townships cover vastly more territory than the cities",
+    subtitle = "Land area, square km",
+    caption = cwr_caption("Statistics Canada, 2021 census boundary files")
+  ) +
+  # theme_cwr() is built for charts with axes; a map wants none of them. Each
+  # element is named individually because the theme sets them individually, and
+  # a blanket axis.text would not override the more specific setting.
+  theme(
+    axis.text.x = element_blank(), axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
+    axis.line.x = element_blank(), axis.line.y = element_blank(),
+    panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+cwr_figure(
+  p, "fig-districts",
+  alt = paste0(
+    "Outline map of Waterloo Region showing the borders of its seven ",
+    "municipalities, each labelled with its name and land area: the cities of ",
+    "Kitchener, Waterloo and Cambridge grouped together in the middle, ringed ",
+    "by Woolwich Township to the north, Wellesley Township to the north west, ",
+    "Wilmot Township to the south west and North Dumfries Township to the ",
+    "south. Land areas in square kilometres: ",
+    # Built from the labelled rows, like every other figure in an alt text here
+    paste(
+      paste(labels$district, label_comma(accuracy = 1)(labels$area_sq_km)),
+      collapse = ", "
+    ),
+    "."
+  ),
+  # The phone map is half as wide but its text is drawn at the same size, so the
+  # three cities in the middle cannot hold their labels without a further
+  # reduction. 0.55 is where they sit clear of each other and of the borders
+  # now that each carries a second line; it was 0.60 with names alone.
+  height = 7.6, phone_height = 5.0, phone_text_scale = 0.55
+)
+```
+
+```{r}
+#| label: population-inline-objects
+#| include: false
+
+# objects to use for inline text in population discussion
+kit_pop <- districts |> filter(district == "Kitchener") |> pull(population)|> comma(accuracy = 1)
+
+```
+
+## More cows than people?!
+
+You don't have to drive through the townships to guess that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let's see how many more people live in the cities than in the townships.
+
+The latest estimates from 2025 show that, with `r kit_pop` residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have `r city_pop` people, or `r city_pop_share` of the Region's population of `r region_pop`. So despite covering `r township_area_share` of the Region's territory, the townships are home to only `r township_pop` residents, or `r township_pop_share` of total population. With a combined density of only `r township_density` residents per square km, they certainly have lots of room for cows!
+
+```{r}
+#| label: sizes
+#| output: asis
+
+# How far the axis runs, in residents, on each version of the chart. The density
+# boxes hang from the right-hand edge of the panel, so this is also what sets
+# the gap between the end of Kitchener's bar (about 324,000) and its box.
+#
+# The two versions need different numbers. A box is a fixed width in points,
+# and the phone's panel is less than half as wide, so in residents a box is more
+# than twice as wide there: a range that leaves a neat gap on a desktop puts the
+# phone's box on top of the bar. So each gets its own, both read off a render,
+# and the phone's is swapped in through cwr_figure() below.
+axis_max <- 375000
+axis_max_phone <- 470000
+
+# Roughly how many characters of label fit across the whole phone axis, from
+# zero to `axis_max_phone`. Used only to decide which labels go inside their
+# bars; the phone is the narrower render, so a label that fits there fits on a
+# desktop too.
+axis_chars <- 30
+
+population_bars <- districts |>
+  st_drop_geometry() |>
+  mutate(
+    # fct_reorder() sorts ascending and a horizontal bar chart draws the first
+    # level at the bottom, so the largest municipality ends up on top.
+    district = fct_reorder(district, population),
+    label = label_comma(accuracy = 1)(population),
+    density_label = label_comma(accuracy = 1)(density_per_sq_km),
+    # Whether a population label fits inside its bar. What decides it is the
+    # width of the text in the axis's own units: one character is
+    # axis_max_phone / axis_chars residents wide, and a label needs its length plus
+    # a space or so of padding. The townships' bars are far too short; the
+    # cities' are not.
+    inside = population >= (nchar(label) + 1.5) * (axis_max_phone / axis_chars)
+  )
+
+p <- ggplot(population_bars, aes(x = population, y = district, fill = district_type)) +
+  geom_col(width = 0.7) +
+  # The baseline the bars grow from. theme_cwr()'s own x axis line is switched
+  # off below, because with labels on the bars there is no axis to carry.
+  #
+  # A segment rather than geom_vline(), which would run the full height of the
+  # panel - up through the space left for the column heading. On a discrete
+  # scale the rows sit at 1, 2, 3 ... and each bar is 0.7 tall, so running from
+  # 0.5 to half a row past the top one stops the line just beyond the bars at
+  # both ends.
+  annotate(
+    "segment",
+    x = 0, xend = 0, y = 0.5, yend = nrow(population_bars) + 0.5,
+    colour = "black", linewidth = 0.5
+  ) +
+  geom_text(
+    aes(
+      label = label,
+      # Inside the bar end, or just past it - hjust flips the text about its
+      # anchor, and the anchor is the end of the bar either way
+      hjust = if_else(inside, 1.15, -0.15),
+      # White inside the dark city bars only; inside the light township
+      # bars, and outside any bar, black reads better
+      colour = if_else(inside & district_type == "City", "white", "black")
+    ),
+    size = label_size * 0.8
+  ) +
+  # Density, boxed in a column of its own rather than drawn as a second set of
+  # bars. It is a different unit from the bars beside it, and a column of
+  # numbers reads as a second fact about each row without competing for the eye.
+  # x = Inf is the right-hand edge of the panel, whatever the axis range, and
+  # hjust = 1 hangs each box from it. That is what lets the phone's wider range
+  # move the column without a second set of layers.
+  geom_label(
+    aes(x = Inf, label = density_label),
+    hjust = 1,
+    size = label_size * 0.8,
+    fill = "grey90",
+    colour = "black",
+    linewidth = 0,
+    label.padding = unit(0.3, "lines")
+  ) +
+  # The column's heading, in the room the y scale below leaves above the top
+  # row. y = Inf is the top edge of the panel and vjust = 1 hangs the box from
+  # it. (The industry chart this pattern came from lifted its heading above the
+  # panel instead, but that chart had an axis row up there to make space; this
+  # one has none, so a lifted heading ran into the subtitle.) hjust = 1
+  # right-aligns the two lines with each other and with the figures under them.
+  annotate(
+    "label",
+    x = Inf, y = Inf, label = "Residents\nper km\u00b2",
+    hjust = 1, vjust = 1, lineheight = 1.0,
+    size = label_size * 0.8,
+    fontface = "plain",
+    fill = "grey90", colour = "grey30",
+    linewidth = 0,
+    label.padding = unit(0.3, "lines")
+  ) +
+  # The colours above are literal colour names rather than groups to map, which
+  # is what scale_colour_identity() means: use the value, do not look it up
+  scale_colour_identity() +
+  scale_fill_manual(
+    values = c(City = dodgerblue, Township = dodgerblue50),
+    guide = "none"   # the colours are explained by the bars themselves
+  ) +
+  # The axis runs out to the box column and no further
+  scale_x_continuous(limits = c(0, axis_max), expand = expansion(mult = c(0, 0))) +
+  # An extra row and a half of space above Kitchener, which is where the column
+  # heading hangs. add is in rows, because the scale is discrete.
+  scale_y_discrete(expand = expansion(add = c(0.6, 1.6)), labels = cwr_short_name) +
+  # Stops the heading and any label that overhangs the panel from being cut off
+  coord_cartesian(clip = "off") +
+  labs(
+    title = "The townships are very sparsely populated compared to the cities",
+    subtitle = "Estimated population, 2025",
+    caption = cwr_caption(
+      c("Statistics Canada Table 17-10-0155-01",
+        "the 2021 census boundary files"),
+      credit = TRUE
+    )
+  ) +
+  # Every bar carries its number, so the value axis and its gridlines are gone.
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+# The figures in the alt text are built from the same rows the bars are drawn
+# from, not typed out. Typed, they would be right today and quietly wrong the
+# first time an estimate is revised - and wrong only for the readers who cannot
+# see the chart to check it against.
+alt_entries <- population_bars |>
+  arrange(desc(population)) |>
+  mutate(entry = paste0(district, " ", label, " residents, ",
+                        density_label, " per square kilometre")) |>
+  pull(entry)
+
+cwr_figure(
+  p, "fig-sizes",
+  alt = paste0(
+    "Horizontal bars of population, one per municipality, largest first, with ",
+    "the three cities in dark blue and the four townships in light blue, and each ",
+    "municipality's residents per square kilometre boxed in a column on the ",
+    "right. ",
+    paste(alt_entries, collapse = "; "), "."
+  ),
+  # No height given: cwr_figure() sets it from the number of rows.
+  # The phone's longer axis, for the reason given at the top of the chunk.
+  # Adding a scale of a type already present replaces it.
+  phone = list(
+    scale_x_continuous(limits = c(0, axis_max_phone), expand = expansion(mult = c(0, 0)))
+  )
+)
+```
+
+```{r}
+#| label: prep-cattle
+#| include: false
+
+# The four townships added together: all cattle and every resident, counted on
+# the same day - 11 May 2021, census day for both the Census of Agriculture and
+# the Census of Population. sum() is used without na.rm = TRUE on purpose: if
+# the quality check in 02_clean_data.R had blanked a township's figure, the
+# total would come out missing rather than quietly short.
+#
+# The chart is the two figures themselves rather than bars, so each row carries
+# where it sits (x) and the finished text of its number.
+cattle_people <- cattle |>
+  summarise(Cows = sum(cattle), People = sum(population)) |>
+  pivot_longer(everything(), names_to = "what", values_to = "count") |>
+  mutate(
+    what = fct_inorder(what),
+    label = label_comma(accuracy = 1)(count),
+    # People on the left, cows on the right
+    x = if_else(what == "People", 0, 1)
+  )
+
+# Cows per hundred people, worked out from the figures above rather than typed,
+# and rounded: the two counts are exact, but a ratio to the decimal would be
+# false precision on top of a census.
+cows_per_100 <- round(
+  (cattle_people |> filter(what == "Cows") |> pull(count)) /
+    (cattle_people |> filter(what == "People") |> pull(count)) * 100
+)
+
+```
+
+By the way, cows did not figure in this post when I conceived it. Not until I saw the density data did I jokingly add the "More cows than people?!" heading to this section. And even after that, it took a while before I thought, *I wonder if there actually is any data on how many cows there are in the townships*. Serendipitously, I found that not only is there a Census of Population, there's also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could answer the question, "What do the townships have more of, cows or people?"
+
+(In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say *cows*, I mean *cattle*.)
+
+The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we'll use the 2021 census populations as well. On census day in 2021, just over 70,000 people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.
+
+::: panel-tabset
+### People
+
+```{r}
+#| label: cattle-people
+#| output: asis
+
+# Two tabs, one chart, and the chart is the figures themselves: no bars, no
+# axes, just the two counts at reading size with the ratio under them. The first
+# tab shows the people alone, and everything that fixes where that figure sits -
+# its x position, the y range, the chart's height - is the same in both, so
+# switching to the second tab looks like the cows arriving and nothing else
+# moving.
+
+# The three rows of the chart, each placed by its own y and centred on it: the
+# word on top, the figure under it, and the ratio on a line of its own below.
+# Read off a render, tightened until the group sits close without the ratio
+# touching the descender on 70,365.
+row_word  <-  0.26
+row_count <-  0
+row_ratio <- -0.26
+
+cattle_chart <- function(show_cattle) {
+  shown <- cattle_people |> filter(show_cattle | what == "People")
+
+  ggplot(shown, aes(x = x)) +
+    geom_text(
+      aes(y = row_word, label = str_to_lower(what)),
+      colour = "grey30", size = label_size * 1.1
+    ) +
+    geom_text(
+      aes(y = row_count, label = label, colour = what),
+      fontface = "bold", size = label_size * 3.2
+    ) +
+    # Only on the second tab, and centred between the two figures
+    {if (show_cattle)
+      annotate(
+        "text", x = 0.5, y = row_ratio,
+        label = paste0(cows_per_100, " cows for every 100 people"),
+        colour = dodgerblue, size = label_size * 1.1
+      )} +
+    scale_colour_manual(
+      values = c(People = cowboysilver, Cows = dodgerblue),
+      guide = "none"   # each figure is named above it
+    ) +
+    # Both scales are fixed rather than fitted to what is drawn, which is what
+    # keeps the people figure in the same place on both tabs
+    scale_x_continuous(limits = c(-0.35, 1.35), expand = expansion(0)) +
+    scale_y_continuous(limits = c(-0.32, 0.34), expand = expansion(0)) +
+    coord_cartesian(clip = "off") +
+    # Nothing here is a scale a reader reads, so every axis and gridline goes.
+    # Each element is named individually because theme_cwr() sets them
+    # individually - including axis.text.y.left, which is more specific than
+    # axis.text.y and would otherwise win.
+    theme(
+      axis.text.x = element_blank(), axis.text.y = element_blank(),
+      axis.text.y.left = element_blank(),
+      axis.ticks.x = element_blank(), axis.ticks.y = element_blank(),
+      axis.line.x = element_blank(), axis.line.y = element_blank(),
+      axis.title.x = element_blank(), axis.title.y = element_blank(),
+      panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+}
+
+# Alt text for a tab, built from the plotted figures, like every alt text in
+# the post
+cattle_alt <- function(show_cattle) {
+  figures <- cattle_people |>
+    filter(show_cattle | what == "People") |>
+    mutate(entry = paste0(label, " ", str_to_lower(what))) |>
+    pull(entry) |>
+    paste(collapse = " and ")
+
+  if (show_cattle) {
+    paste0(figures, ", or ", cows_per_100, " cows for every 100 people")
+  } else {
+    figures
+  }
+}
+
+# The same title on both tabs. A title that wraps onto one more line in one
+# tab than the other - on a phone especially - moves that tab's bars down, so
+# whatever replaces it, both tabs keep the same number of lines.
+p <- cattle_chart(show_cattle = FALSE) +
+  labs(
+    title = "In May 2021, the townships had more...",
+    subtitle = "Townships, number of people, 11 May 2021",
+    caption = cwr_caption("Statistics Canada Table 98-10-0002-01", credit = TRUE)
+  )
+
+cwr_figure(
+  p, "fig-cattle-people",
+  alt = paste0(
+    "The number of people living in North Dumfries, Wellesley, Wilmot and ",
+    "Woolwich townships together on 11 May 2021, written large: ",
+    cattle_alt(FALSE), "."
+  ),
+  # This chart has no rows to set a height from, so both tabs are given the
+  # same one and the figures stay put as the reader switches between them.
+  height = 2.2, phone_height = 2.2
+)
+```
+
+### People and cows
+
+```{r}
+#| label: cattle
+#| output: asis
+
+p <- cattle_chart(show_cattle = TRUE) +
+  labs(
+    title = "In May 2021, the townships had more...cows than people!",
+    subtitle = "Townships, number of people and cows, 11 May 2021",
+    caption = cwr_caption(
+      c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
+      credit = TRUE
+    )
+  )
+
+cwr_figure(
+  p, "fig-cattle",
+  alt = paste0(
+    "The same figure for people, where the previous tab wrote it, with the ",
+    "number of cattle on farms in those four townships on the same day beside ",
+    "it: ", cattle_alt(TRUE), "."
+  ),
+  # The same height as the first tab, for the reason given there
+  height = 2.2, phone_height = 2.2
+)
+```
+:::
+
+And there we have it: more cows than people lived in the townships on census day in 2021. What I thought was a joke turns out to be true!
+
+## What have we learned?
+
+In CWR's debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region's rolling hills. We learned there were lots of roads and hills to roam because the townships cover `r township_area` square km, over three-quarters of the Region's `r region_area` square km, while holding only `r township_pop` people, a ninth of its `r region_pop` residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we'll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now, when this year's census data is released, we'll revisit this post and see if cows still outnumber people in cattle country.
+
+::: {#data-sources-and-reliability .callout-note collapse="true"}
+## Data sources and reliability
+
+### Sources
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this post's README.md - edit it there, not here
+cwr_sources_table("welcome")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this post's
+# README.md - edit them there, not here. To leave an issue out of the post, do
+# not delete its row: write why in its "Left out of the post because" column,
+# and it drops out of the post while the README keeps the record.
+cwr_reliability_table("welcome")
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Reproducibility and data download
+
+**Reproduce the post**: get the code and data for this post from [`posts/welcome/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome) on GitHub.
+
+**Download the data:** `r cwr_bundle_link("welcome", data_bundle_version)` holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post's [README](https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome#data-dictionary).
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

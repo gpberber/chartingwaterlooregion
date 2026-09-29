@@ -1,0 +1,38 @@
+# Defaults applied to every post under posts/. A post can override any of these
+# in its own YAML header. Site-wide settings live in _quarto.yml.
+
+title-block-banner: true
+author: "Greg Berberich"
+
+# No date-modified here on purpose. Set site-wide to `last-modified`, it showed a
+# "Modified" date on every post, taken from the file's timestamp, so a draft
+# reflowed in the visual editor looked freshly revised. Instead `date:` is the
+# day the post went live (/publish sets it when it flips draft: false), and a
+# post gains its own `date-modified:` line only when it is changed after that -
+# which /publish adds. A post that has never been revised shows no Modified date.
+
+# Adds a "Reusing this post" box at the end of every post (heading set in _quarto.yml).
+# Text and charts are CC BY 4.0; code is MIT (see LICENSE and LICENSE-CONTENT.md).
+license:
+  text: "The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above. Material quoted from other sources stays under its owner's terms."
+  url: https://creativecommons.org/licenses/by/4.0/
+
+# Posts show prose, charts, and tables, not code. Readers who want the code use
+# the "view source" link in the page header or clone the repo.
+execute:
+  echo: false
+  warning: false
+  message: false
+
+# Chart defaults; set fig-height / fig-width per chunk when a chart needs it.
+# Charts go through cwr_figure() (R/theme_cwr.R), which draws each one twice:
+# 8.3 in wide for desktops (the paragraph width) and 4.2 in wide for phones.
+# These knitr defaults only apply to anything plotted outside cwr_figure().
+fig-width: 8.3
+fig-height: 5
+fig-align: center
+tbl-cap-location: bottom
+
+crossref:
+  fig-prefix: Figure
+  tbl-prefix: Table

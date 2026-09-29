@@ -1,0 +1,2502 @@
+---
+title: "Vital Statistics"
+description: "Regularly updated charts tracking employment, business activity, housing, population, and crime in Waterloo Region."
+image: images/card.png   # the link image, drawn by R/make_card.R
+draft: false
+# The page's last publish date, shown under the description as "Last updated".
+# /publish sets it to the day it publishes this page; there is no need to type it.
+date-modified: 2026-09-29
+language:
+  title-block-modified: "Last updated"   # Quarto's label is "Modified"; this page only
+body-classes: vital-statistics   # custom.scss rules a line under the subtitle
+# A page, not a post, so posts/_metadata.yml does not apply here: its
+# execute settings are repeated below so the page shows charts and not code.
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Anchor here() to this page so paths work no matter where R starts
+here::i_am("vital-statistics/index.qmd")
+
+# House colours, ggplot2 theme, and the packages every post uses
+source(here::here("R", "theme_cwr.R"))
+
+library(ggiraph)   # interactive layers (geom_point_interactive) for cwr_interactive()
+
+# ---- The data ------------------------------------------------------------
+# Small tidy files written by R/02_clean_data.R, one per statistic. Every file
+# has a `geo` column holding "Canada", "Ontario" or "Region" (the cleaning
+# script types the word that cwr_region holds). It is made a factor in that
+# order so the Region's line is drawn last, on top of the other two.
+read_vs <- function(file) {
+  read_csv(here("vital-statistics", "data", file), show_col_types = FALSE) |>
+    mutate(geo = factor(geo, levels = c("Canada", "Ontario", cwr_region)))
+}
+
+unemployment_rate <- read_vs("unemployment_rate.csv")
+employment_change <- read_vs("employment_change.csv")
+participation_rate <- read_vs("participation_rate.csv")
+rates_by_age <- read_vs("rates_by_age.csv")
+ei_beneficiaries <- read_vs("ei_beneficiaries.csv")
+business_dynamics <- read_vs("business_dynamics.csv")
+building_permits <- read_vs("building_permits.csv")
+permit_units <- read_vs("permit_units.csv")
+new_housing_price_index <- read_vs("new_housing_price_index.csv")
+housing_starts <- read_vs("housing_starts.csv")
+starts_intended_market <- read_vs("starts_intended_market.csv")
+vacancy_rate <- read_vs("vacancy_rate.csv")
+average_rent <- read_vs("average_rent.csv")
+rent_change <- read_vs("rent_change.csv")
+population_growth <- read_vs("population_growth.csv")
+population_components <- read_vs("population_components.csv")
+crime_severity <- read_vs("crime_severity.csv")
+crime_rate <- read_vs("crime_rate.csv")
+
+# Wellesley Township's share of the Region's population on July 1 of the
+# latest year, to one decimal, for the introduction: write `r wellesley_share`%
+# in the text. It is text ("1.7"), so a round figure still prints its decimal
+# ("2.0"). wellesley_year is the year it is for.
+wellesley <- read_csv(here("vital-statistics", "data", "wellesley_share.csv"), show_col_types = FALSE)
+wellesley_share <- label_number(accuracy = 0.1)(pull(wellesley, percent))
+wellesley_year <- pull(wellesley, year)
+
+# ---- One line chart, many times ------------------------------------------------
+# Every chart on the page is the same picture: the Region in blue, Ontario in
+# silver and Canada in red (or the Region alone), over five years. So the
+# chart is built once, here, from the house ggline template (cwr-charts,
+# lines.md), and each chunk below hands it its own data and adds its own
+# labs() - the pattern the cwr-charts skill uses for tabs, so the charts
+# cannot drift apart.
+#
+# A chunk renames its columns before calling vs_line():
+#   x      the date (monthly series) or the year (annual ones)
+#   y      the value
+#   geo    the place
+#   lower, upper  (optional) the Region's 95% confidence interval, drawn as a band
+#
+# The charts carry no line labels and no legend: one key at the top of the
+# page names the three colours for every chart (the page-legend chunk).
+# Hovering over a line shows the place, the period and the value instead.
+# A chart whose lines are not the three places can pass its own `colours` and
+# name its lines on the chart with `label_lines = TRUE`, since the page's key
+# does not cover them (no chart does at present).
+
+# Colours carry meaning (rule 2): blue the focus, red the main comparison,
+# silver everyone else
+vs_colours <- set_names(manual_3_colours, c("Canada", "Ontario", cwr_region))
+
+vs_line <- function(plot_data,
+                    y_labels = label_number(big.mark = ","),
+                    limits = NULL,        # y limits, NA where the data decide
+                    breaks = waiver(),    # y breaks
+                    zero_line = FALSE,    # a darker line at zero, for values that go negative
+                    x_labels = waiver(),
+                    tip = label_number(big.mark = ","),   # the value, in words, for the tooltip
+                    when = NULL,                          # the period, in words, for the tooltip
+                    colours = vs_colours,                 # one colour per value of `geo`
+                    label_lines = FALSE,                  # name each line on the chart
+                    index = NULL) {                       # an index chart's base (100)
+  dated <- inherits(pull(plot_data, x), "Date")
+  banded <- "lower" %in% names(plot_data)
+  if (is.null(when)) when <- if (dated) \(x) format(x, "%B %Y") else as.character
+
+  # What the hover shows: the place in bold, the period, and the value. Each
+  # point gets an id shared by its two hover layers below. A figure left out
+  # as unreliable (NA) gets no hover point.
+  hover_data <- plot_data |>
+    filter(!is.na(y)) |>
+    mutate(
+      hover_id = str_c(geo, "-", x),
+      tooltip = str_glue("<b>{geo}</b><br>{when(x)}<br>{tip(y)}")
+    )
+
+  # Room on the right for the axis numbers, which sit above their gridlines
+  # and end where the gridlines end (the theme() block at the bottom). The
+  # lines stop short of the panel's right edge by the same share of the x
+  # range on every chart - 6% on a monthly chart, 7% on an annual one to
+  # clear its end dots - which holds a number about three digits wide. A
+  # chart whose numbers are wider rescales them (to thousands, say) rather
+  # than widening the room; cwr_right_axis() at the bottom says when. (The phone
+  # version moves the numbers outside the panel, where they need no room.)
+  right_room <- if (dated) 0.06 else 0.07
+  left_room <- if (dated) 0.02 else 0.06
+
+  p <- ggplot(plot_data, aes(x = x, y = y, colour = geo))
+
+  # The Region's 95% confidence interval, where the source publishes one
+  if (banded) {
+    p <- p +
+      geom_ribbon(
+        data = filter(plot_data, geo == cwr_region),
+        aes(x = x, ymin = lower, ymax = upper),
+        fill = dodgerblue, alpha = 0.15,
+        inherit.aes = FALSE
+      )
+  }
+
+  if (zero_line) {
+    p <- p + geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.4)
+  }
+
+  # Line names (cwr-charts rule 3a), for a chart the page's key does not
+  # cover. cwr_line_labels() sets each name's height from its own line and
+  # finds a clear spot automatically, away from the other line; the name's
+  # size and clearance are measured on each drawn version by
+  # cwr_interactive(), so nothing here sets them. Each name is in its own line's colour
+  # (the `label` column holds the line's name, which the colour scale maps),
+  # because two lines that cross every month leave no spot hugging one line
+  # alone, and a grey name could belong to either.
+  if (label_lines) {
+    label_data <- cwr_line_labels(
+      plot_data, x = x, y = y, group = geo,
+      limits = limits, breaks = if (is.numeric(breaks)) breaks else NULL
+    )
+    if (dated) label_data <- mutate(label_data, x = as_date(x))
+    p <- p +
+      cwr_label(
+        data = label_data,
+        aes(x = x, y = y, label = label, fontface = fontface, vjust = vjust, colour = label),
+        size = 3.2,
+        hjust = 0.5,
+        inherit.aes = FALSE
+      )
+  }
+
+  # geom_line() breaks the line at a missing month, so a figure blanked as
+  # unreliable leaves a gap rather than being bridged
+  p <- p + geom_line(linewidth = 0.8)
+
+  # Monthly series: a tick each January, labelled with the year, and a
+  # minor tick each quarter. Annual series: a tick and a dot for each year,
+  # since five points are few enough to mark, and no minor ticks - ggplot's
+  # default would put one at each half-year, where there is no figure
+  # (cwr-charts rule 4b: minor ticks only where the chart has data).
+  if (dated) {
+    x_min <- min(pull(plot_data, x))
+    x_max <- max(pull(plot_data, x))
+    p <- p +
+      scale_x_date(
+        # each January inside the data, so the room on the right never
+        # sprouts a tick for a year with no data in it
+        breaks = seq(ceiling_date(x_min, "year"), x_max, by = "1 year"),
+        date_labels = "%Y",
+        # each quarter's first month that is in the data, so no minor tick
+        # falls where there is no figure (cwr-charts rule 4b)
+        minor_breaks = keep(sort(unique(pull(plot_data, x))), \(d) month(d) %in% c(1, 4, 7, 10)),
+        expand = expansion(mult = c(left_room, right_room))
+      )
+  } else {
+    p <- p +
+      geom_point(size = 1.8) +
+      scale_x_continuous(
+        breaks = sort(unique(pull(plot_data, x))),
+        minor_breaks = NULL,
+        labels = x_labels,
+        expand = expansion(mult = c(left_room, right_room))
+      )
+  }
+
+  p <- p +
+    # The hover layers (cwr-charts rule 3c). Small invisible dots that appear
+    # on hover to mark the point...
+    geom_point_interactive(
+      data = hover_data, aes(data_id = hover_id),
+      size = 2.5, alpha = 0
+    ) +
+    # ...under large invisible squares that catch the mouse anywhere near a
+    # line and carry the tooltip. The squares go on top: a dot drawn over them
+    # would take the mouse at the very point a reader aims for.
+    geom_point_interactive(
+      data = hover_data, aes(tooltip = tooltip, data_id = hover_id),
+      shape = 15, size = 7, alpha = 0
+    ) +
+
+    scale_y_continuous(
+      limits = limits,
+      breaks = breaks,
+      position = "right",
+      labels = y_labels,
+      expand = expansion(mult = c(0.02, 0.08))
+    ) +
+
+    # No legend: the key at the top of the page covers every chart, and a
+    # chart with other lines names them on the chart
+    scale_colour_manual(values = colours, guide = "none") +
+
+    guides(x = guide_axis(minor.ticks = dated))
+
+  # Right-axis numbers above their gridlines, ending where the gridlines end
+  # (cwr-charts rule 6), with 0 labelled, or a zig-zag and a baseline stopping
+  # at the last point when the axis does not reach zero (rule 6a).
+  # cwr_right_axis() measures the numbers, and prints a
+  # warning while the page renders if they are too wide to clear the ends of
+  # the lines; that chart's chunk then rescales its axis (to thousands, say)
+  # and says so in the subtitle. On an index chart (`index = 100`) the base
+  # takes zero's place: its gridline is black and the axis is not cut.
+  p <- p + cwr_right_axis(index = index)
+  p
+}
+
+# ---- One bar chart, many times ------------------------------------------------
+# The Region's own count of each component of population change, one bar per
+# twelve months, from the house ggvertbar template (cwr-charts, bars.md) with
+# the page's hover and axis habits. The chunk renames its columns to x (the
+# year), y (the value) and geo (the Region), as for vs_line().
+#
+# The bars start at zero, so cwr_right_axis() lays the baseline on the zero
+# gridline and labels 0 (rule 6a); where a count goes below zero, a darker
+# line marks zero and the bars hang from it. The hover names the Region, the
+# period and the value; the bar under the mouse does not change colour.
+#
+# The Region's net business openings use it too, a bar a month: a date `x`
+# gets the monthly charts' axis (a year label each January, a minor tick each
+# quarter), and `signed = TRUE` colours each bar by its sign - blue above
+# zero, red below - instead of all blue. `colours` gives the two fills.
+vs_bar <- function(plot_data,
+                   y_labels = label_number(big.mark = ","),
+                   breaks = waiver(),    # y breaks
+                   x_labels = waiver(),
+                   tip = label_number(big.mark = ","),
+                   when = as.character,
+                   signed = FALSE,       # red bars below zero
+                   colours = c(positive = dodgerblue, negative = habsred)) {
+  dated <- inherits(pull(plot_data, x), "Date")
+  plot_data <- plot_data |>
+    filter(!is.na(y)) |>
+    mutate(
+      sign = if_else(signed & y < 0, "negative", "positive"),
+      hover_id = str_c(geo, "-", x),
+      tooltip = str_glue("<b>{geo}</b><br>{when(x)}<br>{tip(y)}")
+    )
+
+  p <- ggplot(plot_data, aes(x = x, y = y)) +
+    geom_col_interactive(
+      aes(tooltip = tooltip, data_id = hover_id, fill = sign),
+      # a month's bar is 20 days wide, leaving a gap between months
+      width = if (dated) 20 else 0.7
+    ) +
+    scale_fill_manual(values = colours, guide = "none")
+
+  if (any(pull(plot_data, y) < 0)) {
+    p <- p + geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.4)
+  }
+
+  if (dated) {
+    # As vs_line()'s monthly charts: a label each January inside the data,
+    # and minor ticks only on the quarters' first months that have a bar
+    # (cwr-charts rule 4b)
+    x_min <- min(pull(plot_data, x))
+    x_max <- max(pull(plot_data, x))
+    p <- p +
+      scale_x_date(
+        breaks = seq(ceiling_date(x_min, "year"), x_max, by = "1 year"),
+        date_labels = "%Y",
+        minor_breaks = keep(sort(unique(pull(plot_data, x))), \(d) month(d) %in% c(1, 4, 7, 10)),
+        expand = expansion(mult = c(0.02, 0.07))
+      )
+  } else {
+    p <- p +
+      scale_x_continuous(
+        breaks = sort(unique(pull(plot_data, x))),
+        minor_breaks = NULL,
+        labels = x_labels,
+        # the same room on the right as the page's annual line charts, for the
+        # axis numbers
+        expand = expansion(mult = c(0.02, 0.07))
+      )
+  }
+
+  p +
+    scale_y_continuous(
+      breaks = breaks,
+      position = "right",
+      labels = y_labels,
+      expand = expansion(mult = c(0.02, 0.08))
+    ) +
+    guides(x = guide_axis(minor.ticks = dated)) +
+    # Numbers right-aligned with the gridlines, 0 labelled (rules 6, 6a)
+    cwr_right_axis()
+}
+
+# ---- Hovering over a 12-month average line ---------------------------------------
+# The hover layers for a black 12-month average line drawn over monthly bars
+# (vs_monthly() below, and the net business openings chart): the house pair of
+# cwr-charts rule 3c, a small dot that appears on hover under a square that
+# carries the tooltip, one pair a month on the line. The squares are smaller
+# than rule 3c's (size 4, not 7) because the line runs through the bars, and a
+# big square would take the hover from the top of every bar it crosses.
+# `plot_data` needs x (the month) and average; `tip` writes the average.
+vs_average_hover <- function(plot_data, tip) {
+  hover_data <- plot_data |>
+    distinct(x, average) |>
+    filter(!is.na(average)) |>
+    mutate(
+      hover_id = str_c("average-", x),
+      tooltip = str_glue("<b>12-month moving average</b><br>{format(x, '%B %Y')}<br>{tip(average)}")
+    )
+  list(
+    geom_point_interactive(
+      data = hover_data, aes(x = x, y = average, data_id = hover_id),
+      size = 2.5, alpha = 0, inherit.aes = FALSE
+    ),
+    geom_point_interactive(
+      data = hover_data, aes(x = x, y = average, tooltip = tooltip, data_id = hover_id),
+      shape = 15, size = 4, alpha = 0, inherit.aes = FALSE
+    )
+  )
+}
+
+# ---- Monthly bars and their 12-month average ------------------------------------
+# For the Region's monthly series that jump about with single large projects
+# (building permits, dwelling units, housing starts): each month's figure as a
+# bar, as published, and a black line for the 12-month average - the average
+# month over the past year, which 02_clean_data.R works out. A reader sees what
+# actually happened each month and, in the same units, the trend (Greg,
+# 2026-09-27, in place of 12-month totals, which read as monthly figures).
+# Built like vs_bar(), with its monthly axis and right-axis habits.
+#
+# The chunk renames its columns to x (the month), y (the month's figure),
+# group (what the bar or bar segment is, named in the hover) and average (the
+# 12-month average of the whole bar). Several groups are stacked, the factor's
+# last level at the bottom, in `fills`; their names then go in the key.
+#
+# The key sits inside the plot, like the net business openings chart's: a
+# swatch for each stacked group and a short black line for the average, each
+# with its name. Its spot is found from the data: the stretch of months, as
+# wide as the key on a phone (the wider case), whose bars and line stay
+# lowest, with the key's rows set above them near the top of the chart.
+vs_monthly <- function(plot_data, fills,
+                       y_labels = label_number(big.mark = ","),
+                       breaks = waiver(),
+                       tip = label_number(big.mark = ",")) {
+  plot_data <- plot_data |>
+    mutate(
+      hover_id = str_c(group, "-", x),
+      tooltip = str_glue("<b>{group}</b><br>{format(x, '%B %Y')}<br>{tip(y)}")
+    )
+  x_dates <- sort(unique(pull(plot_data, x)))
+  heights <- plot_data |>
+    summarise(total = sum(y), average = first(average), .by = x) |>
+    mutate(high = pmax(total, average))
+
+  # The key's rows: a swatch per group when bars are stacked, then the line
+  groups <- levels(pull(plot_data, group))
+  stacked <- length(groups) > 1
+  key <- tibble(
+    label = c(if (stacked) rev(groups), "12-month moving average"),
+    kind = c(if (stacked) rep("fill", length(groups)), "line"),
+    colour = c(if (stacked) unname(fills[rev(groups)]), "black")
+  )
+
+  # Where it goes. The key is up to half the months wide on a phone, so each
+  # month is tried as its left edge and the stretch whose tallest bar or line
+  # is lowest wins, counting the two months before it too so a tall bar just
+  # to the left does not touch it. The rows sit a quarter of the way between
+  # gridlines, half a gridline apart, which keeps them evenly spaced (a name
+  # over a gridline would be fine too - the halo is for that); the lowest is
+  # the first such spot at least 8% of the tallest figure clear of the bars
+  # below it.
+  top <- max(pull(heights, high))
+  span <- as.numeric(diff(range(x_dates)))
+  starts <- keep(x_dates, \(d) d + 0.5 * span <= max(x_dates))
+  under <- map_dbl(starts, \(d) {
+    heights |>
+      filter(x >= d - 60, x <= d + 0.5 * span) |>
+      pull(high) |>
+      max()
+  })
+  key_x <- starts[which.min(under)]
+  # the gridlines ggplot would draw: the chart's own breaks, or its default
+  grid <- if (is.function(breaks)) breaks(c(0, top)) else if (is.numeric(breaks)) breaks else extended_breaks()(c(0, top))
+  step <- diff(grid)[1]
+  bottom_row <- (ceiling((min(under) + 0.08 * top) / step - 0.25) + 0.25) * step
+  key <- key |> mutate(x = key_x, y = bottom_row + (rev(seq_len(n())) - 1) * step / 2)
+
+  x_min <- min(x_dates)
+  x_max <- max(x_dates)
+  ggplot(plot_data, aes(x = x, y = y)) +
+    geom_col_interactive(
+      aes(fill = group, tooltip = tooltip, data_id = hover_id),
+      width = 20   # a month's bar is 20 days wide, leaving a gap between months
+    ) +
+    geom_line(
+      data = distinct(plot_data, x, average),
+      aes(x = x, y = average),
+      colour = "black", linewidth = 0.8
+    ) +
+    # Hovering over the line shows the month's 12-month average
+    vs_average_hover(plot_data, tip) +
+    # The key: swatches, the line's sample, and the names
+    geom_point(
+      data = filter(key, kind == "fill"),
+      aes(x = x + 45, y = y, colour = colour),
+      shape = 15, size = 4, inherit.aes = FALSE
+    ) +
+    scale_colour_identity() +   # the swatches' colours are in the key's own column
+    geom_segment(
+      data = filter(key, kind == "line"),
+      aes(x = x, xend = x + 90, y = y, yend = y),
+      colour = "black", linewidth = 0.8, inherit.aes = FALSE
+    ) +
+    cwr_label(
+      data = key,
+      aes(x = x + 110, y = y, label = label),
+      colour = "black", size = 3.2, hjust = 0, inherit.aes = FALSE
+    ) +
+    scale_fill_manual(values = fills, guide = "none") +
+    # As vs_bar()'s monthly charts: a label each January, minor ticks only on
+    # the quarters' first months (cwr-charts rule 4b)
+    scale_x_date(
+      breaks = seq(ceiling_date(x_min, "year"), x_max, by = "1 year"),
+      date_labels = "%Y",
+      minor_breaks = keep(x_dates, \(d) month(d) %in% c(1, 4, 7, 10)),
+      expand = expansion(mult = c(0.02, 0.07))
+    ) +
+    scale_y_continuous(
+      breaks = breaks,
+      position = "right",
+      labels = y_labels,
+      expand = expansion(mult = c(0.02, 0.08))
+    ) +
+    guides(x = guide_axis(minor.ticks = TRUE)) +
+    # Numbers right-aligned with the gridlines, 0 labelled (rules 6, 6a)
+    cwr_right_axis()
+}
+
+# Alt text for a vs_monthly() chart: what it shows, then the latest month and
+# the latest 12-month average. `what` names the bars ("single-detached housing
+# starts"); `fmt` writes a number.
+vs_monthly_alt <- function(plot_data, what, fmt) {
+  latest <- plot_data |>
+    filter(x == max(x)) |>
+    summarise(total = sum(y), average = first(average))
+  str_glue(
+    "Bar chart of {what} each month, {vs_span(plot_data)}, in {cma_words}, with a line showing ",
+    "the 12-month moving average. In {format(max(pull(plot_data, x)), '%B %Y')}: ",
+    "{fmt(pull(latest, total))}, and a 12-month average of {fmt(pull(latest, average))} a month."
+  )
+}
+
+# ---- Alt text ---------------------------------------------------------------
+# Every chart's alt text ends with its latest figures, worked out from the
+# data it draws so they cannot go stale when the page is refreshed. `fmt`
+# turns a number into words ("5.8%"); `when` names the latest period.
+vs_latest <- function(plot_data, fmt, when = \(x) format(x, "%B %Y")) {
+  latest <- plot_data |>
+    filter(!is.na(y)) |>
+    group_by(geo) |>
+    slice_max(x, n = 1) |>
+    ungroup()
+  place_names <- c("Canada" = "Canada", "Ontario" = "Ontario") |> c(set_names("Waterloo Region", cwr_region))
+  figures <- latest |>
+    arrange(desc(geo)) |>
+    mutate(text = str_c(place_names[as.character(geo)], " ", fmt(y))) |>
+    pull(text)
+  str_glue("In {when(max(pull(latest, x)))}: {str_flatten_comma(figures, ', and ')}.")
+}
+
+# The first and last periods on a chart, for the start of its alt text
+vs_span <- function(plot_data, when = \(x) format(x, "%B %Y")) {
+  str_glue("from {when(min(pull(plot_data, x)))} to {when(max(pull(plot_data, x)))}")
+}
+
+# The latest period a chart shows, in words, for its subtitle's "Most recent
+# period available". `when` writes a period the way the chart's hover does
+# (october, july_1, july_to_june); without it a month is "August 2026" and a
+# year is the year. A figure left out as unreliable (NA) does not count.
+latest_period <- function(plot_data, when = NULL) {
+  latest <- plot_data |>
+    filter(!is.na(y)) |>
+    pull(x) |>
+    max()
+  if (is.null(when)) when <- if (inherits(latest, "Date")) \(x) format(x, "%B %Y") else as.character
+  when(latest)
+}
+
+# The Region, in words, for alt text: most series are for the census
+# metropolitan area rather than the Region itself
+cma_words <- "Waterloo Region (the Kitchener - Cambridge - Waterloo census metropolitan area)"
+
+# An annual period that runs July to June, written "2024/25"
+year_span <- \(year) str_c(year, "/", str_sub(year + 1, 3, 4))
+
+# Number formats shared by several charts' tooltips and alt text
+percent_1 <- label_percent(accuracy = 0.1, scale = 1)
+percent_change <- label_percent(accuracy = 0.1, scale = 1, style_positive = "plus")
+
+# Chart notes are written out in full in each chart's own chunk, so each can
+# be edited or deleted there (cwr-charts rule 1d): no stored notes, no
+# caption functions. Most figures are for the Kitchener - Cambridge - Waterloo
+# CMA, which leaves out Wellesley Township; the paragraph above the charts
+# says so once for the page.
+
+# The months a monthly chart's Region line skips, in words ("November 2023",
+# or "May 2022 and June 2022"), for a note's {placeholder}: a figure left out
+# because Statistics Canada flags it (F, or E, which the site never uses).
+# With no gap it returns nothing, so str_glue() returns nothing and the
+# chart has no such note.
+missing_months <- function(plot_data) {
+  blanked <- plot_data |>
+    filter(geo == cwr_region, is.na(y)) |>
+    pull(x) |>
+    format("%B %Y")
+  if (length(blanked) > 0) str_flatten_comma(blanked, " and ") else character(0)
+}
+```
+
+Looking for a handy overview of employment, business activity, housing, population, and crime in Waterloo Region? This Vital Statistics page is where to look. It contains a regularly updated collection of charts on the Region's health in each of these key areas, often with Ontario and Canada added for comparison. Most of the data used to produce these charts is updated monthly, so this page will be refreshed at least once a month to capture the latest statistics. The rental, population, and crime data is released annually, so those charts will only change once a year. The data in many of these charts will also be analyzed in more depth in regular posts.
+
+The population and crime charts include data for the entire Region, but for all other charts, only data for the Kitchener-Cambridge-Waterloo census metropolitan area (CMA) is available. The CMA covers the Region excluding Wellesley Township. Wellesley contains only `r wellesley_share`% of the Region's population, so its exclusion from the data has no meaningful impact on the statistics in these charts. As such, the term "Region" is used throughout the charts on this page.
+
+All charts are interactive, so hovering over any line or bar shows a box with details of the underlying data point.
+
+See [Key terms](#key-terms) for definitions.
+
+Unless otherwise indicated, this legend applies to all charts on this page.
+
+```{r}
+#| label: page-legend
+#| output: asis
+
+# One key for the whole page, in place of a legend or line labels on each
+# chart: every chart draws the same three places in the same three colours
+# (a chart of the Region alone draws only its blue line). The colours come
+# from vs_colours, so the key cannot drift from the charts. prismatic turns
+# an R colour name such as "dodgerblue4", which a browser does not know, into
+# its hex code.
+legend_key <- function(place, colour) {
+  str_glue(
+    '<span style="display: inline-flex; align-items: center; gap: 0.45em; margin-right: 1.5em;">',
+    '<span style="display: inline-block; width: 1.8em; height: 3px; background: {as.character(prismatic::color(colour))};"></span>',
+    '{place}</span>'
+  )
+}
+
+cat(
+  '<div class="vs-legend" style="margin: 0.5em 0 1.5em;">',
+  # '<p style="font-size: 0.9em; color: #555;">Unless otherwise indicated, this legend applies to all charts on this page.</p>',
+  '<p style="margin-bottom: 0.25em;">',
+  # the Region first, as on the charts
+  str_flatten(map2_chr(rev(names(vs_colours)), rev(vs_colours), legend_key)),
+  '</p>',
+  '</div>',
+  sep = ""
+)
+```
+
+## Labour market
+
+### Employment
+
+```{r}
+#| label: employment-change
+
+plot_data <- employment_change |>
+  rename(x = date, y = percent, lower = percent_lower, upper = percent_upper)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), zero_line = TRUE, tip = percent_change) +
+  labs(
+    title = "Year-over-year change in number of people with employment^1^, %",        
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0459-01",
+      credit = TRUE,   
+      # the change and its band are worked out here
+      notes = c(
+        str_glue("Three-month moving average, seasonally adjusted, the band shows the {cwr_region}'s 95% confidence interval")
+      )
+    )
+  )
+
+cwr_interactive(
+  p, "fig-employment-change",
+  alt = str_glue(
+    "Line chart of the percentage change in employment from the same month a year earlier, ",
+    "a three-month moving average adjusted for the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada, with a band showing the Region's ",
+    "95% confidence interval. {vs_latest(plot_data, percent_change)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+### Labour force participation rate
+
+::: panel-tabset
+#### All ages
+
+```{r}
+#| label: participation-rate
+
+plot_data <- participation_rate |>
+  rename(x = date, y = percent, lower = percent_lower, upper = percent_upper)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate^1^, ages 15 and over, %",                        
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0459-01",
+      credit = TRUE,   # the band is worked out here from the published standard errors
+      notes = c(
+        paste("Three-month moving average, seasonally adjusted,",
+        str_glue("the band shows the {cwr_region}'s 95% confidence interval"))
+      )
+    )
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate",
+  alt = str_glue(
+    "Line chart of the labour force participation rate, a three-month moving average adjusted for ",
+    "the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada, with a band showing ",
+    "the Region's 95% confidence interval. {vs_latest(plot_data, percent_1)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 15-24
+
+```{r}
+#| label: participation-rate-15-24
+
+# Shared by the six age tabs, three for the participation rate and three for
+# the unemployment rate. The CMA publishes these by age only without
+# seasonal adjustment, so, unlike the Overall tabs, every line rises and falls
+# with the seasons. Ten-year age groups are not published for the CMA; these
+# three cover 15 to 64. A month Statistics Canada rates too unreliable to
+# publish (F) leaves a gap in the Region's line, which each chart's unnumbered
+# note names through missing_months() (no gap, no note).
+by_age <- function(which_measure, which_age) {
+  rates_by_age |>
+    filter(measure == which_measure, age == which_age) |>
+    rename(x = date, y = percent)
+}
+age_alt <- function(plot_data, rate_words, age_words) {
+  str_glue(
+    "Line chart of the {rate_words} of people aged {age_words}, a three-month moving average not ",
+    "adjusted for the seasons, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, percent_1)}"
+  )
+}
+
+plot_data <- by_age("Participation rate", "15 to 24 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate^1^, ages 15 to 24, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-15-24",
+  alt = age_alt(plot_data, "labour force participation rate", "15 to 24"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 25-54
+
+```{r}
+#| label: participation-rate-25-54
+
+plot_data <- by_age("Participation rate", "25 to 54 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate^1^, ages 25 to 54, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-25-54",
+  alt = age_alt(plot_data, "labour force participation rate", "25 to 54"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 55-64
+
+```{r}
+#| label: participation-rate-55-64
+
+plot_data <- by_age("Participation rate", "55 to 64 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Labour force participation rate^1^, ages 55 to 64, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-participation-rate-55-64",
+  alt = age_alt(plot_data, "labour force participation rate", "55 to 64"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Unemployment rate
+
+::: panel-tabset
+#### All ages
+
+```{r}
+#| label: unemployment-rate
+
+plot_data <- unemployment_rate |>
+  rename(x = date, y = percent, lower = percent_lower, upper = percent_upper)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate^1^, ages 15 and over, %",                                      
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0459-01",
+      credit = TRUE,   # the band is worked out here from the published standard errors
+      notes = c(
+        paste("Three-month moving average, seasonally adjusted,",
+        str_glue("the band shows the {cwr_region}'s 95% confidence interval"))
+      )
+    )
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate",
+  alt = str_glue(
+    "Line chart of the unemployment rate, a three-month moving average adjusted for the seasons, ",
+    "{vs_span(plot_data)}, for {cma_words}, Ontario and Canada, with a band showing the Region's ",
+    "95% confidence interval. {vs_latest(plot_data, percent_1)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 15-24
+
+```{r}
+#| label: unemployment-rate-15-24
+
+plot_data <- by_age("Unemployment rate", "15 to 24 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate^1^, ages 15 to 24, %",              
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-15-24",
+  alt = age_alt(plot_data, "unemployment rate", "15 to 24"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 25-54
+
+```{r}
+#| label: unemployment-rate-25-54
+
+plot_data <- by_age("Unemployment rate", "25 to 54 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate^1^, ages 25 to 54, %",              
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-25-54",
+  alt = age_alt(plot_data, "unemployment rate", "25 to 54"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Ages 55-64
+
+```{r}
+#| label: unemployment-rate-55-64
+
+plot_data <- by_age("Unemployment rate", "55 to 64 years")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = percent_1) +
+  labs(
+    title = "Unemployment rate^1^, ages 55 to 64, %",              
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0458-01", "14-10-0017-01"),
+      credit = TRUE,   # Ontario's and Canada's three-month averages are worked out here
+      notes = c(
+        "Three-month moving average, not seasonally adjusted; no confidence intervals are published for these figures, so rates close together may differ only by sampling error"
+      ),
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-unemployment-rate-55-64",
+  alt = age_alt(plot_data, "unemployment rate", "55 to 64"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Employment Insurance beneficiaries
+
+::: panel-tabset
+#### Region
+
+```{r}
+#| label: ei-beneficiaries-region
+
+plot_data <- ei_beneficiaries |>
+  filter(geo == cwr_region) |>
+  rename(x = date, y = beneficiaries)
+
+# The axis is in thousands of people
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1)) +
+  labs(
+    title = "Region, number of regular EI beneficiaries^1^, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 14-10-0454-01",
+      notes = "Seasonally adjusted"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-ei-beneficiaries-region",
+  alt = str_glue(
+    "Line chart of the number of people receiving Employment Insurance regular benefits each month, ",
+    "seasonally adjusted, {vs_span(plot_data)}, in {cma_words}. ",
+    "{vs_latest(plot_data, label_number(big.mark = ','))}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### vs ONT & CDA
+
+```{r}
+#| label: ei-beneficiaries-rate
+
+plot_data <- ei_beneficiaries |>
+  rename(x = date, y = per_100)
+
+fmt <- label_number(accuracy = 0.1)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), limits = c(0, NA), tip = fmt) +
+  labs(
+    title = "Number of regular EI beneficiaries^1^ per 100 people in the labour force",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 14-10-0454-01", "14-10-0459-01"),
+      credit = TRUE,   # the rate is worked out here from two tables
+      notes = "Seasonally adjusted"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-ei-beneficiaries-rate",
+  alt = str_glue(
+    "Line chart of Employment Insurance regular beneficiaries per 100 people in the labour force, ",
+    "seasonally adjusted, {vs_span(plot_data)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, fmt)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+## Business activity
+
+### Business openings and closings
+
+::: panel-tabset
+#### Net
+
+```{r}
+#| label: business-region
+
+# Shared by the three business charts: the Region's net openings (openings
+# less closures), then each per 100 active businesses beside Ontario and Canada.
+# A month left blank because Statistics Canada flags a figure behind it for
+# use with caution (E) is named in the rate charts' note through
+# missing_months() (no gap, no note).
+business_rate <- function(which) {
+  business_dynamics |>
+    filter(measure == which) |>
+    rename(x = date, y = percent)
+}
+business_rate_fmt <- label_number(accuracy = 0.01)
+
+# The Region's net openings each month: businesses opening less businesses
+# closing, as bars - light blue in a month with more openings, light red in one
+# with more closures - with the 12-month moving average over them as a black
+# line. Neither count is flagged, so no month is missing. The hover names the
+# Region, the month and the net figure, signed.
+net_fmt <- label_number(big.mark = ",", style_positive = "plus")
+
+# The 12-month averages come from 02_clean_data.R, which works them out from
+# the year before the first month shown too, so the line starts with the bars.
+# The average of the net figure is the openings' average less the closures'.
+plot_data <- business_dynamics |>
+  filter(geo == cwr_region) |>
+  select(geo, date, measure, businesses, average_12) |>
+  pivot_wider(names_from = measure, values_from = c(businesses, average_12)) |>
+  mutate(
+    y = businesses_Openings - businesses_Closures,
+    average = average_12_Openings - average_12_Closures
+  ) |>
+  rename(x = date) |>
+  arrange(x)
+
+# A key for the average line, inside the plot: a short black line and its
+# name, four-fifths of the way up to the tallest bar, lined up on the left
+# with the two labels below (Greg, 2026-09-27). Those end where the months
+# end, so their left edge is a text width back from the last month: about a
+# quarter of the months on the desktop, and 1.73 times as many days on the
+# phone, whose text covers more of the scale (measured from the rendered
+# charts). The key's x is written as `key_back * cwr_gap()` inside aes(),
+# and cwr_interactive()'s `phone_gap = 1.73` makes it the phone's while that
+# version is drawn. If the labels' wording changes, measure again.
+x_range <- range(pull(plot_data, x))
+key_back <- 0.25 * as.numeric(diff(x_range))
+key <- tibble(end = x_range[2], back = key_back, y = 0.8 * max(pull(plot_data, y)))
+
+# Which side of zero means what: a blue label pointing up, above zero, and a
+# red one pointing down, below it, each in the darker shade of its bars so the
+# words read. They end where the months end (hjust = 1), so the phone
+# version's wider text runs leftward into the empty middle, not off the edge;
+# their heights come from the data, like the key's. The arrows are text
+# (Unicode's up and down arrows), which Inter has, so each sits right before
+# its words at any width.
+side_labels <- tibble(
+  x = x_range[2],
+  y = c(0.6 * max(pull(plot_data, y)), 0.6 * min(pull(plot_data, y))),
+  label = c("↑ More openings than closings", "↓ More closings than openings"),
+  colour = c(dodgerblue, habsred)
+)
+
+p <- vs_bar(plot_data, y_labels = label_number(big.mark = ","), tip = net_fmt,
+            when = \(x) format(x, "%B %Y"), signed = TRUE,
+            colours = c(positive = dodgerblue50, negative = habsred50)) +
+  # The 12-month moving average, over the bars
+  geom_line(
+    data = filter(plot_data, !is.na(average)),
+    aes(x = x, y = average),
+    colour = "black",
+    linewidth = 0.8
+  ) +
+  # Hovering over the line shows the month's average, to one decimal
+  vs_average_hover(plot_data, tip = label_number(accuracy = 0.1, style_positive = "plus")) +
+  geom_segment(
+    data = key,
+    aes(x = end - back * cwr_gap(), xend = end - back * cwr_gap() + 90, y = y, yend = y),
+    colour = "black", linewidth = 0.8,
+    inherit.aes = FALSE
+  ) +
+  cwr_label(
+    data = key,
+    aes(x = end - back * cwr_gap() + 110, y = y, label = "12-month moving average"),
+    colour = "black", size = 3.2, hjust = 0,
+    inherit.aes = FALSE
+  ) +
+  cwr_label(
+    data = side_labels,
+    aes(x = x, y = y, label = label),
+    colour = pull(side_labels, colour), size = 3.2, hjust = 1,
+    inherit.aes = FALSE
+  ) +
+  labs(
+    title = "Region, net number of business openings/closings^1^",                    
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 33-10-0270-01",
+      credit = TRUE,   # openings less closures, and its average, are worked out here
+      notes = "Seasonally adjusted"
+    )
+  )
+
+months_net_closing <- plot_data |>
+  filter(y < 0) |>
+  nrow()
+
+cwr_interactive(
+  p, "fig-business-region",
+  alt = str_glue(
+    "Bar chart of the number of businesses opening less the number closing each month, seasonally ",
+    "adjusted, {vs_span(plot_data)}, in {cma_words}. More businesses closed than opened in ",
+    "{months_net_closing} of the {nrow(plot_data)} months. A line shows the 12-month moving average. ",
+    "In {format(max(pull(plot_data, x)), '%B %Y')}: {net_fmt(last(pull(plot_data, y)))}, and a ",
+    "12-month average of {net_fmt(round(last(pull(plot_data, average)), 1))} a month."
+  ),
+  height = 5, phone_height = 4.5,
+  phone_gap = 1.73   # the key's offset on the phone, as the comment above says
+)
+```
+
+#### Openings
+
+```{r}
+#| label: business-openings-rate
+
+plot_data <- business_rate("Openings")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt) +
+  labs(
+    title = "Number of business openings^1^ per 100 active businesses",            
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 33-10-0270-01",
+      credit = TRUE,   # the rates are worked out here
+      notes = "Seasonally adjusted",
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-business-openings-rate",
+  alt = str_glue(
+    "Line chart of business openings per 100 active businesses, seasonally adjusted, ",
+    "{vs_span(plot_data)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, business_rate_fmt)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Closings
+
+```{r}
+#| label: business-closures-rate
+
+plot_data <- business_rate("Closures")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt) +
+  labs(
+    title = "Number of business closings^1^ per 100 active businesses",            
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 33-10-0270-01",
+      credit = TRUE,   # the rates are worked out here
+      notes = "Seasonally adjusted",
+      unnumbered = str_glue("{cwr_region} not shown for {missing_months(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-business-closures-rate",
+  alt = str_glue(
+    "Line chart of business closures per 100 active businesses, seasonally adjusted, ",
+    "{vs_span(plot_data)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, business_rate_fmt)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+## Building permits
+
+::: panel-tabset
+### Residential
+
+```{r}
+#| label: permits-residential-region
+
+# Shared by the two value tabs: the value of the Region's residential or
+# non-residential permits each month, seasonally adjusted and in constant
+# 2023 dollars so a rise in building costs does not read as more building,
+# with its 12-month average.
+millions <- label_dollar(scale = 1e-6, accuracy = 0.1, suffix = " million")
+permits_monthly <- function(which) {
+  building_permits |>
+    filter(geo == cwr_region, type == which) |>
+    rename(x = date, y = value, average = average_12) |>
+    mutate(group = factor(which))
+}
+
+plot_data <- permits_monthly("Residential")
+
+# The axis is in millions of dollars
+p <- vs_monthly(plot_data, fills = c(Residential = dodgerblue50),
+                y_labels = label_number(scale = 1e-6), tip = millions) +
+  labs(
+    title = "Region, value of residential building permits^1^, $ millions",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 34-10-0292-01",
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "2023 prices, seasonally adjusted"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-permits-residential-region",
+  alt = vs_monthly_alt(plot_data, "the value of residential building permits, seasonally adjusted, in constant 2023 dollars,", millions),
+  height = 5, phone_height = 4.5
+)
+```
+
+### Non-residential
+
+```{r}
+#| label: permits-non-residential-region
+
+plot_data <- permits_monthly("Non-residential")
+
+# The axis is in millions of dollars
+p <- vs_monthly(plot_data, fills = c(`Non-residential` = dodgerblue50),
+                y_labels = label_number(scale = 1e-6), tip = millions) +
+  labs(
+    title = "Region, value of non-residential building permits^1^, $ millions",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 34-10-0292-01",
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "2023 prices, seasonally adjusted"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-permits-non-residential-region",
+  alt = vs_monthly_alt(plot_data, "the value of non-residential building permits, seasonally adjusted, in constant 2023 dollars,", millions),
+  height = 5, phone_height = 4.5
+)
+```
+
+### Dwelling units
+
+```{r}
+#| label: permits-units-region
+
+# The number of dwelling units the Region's residential permits create each
+# month, seasonally adjusted, with its 12-month average
+plot_data <- permit_units |>
+  filter(geo == cwr_region) |>
+  rename(x = date, y = units, average = average_12) |>
+  mutate(group = factor("Dwelling units"))
+
+# The axis is in thousands of dwelling units, so its numbers clear the bars
+p <- vs_monthly(plot_data, fills = c(`Dwelling units` = dodgerblue50),
+                y_labels = label_number(scale = 1e-3, accuracy = 0.1),
+                tip = label_number(big.mark = ",", accuracy = 1)) +
+  labs(
+    title = "Region, number of dwelling units included in residential permits^1^, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 34-10-0292-01",
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "Seasonally adjusted"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-permits-units-region",
+  alt = vs_monthly_alt(plot_data, "the number of dwelling units created by residential building permits, seasonally adjusted,",
+                       label_number(big.mark = ",", accuracy = 1)),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+## Housing
+
+### Housing starts
+
+::: panel-tabset
+#### All dwellings
+
+```{r}
+#| label: starts-all-region
+
+# Shared by the five starts tabs: the Region's starts each month - of every
+# dwelling type together ("All"), then of each type - as bars, with their
+# 12-month average. The data call single-detached homes "Single". "All" is
+# seasonally adjusted (CMHC's seasonally adjusted annual rate divided by 12,
+# in 02_clean_data.R); the types are not, because no adjusted version is
+# published for the Region, so the four types do not add up to "All".
+starts_monthly <- function(which) {
+  housing_starts |>
+    filter(geo == cwr_region, dwelling_type == which) |>
+    rename(x = date, y = starts, average = average_12) |>
+    mutate(group = factor("Housing starts"))
+}
+starts_fmt <- label_number(big.mark = ",", accuracy = 1)
+
+plot_data <- starts_monthly("All")
+
+# The axis is in thousands of starts, so its numbers clear the bars
+p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt,
+                y_labels = label_number(scale = 1e-3, accuracy = 0.1)) +
+  labs(
+    title = "Region, all dwellings, number of starts^1^, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC via Statistics Canada Table 34-10-0156-01",
+      credit = TRUE,   # the monthly figure and the 12-month average are worked out here
+      notes = "Seasonally adjusted (CMHC's annual rate divided by 12); other tabs are not seasonally adjusted and do not sum to this total"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-all-region",
+  alt = vs_monthly_alt(plot_data, "housing starts of every dwelling type, seasonally adjusted,", starts_fmt),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Single-detached
+
+```{r}
+#| label: starts-single-region
+
+plot_data <- starts_monthly("Single")
+
+p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
+  labs(
+    title = "Region, single-detached, number of starts, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month average is worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-single-region",
+  alt = vs_monthly_alt(plot_data, "single-detached housing starts", starts_fmt),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Semi-detached
+
+```{r}
+#| label: starts-semi-region
+
+plot_data <- starts_monthly("Semi-detached")
+
+# Whole starts only: gridlines every 5, so the numbers stay narrow
+p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt,
+                breaks = breaks_width(5)) +
+  labs(
+    title = "Region, semi-detached, number of starts, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month average is worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-semi-region",
+  alt = vs_monthly_alt(plot_data, "semi-detached housing starts", starts_fmt),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Row
+
+```{r}
+#| label: starts-row-region
+
+plot_data <- starts_monthly("Row")
+
+p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
+  labs(
+    title = "Region, row, number of starts, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month average is worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-row-region",
+  alt = vs_monthly_alt(plot_data, "row housing starts", starts_fmt),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Apartment
+
+```{r}
+#| label: starts-apartment-region
+
+plot_data <- starts_monthly("Apartment")
+
+# The axis is in thousands of starts, so its numbers clear the bars
+p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt,
+                y_labels = label_number(scale = 1e-3, accuracy = 0.1)) +
+  labs(
+    title = "Region, apartment, number of starts, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month average is worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-apartment-region",
+  alt = vs_monthly_alt(plot_data, "apartment housing starts", starts_fmt),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Ownership type
+
+::: panel-tabset
+#### Rental
+
+```{r}
+#| label: starts-rental-share
+
+# Shared by the three intended-market tabs: one market's share of the starts
+# over the past 12 months
+market_share <- function(which) {
+  starts_intended_market |>
+    filter(intended_market == which) |>
+    rename(x = date, y = percent)
+}
+market_fmt <- label_percent(accuracy = 1, scale = 1)
+market_alt <- function(plot_data, market_words) {
+  str_glue(
+    "Line chart of the percentage of housing starts over the past 12 months intended for the ",
+    "{market_words} market, {vs_span(plot_data)}, for {cma_words}, and for Ontario's and ",
+    "Canada's centres of 10,000 people or more. {vs_latest(plot_data, market_fmt)}"
+  )
+}
+
+plot_data <- market_share("Rental")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+  labs(
+    title = "Rental, share of housing starts over the past 12 months, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month shares are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-rental-share",
+  alt = market_alt(plot_data, "rental"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Condo
+
+```{r}
+#| label: starts-condo-share
+
+plot_data <- market_share("Condo")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+  labs(
+    title = "Condo, share of housing starts over the past 12 months, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month shares are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-condo-share",
+  alt = market_alt(plot_data, "condominium"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Homeowner
+
+```{r}
+#| label: starts-homeowner-share
+
+plot_data <- market_share("Homeowner")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+  labs(
+    title = "Homeowner, share of housing starts over the past 12 months, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "CMHC Starts and Completions Survey",
+      credit = TRUE   # the 12-month shares are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-starts-homeowner-share",
+  alt = market_alt(plot_data, "homeowner"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Housing prices
+
+```{r}
+#| label: new-housing-price-index
+
+plot_data <- new_housing_price_index |>
+  rename(x = date, y = index)
+
+fmt <- label_number(accuracy = 0.1)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), index = 100, tip = fmt) +
+  labs(
+    title = "New Housing Price Index, December 2016 = 100",                                
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 18-10-0205-01"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-new-housing-price-index",
+  alt = str_glue(
+    "Line chart of the New Housing Price Index for house and land, December 2016 = 100, ",
+    "{vs_span(plot_data)}, for {cma_words}, Ontario and Canada. {vs_latest(plot_data, fmt)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+## Rental market
+
+### Vacancy rate
+
+Too little of the data for studio apartments was reliable enough to report, so there is no chart for these units. 
+
+::: panel-tabset
+#### All units
+
+```{r}
+#| label: vacancy-rate
+
+# Shared by the twelve rental charts: three measures from CMHC's October
+# Rental Market Survey - the vacancy rate, the average rent and the
+# same-sample rent change - each for all units and then by unit size, one
+# size a tab. A size is charted only where the Region has at least four usable
+# figures of the five (Greg, 2026-09-26), which leaves out the studio vacancy
+# rate and the studio and 3+ bedroom rent changes; rms_size() prints a warning
+# while the page renders if a refresh leaves a charted size below that.
+october <- \(x) str_c("October ", x)
+
+# How each unit size is named in alt text; the data use CMHC's own names
+unit_words <- c(
+  "Total" = "all units",
+  "Studio" = "studios",
+  "1 Bedroom" = "one-bedroom units",
+  "2 Bedroom" = "two-bedroom units",
+  "3 Bedroom +" = "units with three or more bedrooms"
+)
+
+rms_size <- function(data, size) {
+  plot_data <- data |>
+    filter(bedroom_type == size) |>
+    rename(x = year, y = value)
+  usable <- plot_data |>
+    filter(geo == cwr_region, !is.na(y)) |>
+    nrow()
+  if (usable < 4) {
+    cat("WARNING - rental charts: the Region has only ", usable, " usable figures for ", size,
+        " (", deparse(substitute(data)), "); the page charts a unit size only with four or more.\n",
+        sep = "", file = stderr())
+  }
+  plot_data
+}
+
+# The Octobers the Region's line skips, in words for the unnumbered note's
+# {placeholder}: "October 2021 and October 2023". CMHC rated the figure
+# "Fair (Use with Caution)", which the site never uses (it is blanked in
+# 02_clean_data.R), or did not publish it. With no gap it returns nothing,
+# so str_glue() returns nothing and there is no such note.
+rms_gaps <- function(plot_data) {
+  gaps <- plot_data |>
+    filter(geo == cwr_region, is.na(y)) |>
+    pull(x)
+  if (length(gaps) == 0) character(0) else str_flatten_comma(october(gaps), " and ")
+}
+
+rms_alt <- function(plot_data, size, measure_words, fmt) {
+  str_glue(
+    "Line chart of {measure_words} {unit_words[[size]]} in purpose-built rental apartments and ",
+    "rows each October, {vs_span(plot_data, as.character)}, for {cma_words}, Ontario and Canada. ",
+    "{vs_latest(plot_data, fmt, october)}"
+  )
+}
+
+# The axis numbers are rounded finely (0.1, or $10 on the rent charts), since
+# the gridlines can fall on halves or quarters; cwr_right_axis() then drops
+# the zeros the numbers all share, so whole steps still read "1, 2, 3".
+# The rent changes start their axis at zero unless one goes below it
+from_zero <- \(plot_data) c(min(0, pull(plot_data, y), na.rm = TRUE), NA)
+dollars_1 <- label_dollar(accuracy = 1)
+
+plot_data <- rms_size(vacancy_rate, "Total")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "All units, vacancy rate, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate",
+  alt = rms_alt(plot_data, "Total", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 1 BR
+
+```{r}
+#| label: vacancy-rate-1-bedroom
+
+plot_data <- rms_size(vacancy_rate, "1 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "1 bedroom, vacancy rate, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 2 BR
+
+```{r}
+#| label: vacancy-rate-2-bedroom
+
+plot_data <- rms_size(vacancy_rate, "2 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "2 bedrooms, vacancy rate, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 3+ BR
+
+```{r}
+#| label: vacancy-rate-3-bedroom
+
+plot_data <- rms_size(vacancy_rate, "3 Bedroom +")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+             tip = percent_1, when = october) +
+  labs(
+    title = "3+ bedrooms, vacancy rate, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-vacancy-rate-3-bedroom",
+  alt = rms_alt(plot_data, "3 Bedroom +", "the vacancy rate in", percent_1),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Average rent
+
+::: panel-tabset
+#### All units
+
+```{r}
+#| label: average-rent
+
+plot_data <- rms_size(average_rent, "Total")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "All units, average monthly rent, $ thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-average-rent",
+  alt = rms_alt(plot_data, "Total", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Studio
+
+```{r}
+#| label: average-rent-studio
+
+plot_data <- rms_size(average_rent, "Studio")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "Studio, average monthly rent, $ thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-studio",
+  alt = rms_alt(plot_data, "Studio", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 1 BR
+
+```{r}
+#| label: average-rent-1-bedroom
+
+plot_data <- rms_size(average_rent, "1 Bedroom")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "1 bedroom, average monthly rent, $ thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 2 BR
+
+```{r}
+#| label: average-rent-2-bedroom
+
+plot_data <- rms_size(average_rent, "2 Bedroom")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "2 bedrooms, average monthly rent, $ thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 3+ BR
+
+```{r}
+#| label: average-rent-3-bedroom
+
+plot_data <- rms_size(average_rent, "3 Bedroom +")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+             tip = dollars_1, when = october) +
+  labs(
+    title = "3+ bedrooms, average monthly rent, $ thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-average-rent-3-bedroom",
+  alt = rms_alt(plot_data, "3 Bedroom +", "the average monthly rent of", dollars_1),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Year-over-year change in rent
+
+Too little of the data for studio and 3+ bedroom apartments was reliable enough to report, so there is no chart for these units.
+
+::: panel-tabset
+#### All units
+
+```{r}
+#| label: rent-change
+
+plot_data <- rms_size(rent_change, "Total")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+             tip = percent_change, when = october) +
+  labs(
+    title = "All units, same-sample year-over-year change in average rent, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-rent-change",
+  alt = rms_alt(plot_data, "Total", "the same-sample percentage change in the average rent from the October before, for", percent_change),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 1 BR
+
+```{r}
+#| label: rent-change-1-bedroom
+
+plot_data <- rms_size(rent_change, "1 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+             tip = percent_change, when = october) +
+  labs(
+    title = "1 bedroom, same-sample year-over-year change in average rent, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-rent-change-1-bedroom",
+  alt = rms_alt(plot_data, "1 Bedroom", "the same-sample percentage change in the average rent from the October before, for", percent_change),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### 2 BR
+
+```{r}
+#| label: rent-change-2-bedroom
+
+plot_data <- rms_size(rent_change, "2 Bedroom")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+             tip = percent_change, when = october) +
+  labs(
+    title = "2 bedrooms, same-sample year-over-year change in average rent, %",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, october)}"),
+    caption = cwr_caption(
+      "CMHC Rental Market Survey",
+      unnumbered = str_glue("{cwr_region} not shown for {rms_gaps(plot_data)} because data is too unreliable to report")
+    )
+  )
+
+cwr_interactive(
+  p, "fig-rent-change-2-bedroom",
+  alt = rms_alt(plot_data, "2 Bedroom", "the same-sample percentage change in the average rent from the October before, for", percent_change),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+## Population
+
+### Number of residents
+
+::: panel-tabset
+#### Population
+
+```{r}
+#| label: population-region
+
+# The Region's population on July 1 of each year, the figure the growth rates
+# in the next tab are worked out from. The whole Region (the census-division
+# table), Wellesley included.
+plot_data <- population_growth |>
+  filter(geo == cwr_region) |>
+  rename(x = year, y = population)
+
+july_1 <- \(x) str_c("July 1, ", x)
+
+# The axis is in thousands of people
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), when = july_1) +
+  labs(
+    title = "Region, population, thousands",                               
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_1)}"),
+    caption = cwr_caption("Statistics Canada Table 17-10-0152-01")
+  )
+
+cwr_interactive(
+  p, "fig-population-region",
+  alt = str_glue(
+    "Line chart of the population of Waterloo Region on July 1 of each year, ",
+    "{vs_span(plot_data, as.character)}. {vs_latest(plot_data, label_number(big.mark = ','), july_1)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Population growth
+
+```{r}
+#| label: population-growth
+
+plot_data <- population_growth |>
+  rename(x = year, y = percent)
+
+year_to_july_1 <- \(x) str_c("the year to July 1, ", x)
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), limits = c(0, NA),
+             tip = percent_change, when = \(x) str_c("Year to July 1, ", x)) +
+  labs(
+    title = "Year-over-year change in population, %",                                      
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_1)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 17-10-0152-01",
+      credit = TRUE   # the growth rates are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-population-growth",
+  alt = str_glue(
+    "Line chart of population growth, the percentage change in the population from July 1 of one ",
+    "year to July 1 of the next, for the years to July 1 {vs_span(plot_data, as.character)}, for ",
+    "Waterloo Region, Ontario and Canada. {vs_latest(plot_data, percent_1, year_to_july_1)}"
+  ),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Components of population change
+
+#### Natural increase (births - deaths)
+
+::: panel-tabset
+##### Region
+
+```{r}
+#| label: components-natural-region
+
+# Shared by the ten component charts: for each component, the Region's
+# number of people over the twelve months from July to June, as bars, then
+# the same per 1,000 people beside Ontario and Canada, as lines. These are the
+# whole Region (the census-division table), Wellesley included.
+components_people <- function(which) {
+  population_components |>
+    filter(geo == cwr_region, component == which) |>
+    rename(x = year, y = people)
+}
+components_per_1000 <- function(which) {
+  population_components |>
+    filter(component == which) |>
+    rename(x = year, y = per_1000)
+}
+people_fmt <- label_number(big.mark = ",", style_positive = "plus")
+per_1000_fmt <- label_number(accuracy = 0.1, style_positive = "plus")
+# The twelve months a component's year covers, for the subtitle: 2024 is
+# "July 2024 to June 2025"
+july_to_june <- \(x) str_c("July ", x, " to June ", x + 1)
+components_people_alt <- function(plot_data, component_words) {
+  str_glue(
+    "Bar chart of {component_words} in Waterloo Region, in people, for each twelve months from ",
+    "July to June, {vs_span(plot_data, year_span)}. {vs_latest(plot_data, people_fmt, year_span)}"
+  )
+}
+components_rate_alt <- function(plot_data, component_words, places = "Waterloo Region, Ontario and Canada") {
+  str_glue(
+    "Line chart of {component_words} per 1,000 people, for each twelve months from July to June, ",
+    "{vs_span(plot_data, year_span)}, for {places}. ",
+    "{vs_latest(plot_data, per_1000_fmt, year_span)}"
+  )
+}
+# On a phone, five "2020/21" labels do not fit across: every other one is kept
+components_phone <- list(scale_x_continuous(
+  breaks = sort(unique(pull(population_components, year)))[c(TRUE, FALSE)],
+  labels = year_span,
+  expand = expansion(mult = c(0.1, 0.1))
+))
+
+plot_data <- components_people("Natural increase")
+
+# The axis is in thousands of people
+p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), x_labels = year_span,
+            tip = people_fmt, when = year_span) +
+  labs(
+    title = "Region, natural increase in population, thousands",                         
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 17-10-0153-01",
+      credit = TRUE   # births less deaths is worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-components-natural-region",
+  alt = components_people_alt(plot_data, "natural increase (births less deaths)"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+
+##### vs ONT & CDA
+
+```{r}
+#| label: components-natural-rate
+
+plot_data <- components_per_1000("Natural increase")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_span, limits = c(0, NA),
+             tip = per_1000_fmt, when = year_span) +
+  labs(
+    title = "Natural increase per 1,000 people",                      
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
+      credit = TRUE   # the rates per 1,000 are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-components-natural-rate",
+  alt = components_rate_alt(plot_data, "natural increase (births less deaths)"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+:::
+
+#### Immigrants
+
+::: panel-tabset
+##### Region
+
+```{r}
+#| label: components-immigrants-region
+
+plot_data <- components_people("Immigrants")
+
+# The axis is in thousands of people
+p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_labels = year_span,
+            tip = people_fmt, when = year_span) +
+  labs(
+    title = "Region, number of new immigrants, thousands",                               
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01")
+  )
+
+cwr_interactive(
+  p, "fig-components-immigrants-region",
+  alt = components_people_alt(plot_data, "immigrants"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+
+##### vs ONT & CDA
+
+```{r}
+#| label: components-immigrants-rate
+
+plot_data <- components_per_1000("Immigrants")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_span, limits = c(0, NA),
+             tip = per_1000_fmt, when = year_span) +
+  labs(
+    title = "Number of new immigrants per 1,000 people",                            
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
+      credit = TRUE   # the rates per 1,000 are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-components-immigrants-rate",
+  alt = components_rate_alt(plot_data, "immigrants"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+:::
+
+#### Net non-permanent residents
+
+::: panel-tabset
+##### Region
+
+```{r}
+#| label: components-npr-region
+
+plot_data <- components_people("Net non-permanent residents")
+
+# The axis is in thousands of people
+p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_labels = year_span,
+            tip = people_fmt, when = year_span) +
+  labs(
+    title = "Region, net new non-permanent residents, thousands",              
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01")
+  )
+
+cwr_interactive(
+  p, "fig-components-npr-region",
+  alt = components_people_alt(plot_data, "the net change in non-permanent residents"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+
+##### vs ONT & CDA
+
+```{r}
+#| label: components-npr-rate
+
+plot_data <- components_per_1000("Net non-permanent residents")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_span,
+             zero_line = TRUE, tip = per_1000_fmt, when = year_span) +
+  labs(
+    title = "Net new non-permanent residents per 1,000 people",           
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
+      credit = TRUE   # the rates per 1,000 are worked out here
+    )
+  )
+
+cwr_interactive(
+  p, "fig-components-npr-rate",
+  alt = components_rate_alt(plot_data, "the net change in non-permanent residents"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+:::
+
+#### Net interprovincial migration
+
+::: panel-tabset
+##### Region
+
+```{r}
+#| label: components-interprovincial-region
+
+plot_data <- components_people("Net interprovincial migration")
+
+# The axis is in thousands of people, a gridline every thousand
+p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), breaks = breaks_width(1000),
+            x_labels = year_span, tip = people_fmt, when = year_span) +
+  labs(
+    title = "Region, net interprovincial migration, thousands of people",                  
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01")
+  )
+
+cwr_interactive(
+  p, "fig-components-interprovincial-region",
+  alt = components_people_alt(plot_data, "net interprovincial migration (moves from other provinces less moves to them)"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+
+##### vs ONT
+
+```{r}
+#| label: components-interprovincial-rate
+
+plot_data <- components_per_1000("Net interprovincial migration")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_span,
+             zero_line = TRUE, tip = per_1000_fmt, when = year_span) +
+  labs(
+    title = "Net interprovincial migration per 1,000 people^1^",         
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption(
+      c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
+      credit = TRUE,   # the rates per 1,000 are worked out here
+      notes = "Migration between provinces nets to zero for Canada as a whole, so no line presented"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-components-interprovincial-rate",
+  alt = components_rate_alt(plot_data, "net interprovincial migration", "Waterloo Region and Ontario"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+:::
+
+#### Net intraprovincial migration
+
+```{r}
+#| label: components-intraprovincial-region
+
+plot_data <- components_people("Net intraprovincial migration")
+
+# The axis is in thousands of people, a gridline every thousand
+p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), breaks = breaks_width(1000),
+            x_labels = year_span, tip = people_fmt, when = year_span) +
+  labs(
+    title = "Region, net intraprovincial migration^1^, thousands of people",                  
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01", notes = c("Migration within province nets to zero for Canada and Ontario as a whole, so no comparatives presented"))
+  )
+
+cwr_interactive(
+  p, "fig-components-intraprovincial-region",
+  alt = components_people_alt(plot_data, "net intraprovincial migration (moves from elsewhere in Ontario less moves to it)"),
+  height = 5, phone_height = 4.5, phone = components_phone
+)
+```
+
+## Crime
+
+### All crime
+
+::: panel-tabset
+#### Severity
+
+```{r}
+#| label: crime-severity
+
+# Shared by the six crime charts: for all crime, violent crime and non-violent
+# crime, the Crime Severity Index and then the number of police-reported
+# incidents per 100,000 people. Not the stock CMA note: crime figures are
+# compiled from police services, and both tables' footnotes (52 and 110) say
+# the policing CMA may not match the census one (see the README's Reliability
+# table).
+crime_index <- function(which) {
+  crime_severity |>
+    filter(index == which) |>
+    rename(x = year, y = value)
+}
+crime_per_100k <- function(which) {
+  crime_rate |>
+    filter(kind == which) |>
+    rename(x = year, y = per_100k)
+}
+crime_places <- str_c(
+  "Waterloo Region (the Kitchener - Cambridge - Waterloo census metropolitan area as policed), ",
+  "Ontario and Canada"
+)
+index_fmt <- label_number(accuracy = 0.1)
+rate_fmt <- label_number(accuracy = 1, big.mark = ",")
+crime_index_alt <- function(plot_data, index_words) {
+  str_glue(
+    "Line chart of the {index_words}, 2006 = 100, {vs_span(plot_data, as.character)}, for ",
+    "{crime_places}. {vs_latest(plot_data, index_fmt, as.character)}"
+  )
+}
+crime_rate_alt <- function(plot_data, kind_words) {
+  str_glue(
+    "Line chart of {kind_words} incidents reported to police per 100,000 people, ",
+    "{vs_span(plot_data, as.character)}, for {crime_places}. ",
+    "{vs_latest(plot_data, rate_fmt, as.character)}"
+  )
+}
+
+plot_data <- crime_index("All crime")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), index = 100, tip = index_fmt) +
+  labs(
+    title = "Crime Severity Index, 2006 = 100",                                   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption("Statistics Canada Table 35-10-0026-01")
+  )
+
+cwr_interactive(
+  p, "fig-crime-severity",
+  alt = crime_index_alt(plot_data, "Crime Severity Index"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Incidents
+
+```{r}
+#| label: crime-rate
+
+plot_data <- crime_per_100k("All crime")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
+  labs(
+    title = "Number of incidents per 100,000 people, thousands",           
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption("Statistics Canada Table 35-10-0177-01")
+  )
+
+cwr_interactive(
+  p, "fig-crime-rate",
+  alt = crime_rate_alt(plot_data, "all"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Violent crime
+
+::: panel-tabset
+#### Severity
+
+```{r}
+#| label: violent-crime-severity
+
+plot_data <- crime_index("Violent crime")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), index = 100, tip = index_fmt) +
+  labs(
+    title = "Violent Crime Severity Index, 2006 = 100",                           
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 35-10-0026-01"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-violent-crime-severity",
+  alt = crime_index_alt(plot_data, "violent Crime Severity Index"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Incidents
+
+```{r}
+#| label: violent-crime-rate
+
+plot_data <- crime_per_100k("Violent crime")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
+  labs(
+    title = "Number of violent incidents per 100,000 people, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 35-10-0177-01"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-violent-crime-rate",
+  alt = crime_rate_alt(plot_data, "violent"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+### Non-violent crime
+
+::: panel-tabset
+#### Severity
+
+```{r}
+#| label: non-violent-crime-severity
+
+plot_data <- crime_index("Non-violent crime")
+
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), index = 100, tip = index_fmt) +
+  labs(
+    title = "Non-violent Crime Severity Index, 2006 = 100",                       
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 35-10-0026-01"
+    )
+  )
+
+cwr_interactive(
+  p, "fig-non-violent-crime-severity",
+  alt = crime_index_alt(plot_data, "non-violent Crime Severity Index"),
+  height = 5, phone_height = 4.5
+)
+```
+
+#### Incidents
+
+```{r}
+#| label: non-violent-crime-rate
+
+plot_data <- crime_per_100k("Non-violent crime")
+
+# The axis is in thousands, so its numbers clear the ends of the lines
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), tip = rate_fmt) +
+  labs(
+    title = "Number of non-violent^1^ incidents per 100,000 people, thousands",   
+    subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
+    caption = cwr_caption(
+      "Statistics Canada Table 35-10-0177-01",
+      credit = TRUE,   # all violations less violent ones is worked out here
+      notes = c(
+        "Non-violent: all violations less violent Criminal Code violations"
+      )
+    )
+  )
+
+cwr_interactive(
+  p, "fig-non-violent-crime-rate",
+  alt = crime_rate_alt(plot_data, "non-violent"),
+  height = 5, phone_height = 4.5
+)
+```
+:::
+
+::: {#key-terms .callout-note collapse="true"}
+## Key terms
+
+<!-- The terms a reader needs to read the charts correctly, each with its official
+     definition. The table is printed from the "Key terms" table in this page's
+     README.md, so there is only ever one copy. Edit the definitions there. A term whose
+     Definition cell is still empty is left out of the page, and the render warns until
+     it is defined or deleted. -->
+
+```{r}
+#| label: key-terms
+#| output: asis
+
+# Prints the key terms from this page's README.md - edit them there, not here
+cwr_key_terms_table("vital-statistics")
+```
+
+:::
+
+::: {#data-sources-and-reliability .callout-note collapse="true"}
+## Data sources and reliability
+
+<!-- Where the data came from, what was excluded and why, and any caveat a careful
+     reader should know: write that here, above the tables. Neither table is written
+     here - the chunks below print both straight out of this page's README.md. -->
+
+<!-- The notice the CMHC Licence Agreement for the Use of Data asks for on
+     anything adapted from CMHC data (the housing starts and rental charts) -->
+Adapted from Canada Mortgage and Housing Corporation, Starts and Completions Survey and Rental Market Survey, reference dates as shown on each chart. This does not constitute an endorsement by Canada Mortgage and Housing Corporation of this product.
+
+### Sources
+
+```{r}
+#| label: sources
+#| output: asis
+
+# Prints the source table from this page's README.md - edit it there, not here
+cwr_sources_table("vital-statistics")
+```
+
+### Reliability
+
+```{r}
+#| label: reliability
+#| output: asis
+
+# Prints the data-quality issues from the Reliability table in this page's
+# README.md - edit them there, not here. To leave an issue out of the page, do
+# not delete its row: write why in its "Left out of the post because" column.
+cwr_reliability_table("vital-statistics")
+```
+
+:::
+
+::: {.callout-note collapse="true"}
+## Reproducibility
+
+**Reproduce the page**: get the code and the data behind every chart (CSV files, in its [`data/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/vital-statistics/data) folder) from [`vital-statistics/`](https://github.com/gpberber/chartingwaterlooregion/tree/master/vital-statistics) on GitHub.
+
+```{r}
+#| label: session-info
+
+cwr_session_info()
+```
+:::

@@ -1,0 +1,748 @@
+/*-- scss:defaults --*/
+// ---------------------------------------------------------------------------
+// Charting Waterloo Region house style
+// Base theme: litera. Colours mirror R/theme_cwr.R so charts and pages match.
+// ---------------------------------------------------------------------------
+
+// Typography: Inter for the site, served from fonts/ (see the @font-face rules
+// below). $web-font-path is deliberately absent: setting it here produced no
+// @import and no <link> in the rendered pages, so for a year the site asked for
+// Inter and never delivered it. Greg has Inter installed on his machine and so
+// saw the design as intended; every other reader fell through to -apple-system or
+// Segoe UI, which is why the navbar lined up on his desktop and not on his iPad.
+// If you ever want the font from a CDN instead, it has to be a real <link>, and
+// it would put a third-party request on every page view - see the Privacy section
+// of about.qmd before doing that.
+$font-family-sans-serif: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+// litera sets paragraphs in $font-family-serif (Georgia); we want one face everywhere
+$font-family-serif: $font-family-sans-serif;
+$font-size-base: 1.05rem;
+$headings-font-weight: 600;
+$line-height-base: 1.6;
+
+// House palette (same hex values as the R colour objects)
+$cwr-blue: #104E8B;      // dodgerblue4  - focus colour (Waterloo Region)
+$cwr-red: #AF1E2D;       // habsred      - contrast colour (Canada, highlights)
+$cwr-grey: #869397;      // cowboysilver - context colour (other places, captions)
+$cwr-blue-50: mix($cwr-blue, white, 50%);
+$cwr-grey-50: mix($cwr-grey, white, 50%);
+$cwr-grey-15: mix($cwr-grey, white, 15%);
+
+$primary: $cwr-blue;
+$secondary: $cwr-grey;
+$body-color: #222222;
+$link-color: $cwr-blue;
+$link-hover-color: $cwr-red;
+$navbar-bg: $cwr-blue;
+$navbar-fg: #ffffff;
+$navbar-hl: #ffffff;
+$footer-bg: $cwr-grey-15;
+$footer-fg: #4a5457;
+$code-bg: $cwr-grey-15;
+$code-color: #333333;
+
+/*-- scss:rules --*/
+// ---------------------------------------------------------------------------
+// Inter, self-hosted
+// ---------------------------------------------------------------------------
+// One variable file per subset covers every weight the site uses, which is why
+// font-weight is a range rather than a number - the browser interpolates 500 and
+// 600 from it rather than downloading four files.
+//
+// The paths are root-relative because the site is served from the root of its own
+// domain (see the CNAME). They cannot be relative: this file is compiled into
+// _site/site_libs/bootstrap/, so a bare "fonts/..." would be looked for in there.
+//
+// latin-ext is listed but costs nothing on a normal page: unicode-range tells the
+// browser to fetch it only if the text actually contains a character in that block.
+// Almost nothing here does - French accents all live in the latin range - so it is
+// insurance for the odd name in a dataset rather than weight on every visit.
+//
+// Inter is under the SIL Open Font Licence; fonts/Inter-LICENSE.txt travels with it,
+// as that licence requires. Files came from Google Fonts' subsetted build of v20.
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+// ---------------------------------------------------------------------------
+// Navbar and title banner
+// ---------------------------------------------------------------------------
+.navbar .nav-link { font-weight: 500; }
+
+// Quarto renders the brand as two links side by side in a flex container - one
+// holding the mark, one holding the name.
+//
+// The name being live text is the point of the change. It used to be baked into
+// logo.svg, and a picture of text has its baseline frozen wherever the drawing put
+// it, while the links beside it get theirs from the browser out of the font's
+// metrics. Those two only ever matched by coincidence, and the coincidence did not
+// survive a change of browser, of platform, or of which copy of Inter was in use.
+.navbar .navbar-brand-logo {
+  // No padding, and this is load-bearing. With Bootstrap's padding the 32px mark
+  // was the tallest thing in the brand container and so set its height, which meant
+  // the name was centred against the mark while the links were centred against the
+  // bar - two different reference boxes, and baselines 2.2px apart. Without it the
+  // name's own line box is the tallest and it is centred like everything else.
+  // Checked by swapping the mark to 24px and to 40px: the name does not move.
+  padding: 0;
+  margin-right: 0.55rem;
+
+  img { max-height: 32px; }
+}
+
+.navbar .navbar-brand:not(.navbar-brand-logo) {
+  // Bigger than the links, because it is the site's name. 1.1rem is also, usefully,
+  // about where the two baselines cross: measured 0.05px apart, against 2.2px
+  // before. Not balanced on a knife edge either - anywhere from the links' own size
+  // up to 1.2rem the gap stays under a pixel, so nudging this later is safe.
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+// Firefox lands the name half a pixel below the links where Blink lands it on them.
+// Not a bug in either: the two are separately centred boxes, so each baseline sits
+// at its box centre plus an offset that depends on the font's ascent and descent,
+// and Gecko quantises font sizes to 1/16px where Blink does not - 18.7px becomes
+// 18.6875 and 15.6187 becomes 15.625, and the offsets move with them. Measured at
+// +0.5px in Firefox against +0.05px in Chrome and Edge.
+//
+// Half a pixel would not normally be worth a browser-specific rule, except that
+// text rasterising snaps baselines to whole device pixels, so half a pixel of
+// layout can become a whole one on screen - which is what made it visible.
+//
+// -moz-orient is Gecko-only and not aliased anywhere else, so this reaches Firefox
+// and nothing else. If a future Firefox drops the property the rule stops applying
+// and the half pixel comes back, which is the right way for a hack like this to
+// fail. To re-measure, compare the baselines of .navbar-title and a .nav-link.
+@supports (-moz-orient: inline) {
+  @media (min-width: 992px) {
+    .navbar .navbar-brand:not(.navbar-brand-logo) { position: relative; top: -0.5px; }
+  }
+}
+
+// A phone leaves only about 195px between the menu button and the search icon, and
+// Bootstrap's .navbar-brand hides its overflow rather than wrapping, so a name too
+// wide for the bar would lose its last word rather than shrink. The mark is a
+// square and costs little width; the type is what gives.
+@media (max-width: 991.98px) {
+  .navbar .navbar-brand:not(.navbar-brand-logo) { font-size: 1rem; }
+  .navbar .navbar-brand-logo { margin-right: 0.4rem; }
+}
+
+// A 375px phone is the tight case, and it needs all three of these together or the
+// name ends up as "Charting Waterl...". Quarto caps the brand at
+// calc(100% - 115px) to keep it off the toggle and the search icon, which on a
+// phone leaves the name 148px when it wants 181px - so the cap comes down to 96px
+// and the right padding goes, which is space that was sitting empty anyway. Even
+// then the name has to be smaller. Measured at 375px: the name fits exactly, with
+// 11px of clear space back to the menu button and 14px on to the search icon.
+@media (max-width: 575.98px) {
+  .navbar .navbar-brand-container { padding-right: 0; max-width: calc(100% - 96px); }
+  .navbar .navbar-brand:not(.navbar-brand-logo) { font-size: 0.75rem; }
+  .navbar .navbar-brand-logo { margin-right: 0.35rem; }
+}
+
+.quarto-title-banner {
+  background-color: $cwr-blue;
+  .title { font-weight: 700; letter-spacing: -0.01em; }
+  .subtitle, .description { color: rgba(255, 255, 255, 0.85); }
+}
+.quarto-title-meta-heading { color: $cwr-grey; }
+
+// The Vital Statistics page (body-classes: vital-statistics in its YAML) puts
+// its "Last updated" date (date-modified:) on one line under the description,
+// "Last updated September 29, 2026", instead of Quarto's label-over-value
+// column, and rules the same thin grey line the theme draws under every h2
+// heading below it.
+// (Specific enough to outrank Quarto's own grid rule for the metadata row.)
+body.vital-statistics #title-block-header.quarto-title-block .quarto-title-meta {
+  display: block;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.5rem;
+  color: $cwr-grey;
+  font-size: 0.81rem;   // the size of the dates on a post
+
+  > div { display: flex; gap: 0.3em; align-items: baseline; }
+  .quarto-title-meta-heading {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+  }
+  .quarto-title-meta-contents { font-size: inherit; }
+  .quarto-title-meta-contents p { margin: 0; }
+}
+
+// Quarto lays the title block's metadata out in two columns, so a post that has
+// an author, a published date and a modified date wraps the third onto a row of
+// its own. Laying the items out along a single implicit row instead puts however
+// many there are side by side, top-aligned, without hard-coding a count: a page
+// with two still gets two equal columns, exactly as before.
+//
+// Except on a phone, where three columns leaves each date too narrow to hold
+// "September 7, 2026" on one line. Below the small breakpoint they go back to
+// two, and the modified date wraps as it does now.
+.quarto-title-meta {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: start;
+
+  @media (max-width: 575.98px) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Share controls (navbar and post header)
+// ---------------------------------------------------------------------------
+// _includes/share.html builds two of these: a bare icon in the navbar sharing
+// the home page, and an outlined button at the right-hand end of a post's tag
+// row sharing the post. Everything below the two trigger rules is shared.
+.cwr-share {
+  position: relative;              // the menu and bubble are positioned against this
+  display: flex;
+  align-items: center;
+}
+
+// The post header's trigger. margin-left: auto is what right-justifies it: the
+// tag row is already a flex container, so the automatic margin soaks up all the
+// space left over after the tags.
+.cwr-share-header { margin-left: auto; }
+
+// It copies the tags' shape exactly - same padding, size, radius and uppercase -
+// so it sits on their line rhythm rather than looking bolted on.
+.cwr-share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.75em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    color: #ffffff;
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+// The navbar's trigger is a <button> wearing Quarto's .nav-link class, so it
+// inherits the colour, size and padding of the GitHub, RSS and mail icons beside
+// it; all that is left is to strip the chrome a button comes with.
+.cwr-share-nav-button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+// Below the navbar's breakpoint the icons move into the collapsed panel, and
+// Quarto gives that list `overflow-y: auto` so a long menu can scroll. That clips
+// anything positioned outside the list - the popover simply vanished and a
+// scrollbar appeared in its place. So in the collapsed panel the menu stops being
+// a popover and becomes an ordinary block under the icon, which the panel grows
+// to fit. Same two choices, laid out the way a phone menu usually behaves.
+@media (max-width: 991.98px) {
+  .cwr-share-nav {
+    display: block;                // the menu goes under the icon, not beside it
+
+    .cwr-share-menu, .cwr-share-done {
+      position: static;
+      width: max-content;
+      max-width: calc(100% - 1rem);
+      margin: 0 0 0.5rem 0.75rem;
+    }
+  }
+}
+
+// The menu and the "Link copied" bubble hang from the same spot, one at a time.
+// Right-aligned to the trigger rather than left, so a card wider than the trigger
+// grows inwards instead of off the edge of the page - both triggers sit at the
+// right-hand end of their row.
+.cwr-share-menu, .cwr-share-done {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;                     // above the banner and the page below it
+  background: #ffffff;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.cwr-share-done {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: $cwr-blue;
+}
+
+.cwr-share-menu {
+  min-width: 10.5rem;
+  padding: 0.3rem;
+
+  // Nested, not written flat: both the navbar and the banner set their links to
+  // white so they read on the blue, and either beats a bare `.cwr-share-item` on
+  // specificity - which left "Email" as white text on the menu's white card.
+  .cwr-share-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.9rem;
+    color: $body-color;
+    text-align: left;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+
+    i { font-size: 1.05rem; color: $cwr-grey; }
+
+    &:hover, &:focus-visible {
+      color: $cwr-blue;
+      background: $cwr-grey-15;
+      i { color: $cwr-blue; }
+    }
+  }
+}
+
+// The tagline under the home page title. index.qmd is the only page that sets a
+// `subtitle`, so this rule reaches nowhere else. It fits on one line in a full
+// window, but around 800 to 900px and again near 600px the column is just short
+// enough to push the last word or two on to a line of their own; balance splits
+// the two lines evenly instead. Same treatment as the About hero tagline.
+.quarto-title .subtitle {
+  text-wrap: balance;
+}
+
+// ---------------------------------------------------------------------------
+// Post listing on the home page
+// ---------------------------------------------------------------------------
+.quarto-listing-default {
+  .quarto-post {
+    border-bottom: 1px solid $cwr-grey-50;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    .thumbnail img { border-radius: 4px; border: 1px solid $cwr-grey-50; }
+    .listing-title { font-weight: 600; font-size: 1.35rem; }
+    .listing-description { color: #444; }
+    .listing-date, .listing-reading-time { color: $cwr-grey; }
+  }
+}
+// Quarto hides the margin sidebar on phones (max-width 767.98px), and the home page's
+// category list lives there. Put it back, below the posts, in the content column.
+@media (max-width: 767.98px) {
+  #quarto-margin-sidebar:has(.quarto-listing-category) {
+    display: block !important;
+    grid-column: body-content-start / body-content-end;
+    grid-row: auto;
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding: 1.5rem 0 0 0;
+    border-top: 1px solid $cwr-grey-50;
+  }
+}
+
+// Listing cards and the home page's category list sit on white, so they stay grey.
+.listing-category, .quarto-category {
+  border-color: $cwr-grey-50 !important;
+  color: $cwr-grey !important;
+  font-size: 0.75rem;
+}
+
+// In a post's banner the same tags sit on the blue, where grey read as washed
+// out - Quarto also puts them at opacity 0.6, which took what contrast was left.
+// Full opacity and the same white as the share button beside them.
+// Every !important here is load-bearing. The colours have to beat the rule above,
+// which needs its own !important to get past Quarto's defaults; the opacity has to
+// beat Quarto's `.quarto-title .quarto-categories .quarto-category`, which is a
+// longer selector than this one.
+.quarto-title-banner .quarto-category {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  opacity: 1 !important;
+}
+
+// ---------------------------------------------------------------------------
+// Like buttons
+// ---------------------------------------------------------------------------
+// _includes/like.html puts the same button in two places on a post: under the
+// author/date row, and at the end of the writing. Both sit on the white below
+// the banner, not on the banner itself, so they take the house blue rather than
+// the white the share button needs.
+
+// Under the author. The meta row has no padding of its own; the space beneath it
+// is the bottom margin on its last paragraph, which is enough to sit under
+// without crowding.
+.cwr-like-header {
+  margin: 0 0 1.5rem 0;
+
+  // Once the border goes the padding would leave the text indented against the
+  // author's name above it. The centred copy at the foot does not have that
+  // problem, so the correction belongs here rather than on the button.
+  .cwr-like-button.is-liked { padding-left: 0; }
+}
+
+// ---- Contents list on a phone ---------------------------------------------
+// Built by _includes/phone-toc.html on a page that asks for it, and shown only
+// where Quarto has dropped the margin column that normally holds the list.
+// Bootstrap's lg breakpoint is where that column goes, so that is where this
+// strip takes over; above it the strip is hidden and the margin column is back,
+// and the two are never both on screen.
+.cwr-phone-toc {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .cwr-phone-toc {
+    display: block;
+    margin: 0 0 2rem 0;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid $cwr-grey-50;
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+
+    // The tap target: the whole row, with the marker the browser draws for a
+    // <details> kept, since it is the thing that says this opens.
+    > summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: $cwr-blue;
+    }
+
+    // No bullets: the questions are the list, and a marker in front of each
+    // one competes with the question mark at the end of it.
+    ul {
+      margin: 0.7rem 0 0.2rem 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover, &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// ---- A photo in the text --------------------------------------------------
+// A snapshot set into a post, as opposed to a chart: centred at 60% of the
+// column on a desktop, where full width would fill the screen and push the
+// text below it out of sight, and full width on a phone, where 60% would be too
+// small to see. The caption is centred under it. Used as
+// `![caption](images/photo.jpg){.cwr-photo fig-align="center" fig-alt="..."}`.
+// The space under the caption, since the margin taken off below goes from both
+// the image's block and the one around the whole figure
+figure:has(img.cwr-photo) figcaption {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+// Bootstrap and Quarto each leave a line's worth of space under the image -
+// one on the image, one on the block around it - which floats the caption away
+// from the photo it belongs to
+img.cwr-photo {
+  width: 60%;
+  margin-bottom: 0.25rem;
+}
+
+.quarto-figure:has(img.cwr-photo) {
+  margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+  img.cwr-photo {
+    width: 100%;
+  }
+}
+
+// ---- The house mark -------------------------------------------------------
+// The site's own chart vocabulary borrowed as a printer's mark: the dot and
+// confidence interval of the ggdoterror template, drawn small and centred - an
+// estimate with its margin of error, which is what this site does. It closes the
+// analysis at the end of every post, above the Like button, and any post can put
+// one between sections with a fenced div:
+//
+//     ::: {.cwr-mark}
+//     :::
+//
+// Two background layers on one element rather than a pair of nested ones: the bar
+// is a gradient fading to both ends, as the chart's interval does, and the dot is a
+// radial gradient with a white rim so it sits on the bar the way the chart's dot
+// does. Sized in px, not a share of the column: it is a mark, and it should look the
+// same on a phone as on a desktop rather than stretching.
+@mixin cwr-mark($dot: 15px, $bar: 7px, $width: 180px) {
+  content: "";
+  display: block;
+  width: $width;
+  height: $dot;
+  margin-left: auto;
+  margin-right: auto;
+  background-repeat: no-repeat;
+  background-image:
+    // The dot: solid blue, then a white rim, then nothing
+    radial-gradient(circle closest-side,
+      $cwr-blue 0 68%, white 68% 100%, transparent 100%),
+    // The interval: strongest in the middle, fading to both ends
+    linear-gradient(to right,
+      rgba($cwr-blue, 0.08), rgba($cwr-blue, 0.5) 50%, rgba($cwr-blue, 0.08));
+  background-size: $dot $dot, 100% $bar;
+  background-position: center, center;
+}
+
+// On its own between two sections of a post
+.cwr-mark {
+  @include cwr-mark;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+// Where the analysis stops, just before "Data sources and reliability". It reads as
+// the close of the piece and separates the writing from the reference material that
+// follows. The mark above it is the only thing marking it off; there is no "did you
+// enjoy this?" line, which would be the one piece of salesmanship on the site. It
+// replaced a pair of full-width hairlines (2026-09-20).
+.cwr-like-end {
+  margin: 1.25rem 0 2.5rem 0;   // closer to the paragraph above than to what follows
+  padding: 0;
+  border: 0;
+  text-align: center;
+
+  &::before {
+    @include cwr-mark;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.cwr-like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.3em 0.85em;
+  font-size: 0.85rem;
+  color: $cwr-blue;
+  background: transparent;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    color: $cwr-red;
+    border-color: $cwr-red;
+    background: rgba($cwr-red, 0.06);
+  }
+
+  // Once liked the button stops being a control and becomes a note of thanks:
+  // no border, no pointer, and the heart filled in the house red.
+  &.is-liked {
+    color: $cwr-red;
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Figures and tables
+// ---------------------------------------------------------------------------
+figure figcaption, .figure-caption, .quarto-float-caption {
+  color: $cwr-grey;
+  font-size: 0.9rem;
+  text-align: left;
+}
+// Deep dives number their charts but rarely caption them, so the caption is
+// often just "Figure 3" - an anchor for @fig- references, not something to read.
+// Quarto marks that case .quarto-uncaptioned; keep it quiet and out of the way.
+.quarto-float-caption.quarto-uncaptioned {
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+// Interactive charts (cwr_interactive() in R/theme_cwr.R) are drawn twice, like
+// cwr_figure()'s two PNGs, and CSS picks one at the same 767px breakpoint the
+// <picture> element uses. A <picture> can only swap images, not widgets.
+.cwr-interactive { margin-bottom: 1rem; }
+.cwr-interactive-phone { display: none; }
+@media (max-width: 767.98px) {
+  .cwr-interactive-desktop { display: none; }
+  .cwr-interactive-phone { display: block; }
+}
+.gt_table { font-family: inherit; }
+.gt_sourcenote, .gt_footnote { color: $cwr-grey; }
+
+// ---------------------------------------------------------------------------
+// Embedded Shiny apps (see the shiny-post skill for the HTML pattern)
+// ---------------------------------------------------------------------------
+.shiny-embed {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid $cwr-grey-50;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0 0.25rem 0;
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+}
+.shiny-embed-link {
+  font-size: 0.85rem;
+  color: $cwr-grey;
+  margin-bottom: 1.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Callouts and misc
+// ---------------------------------------------------------------------------
+.callout-note { border-left-color: $cwr-blue; }
+.callout-tip { border-left-color: $cwr-grey; }
+.callout.callout-style-default > .callout-header { font-weight: 600; }
+
+// A post's reference sections - Key terms, Data sources and reliability, Other
+// sources - fold into callouts like the Reproducibility box. Their tables were
+// already wider than the text column and used to spill into the empty margin;
+// inside a box that spill shows, so the tables here run smaller, fit the box,
+// and scroll sideways only if a column still cannot fit. The Sources and
+// Reliability subheadings drop to the size of body text in bold, since the
+// callout's own title is now the section heading above them.
+.callout .callout-body-container {
+  overflow-x: auto;
+
+  table {
+    font-size: 0.8rem;
+    width: 100%;
+  }
+
+  // File names (table_98100462.csv) have no spaces to wrap at, and were the
+  // one thing still pushing the Sources table wider than the box
+  td code { word-break: break-all; }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    border-bottom: none;
+  }
+}
+
+blockquote { border-left: 3px solid $cwr-grey-50; color: #444; }
+
+// ---------------------------------------------------------------------------
+// About page hero
+// ---------------------------------------------------------------------------
+// The About page opens with the same lock-up as the sharing card: the name in
+// two lines, the strapline under it, the mark to the right. about.qmd writes it
+// as live text, so it reflows; the card PNG cannot, because its type is drawn at
+// a fixed size.
+//
+// Quarto's about templates put the page title in a header of their own, above
+// the body, which would leave the hero stranded below the "About" heading rather
+// than above it. There is no slot in the template for content ahead of that
+// header, so the header is hidden and about.qmd writes its own <h1 class="title">
+// after the hero. `.quarto-about-marquee` scopes this to pages using an about
+// template, which is only ever about.qmd - ordinary pages and posts keep theirs.
+.quarto-about-marquee > .about-contents > #title-block-header { display: none; }
+
+// The about template also draws the page's `image:` above the heading. That key
+// has to be set - it is what a chat app shows when the page is linked - but the
+// picture it names is the sharing card, which the hero already says in live text.
+// Showing both would print the same three lines twice.
+.quarto-about-marquee > .about-image-container { display: none; }
+
+.cwr-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  margin-bottom: 2rem;
+
+  // Everything scales with the viewport between a phone and the 800px column, so
+  // there is one layout rather than a set of breakpoints to keep in step.
+  .cwr-hero-name {
+    color: $cwr-blue;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.75rem, 6.5vw, 2.9rem);
+    line-height: 1.08;
+    margin: 0 0 0.4rem 0;
+  }
+  .cwr-hero-tagline {
+    color: #4a5457;                // the strapline grey used on the card
+    font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+    line-height: 1.35;
+    margin: 0;
+    // The tagline is 27.7em on one line, and the column beside the mark is wide
+    // enough for it at the full 800px body width, so the cap sits above that and
+    // only the column decides where it wraps. balance splits the two lines evenly
+    // when the window is narrow enough to force a wrap, instead of dropping the
+    // last word on to a line of its own.
+    max-width: 30em;
+    text-wrap: balance;
+  }
+  .cwr-hero-mark {
+    flex: 0 0 auto;
+    width: clamp(110px, 22vw, 180px);
+    height: auto;
+  }
+}
+
+// Below the small breakpoint the two columns are too narrow to sit side by side,
+// so the mark goes above the name and the block centres.
+@media (max-width: 575.98px) {
+  .cwr-hero {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    .cwr-hero-tagline { max-width: none; }
+  }
+}
+
+// The hand-written heading, matching the one Quarto would have drawn.
+.quarto-about-marquee h1.title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-top: 1px solid $cwr-grey-50;
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

@@ -1,0 +1,130 @@
+---
+title: "About"
+# `image:` is the page's preview picture in a chat app, and it has to be named
+# here: left out, Quarto picks up the first picture in the body, which is now the
+# mark in the hero block below - and a link to this page then arrives as a bare
+# SVG that nothing can render. Naming the site card gives this page the same
+# preview as every other one. The about template also draws `image:` above the
+# heading; custom.scss hides that copy, because the hero says the same thing in
+# live text that reflows. `marquee` stays - solana and trestle both narrow the
+# prose below a post's width.
+image: images/social-card.png
+about:
+  template: marquee
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/gpberber/chartingwaterlooregion
+    - icon: rss
+      text: RSS feed
+      href: index.xml
+    - icon: envelope
+      text: Email
+      href: "mailto:greg@chartingwaterlooregion.ca"
+# The page is a list of questions, so the contents list is a quick way to find
+# one; the site sets toc: true in _quarto.yml and this page used to opt out.
+toc: true
+# On a phone Quarto drops the margin column the list sits in, and fourteen
+# questions is exactly the length that needs one. This marker asks
+# _includes/phone-toc.html for a tap-to-open copy at the top of the page.
+include-in-header:
+  text: |
+    <meta name="cwr-phone-toc" content="1">
+---
+
+```{=html}
+<!-- The site card, rebuilt as live text rather than shown as the picture.
+     images/social-card.png carries the same name and mark, but its type is drawn at
+     a fixed 1200px wide: dropped into a phone column the wording would land a few
+     pixels tall. Set as HTML it reflows.
+     The tagline below is not on the card at all (removed 2026-09-14, see WORKFLOW.md
+     section 8), so this is the only place it appears on this page. The same sentence
+     has to appear in index.qmd (both subtitle and description-meta), description in
+     _quarto.yml, and README.md.
+     custom.scss hides Quarto's own title block here and styles the <h1> below, so
+     that the card sits above the heading instead of underneath it. -->
+<div class="cwr-hero">
+  <div class="cwr-hero-text">
+    <p class="cwr-hero-name">Charting<br>Waterloo Region</p>
+    <p class="cwr-hero-tagline">Learning about life in Waterloo Region, one chart at a time.</p>
+  </div>
+  <img class="cwr-hero-mark" src="images/logo-mark.svg" width="256" height="256"
+       alt="The seven municipalities of Waterloo Region, shaded by population.">
+</div>
+
+<h1 class="title">About</h1>
+```
+
+## What is it?
+
+Charting Waterloo Region (CWR) is a local blog cobbled together to tell stories about life in Waterloo Region using data from (mostly) open sources. In **snapshots**---posts with a few charts and some basic analysis that can be read in under five minutes---and the occasional **deep dive** containing more rigorous analysis, CWR will answer questions from the fundamental to the frivolous. Has crime in the Region gotten worse over the past 25 years? CWR will take a stab at answering that (sorry!). What do the townships have more of, cows or people? CWR will investigate that burning issue as well. Basically, CWR is one guy's effort to illustrate facts and features of Waterloo Region using well-designed charts built from open data.
+
+## Who writes it?
+
+The "one guy" in question is Greg Berberich. I'm a retired GenXer who was a Chartered Accountant for 30 years (I no longer hold the CA designation), the last 25 of those spent between UW and WLU earning a PhD in accounting, teaching, and doing institutional research. In case it's not obvious, I really like playing with numbers, so as boring as it may sound to most people, that's what I spend a lot of time doing. Except for a few years in Vancouver in the mid-90s, I've lived in the Region my whole life, the first 25 in Kitchener and since 1997 in Waterloo. CWR is my first blog and is basically me doing a hobby in public.
+
+## Why does it exist?
+
+After years (no kidding!) of procrastination, I've decided to start publishing some of my charts and analysis because I have learned a lot of interesting and sometimes startling things from them, so I figure it's worth sharing some of what I learn with other Region residents who want to know more about where they live. And to my knowledge, aside from [Jeff Outhit](https://www.therecord.com/users/profile/jeff-outhit/), who does some excellent data journalism for The Record, there is no local outlet that regularly visualizes data about the Region. CWR exists to help fill this gap.
+
+## Where does its data come from?
+
+CWR relies primarily on Statistics Canada tables and government open-data portals for its data, supplemented by data from other sources, most of them publicly available. The "Data sources and reliability" section at the end of each post lists the sources, with their links and licences, where applicable. Notes about data reliability that are critical to the proper interpretation of chart data will also be included in this section.
+
+## Is it independent?
+
+My area of expertise as an accountant was in auditing. An auditor's most-critical asset is their [independence](https://pcaobus.org/oversight/standards/archived-standards/pre-reorganized-auditing-standards-interpretations/details/AU220) because without it, their opinion is worthless. I therefore take CWR's independence very seriously. CWR is not funded by or affiliated with any government, public-service body, institution, or any other organization or person that could compromise its independence. All editorial decisions and opinions are mine alone.
+
+## Does it have guiding principles?
+
+Yes. Because I'm sharing charts and analysis with the public, I believe I have an obligation to earn readers' trust, so CWR operates with a few key principles. I've read a literal shelf-load of books on data visualization. One called *How Charts Lie* by data journalist [Alberto Cairo](https://www.albertocairo.com/) sets out several useful charting principles. I've adapted a few to guide CWR:
+
+1. Charts will be based on reliable data.
+2. Charts will not intentionally mislead and will aim not to mislead by accident.
+3. Charts rarely serve as convincing arguments on their own, so they will be supplemented by honest, insightful analysis.
+4. Charts show only what they show, so accompanying analysis will strive not to overstate their implications. Readers should do the same.
+5. Charts will enhance our understanding of their subject matter and start conversations, not stop them.
+
+CWR will also be free of pies and donuts. I love eating them, but they are [bad for your charts](https://scc.ms.unimelb.edu.au/resources/data-visualisation-and-exploration/no_pie-charts).
+
+## How is it built?
+
+I use [R](https://www.r-project.org), a popular language for doing data science, to produce CWR's charts and tables, and to prepare the data behind them. [Quarto](https://quarto.org) combines the R code with my writing and renders it into the HTML, CSS, and images needed to produce the CWR website. These website elements get pushed to a [GitHub folder](https://github.com/gpberber/chartingwaterlooregion) and then served to you via [GitHub Pages](https://docs.github.com/en/pages).
+
+[GoatCounter](https://www.goatcounter.com/) counts page views and post likes so I know which posts people find interesting. The site sets no cookies and records nothing that identifies you, so there is nothing to opt out of.
+
+## Does it use AI?
+
+Yes, I use [Claude](https://claude.ai), an AI model made by Anthropic, primarily as the supplier of the code used to modify the site's infrastructure, to extract and transform the data, and to create the charts, although I do a lot of data-related coding myself (it's fun!).
+
+I make all editorial and design decisions, from the look and features of the site to the questions I answer, the analysis I do, and the charts I use, sometimes with Claude as a consultant. Claude also assists with background research, helping me identify sources, summarize lengthy documents, and synthesize content to provide useful context for my own analysis. I audit what Claude produces to ensure it's relevant and reliable.
+
+I write the analysis and discussion in each post, including the chart titles and subtitles, with Claude serving as a copy editor to help me clean up and refine the post for publication. Every statistic in a post's text and every data point in its charts is taken from the data by code, and all of that code is public (see next section), so you can check any of it for accuracy. Claude drafts the charts' alt text for screen readers, the Sources sections, each post's README, and the data dictionary, then I review and edit them before posting. I take full responsibility for the final product and credit all sources used to produce it.
+
+## Is it reproducible?
+
+Yes, if you are so inclined, you can reproduce every post using the code and data in its associated GitHub folder. If you just want a post's data, you can download a zip file containing the tables in CSV and Parquet formats, as well as an Excel workbook (when the tables are small enough), and a brief data dictionary describing the fields in each table. The "Reproducibility and data download" section at the end of each post contains links to the post's GitHub folder and zipped data files.
+
+## Can its content be reused?
+
+Yes, everything on CWR is reusable, apart from material quoted from other sources, which stays under its owner's terms. The text and charts are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), so they can be copied, shared, or republished, including in the news, as long as CWR receives credit. And all the code is [MIT licensed](https://github.com/gpberber/chartingwaterlooregion/blob/master/LICENSE), so it can be reused as well. All data stays under the terms set by whoever published it.
+
+## Could it contain mistakes?
+
+Yes, I am human and can make mistakes. If you spot an error or have a question about the data, [email me](mailto:greg@chartingwaterlooregion.ca) with the details. I will correct any post containing verified errors and add a dated note at the top of the post saying what changed.
+
+## Why doesn't it have social-platform buttons or comments?
+
+Social-platform buttons load code from those platforms that lets them track readers, which is inconsistent with CWR's privacy practices. The site and each post have a Share button offering a copy-able link or a pre-filled email, so it's easy to share CWR content without loading any trackers. CWR has no accounts on any platform, and none are planned. And comments require moderation, which is too much effort for what is essentially a hobby blog.
+
+## How often will it contain new content?
+
+While I gain my bearings as a blogger, I'm going to under-promise and hopefully over-deliver. My initial aim is to publish two Snapshots and one Deep dive a month. Once I optimize my workflow and get used to writing for a general audience, I'll likely up it to one Snapshot a week but keep it to a single Deep dive per month.
+
+## Can I subscribe to it?
+
+If you use an RSS reader, which aggregates articles from sites you like into a handy chronological feed, CWR's feed is at https://chartingwaterlooregion.ca/index.xml. Your reader will also find it if you just give it chartingwaterlooregion.ca. If enough people start reading this blog and indicate they'd like another way to subscribe, I will consider wiring that feature into the site.
+
+## How does it make money?
+
+It doesn't. Like Neil Young, it's [sponsored by nobody](https://www.youtube.com/watch?v=KSSvzCNBvlQ). CWR is a non-commercial venture, so it doesn't have ads and it won't ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That's all the reward I need.
