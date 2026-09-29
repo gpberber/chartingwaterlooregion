@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Charting Waterloo Region</title>
+<link>https://chartingwaterlooregion.ca/</link>
+<atom:link href="https://chartingwaterlooregion.ca/index.xml" rel="self" type="application/rss+xml"/>
+<description>Learning about life in Waterloo Region, one chart at a time.</description>
+<image>
+<url>https://chartingwaterlooregion.ca/images/social-card.png</url>
+<title>Charting Waterloo Region</title>
+<link>https://chartingwaterlooregion.ca/</link>
+<height>76</height>
+<width>144</width>
+</image>
+<generator>quarto-1.9.38</generator>
+<lastBuildDate>Tue, 29 Sep 2026 04:00:00 GMT</lastBuildDate>
+<item>
+  <title>Monitoring the Region’s pulse with Vital Statistics</title>
+  <dc:creator>Greg Berberich</dc:creator>
+  <link>https://chartingwaterlooregion.ca/posts/introducing-vital-statistics/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<!-- An announcement, not an analysis: no data, charts or R code, so the post
+     template's data sections (Key terms, Data sources and reliability,
+     Reproducibility) are left out. With no chart PNG, R/seo_post_render.R keeps
+     images/card.png, already 1200 x 630, as the sharing picture. -->
+<p><a href="../../vital-statistics/index.html"><img src="https://chartingwaterlooregion.ca/posts/introducing-vital-statistics/images/card.png" class="img-fluid" style="aspect-ratio: 1200 / 560; object-fit: cover; object-position: bottom;" alt="The seven sections of the Vital Statistics page - Labour market, Housing, Business activity, Crime, Population, Building permits and Rental market - over faded lines of the unemployment rate for Waterloo Region, Ontario and Canada"></a></p>
+<!-- The style above shows the card without the top 70 of its 630 pixel rows,
+     which are blank, so it sits closer to the author line; the file itself
+     stays 1200 x 630 for link previews. -->
+<p>Looking for a handy overview of employment, business activity, housing, population, and crime in Waterloo Region? The new <a href="../../vital-statistics/index.html">Vital Statistics</a> page is where to look. It contains a regularly updated collection of charts on the Region’s health in each of these key areas, often with Ontario and Canada added for comparison. Most of the data used to produce these charts is updated monthly, so the page will be refreshed at least once a month to capture the latest statistics. The rental, population, and crime data is released annually, so those charts will only change once a year. You can find it any time under <strong>Vital Statistics</strong> in the menu at the top of every page.</p>
+<section id="what-does-it-track" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-it-track">What does it track?</h2>
+<p>The page monitors the Region’s health in seven critical areas:</p>
+<ul>
+<li><strong>Labour market:</strong> employment, labour force participation, unemployment, and Employment Insurance beneficiaries</li>
+<li><strong>Business activity:</strong> business openings and closings</li>
+<li><strong>Building permits:</strong> the value of residential and non-residential permits, and the number of dwelling units they create</li>
+<li><strong>Housing:</strong> housing starts by type and by ownership, and new housing prices</li>
+<li><strong>Rental market:</strong> vacancy rates, average rents, and the yearly change in rent</li>
+<li><strong>Population:</strong> the number of residents, how fast it is growing, and where the growth comes from</li>
+<li><strong>Crime:</strong> the Crime Severity Index and the number of police-reported incidents</li>
+</ul>
+<p>Many of these areas will be analyzed in depth in posts of their own. If there’s a statistic you’d like to see added, email me at <a href="mailto:greg@chartingwaterlooregion.ca">greg@chartingwaterlooregion.ca</a>.</p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reusing this post</h2><div class="quarto-appendix-contents"><div>The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above. Material quoted from other sources stays under its owner's terms.<a rel="license" href="https://creativecommons.org/licenses/by/4.0/">(View License)</a></div></div></section></div> ]]></description>
+  <category>Snapshot</category>
+  <category>Site news</category>
+  <category>Vital Statistics</category>
+  <guid>https://chartingwaterlooregion.ca/posts/introducing-vital-statistics/</guid>
+  <pubDate>Tue, 29 Sep 2026 04:00:00 GMT</pubDate>
+  <media:content url="https://chartingwaterlooregion.ca/posts/introducing-vital-statistics/images/card.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
+<item>
+  <title>Welcome to Charting Waterloo Region!</title>
+  <dc:creator>Greg Berberich</dc:creator>
+  <link>https://chartingwaterlooregion.ca/posts/welcome/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/montego-1974.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="My brother and I with our family’s first Mercury Montego, circa 1974."><img src="https://chartingwaterlooregion.ca/posts/welcome/images/montego-1974.jpg" class="cwr-photo img-fluid quarto-figure quarto-figure-center figure-img" alt="A faded colour snapshot of two small boys in brown jackets standing on either side of the front of a red Mercury Montego parked in a wet driveway, with two-storey houses and a newly built street behind them."></a></p>
+</figure>
+</div>
+<figcaption>My brother and I with our family’s first Mercury Montego, circa 1974.</figcaption>
+</figure>
+</div>
+<p>As a kid, one of my favourite family activities was “going for a drive.” That is literally what we called it. Mom or Dad would announce that we were “going for a drive” and the five of us would pile into the Montego and go for a drive. A drive never had a destination, unless we ended up in Hespeler, where we’d get ice cream cones at a convenience store on Cooper Street. Almost all of them meandered through one or more of the Region’s townships. I particularly liked it when Dad drove through the Paradise Lake area in Wellesley Township. I thought it was neat that we had a little cottage-y area so close to home. These drives gave me an early appreciation for the Region’s vastness and variety, and for the contrasts between its rock ‘n’ roll heart and its country soul. In CWR’s inaugural post, we’ll start exploring some of these contrasts and, in the process, answer the burning question: “What do the townships have more of, cows or people?”</p>
+<section id="an-urban-island-in-a-sea-of-farmland" class="level2">
+<h2 class="anchored" data-anchor-id="an-urban-island-in-a-sea-of-farmland">An urban island in a sea of farmland</h2>
+<p>If you haven’t gone for many drives through the townships, you may have no idea how vast they are compared to the cities in the Region’s heart. On a map, they look like a giant jaw chomping the urban core they nearly surround. Collectively, the townships cover 1,056 square km, or 77% of the Region’s 1,370 square km. Even the smallest township, North Dumfries, is considerably larger than Kitchener, the biggest city.</p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-districts-phone.png" width="403" height="480"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-districts.png" alt="Outline map of Waterloo Region showing the borders of its seven municipalities, each labelled with its name and land area: the cities of Kitchener, Waterloo and Cambridge grouped together in the middle, ringed by Woolwich Township to the north, Wellesley Township to the north west, Wilmot Township to the south west and North Dumfries Township to the south. Land areas in square kilometres: Kitchener 137, Cambridge 113, Waterloo 64, Woolwich 327, Wilmot 264, North Dumfries 188, Wellesley 278." class="img-fluid" width="797" height="730"> </picture></p>
+</section>
+<section id="more-cows-than-people" class="level2">
+<h2 class="anchored" data-anchor-id="more-cows-than-people">More cows than people?!</h2>
+<p>You don’t have to drive through the townships to guess that they have fewer people than the cities, but do they have fewer people than cows? Before we answer that, let’s see how many more people live in the cities than in the townships.</p>
+<p>The latest estimates from 2025 show that, with 323,917 residents, Kitchener has by far the highest population in the Region, slightly more than the other two cities combined. Together, the cities have 631,721 people, or 89% of the Region’s population of 711,457. So despite covering 77% of the Region’s territory, the townships are home to only 79,736 residents, or 11% of total population. With a combined density of only 75 residents per square km, they certainly have lots of room for cows!</p>
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-sizes-phone.png" width="403" height="368"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-sizes.png" alt="Horizontal bars of population, one per municipality, largest first, with the three cities in dark blue and the four townships in light blue, and each municipality's residents per square kilometre boxed in a column on the right. Kitchener 323,917 residents, 2,368 per square kilometre; Cambridge 165,354 residents, 1,463 per square kilometre; Waterloo 142,450 residents, 2,224 per square kilometre; Woolwich 31,382 residents, 96 per square kilometre; Wilmot 22,890 residents, 87 per square kilometre; North Dumfries 13,051 residents, 69 per square kilometre; Wellesley 12,413 residents, 45 per square kilometre." class="img-fluid" width="797" height="382"> </picture></p>
+<p>By the way, cows did not figure in this post when I conceived it. Not until I saw the density data did I jokingly add the “More cows than people?!” heading to this section. And even after that, it took a while before I thought, <em>I wonder if there actually is any data on how many cows there are in the townships</em>. Serendipitously, I found that not only is there a Census of Population, there’s also a Census of Agriculture, which most non-farmers have probably never heard of. And when I dug into the most recent data from 2021, I was excited to learn that I could answer the question, “What do the townships have more of, cows or people?”</p>
+<p>(In case there are any cattle farmers reading, I do know that cows are a specific type of cattle, along with heifers, steers, bulls, and calves. But to this lifelong city dweller, they are all cows, so when I say <em>cows</em>, I mean <em>cattle</em>.)</p>
+<p>The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we’ll use the 2021 census populations as well. On census day in 2021, just over 70,000 people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true" href="">People</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false" href="">People and cows</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" aria-labelledby="tabset-1-1-tab">
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-cattle-people-phone.png" width="403" height="211"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-cattle-people.png" alt="The number of people living in North Dumfries, Wellesley, Wilmot and Woolwich townships together on 11 May 2021, written large: 70,365 people." class="img-fluid" width="797" height="211"> </picture></p>
+</div>
+<div id="tabset-1-2" class="tab-pane" aria-labelledby="tabset-1-2-tab">
+<p><picture> <source media="(max-width: 767px)" srcset="figures/fig-cattle-phone.png" width="403" height="211"> <img src="https://chartingwaterlooregion.ca/posts/welcome/figures/fig-cattle.png" alt="The same figure for people, where the previous tab wrote it, with the number of cattle on farms in those four townships on the same day beside it: 83,275 cows and 70,365 people, or 118 cows for every 100 people." class="img-fluid" width="797" height="211"> </picture></p>
+</div>
+</div>
+</div>
+<p>And there we have it: more cows than people lived in the townships on census day in 2021. What I thought was a joke turns out to be true!</p>
+</section>
+<section id="what-have-we-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-have-we-learned">What have we learned?</h2>
+<p>In CWR’s debut post, we learned that my family thought it was fun to jump in our gas-guzzling Mercury and aimlessly roam the rural roads through the Region’s rolling hills. We learned there were lots of roads and hills to roam because the townships cover 1,056 square km, over three-quarters of the Region’s 1,370 square km, while holding only 79,736 people, a ninth of its 711,457 residents. And last, we learned that with so much space and so few residents, the townships were home to more cows than people in 2021. In future posts, we’ll explore more differences between the cities and their country cousins. And if CWR is still active a year or so from now, when this year’s census data is released, we’ll revisit this post and see if cows still outnumber people in cattle country.</p>
+<div id="data-sources-and-reliability" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Data sources and reliability
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<section id="sources" class="level3">
+<h3 class="anchored" data-anchor-id="sources">Sources</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>File in <code>data-raw/</code></th>
+<th>What it is</th>
+<th>Source (link)</th>
+<th>Licence</th>
+<th>Sample</th>
+<th>Accessed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_17100155.csv</code></td>
+<td>Table 17-10-0155-01, population estimates on 1 July by census subdivision, 2021 boundaries</td>
+<td><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710015501">Statistics Canada</a></td>
+<td><a href="https://www.statcan.gc.ca/en/reference/licence">Statistics Canada Open Licence</a></td>
+<td>None (population estimates)</td>
+<td>2026-09-14</td>
+</tr>
+<tr class="even">
+<td><code>csd_boundaries/</code></td>
+<td>2021 census subdivision cartographic boundary file (<code>lcsd000b21a_e</code>), the municipal polygons</td>
+<td><a href="https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21">Statistics Canada</a></td>
+<td><a href="https://www.statcan.gc.ca/en/reference/licence">Statistics Canada Open Licence</a></td>
+<td>None (boundaries)</td>
+<td>2026-09-14</td>
+</tr>
+<tr class="odd">
+<td><code>table_32100370.csv</code></td>
+<td>Table 32-10-0370-01, cattle inventory on farms, 2021 Census of Agriculture, cut to Waterloo Region</td>
+<td><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3210037001">Statistics Canada</a></td>
+<td><a href="https://www.statcan.gc.ca/en/reference/licence">Statistics Canada Open Licence</a></td>
+<td>None (Census of Agriculture, every farm)</td>
+<td>2026-09-18</td>
+</tr>
+<tr class="even">
+<td><code>table_98100002.csv</code></td>
+<td>Table 98-10-0002-01, population and dwelling counts, 2021 census, cut to Waterloo Region</td>
+<td><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810000201">Statistics Canada</a></td>
+<td><a href="https://www.statcan.gc.ca/en/reference/licence">Statistics Canada Open Licence</a></td>
+<td>None (census short form, full count)</td>
+<td>2026-09-18</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="reliability" class="level3">
+<h3 class="anchored" data-anchor-id="reliability">Reliability</h3>
+<table class="table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Items of note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Cattle counts, 2021:</strong> Statistics Canada grades the quality of each township’s cattle count separately, on a scale from A (excellent) to E (use with caution): Wellesley - excellent (A), Woolwich - very good (B), Wilmot - good (C) and North Dumfries - acceptable (D). (table 32-10-0370-01)</td>
+</tr>
+<tr class="even">
+<td><strong>Township population, 2021:</strong> the population is the 2021 census count, which is not adjusted for people the census missed. (table 98-10-0002-01)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Reproducibility and data download
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Reproduce the post</strong>: get the code and data for this post from <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome"><code>posts/welcome/</code></a> on GitHub.</p>
+<p><strong>Download the data:</strong> <a href="https://github.com/gpberber/chartingwaterlooregion/releases/download/data-welcome-v1/welcome-data-v1.zip">welcome-data-v1.zip</a> holds every table used in this post as CSV and Parquet files, an Excel workbook, a data dictionary, and a README with sources and licences. The same dictionary is in the post’s <a href="https://github.com/gpberber/chartingwaterlooregion/tree/master/posts/welcome#data-dictionary">README</a>.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>R version: R version 4.5.3 (2026-03-11 ucrt)
+OS:        Windows 11 x64 (build 26200)
+Rendered:  2026-09-26
+Quarto:    1.9.38
+
+    package version       date         source
+      arrow  25.0.1 2026-08-23 CRAN (R 4.5.3)
+ conflicted   1.2.0 2023-02-01 CRAN (R 4.2.3)
+      dplyr   1.2.1 2026-04-03 CRAN (R 4.5.2)
+    forcats   1.0.1 2025-09-25 CRAN (R 4.5.3)
+    ggplot2   4.0.3 2026-04-22 CRAN (R 4.5.3)
+     ggtext   0.2.0 2026-08-28 CRAN (R 4.5.3)
+         gt   1.3.0 2026-01-22 CRAN (R 4.5.3)
+   gtExtras   0.6.2 2026-01-17 CRAN (R 4.5.3)
+       here   1.0.2 2025-09-15 CRAN (R 4.5.3)
+    janitor   2.2.1 2024-12-22 CRAN (R 4.5.3)
+  lubridate   1.9.5 2026-02-04 CRAN (R 4.5.3)
+  patchwork   1.3.2 2025-08-25 CRAN (R 4.4.3)
+      purrr   1.2.2 2026-04-10 CRAN (R 4.5.2)
+      readr   2.2.0 2026-02-19 CRAN (R 4.5.3)
+     scales   1.4.0 2025-04-24 CRAN (R 4.5.3)
+         sf   1.1-2 2026-07-23 CRAN (R 4.5.3)
+ shadowtext   0.1.6 2025-08-24 CRAN (R 4.5.3)
+    stringr   1.6.0 2025-11-04 CRAN (R 4.5.3)
+     tibble   3.3.1 2026-01-11 CRAN (R 4.5.2)
+      tidyr   1.3.2 2025-12-19 CRAN (R 4.5.3)
+  tidyverse   2.0.0 2023-02-22 CRAN (R 4.5.2)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reusing this post</h2><div class="quarto-appendix-contents"><div>The text and charts in this post are free to copy, share, or republish, including in the news, as long as you credit Charting Waterloo Region and link to the post (Creative Commons CC BY 4.0). The code is MIT licensed; data stays under the licence of its original source, listed above. Material quoted from other sources stays under its owner's terms.<a rel="license" href="https://creativecommons.org/licenses/by/4.0/">(View License)</a></div></div></section></div> ]]></description>
+  <category>Snapshot</category>
+  <category>Agriculture</category>
+  <category>Population</category>
+  <category>Geography</category>
+  <guid>https://chartingwaterlooregion.ca/posts/welcome/</guid>
+  <pubDate>Mon, 21 Sep 2026 04:00:00 GMT</pubDate>
+  <media:content url="https://chartingwaterlooregion.ca/posts/welcome/images/thumbnail.png" medium="image" type="image/png" height="172" width="144"/>
+</item>
+</channel>
+</rss>
