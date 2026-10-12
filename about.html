@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -39,10 +42,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-a3d3f75a6686243cb05a698fd0c81aa9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-980ae3136e718747af3e6029d2591761.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,49 +73,27 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <!--
-
   GoatCounter: counts page views without cookies and without tracking individual
-
   people, which is why the site needs no consent banner. Wired into every page by
-
   the include-in-header line in _quarto.yml.
 
-
-
   The numbers are at https://chartingwaterlooregion.goatcounter.com; the account code in the URL
-
   below is what ties this script to that dashboard.
-
   The code is public by design - it appears in the page source of every visitor -
-
   so it is not a secret and belongs in the repository.
 
-
-
   The script ignores localhost, so local previews do not pollute the numbers.
-
 -->
-
 <script data-goatcounter="https://chartingwaterlooregion.goatcounter.com/count" async="" src="//gc.zgo.at/count.js"></script>
-
 <!-- Icons Quarto's `favicon:` setting does not emit on its own.
-
      `favicon:` gives the SVG, which Safari uses and which stays crisp at any size.
-
      These two cover the rest: /favicon.ico is what a browser asks for on its own
-
      whether or not a page names it - Chrome on iPadOS ignored the SVG, asked for
-
      this, got a 404 and drew a generic globe - and the PNG is what iOS uses when a
-
      page is saved to a home screen. Both are built by _dev/logo/make_logo.R.
-
      Root-relative because the site is served from the root of its own domain. -->
-
 <link rel="icon" href="./favicon.ico" sizes="16x16 32x32 48x48">
-
 <link rel="apple-touch-icon" href="./images/apple-touch-icon.png">
-
 <meta name="cwr-phone-toc" content="1">
 
 
@@ -311,7 +292,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="how-does-it-make-money" class="level2">
 <h2 data-anchor-id="how-does-it-make-money">How does it make money?</h2>
-<p>It doesn’t. Like Neil Young, it’s <a href="https://www.youtube.com/watch?v=KSSvzCNBvlQ">sponsored by nobody</a>. CWR is a non-commercial venture, so it doesn’t have ads and it won’t ask you to pay for a subscription. If you find a post enlightening, hit the Like button or drop me an email. That’s all the reward I need.</p>
+<p>It doesn’t. Like Neil Young, it’s <a href="https://www.youtube.com/watch?v=KSSvzCNBvlQ">sponsored by nobody</a>. CWR is a non-commercial venture, so it doesn’t have ads and it won’t ask you to pay for a subscription. Nor am I using it to generate consulting leads. I am fully retired and plan to stay that way. If you find a post enlightening, hit the Like button or drop me an email. That’s all the reward I need.</p>
 
 
 </section>
@@ -335,325 +316,165 @@ ul.task-list li input[type="checkbox"] {
 </div>
  <!-- /main -->
 <!-- ---------------------------------------------------------------------------
-
      Share controls.
 
-
-
      Two of them, both built here because they behave identically and differ only
-
      in what they point at:
 
-
-
        - in the navbar, on every page, sharing the site's home page;
-
        - at the right-hand end of a post's category row, sharing that post.
 
-
-
      Each opens a small menu with two choices: copy the link, or open an email
-
      about it. Nothing is sent anywhere and no third-party script is loaded - the
-
      copy uses the browser's own clipboard and the email is an ordinary mailto:
-
      link that opens the reader's mail app. That is the reason for building this
-
      by hand rather than turning on Quarto's `sharing:` option, which only offers
-
      Twitter, Facebook and LinkedIn and loads their buttons.
 
-
-
      Built in JavaScript rather than in the page template because both the navbar
-
      and the title banner are generated by Quarto's own Pandoc templates.
-
      Overriding those would mean keeping copies in step with every Quarto release;
-
      finding the spots after the page loads costs nothing and cannot break a
-
      render. It also means readers without JavaScript simply see no share buttons,
-
      which is the right outcome - the buttons would do nothing for them.
 
-
-
      Styling lives in custom.scss under "Share controls". This file is pulled in
-
      site-wide by `include-after-body` in _quarto.yml.
-
 --------------------------------------------------------------------------- -->
-
 <script>
-
 (() => {
-
   // Every control registers a way to shut itself, so opening one closes the other.
-
   const closers = [];
 
-
-
   // Build one control. `tag` and `wrapClass` place it in its surroundings, and
-
   // `triggerClass` and `trigger` decide what the button looks like - an outlined
-
   // "Share" in the post header, a bare icon in the navbar. The JavaScript hooks
-
   // on to data attributes rather than to those classes, so the two can be styled
-
   // independently without breaking the behaviour.
-
   const buildControl = ({ url, subject, label, tag, wrapClass, triggerClass, trigger }) => {
-
     const mailto = "mailto:?subject=" + encodeURIComponent(subject) +
-
                    "&body=" + encodeURIComponent(subject + "\n\n" + url);
 
-
-
     const wrap = document.createElement(tag);
-
     wrap.className = "cwr-share " + wrapClass;
-
     wrap.innerHTML = `
-
       <button type="button" class="${triggerClass}" data-share-trigger
-
               aria-expanded="false" aria-haspopup="true" aria-label="${label}">
-
         ${trigger}
-
       </button>
-
       <div class="cwr-share-menu" role="menu" hidden>
-
         <button type="button" class="cwr-share-item" role="menuitem" data-share-copy>
-
           <i class="bi bi-link-45deg" aria-hidden="true"></i>Copy link
-
         </button>
-
         <a class="cwr-share-item" role="menuitem" href="${mailto}">
-
           <i class="bi bi-envelope" aria-hidden="true"></i>Email
-
         </a>
-
       </div>
-
       <p class="cwr-share-done" role="status" hidden>
-
         <i class="bi bi-check2" aria-hidden="true"></i>Link copied
-
       </p>`;
 
-
-
     const button = wrap.querySelector("[data-share-trigger]");
-
     const menu   = wrap.querySelector(".cwr-share-menu");
-
     const done   = wrap.querySelector(".cwr-share-done");
 
-
-
     // `hidden` rather than a display rule, so a shut menu is out of the
-
     // accessibility tree as well as off the screen.
-
     const open = (yes) => {
-
       menu.hidden = !yes;
-
       button.setAttribute("aria-expanded", String(yes));
-
     };
-
     const close = () => open(false);
-
     closers.push({ wrap, close });
 
-
-
     button.addEventListener("click", (e) => {
-
       e.stopPropagation();                       // the document listener would undo this
-
       const show = menu.hidden;
-
       closers.forEach((c) => { if (c.wrap !== wrap) c.close(); });
-
       open(show);
-
     });
-
-
 
     document.addEventListener("click", (e) => {
-
       if (!menu.hidden && !wrap.contains(e.target)) close();
-
     });
-
-
 
     document.addEventListener("keydown", (e) => {
-
       if (e.key === "Escape" && !menu.hidden) {
-
         close();
-
         button.focus();                          // put the reader back where they were
-
       }
-
     });
-
-
 
     wrap.querySelector("[data-share-copy]").addEventListener("click", async () => {
-
       let copied = true;
-
       try {
-
         // Only available over https and on localhost, which covers the live site
-
         // and a local preview.
-
         await navigator.clipboard.writeText(url);
-
       } catch {
-
         // Anywhere else, fall back to the older select-then-copy trick so the
-
         // button never fails silently.
-
         const box = document.createElement("textarea");
-
         box.value = url;
-
         box.setAttribute("readonly", "");
-
         box.style.cssText = "position:fixed;top:-1000px";
-
         document.body.appendChild(box);
-
         box.select();
-
         copied = document.execCommand("copy");
-
         box.remove();
-
       }
-
       // Confirm in a bubble rather than on the button: both buttons sit at the
-
       // right-hand end of their row, so a label that changed length would shunt
-
       // everything sideways and back again.
-
       close();
-
       done.lastChild.textContent = copied ? "Link copied" : "Copy failed - use the address bar";
-
       done.hidden = false;
-
       setTimeout(() => { done.hidden = true; }, 1600);
-
     });
 
-
-
     return wrap;
-
   };
 
-
-
   // ---- the navbar control, on every page ----------------------------------
-
   // The brand links to the site root from wherever the reader is, so it is the
-
   // reliable way to name the home page without hard-coding a path - it stays
-
   // right even if the site is ever served from a subdirectory. Quarto writes that
-
   // link as ".../index.html"; trimming the filename makes the shared address the
-
   // tidy one people expect to see.
-
   const icons = document.querySelector(".navbar-nav.ms-auto");
-
   const brand = document.querySelector(".navbar-brand");
-
   if (icons) {
-
     icons.appendChild(buildControl({
-
       url: brand ? brand.href.replace(/index\.html$/, "") : location.origin + "/",
-
       subject: document.querySelector('meta[property="og:site_name"]')?.content || document.title,
-
       label: "Share this site",
-
       tag: "li",
-
       wrapClass: "nav-item compact cwr-share-nav",
-
       triggerClass: "cwr-share-nav-button nav-link",
-
       trigger: '<i class="bi bi-share" aria-hidden="true"></i>'
-
     }));
-
   }
-
-
 
   // ---- the post control ---------------------------------------------------
-
   // Only a post has a category row inside the banner, which is what keeps this
-
   // one off the home page, About and 404.
-
   const categories = document.querySelector(".quarto-title-banner .quarto-categories");
-
   if (categories) {
-
     categories.appendChild(buildControl({
-
       // Dropping the query string and any #section anchor means a reader who
-
       // followed a deep link still shares the post rather than the spot they
-
       // happen to be scrolled to.
-
       url: location.origin + location.pathname,
-
       subject: (document.querySelector("h1.title")?.textContent || document.title).trim(),
-
       label: "Share this post",
-
       tag: "div",
-
       wrapClass: "cwr-share-header",
-
       triggerClass: "cwr-share-button",
-
       trigger: '<i class="bi bi-share" aria-hidden="true"></i>Share'
-
     }));
-
   }
-
 })();
-
 </script>
-
 <!-- ---------------------------------------------------------------------------
 
      Like buttons.
@@ -921,277 +742,141 @@ ul.task-list li input[type="checkbox"] {
 </script>
 
 <!-- ---------------------------------------------------------------------------
-
      Contents list on a phone.
 
-
-
      Quarto puts "On this page" in the right-hand margin column, and that column
-
      is dropped below Bootstrap's lg breakpoint - so on a phone the list is not
-
      hidden, it is gone. That costs a post nothing, since a post is read straight
-
      through, but the About page is a list of questions and a reader arriving with
-
      one of them in mind would have to scroll past all the others to find it.
 
-
-
      So on a narrow screen this moves the existing list to the top of the page and
-
      wraps it in a <details>, which is a tap-to-open strip that needs no JavaScript
-
      of its own to work once it is built. Collapsed by default: the answer to the
-
      first question should still be the first thing under the title.
 
-
-
      Only on pages that ask for it, with `phone-toc: true` in their YAML - About
-
      today. It is one list moved, not a second one built, so the two can never
-
      disagree, and a page with no headings is left alone.
 
-
-
      Styling lives in custom.scss under "Contents list on a phone". Pulled in
-
      site-wide by `include-after-body` in _quarto.yml, like the share and like
-
      buttons, and like them it decides for itself whether it belongs on the page.
-
 --------------------------------------------------------------------------- -->
-
 <script>
-
 (() => {
-
   // The page opts in through its YAML, which Quarto writes into the body as a
-
   // data attribute of the meta block. Reading a marker rather than the path
-
   // means a second page can have one by adding the same line.
-
   const wants = document.querySelector('meta[name="cwr-phone-toc"]');
-
   if (!wants) return;
 
-
-
   const toc = document.querySelector("#TOC");
-
   const main = document.querySelector("main.content");
-
   if (!toc || !main || !toc.querySelector("a")) return;
 
-
-
   // Built once and left in place. Below the breakpoint the stylesheet shows this
-
   // copy and hides the margin column; above it, the reverse - so a reader who
-
   // turns their phone sideways gets the right one without anything rebuilding.
-
   const strip = document.createElement("details");
-
   strip.className = "cwr-phone-toc";
 
-
-
   const summary = document.createElement("summary");
-
   // The same words as the margin column's heading, so it is recognisably the
-
   // same thing in a different place.
-
   summary.textContent = document.querySelector("#toc-title")?.textContent || "On this page";
-
   strip.appendChild(summary);
 
-
-
   // The list itself, moved rather than copied. Quarto's own scroll-spy still
-
   // tracks the margin copy; this one is a set of links, which is all it needs
-
   // to be.
-
   const list = toc.querySelector("ul").cloneNode(true);
-
   // The margin column's list carries Bootstrap's collapse class, which would
-
   // hide it here; it is the stylesheet that decides what shows on a phone.
-
   list.className = "";
-
   strip.appendChild(list);
 
-
-
   // Closing the strip after a tap: on a phone the answer is what the reader
-
   // wanted, not a list still covering it.
-
   strip.addEventListener("click", (event) => {
-
     if (event.target.closest("a")) strip.open = false;
-
   });
 
-
-
   // Below everything that introduces the page - the hero block and the title -
-
   // and above the first section, so the strip reads as a way into the content
-
   // rather than as something sitting on top of the masthead.
-
   const intro = [...main.children].filter((el) =>
-
     el.classList.contains("cwr-hero") ||
-
     el.classList.contains("quarto-title-block") ||
-
     el.tagName === "HEADER" ||
-
     el.tagName === "H1"
-
   );
-
   const last = intro[intro.length - 1];
 
-
-
   if (last) {
-
     last.insertAdjacentElement("afterend", strip);
-
   } else {
-
     main.insertAdjacentElement("afterbegin", strip);
-
   }
 
-
-
   // ---- And on a desktop, start the margin list level with the first heading --
-
   // Quarto hangs the margin column from the top of the page, which on a page
-
   // with a hero block leaves the list floating opposite the masthead. Lining it
-
   // up with the first heading is a measurement rather than a fixed offset,
-
   // because the hero's height changes with the width of the window.
-
   const firstHeading = main.querySelector("section h2, h2");
 
-
-
   // A gap above the list is wanted at the top of the page and nowhere else. The
-
   // column the list sits in is sticky, so a plain margin would hold that gap for
-
   // the whole scroll and keep the list a third of the way down the screen. The
-
   // theme rewrites that column's sticky offset on every scroll - it has a fixed
-
   // navbar to allow for - so the offset is no use to us either.
-
   //
-
   // Instead the margin shrinks as the page scrolls: the list starts level with
-
   // the first heading, rides up with the text, and once the gap is used up it
-
   // sits where the theme puts it and sticks there as it always did.
-
   let gap = 0;
 
-
-
   const applyGap = () => {
-
     toc.style.marginTop = Math.max(0, gap - window.scrollY) + "px";
-
   };
-
-
 
   const measureGap = () => {
-
     toc.style.marginTop = "";          // measure against no offset of our own
-
     gap = 0;
 
-
-
     if (firstHeading && getComputedStyle(toc).display !== "none") {
-
       gap = Math.max(0, Math.round(firstHeading.getBoundingClientRect().top -
-
                                    toc.getBoundingClientRect().top) +
-
                         window.scrollY);
-
     }
-
     applyGap();
-
   };
-
-
 
   measureGap();
 
-
-
   // Cheap on every scroll: one subtraction, and the browser is asked to write
-
   // the style once a frame rather than once an event.
-
   let queued = false;
-
   window.addEventListener("scroll", () => {
-
     if (queued || gap === 0) return;
-
     queued = true;
-
     requestAnimationFrame(() => { queued = false; applyGap(); });
-
   }, { passive: true });
 
-
-
   // The hero reflows as the window changes, so the measurement is taken again
-
   // once things have settled rather than on every pixel of a drag.
-
   let settling;
-
   window.addEventListener("resize", () => {
-
     clearTimeout(settling);
-
     settling = setTimeout(measureGap, 150);
-
   });
 
-
-
   // Web fonts land after this runs and change how tall the hero is, so the
-
   // measurement is taken once more when they have.
-
   if (document.fonts?.ready) document.fonts.ready.then(measureGap);
-
 })();
-
 </script>
-
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const isCodeAnnotation = (el) => {
