@@ -79,9 +79,15 @@ dodgerblue          <- "dodgerblue4"                                            
 dodgerblue50        <- prismatic::clr_mix(dodgerblue, "white", ratio = 0.5)
 ontgreen            <- "darkgreen"
 
-# Ready-made palettes for 2 to 5 groups. Order matters: the first colour goes
+# Ready-made palettes for 2 to 6 groups. Order matters: the first colour goes
 # to the first group. Rename with set_names() to map colours to group labels:
 #   scale_colour_manual(values = set_names(manual_3_colours, c("A", "B", "C")))
+# The six run red to blue in three steps a side, for a scale of falls and
+# rises with no middle class (kwc-da-pop-changes' maps, 2026-10-08)
+manual_6_colours <- c(
+  habsred, prismatic::clr_mix(habsred, "white", ratio = 0.35), prismatic::clr_mix(habsred, "white", ratio = 0.65),
+  prismatic::clr_mix(dodgerblue, "white", ratio = 0.65), prismatic::clr_mix(dodgerblue, "white", ratio = 0.35), dodgerblue
+)
 manual_5_colours <- c(habsred, habsred50, cowboysilver, dodgerblue50, dodgerblue)
 manual_4_colours <- c(habsred, habsred50, dodgerblue50, dodgerblue)
 manual_3_colours <- c(habsred, cowboysilver, dodgerblue)
@@ -300,7 +306,11 @@ theme_set(theme_cwr(base_size = 15))
 # cwr_label_repel() - and ggtext's geom_richtext() carry
 # their own fixed default instead, the graphics device's plain sans font
 # (Arial on Windows), so their default is changed here, once, for every chart.
-update_geom_defaults(GeomShadowText, aes(family = cwr_font()))
+# geom_shadowtext() also draws its letters WHITE by default (its halo is
+# meant to be dark), so a cwr_label() with no `colour` came out white on its
+# own white halo - invisible (the value labels of Figure 6 of
+# nd-population-forecast-sanity-check, 2026-10-07). Black, as geom_text().
+update_geom_defaults(GeomShadowText, aes(family = cwr_font(), colour = "black"))
 update_geom_defaults(GeomTextRepel, aes(family = cwr_font()))
 update_geom_defaults(GeomRichText, aes(family = cwr_font()))
 

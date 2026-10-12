@@ -6,3 +6,8 @@ CNAME text eol=lf
 # that ever went through line-ending conversion would be silently corrupt and the
 # site would fall back to a system font without an error anywhere - so say it.
 *.woff2 binary
+
+# Shell scripts run under bash, which reads a carriage return as part of the
+# command ("exit 0\r" fails). Keep the hooks in _dev/ on Unix line endings.
+*.sh text eol=lf
+_dev/hooks/pre-commit text eol=lf

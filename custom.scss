@@ -499,6 +499,50 @@ img.cwr-photo {
   }
 }
 
+// ---- An image from a source document --------------------------------------
+// A slide, or an excerpt of a report's figure, shown as published, its source
+// line as the caption: `![Source: ...](images/x.png){.cwr-source
+// fig-align="center" fig-alt="..."}`. The source line looks like the one drawn
+// into our charts by cwr_caption(): the same grey, close under the image, and
+// the same size as it appears on screen. A chart's caption is 9 pt in a PNG
+// 8.3 in wide (797 px at 96 per inch; 4.2 in, 403 px, for the phone version
+// under 768 px), and the PNG is scaled to the column, so the text is 12 px x
+// column width / 797 (or / 403). The figure is made a size container so
+// `cqi` - 1% of its width, which is the column's - can do that sum.
+figure:has(> figcaption):has(img.cwr-source) {
+  container-type: inline-size;
+}
+
+figure:has(img.cwr-source) figcaption {
+  font-size: calc(100cqi * 12 / 797);
+  line-height: 1.1;
+  margin-top: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+// The line's worth of space Bootstrap and Quarto each leave under an image
+// (on the image and on the paragraph and block around it), taken off. An image
+// narrower than the column sits in a line of text, which leaves room under it
+// for letters' tails; aligning it to the bottom of the line takes that off too.
+img.cwr-source {
+  margin-bottom: 0;
+  vertical-align: bottom;
+}
+
+figure:has(img.cwr-source) p {
+  margin-bottom: 0;
+}
+
+.quarto-figure:has(img.cwr-source) {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+  figure:has(img.cwr-source) figcaption {
+    font-size: calc(100cqi * 12 / 403);
+  }
+}
+
 // ---- The house mark -------------------------------------------------------
 // The site's own chart vocabulary borrowed as a printer's mark: the dot and
 // confidence interval of the ggdoterror template, drawn small and centred - an
@@ -600,6 +644,12 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
 }
+// The image's own bottom margin and its paragraph's left 25px between a chart's
+// source line and its "Figure N"; drop both so the label sits just under it
+.quarto-float-fig:has(.quarto-uncaptioned) p:has(> picture, > img),
+.quarto-float-fig:has(.quarto-uncaptioned) img.figure-img {
+  margin-bottom: 0;
+}
 // Interactive charts (cwr_interactive() in R/theme_cwr.R) are drawn twice, like
 // cwr_figure()'s two PNGs, and CSS picks one at the same 767px breakpoint the
 // <picture> element uses. A <picture> can only swap images, not widgets.
@@ -610,7 +660,10 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   .cwr-interactive-phone { display: block; }
 }
 .gt_table { font-family: inherit; }
-.gt_sourcenote, .gt_footnote { color: $cwr-grey; }
+// Notes and sources left-justified (Greg, 2026-10-04): a tbl- table sits in
+// Quarto's centred figure block, and gt sets no alignment of its own on them,
+// so without this they inherit the centring
+.gt_sourcenote, .gt_footnote { color: $cwr-grey; text-align: left; }
 
 // ---------------------------------------------------------------------------
 // Embedded Shiny apps (see the shiny-post skill for the HTML pattern)

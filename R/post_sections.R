@@ -55,6 +55,23 @@ cwr_readme_table <- function(slug, heading, readme = cwr_page_readme(slug)) {
   next_heading <- which(str_starts(str_trim(after), "## "))
   section <- if (length(next_heading) > 0) after[seq_len(next_heading[1] - 1)] else after
 
+  # Lines inside an HTML comment are instructions for whoever edits the README,
+  # never part of the table. The template's Reliability instructions hold
+  # example rows that start with "|" once trimmed, and those used to print in
+  # the post (found 2026-10-01 in seven drafts). So each line is given the
+  # comment depth it starts at: accumulate() runs along the lines, adding the
+  # "<!--" openings and taking away the "-->" closings it meets. Counting
+  # rather than looking for the next "-->" matters because the instructions
+  # contain a complete example comment on one line ("<!-- flags: ... -->"),
+  # which opens and closes on the same line and leaves the depth unchanged.
+  # Real table rows end with that same balanced comment and start at depth 0.
+  depth_after <- accumulate(
+    str_count(section, fixed("<!--")) - str_count(section, fixed("-->")),
+    `+`
+  )
+  depth_before <- c(0, head(depth_after, -1))
+  section <- section[depth_before == 0]
+
   # The table is the run of pipe-delimited lines in that section
   table_lines <- section[str_starts(str_trim(section), fixed("|"))]
   if (length(table_lines) == 0) {

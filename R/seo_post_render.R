@@ -34,7 +34,22 @@
 #
 # Nothing here needs a post to change. To run it by hand after a render:
 #   Rscript R/seo_post_render.R
+#
+# Quarto runs it only after a render of the whole site (`quarto render`, which
+# /publish always ends with), not after a render of one post or page. That is
+# for `quarto preview`: to decide whether a page needs rendering again, the
+# preview remembers a fingerprint of the built page, taken before this script
+# edits it. Tidying the page afterwards made every page look out of date, so
+# each request rendered the page again, ran this script, reloaded the browser
+# and so made the next request - an endless loop (2026-10-09 and 2026-10-12).
+# Quarto marks a whole-site render with QUARTO_PROJECT_RENDER_ALL = "1", and
+# any run by Quarto with QUARTO_PROJECT_OUTPUT_DIR; run by hand, it always runs.
 # ---------------------------------------------------------------------------
+
+if (nzchar(Sys.getenv("QUARTO_PROJECT_OUTPUT_DIR")) && Sys.getenv("QUARTO_PROJECT_RENDER_ALL") != "1") {
+  message("seo_post_render.R: skipped (not a whole-site render)")
+  quit(save = "no", status = 0)
+}
 
 suppressPackageStartupMessages({
   library(tidyverse)
@@ -285,6 +300,7 @@ listed <- c()
 walk(pages, function(path) {
   file <- file.path(site_dir, path)
   html <- read_file(file)
+  as_read <- html   # to write the page back only if this run changed it (below)
 
   # Drafts leave a tiny placeholder file behind in a public render (see the
   # publish skill); it has no <head> worth tagging, and /publish deletes it.
@@ -401,7 +417,11 @@ walk(pages, function(path) {
     }
   }
 
-  write_file(html, file)
+  # Written back only when something changed. `quarto preview` reloads the
+  # browser whenever a file in _site/ is written, and the reload runs this
+  # script again, so rewriting pages that were already tagged kept the
+  # preview reloading in an endless loop (2026-10-12).
+  if (!identical(html, as_read)) write_file(html, file)
   counts[["pages"]] <<- counts[["pages"]] + 1
 })
 
@@ -420,7 +440,7 @@ walk(pages, function(path) {
 if (length(listed) > 0) {
   entries <- listed[!duplicated(names(listed))]
   entries <- entries[order(names(entries))]
-  str_c(
+  new_sitemap <- str_c(
     '<?xml version="1.0" encoding="UTF-8"?>\n',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
     str_c(
@@ -429,8 +449,10 @@ if (length(listed) > 0) {
       collapse = "\n"
     ),
     "\n</urlset>\n"
-  ) |>
-    write_file(sitemap)
+  )
+  # Like the pages: left alone when it is already right, so a preview does not
+  # reload for nothing
+  if (!file.exists(sitemap) || read_file(sitemap) != new_sitemap) write_file(new_sitemap, sitemap)
 }
 
 message(str_glue(

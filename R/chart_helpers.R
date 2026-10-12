@@ -38,6 +38,14 @@ cwr_ci_widest <- function(estimate, lower, upper) {
 # Worked case: the year labels on fig-work-at-home in the commuting post.
 cwr_gap <- function() getOption("cwr.gap", 1)
 
+# TRUE while cwr_figure() or cwr_interactive() draws the phone version, FALSE
+# otherwise - for anything inside an aes that should differ there, such as a
+# label wrapped to fit half the width:
+#   aes(label = if (cwr_on_phone()) "Watson\nforecast" else "Watson forecast")
+# Worked case: the forecast line's label on fig-population-cagr in
+# nd-population-forecast.
+cwr_on_phone <- function() getOption("cwr.phone", FALSE)
+
 # A text label inside the plot area: the house version of geom_text()
 # (Greg, 2026-09-23).
 #
@@ -128,6 +136,22 @@ cwr_label_repel <- function(..., bg.colour = "white", bg.r = 0.15, seed = 1,
 #   cwr_caption(c("Statistics Canada Table 17-10-0155-01",
 #                 "the 2021 census boundary files"))
 #
+# Sources from different publishers are separated by semicolons, and a
+# publisher's own items keep their commas (Greg, 2026-10-01). Pass them as a
+# list with one element per publisher, each a string or a vector of that
+# publisher's items:
+#
+#   cwr_caption(list(
+#     c("Statistics Canada, censuses of 1971 to 2001", "Table 17-10-0155-01"),
+#     "Ontario Ministry of Finance, population projections, Summer 2026"
+#   ))
+#   -> "Sources: Statistics Canada, censuses of 1971 to 2001, Table
+#       17-10-0155-01; Ontario Ministry of Finance, population projections,
+#       Summer 2026"
+#
+# A plain vector is read as one publisher's items, so every caption with a
+# single publisher is written exactly as before.
+#
 # `notes` takes footnotes to qualify something in the title or subtitle. They are
 # numbered here, in the order given, so a note and its key cannot drift apart;
 # write the note alone and put the matching key in the title or subtitle by hand,
@@ -163,8 +187,11 @@ cwr_label_repel <- function(..., bg.colour = "white", bg.r = 0.15, seed = 1,
 #   )
 cwr_caption <- function(source, credit = FALSE, notes = NULL, unnumbered = NULL) {
   # The byline is a source like any other, so it decides the plural too
-  label <- if (length(source) > 1 || credit) "Sources: " else "Source: "
-  caption <- paste0(label, paste(source, collapse = ", "))
+  # One publisher unless a list says otherwise; commas within a publisher,
+  # semicolons between publishers
+  if (!is.list(source)) source <- list(source)
+  label <- if (length(unlist(source)) > 1 || credit) "Sources: " else "Source: "
+  caption <- paste0(label, str_flatten(map_chr(source, \(items) str_flatten(items, ", ")), "; "))
   if (credit) caption <- paste0(caption, " | *Charting Waterloo Region*")
 
   # The numbered notes, then the unnumbered ones. A note str_glue() leaves
@@ -332,6 +359,45 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
   )
 }
 
+# The placement a label helper returns travels two ways: as the attribute
+# "cwr_line_labels" on the table, and on every row, in a list column
+# `cwr_place` with an id for the call (`cwr_call`). An attribute is lost
+# when tables are bound together - bind_rows(), list_rbind() - which is how
+# a faceted chart builds its labels, one call per panel; the columns are
+# not, so cwr_figure() and cwr_interactive() can still place each call's
+# labels against its own panel, measured as drawn (Greg, 2026-10-06: names
+# on faceted charts kept their first guess and sat too far from their
+# lines). The id is a count kept for the session (cwr_call_counter, below):
+# each call takes the next number, so no two calls ever share one, and making
+# it never touches the random number stream a chart's simulation may use.
+# (It was a temporary file name until 2026-10-07, but tempfile() only avoids
+# names of files that exist, and these are never made, so two calls could in
+# principle be given the same name and one call's labels placed as the
+# other's.)
+# `measure` lists every label the placement needs the width of - all the
+# groups, even those the caller drops from the result afterwards (a name
+# kept off the chart still stands in the way of the others) - and `bold`
+# those of them set in bold; both ride on the placement as attributes.
+# `kind` is "point" for cwr_point_labels(), whose layers cwr_figure() gives a
+# leader line layer.
+# Kept when the house style is sourced again (drafting in RStudio), so tables
+# made before and after cannot share a number
+if (!exists("cwr_call_counter", inherits = FALSE) || !is.environment(cwr_call_counter)) {
+  cwr_call_counter <- new.env()
+  cwr_call_counter$n <- 0L
+}
+
+cwr_carry_place <- function(guess, place, measure, bold = NULL, kind = "line") {
+  attr(place, "measure") <- measure
+  attr(place, "bold") <- bold
+  attr(place, "kind") <- kind
+  cwr_call_counter$n <- cwr_call_counter$n + 1L
+  carried <- guess |>
+    mutate(cwr_call = str_c("cwr", cwr_call_counter$n), cwr_place = list(place))
+  attr(carried, "cwr_line_labels") <- place
+  carried
+}
+
 # Place line-chart labels against their own lines.
 #
 # A label typed at a hand-picked (x, y) drifts away from its line: the eye
@@ -358,7 +424,11 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 # edge, so its thickness (`linewidth`, as in geom_line()) is allowed for. The
 # ink is measured, not the text box: ggplot2 sets a label drawn above a line
 # (vjust = 0) on its baseline, so a "g", "p" or "y" hangs below it, and the
-# height is raised by that descender for a name that has one.
+# height is raised by that descender for a name that has one. Points drawn
+# on the line (geom_point(), measured on each version at their drawn size)
+# are cleared the same way, `gap` mm from their edge, so a name never sits on
+# a dot; a point on another line is kept clear of as that line is (Greg,
+# 2026-10-07).
 #
 # Where each label goes along the line:
 #   - `at` names a group and the x to centre its label on. Rarely needed now;
@@ -382,12 +452,40 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 #   not an order: both sides are tried and the ranking above decides. A label
 #   over a gridline is fine - the halo is there for exactly that (Greg,
 #   2026-09-28) - so gridlines play no part unless `avoid_gridlines = TRUE`,
-#   which steers labels off them where that costs nothing else.
+#   which steers labels off them where that costs nothing else. Groups listed
+#   in `fixed` keep their `side` on every version, as an order - for a name
+#   placed by hand, which the phone's tighter panel would otherwise flip.
 #   `limits` and `breaks` are the y scale's, as given to scale_y_continuous();
 #   they only shape the first guess (the fitted placement reads the drawn
 #   scale) and, with `avoid_gridlines`, the gridlines.
 #
-# Returns one row per label with x, y, label, vjust, side and fontface, for
+# Which lines get a name:
+#   `named` lists the groups to label; NULL (the default) labels them all. A
+#   group left out is still drawn and still kept clear of - only its own name
+#   goes - for a chart that names a few highlighted lines among faint context
+#   lines (nd-population-forecast, 2026-10-01).
+#
+# Which way a label runs from its x:
+#   `hjust` (one per group, named; 0.5 where not given) is the label's
+#   justification at its x, as in geom_text(): 1 ends the label at x, 0
+#   starts it there. The spot is measured over the stretch the label really
+#   covers, and the result carries an `hjust` column for the label layer's
+#   aes(hjust = hjust). Mostly useful with `at`: a name that should end at a
+#   given year.
+#
+# A different spot on the phone:
+#   `phone_at` (named, like `at`) replaces `at` for the phone version, where a
+#   hand-picked spot that fits the desktop can be too tight: half the width
+#   and larger text. NA leaves that group to the automatic placement on the
+#   phone, both sides tried even if it is in `fixed`. The desktop then keeps
+#   its own `at` spot (and side) for these groups instead of copying the
+#   phone's.
+#   `phone_side` (named, like `side`) replaces `side` for those groups on the
+#   phone, and the desktop then keeps its own side for them, as with
+#   phone_at - for a name Greg wants above its line on the desktop and below
+#   it on the phone (Greg, 2026-10-07).
+#
+# Returns one row per label with x, y, label, vjust, side, fontface and hjust, for
 # the templates' cwr_label() layer with `aes(vjust = vjust)` and hjust = 0.5.
 # x must be numeric (years); for a date axis pass as.numeric(date) and `at`
 # as numbers too, then turn x back into dates - the fitted placement does
@@ -409,7 +507,8 @@ cwr_stack_keys <- function(data, x, y, fill, labels, colours, width = 0.7,
 #     limits = c(45, NA), bold = cwr_region
 #   )
 cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
-                            bold = NULL, gap = 0.8, linewidth = 0.8,
+                            bold = NULL, named = NULL, hjust = NULL, fixed = NULL, phone_at = NULL,
+                            phone_side = NULL, gap = 0.8, linewidth = 0.8,
                             limits = NULL, breaks = NULL,
                             avoid_gridlines = FALSE, right_margin = 0.12) {
   lines <- data |>
@@ -428,6 +527,7 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
   )
   line_of <- map(set_names(groups), \(g) lines |> filter(group == g) |> arrange(x))
   face_of <- set_names(if_else(groups %in% bold, "bold", "plain"), groups)
+  hjust_of <- c(hjust, set_names(rep(0.5, length(groups)), groups))[groups]
 
   # Where a line runs across a window of x: every point inside it, plus where
   # the line crosses the window's two edges.
@@ -467,23 +567,67 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
                      bottom = numeric(0), top = numeric(0))
 
     score <- function(g, x_c, where, preferred_side) {
-      half <- panel$label_mm[[g]] / 2 * x_per_mm + pad
-      window <- x_c + c(-half, half)
+      # The stretch the label covers: its width, split around x_c by its
+      # hjust, plus `pad` either side
+      label_w <- panel$label_mm[[g]] * x_per_mm
+      window <- x_c + c(-hjust_of[[g]] * label_w - pad, (1 - hjust_of[[g]]) * label_w + pad)
       own <- heights_in(line_of[[g]], window)
+      # The points drawn on this line under the label's stretch (the panel's
+      # geom_point() markers, measured by cwr_figure() with their radius in
+      # mm): the label clears their edge by `gap`, as it clears the line, so
+      # a name never sits on a year's dot (Greg, 2026-10-07, Figures 20 and
+      # 22 of nd-population-forecast-sanity-check: "this shouldn't keep
+      # happening"). A point on another line counts as that line, below.
+      markers <- panel$markers %||% tibble(x = numeric(0), y = numeric(0), radius = numeric(0))
+      markers <- markers |>
+        filter(x + radius * x_per_mm > window[1], x - radius * x_per_mm < window[2])
+      on_line <- abs(markers$y - approx(line_of[[g]]$x, line_of[[g]]$y, xout = markers$x, rule = 2)$y) <=
+        markers$radius * y_per_mm + 1e-9
+      own_markers <- markers[on_line, ]
+      other_markers <- markers[!on_line, ]
       if (where == "above") {
         edge <- max(own)
-        ink <- c(edge + clear, edge + clear + rise + if (has_drop[[g]]) drop else 0)
-        y_pos <- ink[1] + if (has_drop[[g]]) drop else 0
+        # The baseline clears the line everywhere; a descender ("g", "y") has
+        # to clear it only where that letter is. The letters are taken as
+        # equally wide, so a letter's stretch is its share of the label, plus
+        # half the pad. On a sloping line this lets the label down to the line
+        # where it carries no descender ("Region" ending at the top of a rise).
+        baseline <- edge + clear
+        if (has_drop[[g]]) {
+          letters_at <- str_locate_all(g, "[gjpqy,;]")[[1]][, "start"]
+          n_letters <- str_length(g)
+          from <- window[1] + pad + (min(letters_at) - 1) / n_letters * label_w - pad / 2
+          to <- window[1] + pad + max(letters_at) / n_letters * label_w + pad / 2
+          baseline <- max(baseline, max(heights_in(line_of[[g]], c(from, to))) + clear + drop)
+        }
+        # Above the line's points: the lowest ink (a descender's, if any)
+        # clears the top of each
+        if (nrow(own_markers)) {
+          baseline <- max(baseline, max(own_markers$y + (own_markers$radius + gap) * y_per_mm) +
+                            if (has_drop[[g]]) drop else 0)
+        }
+        ink <- c(baseline - if (has_drop[[g]]) drop else 0, baseline + rise)
+        y_pos <- baseline
       } else {
         edge <- min(own)
-        ink <- c(edge - clear - rise - if (has_drop[[g]]) drop else 0, edge - clear)
+        top <- edge - clear
+        # Below the line's points: the top of the ink clears the bottom of each
+        if (nrow(own_markers)) {
+          top <- min(top, min(own_markers$y - (own_markers$radius + gap) * y_per_mm))
+        }
+        ink <- c(top - rise - if (has_drop[[g]]) drop else 0, top)
         y_pos <- ink[2]
       }
-      # How far other lines come to the label, in y units (negative = through it)
+      # How far other lines come to the label, in y units (negative = through
+      # it), their points' edges included
       others <- map_dbl(line_of[names(line_of) != g], \(l) {
         r <- range(heights_in(l, window))
         if (r[1] > ink[2]) r[1] - ink[2] else if (r[2] < ink[1]) ink[1] - r[2] else -1
       })
+      others <- c(others, pmap_dbl(other_markers, \(x, y, radius, ...) {
+        r <- y + c(-1, 1) * radius * y_per_mm
+        if (r[1] > ink[2]) r[1] - ink[2] else if (r[2] < ink[1]) ink[1] - r[2] else -1
+      }))
       nearest <- if (length(others)) min(others) else Inf
       # The average distance from the label to its own line across the label
       along <- approx(line_of[[g]]$x, line_of[[g]]$y, xout = seq(window[1], window[2], length.out = 11),
@@ -507,25 +651,38 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
     }
 
     # Placement order: the bold (focus) groups first, then `at`, then the rest
+    # (only the `named` groups, when given; the rest stay in line_of as obstacles)
     order <- unique(c(intersect(bold, groups), names(at), groups))
+    if (!is.null(named)) order <- intersect(order, named)
+    # The phone's own spots: phone_at replaces at, NA meaning automatic
+    at_here <- at
+    if (isTRUE(panel$phone) && !is.null(phone_at)) {
+      at_here <- c(at[setdiff(names(at), names(phone_at))], phone_at[!is.na(phone_at)])
+    }
+    # The phone's own sides: phone_side replaces side
+    side_here <- side
+    if (isTRUE(panel$phone) && !is.null(phone_side)) side_here[names(phone_side)] <- phone_side
     result <- list()
     for (g in order) {
-      if (!is.null(keep)) {
+      if (!is.null(keep) && !g %in% c(names(phone_at), names(phone_side))) {
         # The same spot and side as the earlier placement, at this drawing's height
         k <- keep |> filter(label == g)
         options <- score(g, k$x, k$side, k$side)
       } else {
-        if (g %in% names(at)) {
-          xs <- at[[g]]
+        if (g %in% names(at_here)) {
+          xs <- at_here[[g]]
         } else {
-          # Every millimetre along its own line, less half a label at each end
-          # and the axis labels' strip
-          half <- panel$label_mm[[g]] / 2 * x_per_mm + pad
+          # Every millimetre along its own line, less the label (split by its
+          # hjust) and the pad at each end, and the axis labels' strip
+          label_w <- panel$label_mm[[g]] * x_per_mm
           own_x <- range(line_of[[g]]$x)
-          last <- min(own_x[2], x_stop) - half
-          xs <- if (last > own_x[1] + half) seq(own_x[1] + half, last, by = x_per_mm) else mean(own_x)
+          first <- own_x[1] + hjust_of[[g]] * label_w + pad
+          last <- min(own_x[2], x_stop) - (1 - hjust_of[[g]]) * label_w - pad
+          xs <- if (last > first) seq(first, last, by = x_per_mm) else mean(own_x)
         }
-        options <- map(xs, \(x_c) list_rbind(map(c("above", "below"), \(w) score(g, x_c, w, side[[g]])))) |>
+        free_on_phone <- isTRUE(panel$phone) && g %in% names(phone_at) && is.na(phone_at[[g]])
+        sides <- if (g %in% fixed && !free_on_phone) side_here[[g]] else c("above", "below")
+        options <- map(xs, \(x_c) list_rbind(map(sides, \(w) score(g, x_c, w, side_here[[g]])))) |>
           list_rbind() |>
           arrange(hits_label, hits_line, outside, crowded, hits_grid, float, desc(preferred), x)
       }
@@ -546,7 +703,8 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
         label = g,
         vjust = if (pick$side == "above") 0 else 1,
         side = pick$side,
-        fontface = face_of[[g]]
+        fontface = face_of[[g]],
+        hjust = hjust_of[[g]]
       )
     }
     list_rbind(result)
@@ -564,6 +722,7 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
     y_range = y_guess,
     width_mm = 95, height_mm = 65,
     size = guess_size,
+    phone = TRUE,
     label_mm = set_names(0.55 * guess_size * str_length(groups) * if_else(groups %in% bold, 1.08, 1), groups),
     breaks = breaks %||% scales::breaks_extended()(y_guess)
   ))
@@ -571,7 +730,292 @@ cwr_line_labels <- function(data, x, y, group, at = NULL, side = "above",
   # The fitting in cwr_figure() / cwr_interactive() finds the placement by
   # this attribute and calls it again with the real measurements
   attr(guess, "cwr_line_labels") <- place
-  guess
+  cwr_carry_place(guess, place, measure = groups, bold = bold)
+}
+
+# ---- Value labels on points ------------------------------------------------
+# cwr_point_labels(): where to write a value beside a point - "11,038" over
+# the first point of a line, "27,300" over its last (Greg, 2026-10-04: the
+# old placements, nudges in data units, sat too far from their points on one
+# version and too close on the other). Each label is placed in millimetres
+# from its point, measured on each drawn version as cwr_line_labels() names
+# are: cwr_figure() and cwr_interactive() find the layer by the same
+# attribute and call the placement again with the real panel and text sizes.
+#
+#   position   one per row (or one for all): "above", "below", "left" or
+#              "right" of the point
+#   hjust      for "above" and "below", one per row: 0.5 centres the label
+#              over the point, 1 right-justifies it (it ends at the point's
+#              centre), 0 left-justifies it (it starts there)
+#   phone_position, phone_hjust  the same for the phone version, where they
+#              differ (NULL keeps the desktop's)
+#   lines      optional, the chart's lines as a data frame with columns x, y
+#              and group: an "above" label is raised, and a "below" one
+#              lowered, until it clears every line across its width by `gap`;
+#              a "left" label is moved left, and a "right" one right, until
+#              no line runs through it (Greg, 2026-10-07). Leave out a line
+#              that runs through the point itself, beside a left or right
+#              label, or the label is pushed along it
+#   gap        the space between the point's edge (or a line) and the label's
+#              letters, in mm
+#   point_size the points' size, as given to geom_point(); the phone draws
+#              them at phone_point_scale of it (cwr_figure()'s default 0.65)
+#   leader     how much further out, in mm, a label that could be read as
+#              another point's is set, with a leader line to its own point;
+#              one for all or one per row, NA for none (the label stays at
+#              its usual distance, with no line; Greg, 2026-10-07)
+#   phone_leader  the same for the phone version, where it differs (NULL
+#              keeps the desktop's)
+#
+# A label that would run out of the panel sideways is slid back inside it.
+# A label above or below a point that could be read as a neighbour's - one
+# starting at its point, as at a panel's left edge, runs on over the next
+# point - is lifted (or lowered) `leader` mm and joined to its point by a
+# thin leader line in its colour (Greg, 2026-10-06). The result's
+# leader_x, leader_from and leader_to columns hold the line (NA where there
+# is none), and cwr_figure() and cwr_interactive() draw it themselves, so a
+# chart adds nothing for it.
+# Returns one row per label with x, y, label, hjust, vjust and fontface, for
+# a cwr_label() layer with aes(x = x, y = y, label = label, hjust = hjust,
+# vjust = vjust) and inherit.aes = FALSE. First worked case:
+# fig-nd-population-from-2021 in nd-population-forecast.
+#
+#   value_labels <- cwr_point_labels(
+#     end_points, x = year, y = population, label = label_comma()(population),
+#     position = c("above", "below", "above"), hjust = c(1, 0, 0.5),
+#     lines = plot_data |> select(x = year, y = population, group = segment)
+#   )
+cwr_point_labels <- function(data, x, y, label, position = "above", hjust = 0.5,
+                             phone_position = NULL, phone_hjust = NULL, lines = NULL,
+                             gap = 0.8, point_size = 2, phone_point_scale = 0.65, limits = NULL,
+                             leader = 2.5, phone_leader = NULL) {
+  points <- data |>
+    cwr_point_columns(x = {{ x }}, y = {{ y }}, label = {{ label }})
+  n <- nrow(points)
+  position <- rep_len(position, n)
+  hjust <- rep_len(hjust, n)
+  leader <- rep_len(leader, n)
+  phone_leader <- if (is.null(phone_leader)) leader else rep_len(phone_leader, n)
+  phone_position <- if (is.null(phone_position)) position else rep_len(phone_position, n)
+  phone_hjust <- if (is.null(phone_hjust)) hjust else rep_len(phone_hjust, n)
+  stopifnot(all(c(position, phone_position) %in% c("above", "below", "left", "right")))
+  # Each line's points in order along x. Sorted first and split by the sorted
+  # rows' own groups: splitting the sorted rows by the unsorted group column
+  # mixed the lines together, so a label was kept clear of lines that are not
+  # drawn and landed on the real one (Fig 19's growth note, 2026-10-07)
+  line_of <- if (is.null(lines)) list() else {
+    sorted <- arrange(lines, group, x)
+    split(sorted, sorted$group)
+  }
+
+  # Every line's heights across a stretch of x: the points inside it and where
+  # the line crosses its two ends (a line that does not reach it plays no part)
+  heights_in <- function(window) {
+    map(line_of, \(l) {
+      if (max(l$x) < window[1] || min(l$x) > window[2]) return(numeric(0))
+      inside <- l |> filter(between(x, window[1], window[2])) |> pull(y)
+      ends <- approx(l$x, l$y, xout = window)$y
+      c(inside, ends[!is.na(ends)])
+    }) |>
+      unlist()
+  }
+
+  place <- function(panel, keep = NULL) {
+    phone <- isTRUE(panel$phone)
+    x_per_mm <- diff(panel$x_range) / panel$width_mm
+    y_per_mm <- diff(panel$y_range) / panel$height_mm
+    # Text sizes are mm of font size (ggplot2's); Inter's capitals and figures
+    # are 0.7275 of it tall and its comma drops 0.21 below the baseline - the
+    # same measures as cwr_line_labels() and cwr_right_axis() use
+    cap <- 0.7275 * panel$size
+    drop <- 0.21 * panel$size
+    # A point's radius: geom_point()'s filled circle is 0.375 of its font
+    # size, which is its size in mm times .pt plus half its 0.5 stroke
+    size_now <- point_size * if (phone) phone_point_scale else 1
+    radius <- 0.375 * (size_now * .pt + 0.5 * .stroke / 2) * 25.4 / 72.27
+    pos <- if (phone) phone_position else position
+    hj <- if (phone) phone_hjust else hjust
+    ld <- if (phone) phone_leader else leader
+
+    pmap(list(points$x, points$y, points$label, pos, hj, ld), \(x0, y0, lab, p, h, l) {
+      width <- panel$label_mm[[lab]] * x_per_mm
+      has_drop <- str_detect(lab, "[gjpqy,;]")
+      if (p %in% c("above", "below")) {
+        # Slide a label that would leave the panel back inside it
+        x_left <- x0 - h * width
+        x_left <- min(max(x_left, panel$x_range[1]), panel$x_range[2] - width)
+        x_pos <- x_left + h * width
+        window <- c(x_left, x_left + width)
+        near <- heights_in(window)
+        # Could the label be read as another point's? (Greg, 2026-10-06: a
+        # 1976 value starting at its point ran on over the 1981 point.) It
+        # could when another drawn point near it - within 8 mm up or down of
+        # this one - is less than twice as far from the label's middle as its
+        # own point is. The label is then lifted `leader` mm further out and
+        # a thin leader line drawn from its point to it (by cwr_figure(),
+        # which adds the leader layer itself). The drawn points are the
+        # panel's geom_point() markers, which cwr_figure() measures
+        # (`markers`); a line's vertices without a marker do not count, as a
+        # reader cannot see them. The first guess knows only the labelled
+        # points. The line stops 1.2 mm short of the label, so it is never
+        # read as a "1" in front of the figure.
+        middle <- x_left + width / 2
+        own_mm <- abs(middle - x0) / x_per_mm
+        others <- (panel$markers %||% tibble(x = points$x, y = points$y)) |>
+          filter(abs(x - x0) > 1e-9, abs(y - y0) / y_per_mm <= 8)
+        other_mm <- if (nrow(others)) min(abs(middle - others$x)) / x_per_mm else Inf
+        unclear <- !is.na(l) && own_mm > 1 && other_mm < 2 * own_mm
+        lift <- if (unclear) l else 0
+        if (p == "above") {
+          # The baseline, high enough for the comma to clear the point and
+          # every line under the label
+          base <- y0 + (radius + gap + lift + if (has_drop) drop else 0) * y_per_mm
+          if (length(near)) base <- max(base, max(near) + (gap + lift + if (has_drop) drop else 0) * y_per_mm)
+          tibble(x = x_pos, y = base, hjust = h, vjust = 0,
+                 leader_x = if (unclear) x0 else NA_real_,
+                 leader_from = if (unclear) y0 + (radius + 0.4) * y_per_mm else NA_real_,
+                 leader_to = if (unclear) base - 1.2 * y_per_mm else NA_real_)
+        } else {
+          # The tops of the figures, low enough to clear the point and every
+          # line over the label
+          top <- y0 - (radius + gap + lift) * y_per_mm
+          if (length(near)) top <- min(top, min(near) - (gap + lift) * y_per_mm)
+          tibble(x = x_pos, y = top, hjust = h, vjust = 1,
+                 leader_x = if (unclear) x0 else NA_real_,
+                 leader_from = if (unclear) y0 - (radius + 0.4) * y_per_mm else NA_real_,
+                 leader_to = if (unclear) top + 1.2 * y_per_mm else NA_real_)
+        }
+      } else {
+        # Left or right of the point, its near edge `gap` mm out from the
+        # point's edge, then pushed further out sideways until no line runs
+        # through it (Greg, 2026-10-07: "Growth 2.6 times" kept landing on
+        # North Dumfries' line, "this shouldn't keep happening"). The label's
+        # height is its rows of text, about 0.9 of the text size apart, plus
+        # `gap` above and below; each line is followed in steps of a quarter
+        # of a millimetre, and any step inside that band and inside the
+        # label's width (plus `gap`) is a hit. A left label then moves to end
+        # `gap` mm short of the leftmost hit, a right one to start `gap` mm
+        # past the rightmost, and the check runs again, until nothing hits.
+        side <- if (p == "right") 1 else -1
+        rows <- str_count(lab, "\n") + 1
+        half_mm <- (cap + (rows - 1) * 0.9 * panel$size) / 2 + gap
+        band <- y0 + c(-1, 1) * half_mm * y_per_mm
+        edge <- x0 + side * (radius + gap) * x_per_mm
+        for (i in 1:100) {
+          reach <- sort(c(edge - side * gap * x_per_mm, edge + side * (width + gap * x_per_mm)))
+          hits <- map(line_of, \(l) {
+            from <- max(reach[1], min(l$x))
+            to <- min(reach[2], max(l$x))
+            if (from > to) return(numeric(0))
+            xs <- seq(from, to, by = 0.25 * x_per_mm)
+            ys <- approx(l$x, l$y, xout = xs)$y
+            xs[!is.na(ys) & between(ys, band[1], band[2])]
+          }) |>
+            unlist()
+          if (!length(hits)) break
+          edge <- if (side < 0) min(hits) - gap * x_per_mm else max(hits) + gap * x_per_mm
+        }
+        tibble(x = edge, y = y0,
+               hjust = if (p == "right") 0 else 1, vjust = 0.5,
+               leader_x = NA_real_, leader_from = NA_real_, leader_to = NA_real_)
+      }
+    }) |>
+      list_rbind() |>
+      mutate(label = points$label, fontface = "plain")
+  }
+
+  # First guess, for a chart not drawn by cwr_figure() or cwr_interactive(),
+  # as cwr_line_labels() makes one: a phone-sized panel (95 x 65 mm), the
+  # templates' 3.2 mm text at the phone's 0.8, 0.55 of the text size per
+  # character
+  all_x <- c(points$x, if (!is.null(lines)) lines$x)
+  all_y <- c(points$y, if (!is.null(lines)) lines$y)
+  y_guess <- range(all_y)
+  if (!is.null(limits)) y_guess <- coalesce(as.numeric(limits), y_guess)
+  y_guess[2] <- y_guess[2] + 0.05 * diff(y_guess)
+  guess_size <- 3.2 * 0.8
+  guess <- place(list(
+    x_range = range(all_x) + c(-0.02, 0.05) * diff(range(all_x)),
+    y_range = y_guess,
+    width_mm = 95, height_mm = 65,
+    size = guess_size,
+    phone = TRUE,
+    label_mm = set_names(0.55 * guess_size * str_length(points$label), points$label)
+  ))
+  # The hook cwr_figure() and cwr_interactive() look for (named after the
+  # line-name helper that first used it)
+  attr(guess, "cwr_line_labels") <- place
+  cwr_carry_place(guess, place, measure = points$label, kind = "point")
+}
+
+# The x, y and label columns cwr_point_labels() works from, picked out of the
+# caller's data by name or expression
+cwr_point_columns <- function(data, x, y, label) {
+  data |>
+    mutate(x = as.numeric({{ x }}), y = {{ y }}, label = as.character({{ label }}), .keep = "none")
+}
+
+# ---- Half dots where two dots overlap ----------------------------------------
+# cwr_half_points(): a dot drawn as half a circle, its left or right half, so
+# two dots that would cover each other - a dumbbell row whose two years are
+# nearly equal - both show (Greg, 2026-10-09, kwc-da-pop-changes). Map `side`
+# to "left" or "right" and give the same size as the chart's geom_point()
+# dots: each half is that dot's exact half, measured in mm on the page (a
+# filled circle is 0.375 of its font size, as cwr_point_labels() measures
+# it), so it is round on every chart whatever the axes' units. Its geom is a
+# kind of GeomPoint, so cwr_figure() shrinks it on the phone with the other
+# dots. No legend key: the dots it pairs with carry the colours.
+#
+#   cwr_half_points(data = close_pairs, aes(x = population, y = neighbourhood,
+#                   colour = year, side = side), size = 4)
+GeomCwrHalfPoint <- ggproto(
+  "GeomCwrHalfPoint", GeomPoint,
+  required_aes = c("x", "y", "side"),
+  draw_panel = function(data, panel_params, coord) {
+    coords <- coord$transform(data, panel_params)
+    # The radius geom_point() would draw: 0.375 of the font size (size in mm
+    # times .pt, plus half the stroke), plus half the border line it draws
+    # round a filled circle, in mm
+    radius <- (0.375 * (coords$size * .pt + coords$stroke * .stroke / 2) +
+                 coords$stroke * .stroke / 4 * 72.27 / 96) * 25.4 / 72.27
+    outline <- pmap(list(seq_len(nrow(coords)), coords$side, radius), \(i, side, r) {
+      angle <- if (side == "left") seq(pi / 2, 3 * pi / 2, length.out = 40) else seq(-pi / 2, pi / 2, length.out = 40)
+      tibble(id = i, dx = r * cos(angle), dy = r * sin(angle))
+    }) |>
+      list_rbind()
+    grid::polygonGrob(
+      x = unit(coords$x[outline$id], "npc") + unit(outline$dx, "mm"),
+      y = unit(coords$y[outline$id], "npc") + unit(outline$dy, "mm"),
+      id = outline$id,
+      gp = grid::gpar(fill = alpha(coords$colour, coords$alpha), col = NA)
+    )
+  }
+)
+
+cwr_half_points <- function(mapping = NULL, data = NULL, ..., inherit.aes = TRUE) {
+  layer(
+    geom = GeomCwrHalfPoint, stat = "identity", position = "identity",
+    mapping = mapping, data = data, params = list(...),
+    inherit.aes = inherit.aes, show.legend = FALSE
+  )
+}
+
+# ---- Year labels, Economist style --------------------------------------------
+# cwr_year_labels(): the phone version's x-axis years (Greg, 2026-10-04), as
+# The Economist writes them - the first year in full, then the last two
+# digits, and the first year of a new century in full again: 2021, 26, 31 /
+# 1996, 2001, 06, 11. Only the phone uses it (Greg: "Economist-style year
+# labels for phone only"); the desktop keeps every year in full. A house
+# standard: cwr_figure() and cwr_interactive() put it on every phone chart
+# whose x axis shows plain years (cwr_phone_year_labels() in figures.R), so a
+# chart never passes it itself.
+cwr_year_labels <- function(breaks) {
+  labels <- as.character(breaks)
+  shown <- !is.na(breaks)
+  years <- breaks[shown]
+  full <- c(TRUE, diff(years %/% 100) != 0)
+  labels[shown] <- if_else(full, as.character(years), str_sub(as.character(years), -2))
+  labels
 }
 
 # ggplot2 text sizes for geom_text/geom_label/cwr_label are in mm, not points.

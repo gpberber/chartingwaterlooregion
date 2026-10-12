@@ -14,6 +14,7 @@
 #   cwr_map_nudges  the three district labels that need moving off that point
 #   cwr_map_theme() the theme every map adds (no axes, no gridlines)
 #   cwr_text_on_fill()  white or black label text, whichever the fill needs
+#   cwr_leaflet()   a leaflet street map set out like a house chart
 #
 # sf is not loaded here: a post or script that draws a map loads it itself
 # (library(sf)), and these functions call sf:: explicitly so they work either
@@ -180,4 +181,63 @@ cwr_text_on_fill <- function(values, low, high, limits, switch_at = 55) {
   fills <- scales::pal_seq_gradient(low, high)(scales::rescale(values, from = limits))
   lightness <- farver::decode_colour(fills, to = "lab")[, "l"]
   dplyr::if_else(lightness < switch_at, "white", "black")
+}
+
+# A leaflet map - shapes over OpenStreetMap's streets, which a reader can pan,
+# zoom and hover - set out like a house chart: the title and subtitle above,
+# the notes and source line below, in the chart's sizes and colours. A
+# ggplot map is a picture; this one is a web page, so cwr_figure() cannot draw
+# it, and the words are written around it in HTML instead.
+#
+# `map` is the finished leaflet() widget. `title` and `subtitle` are strings
+# like a chart's labs(), and `caption` is cwr_caption()'s output, written in
+# the chunk as for any chart; its markdown (*italics*, <sup>, <br>) is turned
+# into HTML here. `alt` describes the map for screen readers, which announce
+# it as a figure.
+#
+# Use it in a chunk WITHOUT `output: asis`: it returns HTML tags, and knitr
+# then puts leaflet's JavaScript in the page itself. It is not numbered, so
+# it suits a Snapshot; a Deep dive needs a #fig- div around the chunk.
+cwr_leaflet <- function(map, title, subtitle, caption, alt) {
+  # cwr_caption() writes markdown, the way ggtext reads it; commonmark turns
+  # it into HTML. Its <p> wrapper is dropped so the margins below decide the
+  # spacing.
+  caption_html <- commonmark::markdown_html(caption) |>
+    stringr::str_remove_all("</?p>") |>
+    stringr::str_trim()
+
+  # theme_cwr(): title bold at base size, subtitle bold at 0.7, caption grey
+  # at 0.6, with Inter (the site's face) everywhere. Under the site's 767px
+  # breakpoint, where the PNG charts switch to their phone versions, the text
+  # steps down to match theirs and the map gets shorter, since a narrow map
+  # zoomed out to fit its width would otherwise leave empty country above and
+  # below. singleton() writes these rules once however many maps a post has.
+  css <- stringr::str_c(
+    ".cwr-leaflet { margin: 1.5rem 0; }",
+    ".cwr-leaflet-title { font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 0.3rem; }",
+    ".cwr-leaflet-subtitle { font-weight: 700; font-size: 0.85rem; line-height: 1.25; margin-bottom: 0.6rem; }",
+    ".cwr-leaflet-caption { color: ", cowboysilver, "; font-size: 0.75rem; line-height: 1.4; margin-top: 0.5rem; }",
+    "@media (max-width: 767px) {",
+    ".cwr-leaflet-title { font-size: 0.95rem; }",
+    ".cwr-leaflet-subtitle { font-size: 0.75rem; }",
+    ".cwr-leaflet-caption { font-size: 0.7rem; }",
+    ".cwr-leaflet .leaflet { height: 440px !important; }",
+    ".cwr-leaflet .legend { font-size: 11px; line-height: 15px; padding: 4px 6px; }",
+    ".cwr-leaflet .legend i { width: 15px; height: 15px; }",
+    "}",
+    sep = "\n"
+  )
+
+  htmltools::tagList(
+    htmltools::singleton(htmltools::tags$style(htmltools::HTML(css))),
+    htmltools::tags$div(
+      class = "cwr-leaflet",
+      role = "figure",
+      `aria-label` = alt,
+      htmltools::tags$div(class = "cwr-leaflet-title", htmltools::HTML(title)),
+      htmltools::tags$div(class = "cwr-leaflet-subtitle", htmltools::HTML(subtitle)),
+      map,
+      htmltools::tags$div(class = "cwr-leaflet-caption", htmltools::HTML(caption_html))
+    )
+  )
 }

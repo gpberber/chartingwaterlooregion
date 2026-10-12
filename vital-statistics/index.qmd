@@ -5,7 +5,7 @@ image: images/card.png   # the link image, drawn by R/make_card.R
 draft: false
 # The page's last publish date, shown under the description as "Last updated".
 # /publish sets it to the day it publishes this page; there is no need to type it.
-date-modified: 2026-09-29
+date-modified: 2026-10-12
 language:
   title-block-modified: "Last updated"   # Quarto's label is "Modified"; this page only
 body-classes: vital-statistics   # custom.scss rules a line under the subtitle

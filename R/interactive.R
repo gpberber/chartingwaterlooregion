@@ -49,12 +49,17 @@
 cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
                             width = 8.3, height = 5,
                             phone_width = 4.2, phone_height = height * 0.9,
-                            phone = list(), phone_text_scale = 0.8, phone_gap = 1,
+                            phone = list(), phone_text_scale = 0.8, phone_point_scale = 0.65, phone_gap = 1,
                             draft_phone = FALSE) {
   stopifnot(str_starts(id, "fig-"))
 
   # Note keys in the title and subtitle match the numbered notes (chart_helpers.R)
   cwr_check_note_keys(plot, id)
+  # Numbers in the plot in the same units as their axis (figures.R)
+  cwr_check_label_units(plot, id, "desktop")
+
+  # Leader lines for value labels that need one (figures.R)
+  plot <- cwr_add_point_leaders(plot)
 
   # Snapshot or Deep dive, read from the post's categories (see cwr_figure())
   if (is.null(number)) {
@@ -64,9 +69,19 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
 
   phone_plot <- plot + cwr_phone_theme(phone_width)
   for (piece in phone) phone_plot <- phone_plot + piece
+  # Years on the x axis in the Economist's style (2021, 26, 31), as in
+  # cwr_figure()
+  phone_plot <- cwr_phone_year_labels(phone_plot)
   # A chart drawn with cwr_right_axis() keeps its numbers inside the panel,
   # right-aligned with the gridlines, on the phone too
   phone_plot <- cwr_phone_right_axis(phone_plot, phone_width)
+
+  # A plot area never squeezed by the notes, as in cwr_figure()
+  # (cwr_hold_plot_area(), figures.R). The phone's height is settled first,
+  # since by default it is worked out from the desktop's.
+  force(phone_height)
+  height <- cwr_hold_plot_area(plot, width, height, cwr_min_plot_area)
+  phone_height <- cwr_hold_plot_area(phone_plot, phone_width, phone_height, cwr_phone_min_plot_area)
 
   # What every hover does: the tooltip in the house font on a white card, and
   # round points sharing the hovered data_id made visible. A line chart draws
@@ -145,7 +160,8 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   # Line names from cwr_line_labels(), placed against each version's own
   # measurements, as in cwr_figure()
   line_labels <- cwr_fit_line_labels(plot, phone_plot, width, height,
-                                     phone_width, phone_height, phone_text_scale)
+                                     phone_width, phone_height, phone_text_scale,
+                                     phone_point_scale = phone_point_scale)
   on.exit(line_labels$restore(), add = TRUE)
 
   line_labels$desktop()
@@ -162,9 +178,13 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   })
   original_sizes <- map(text_layers, \(layer) layer$aes_params$size)
   walk(text_layers, \(layer) layer$aes_params$size <- layer$aes_params$size * phone_text_scale)
+  # Points smaller too, as in cwr_figure() (cwr_shrink_phone_points(), in
+  # figures.R); the invisible hover targets keep their size
+  restore_points <- cwr_shrink_phone_points(phone_plot$layers, phone_point_scale)
+  on.exit(restore_points(), add = TRUE)
   # `phone_gap` as in cwr_figure(): what cwr_gap() returns while the phone
   # version is drawn, for a gap written in data units (`nudge * cwr_gap()`)
-  phone_gap_option <- options(cwr.gap = phone_gap)
+  phone_gap_option <- options(cwr.gap = phone_gap, cwr.phone = TRUE)
   line_labels$phone()
   phone_widget <- make_widget(phone_plot, phone_width, phone_height, "phone")
   options(phone_gap_option)
