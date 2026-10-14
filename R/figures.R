@@ -428,6 +428,31 @@ cwr_measure_panel <- function(plot, width, height, dpi, labels, panel = NULL) {
   )
 }
 
+# ---- Bar labels measured against each drawing ------------------------------------
+# cwr_fits_inside() (chart_helpers.R) needs to know how many millimetres one
+# data unit takes on the page, across and up, in the version being drawn. This
+# measures the (first) panel and sets the cwr.panel_mm option for the draw that
+# follows, returning the old options for options() to put back. A chart that
+# never calls cwr_fits_inside() is not measured, so it costs nothing. The
+# measuring draw itself sees no scale (every label "fits"), which leaves the
+# panel's size the same: text inside the panel never changes its layout.
+cwr_set_panel_mm <- function(plot, width, height, dpi) {
+  asks <- c(list(plot$mapping), map(plot$layers, "mapping")) |>
+    unlist() |>
+    map_chr(rlang::quo_text) |>
+    str_detect("cwr_fits_inside") |>
+    any()
+  if (!asks) return(options(cwr.panel_mm = NULL))
+  no_labels <- tibble(label = character(), fontface = character(), size = numeric(), family = character())
+  previous <- options(cwr.panel_mm = NULL)
+  panel <- cwr_measure_panel(plot, width, height, dpi, no_labels, panel = 1)
+  options(cwr.panel_mm = list(
+    x = panel$width_mm / diff(panel$x_range),
+    y = panel$height_mm / diff(panel$y_range)
+  ))
+  previous
+}
+
 # Leader lines for value labels (Greg, 2026-10-06: a 1976 value starting at
 # its point ran on over the 1981 point, so it read as either's). Under every
 # text layer made from cwr_point_labels(), a geom_segment() layer is added
@@ -1197,6 +1222,10 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # Panel headings the same distance above their top gridlines, the image
   # taller by the space added (cwr_even_heading_gaps() above)
   desktop_out <- cwr_even_heading_gaps(desktop_plot, width, height, dpi)
+  # Bar labels inside their bars where they fit, measured on this drawing
+  # (cwr_set_panel_mm() above)
+  panel_option <- cwr_set_panel_mm(desktop_out$plot, width, desktop_out$height, dpi)
+  on.exit(options(panel_option), add = TRUE)
   ggsave(desktop_file, desktop_out$plot, width = width, height = desktop_out$height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
   # Every line's name close to its line, as drawn (see above)
@@ -1234,14 +1263,17 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # multiplied by while the phone version is drawn (2 keeps it the same
   # distance on the page). The aes is evaluated as the chart is saved, so
   # setting the option here reaches it. cwr.phone does the same for
-  # cwr_on_phone(), for text that differs on the phone (a label wrapped).
-  phone_gap_option <- options(cwr.gap = phone_gap, cwr.phone = TRUE)
+  # cwr_on_phone(), for text that differs on the phone (a label wrapped), and
+  # cwr.text_scale tells cwr_fits_inside() how much smaller the text is drawn.
+  phone_gap_option <- options(cwr.gap = phone_gap, cwr.phone = TRUE, cwr.text_scale = phone_text_scale)
   phone_out <- cwr_even_heading_gaps(phone_plot, phone_width, phone_height, dpi)
+  cwr_set_panel_mm(phone_out$plot, phone_width, phone_out$height, dpi)
   ggsave(phone_file, phone_out$plot, width = phone_width, height = phone_out$height,
          dpi = dpi, bg = "white", device = ragg::agg_png)
   cwr_check_line_names(phone_plot, id, "phone", phone_width, phone_height, dpi)
   cwr_check_label_units(phone_plot, id, "phone")
   options(phone_gap_option)
+  options(panel_option)
 
   # Drafting, there is no document for the HTML below to go into, so cat()ing it
   # would print tags to the console and show no chart at all. Draw the PNGs into

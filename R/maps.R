@@ -15,6 +15,8 @@
 #   cwr_map_theme() the theme every map adds (no axes, no gridlines)
 #   cwr_text_on_fill()  white or black label text, whichever the fill needs
 #   cwr_leaflet()   a leaflet street map set out like a house chart
+#   cwr_hover_box() a leaflet map's hover text shown in a corner box, not
+#                   by the pointer
 #
 # sf is not loaded here: a post or script that draws a map loads it itself
 # (library(sf)), and these functions call sf:: explicitly so they work either
@@ -217,6 +219,11 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
     ".cwr-leaflet-title { font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 0.3rem; }",
     ".cwr-leaflet-subtitle { font-weight: 700; font-size: 0.85rem; line-height: 1.25; margin-bottom: 0.6rem; }",
     ".cwr-leaflet-caption { color: ", cowboysilver, "; font-size: 0.75rem; line-height: 1.4; margin-top: 0.5rem; }",
+    # cwr_hover_box()'s corner box: the legend's own look (leaflet's "info"
+    # class), with a width range so it does not jump about as the text changes
+    ".cwr-leaflet .cwr-hover-box { font-size: 13px; line-height: 1.35; min-width: 150px; max-width: 230px; }",
+    # ...and the tooltips whose text it shows stay hidden
+    ".cwr-leaflet .cwr-hover-boxed .leaflet-tooltip { display: none; }",
     "@media (max-width: 767px) {",
     ".cwr-leaflet-title { font-size: 0.95rem; }",
     ".cwr-leaflet-subtitle { font-size: 0.75rem; }",
@@ -224,6 +231,7 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
     ".cwr-leaflet .leaflet { height: 440px !important; }",
     ".cwr-leaflet .legend { font-size: 11px; line-height: 15px; padding: 4px 6px; }",
     ".cwr-leaflet .legend i { width: 15px; height: 15px; }",
+    ".cwr-leaflet .cwr-hover-box { font-size: 11px; line-height: 15px; padding: 4px 6px; min-width: 0; max-width: 170px; }",
     "}",
     sep = "\n"
   )
@@ -239,5 +247,50 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
       map,
       htmltools::tags$div(class = "cwr-leaflet-caption", htmltools::HTML(caption_html))
     )
+  )
+}
+
+# A leaflet map's hover text, shown in a fixed box in one corner of the map
+# instead of in a tooltip beside the pointer, which covers part of the very
+# area being looked at. Add it as the last step of the map:
+#
+#   leaflet(...) |> addPolygons(label = ~hover, ...) |> cwr_hover_box()
+#
+# The shapes keep their `label =` as usual, and Leaflet still opens each
+# label's tooltip when the pointer is over the shape (or a finger taps it, on
+# a phone). A few lines of JavaScript listen for the map's "tooltip opened"
+# and "tooltip closed" events, copy the tooltip's text into the box, and
+# cwr_leaflet()'s styles hide the tooltip itself (the map's container gets
+# the class "cwr-hover-boxed"). Listening on the map rather than on each
+# shape matters: leaflet can add its shapes after this code runs, so shapes
+# looked for at that moment may not be there yet. With nothing under the
+# pointer the box shows `prompt`. `position` is the corner: "topleft" (the
+# default) sets the box under the zoom buttons; keep it out of the legend's
+# corner. Use cwr_leaflet() around the result as usual - it styles the box
+# and hides the tooltips.
+cwr_hover_box <- function(map, position = "topleft",
+                          prompt = "Hover over or tap an area to see its figures") {
+  htmlwidgets::onRender(
+    map,
+    "function(el, x, data) {
+      var map = this;
+      L.DomUtil.addClass(map.getContainer(), 'cwr-hover-boxed');
+      // The box: a Leaflet control in the chosen corner. Clicks and scrolls on
+      // it stay in the box rather than reaching the map underneath
+      var box = L.control({position: data.position});
+      box.onAdd = function() {
+        var div = L.DomUtil.create('div', 'info cwr-hover-box');
+        div.innerHTML = data.prompt;
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        return div;
+      };
+      box.addTo(map);
+      var div = box.getContainer();
+      // A tooltip opening puts its text in the box; closing puts the prompt back
+      map.on('tooltipopen', function(e) { div.innerHTML = e.tooltip.getContent(); });
+      map.on('tooltipclose', function() { div.innerHTML = data.prompt; });
+    }",
+    data = list(position = position, prompt = prompt)
   )
 }

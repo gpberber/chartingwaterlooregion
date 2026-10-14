@@ -165,6 +165,10 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   on.exit(line_labels$restore(), add = TRUE)
 
   line_labels$desktop()
+  # Bar labels inside their bars where they fit, measured on each drawing, as
+  # in cwr_figure() (cwr_set_panel_mm(), in figures.R)
+  panel_option <- cwr_set_panel_mm(plot, width, height, 96)
+  on.exit(options(panel_option), add = TRUE)
   desktop_widget <- make_widget(plot, width, height, "desktop")
 
   # geom_text/geom_label/cwr_label sizes are shrunk for the phone exactly as in
@@ -184,10 +188,12 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   on.exit(restore_points(), add = TRUE)
   # `phone_gap` as in cwr_figure(): what cwr_gap() returns while the phone
   # version is drawn, for a gap written in data units (`nudge * cwr_gap()`)
-  phone_gap_option <- options(cwr.gap = phone_gap, cwr.phone = TRUE)
+  phone_gap_option <- options(cwr.gap = phone_gap, cwr.phone = TRUE, cwr.text_scale = phone_text_scale)
   line_labels$phone()
+  cwr_set_panel_mm(phone_plot, phone_width, phone_height, 96)
   phone_widget <- make_widget(phone_plot, phone_width, phone_height, "phone")
   options(phone_gap_option)
+  options(panel_option)
   walk2(text_layers, original_sizes, \(layer, size) layer$aes_params$size <- size)
 
   drafting <- !isTRUE(getOption("knitr.in.progress")) ||

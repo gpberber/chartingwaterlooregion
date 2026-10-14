@@ -1302,7 +1302,7 @@ plot_data <- starts_monthly("Single")
 
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
   labs(
-    title = "Region, single-detached, number of starts, thousands",   
+    title = "Region, single-detached, number of starts",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
@@ -1328,7 +1328,7 @@ plot_data <- starts_monthly("Semi-detached")
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt,
                 breaks = breaks_width(5)) +
   labs(
-    title = "Region, semi-detached, number of starts, thousands",   
+    title = "Region, semi-detached, number of starts",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
@@ -1352,7 +1352,7 @@ plot_data <- starts_monthly("Row")
 
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
   labs(
-    title = "Region, row, number of starts, thousands",   
+    title = "Region, row, number of starts",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",

@@ -23,7 +23,7 @@ cwr_packages <- c(
   "tidyverse", "scales", "ggtext", "shadowtext", "ggrepel", "patchwork", "gt", "gtExtras", "here",
   "janitor", "conflicted", "prismatic", "systemfonts", "ragg", "png",
   "ggiraph", "gdtools", "htmltools",   # interactive charts, cwr_interactive()
-  "ggh4x",   # facets with an axis on every panel and panels sized to their rows (kwc-da-pop-changes, nd-population-forecast)
+  "ggh4x",   # facets with an axis on every panel and panels sized to their rows (nd-population-forecast; once kwc-da-pop-changes)
 
   # Rendering and publishing
   "quarto", "rmarkdown", "knitr", "sessioninfo", "gh", "httr2",
@@ -35,11 +35,11 @@ cwr_packages <- c(
   "cmhc",   # CMHC's Housing Market Information Portal (Vital Statistics page)
   "pdftools",   # posts/wrhn-fsa/R/extract_helpers.R, for checking a transcribed statement against its PDF
   "readxl",   # datasets/nd-population-forecast: the Ministry of Finance projection workbooks
-  "cancensus",   # datasets/nd-population-forecast (census ages 1996-2011), posts/kwc-da-pop-changes; CensusMapper (free API key in ~/.Renviron)
+  "cancensus",   # datasets/nd-population-forecast (census ages 1996-2011), datasets/population-since-1971; CensusMapper (free API key in ~/.Renviron)
 
   # Spatial and maps
   "sf", "units", "farver",   # farver: cwr_text_on_fill() in R/maps.R
-  "tongfen",   # posts/kwc-da-pop-changes: matching 1996 and 2021 census areas
+  "tongfen",   # tried for datasets/population-since-1971 (matching 1996 and 2021 census areas), not used now
   "leaflet", "commonmark",   # street maps a reader can pan and hover, cwr_leaflet() in R/maps.R
 
   # Time series and text

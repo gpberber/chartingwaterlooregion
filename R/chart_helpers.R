@@ -46,6 +46,59 @@ cwr_gap <- function() getOption("cwr.gap", 1)
 # nd-population-forecast.
 cwr_on_phone <- function() getOption("cwr.phone", FALSE)
 
+# Whether a bar's value label fits inside the bar, measured on the page
+# (cwr-charts rule 3g; Greg, 2026-10-02: "Bar labels always go inside bars
+# unless they don't fit"). Called inside an aes, it takes each label as it will
+# be printed, the bar's length in data units (its value, for a bar from zero)
+# and the label's size, and answers TRUE where the bar is at least as long, in
+# millimetres, as the text plus `room` (mm, the gap at the bar's end and a
+# margin at its start). The text is measured in the house font at the size it
+# is drawn, shrunk on the phone as cwr_figure() shrinks it; the bar is measured
+# with the panel's own scale, which cwr_figure() and cwr_interactive() measure
+# on each drawn version and hand over in the cwr.panel_mm option. `axis` is the
+# direction the bars run as drawn: "x" for horizontal bars (the text's width
+# counts), "y" for upright ones (its height). Before a chart is measured (and
+# outside cwr_figure()) there is no scale yet, and every label counts as
+# fitting. Write the inside layer and the outside layer over the same rows,
+# blanking the label the other one draws:
+#   geom_text(aes(label = if_else(cwr_fits_inside(value_label, value, 3.2), value_label, "")), ...)
+#   cwr_label(aes(label = if_else(cwr_fits_inside(value_label, value, 3.2), "", value_label)), ...)
+# Never decide "fits" by a share of the longest bar or a value in data units:
+# a guess like that put labels of 2.8 and 6.3 outside bars with room to spare
+# (population-since-1971, 2026-10-13).
+cwr_fits_inside <- function(label, length, size, axis = "x", room = 3) {
+  panel_mm <- getOption("cwr.panel_mm")
+  if (is.null(panel_mm)) return(rep(TRUE, length(label)))
+  if (cwr_on_phone()) size <- size * getOption("cwr.text_scale", 1)
+  # A label's height is its size (ggplot2 sizes are millimetres)
+  text_mm <- if (axis == "x") cwr_text_mm(label, size) else rep(size, length(label))
+  abs(length) * panel_mm[[axis]] >= text_mm + room
+}
+
+# The width in mm of each label at a ggplot2 text size, in the house font, as
+# ragg draws it. Measured with grid in a throwaway ragg device, as
+# cwr_measure_panel() (figures.R) measures line names, then switched back to
+# whichever device was drawing (cwr_fits_inside() runs in the middle of a
+# ggsave()). systemfonts::string_width() is not used: on this machine it
+# matched a different Inter and measured "2.8" at 6.3 mm, which ragg draws at
+# 4.8 mm (2026-10-13).
+cwr_text_mm <- function(label, size) {
+  label <- replace_na(as.character(label), "")
+  if (length(label) == 0) return(numeric(0))
+  previous_device <- dev.cur()
+  file <- tempfile(fileext = ".png")
+  ragg::agg_png(file, width = 1, height = 1, units = "in", res = 72)
+  on.exit({
+    dev.off()
+    if (previous_device > 1) dev.set(previous_device)
+    unlink(file)
+  })
+  map_dbl(label, \(text) {
+    convertWidth(grobWidth(textGrob(text, gp = gpar(fontfamily = cwr_font(), fontsize = size * .pt))),
+                 "mm", valueOnly = TRUE)
+  })
+}
+
 # A text label inside the plot area: the house version of geom_text()
 # (Greg, 2026-09-23).
 #
