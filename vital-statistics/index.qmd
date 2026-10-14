@@ -257,7 +257,9 @@ vs_line <- function(plot_data,
 # The Region's net business openings use it too, a bar a month: a date `x`
 # gets the monthly charts' axis (a year label each January, a minor tick each
 # quarter), and `signed = TRUE` colours each bar by its sign - blue above
-# zero, red below - instead of all blue. `colours` gives the two fills.
+# zero, red below - instead of all blue. `colours` gives the two fills. The
+# population bars set it too, so a year of net losses is red wherever it falls
+# (Greg, 2026-10-14).
 vs_bar <- function(plot_data,
                    y_labels = label_number(big.mark = ","),
                    breaks = waiver(),    # y breaks
@@ -1333,11 +1335,12 @@ plot_data <- starts_monthly("Single")
 
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
   labs(
-    title = "Region, single-detached, number of starts",   
+    title = "Region, single-detached, number of starts^1^",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
-      credit = TRUE   # the 12-month average is worked out here
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "Not seasonally adjusted"
     )
   )
 
@@ -1359,11 +1362,12 @@ plot_data <- starts_monthly("Semi-detached")
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt,
                 breaks = breaks_width(5)) +
   labs(
-    title = "Region, semi-detached, number of starts",   
+    title = "Region, semi-detached, number of starts^1^",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
-      credit = TRUE   # the 12-month average is worked out here
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "Not seasonally adjusted"
     )
   )
 
@@ -1383,11 +1387,12 @@ plot_data <- starts_monthly("Row")
 
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
   labs(
-    title = "Region, row, number of starts",   
+    title = "Region, row, number of starts^1^",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
-      credit = TRUE   # the 12-month average is worked out here
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "Not seasonally adjusted"
     )
   )
 
@@ -1408,11 +1413,12 @@ plot_data <- starts_monthly("Apartment")
 # The axis counts starts as they are, like the other tabs (see All dwellings)
 p <- vs_monthly(plot_data, fills = set_names(dodgerblue50, levels(pull(plot_data, group))), tip = starts_fmt) +
   labs(
-    title = "Region, apartment, number of starts",
+    title = "Region, apartment, number of starts^1^",
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "CMHC Starts and Completions Survey",
-      credit = TRUE   # the 12-month average is worked out here
+      credit = TRUE,   # the 12-month average is worked out here
+      notes = "Not seasonally adjusted"
     )
   )
 
@@ -2076,7 +2082,7 @@ plot_data <- components_people("Natural increase")
 
 # The axis is in thousands of people
 p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.1), x_labels = year_span,
-            tip = people_fmt, when = year_span) +
+            tip = people_fmt, when = year_span, signed = TRUE) +
   labs(
     title = "Region, natural increase in population, thousands",                         
     subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
@@ -2131,7 +2137,7 @@ plot_data <- components_people("Immigrants")
 
 # The axis is in thousands of people
 p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_labels = year_span,
-            tip = people_fmt, when = year_span) +
+            tip = people_fmt, when = year_span, signed = TRUE) +
   labs(
     title = "Region, number of new immigrants, thousands",                               
     subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
@@ -2183,7 +2189,7 @@ plot_data <- components_people("Net non-permanent residents")
 
 # The axis is in thousands of people
 p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), x_labels = year_span,
-            tip = people_fmt, when = year_span) +
+            tip = people_fmt, when = year_span, signed = TRUE) +
   labs(
     title = "Region, net new non-permanent residents, thousands",              
     subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
@@ -2235,7 +2241,7 @@ plot_data <- components_people("Net interprovincial migration")
 
 # The axis is in thousands of people, a gridline every thousand
 p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), breaks = breaks_width(1000),
-            x_labels = year_span, tip = people_fmt, when = year_span) +
+            x_labels = year_span, tip = people_fmt, when = year_span, signed = TRUE) +
   labs(
     title = "Region, net interprovincial migration, thousands",                  
     subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
@@ -2264,7 +2270,7 @@ p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), x_labels = year_s
     caption = cwr_caption(
       c("Statistics Canada Tables 17-10-0153-01", "17-10-0152-01"),
       credit = TRUE,   # the rates per 1,000 are worked out here
-      notes = "Migration between provinces nets to zero for Canada as a whole, so no line presented"
+      notes = "Migration between provinces nets to zero for Canada, so Canada is not shown"
     )
   )
 
@@ -2285,11 +2291,11 @@ plot_data <- components_people("Net intraprovincial migration")
 
 # The axis is in thousands of people, a gridline every thousand
 p <- vs_bar(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 1), breaks = breaks_width(1000),
-            x_labels = year_span, tip = people_fmt, when = year_span) +
+            x_labels = year_span, tip = people_fmt, when = year_span, signed = TRUE) +
   labs(
     title = "Region, net intraprovincial migration^1^, thousands",                  
     subtitle = str_glue("Most recent period available: {latest_period(plot_data, july_to_june)}"),
-    caption = cwr_caption("Statistics Canada Table 17-10-0153-01", notes = c("Migration within province nets to zero for Canada and Ontario as a whole, so no comparatives presented"))
+    caption = cwr_caption("Statistics Canada Table 17-10-0153-01", notes = "Migration within a province nets to zero for Ontario and Canada, so neither is shown")
   )
 
 cwr_interactive(
