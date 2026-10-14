@@ -1224,12 +1224,12 @@ plot_data <- permit_units |>
   rename(x = date, y = units, average = average_12) |>
   mutate(group = factor("Dwelling units"))
 
-# The axis is in thousands of dwelling units, so its numbers clear the bars
+# The axis counts dwelling units as they are, not in thousands, like the
+# housing starts charts, which count dwellings too (Greg, 2026-10-14)
 p <- vs_monthly(plot_data, fills = c(`Dwelling units` = dodgerblue50),
-                y_labels = label_number(scale = 1e-3, accuracy = 0.1),
                 tip = label_number(big.mark = ",", accuracy = 1)) +
   labs(
-    title = "Region, number of dwelling units included in residential permits^1^, thousands",   
+    title = "Region, number of dwelling units included in residential permits^1^",
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
     caption = cwr_caption(
       "Statistics Canada Table 34-10-0292-01",
