@@ -526,6 +526,28 @@ cma_words <- "Waterloo Region (the Kitchener - Cambridge - Waterloo census metro
 # An annual period that runs July to June, written "2024/25"
 year_span <- \(year) str_c(year, "/", str_sub(year + 1, 3, 4))
 
+# ---- One axis for a set of tabs ---------------------------------------------
+# Tabs that show one measure for different groups - vacancy rates by unit
+# size, say - share one y axis, so switching tabs changes only the lines
+# (cwr-charts, Tabs: keep the scales identical across tabs; Greg, 2026-10-14).
+# It is worked out from every tab's figures together, so a data refresh can
+# never push a line off it: a gridline every `step`, from the step at or below
+# the lowest figure (or from zero, with `zero = TRUE`, unless a figure goes
+# below it) to the step at or above the highest. An axis that does not reach
+# zero runs half a step below its lowest gridline, the room its zig-zag needs
+# (cwr-charts rule 6a). A chunk passes both parts to vs_line():
+#   limits = axis$limits, breaks = axis$breaks
+vs_shared_axis <- function(values, step, zero = FALSE) {
+  values <- values[!is.na(values)]
+  low <- floor(min(values) / step) * step
+  high <- ceiling(max(values) / step) * step
+  if (zero) low <- min(0, low)
+  list(
+    breaks = seq(low, high, by = step),
+    limits = c(if (zero) low else low - step / 2, high)
+  )
+}
+
 # Number formats shared by several charts' tooltips and alt text
 percent_1 <- label_percent(accuracy = 0.1, scale = 1)
 percent_change <- label_percent(accuracy = 0.1, scale = 1, style_positive = "plus")
@@ -1087,9 +1109,16 @@ cwr_interactive(
 ```{r}
 #| label: business-openings-rate
 
+# Openings and closings share one axis, worked out from both rates, so the
+# two tabs can be compared directly (vs_shared_axis(), in the setup chunk)
+business_axis <- bind_rows(business_rate("Openings"), business_rate("Closures")) |>
+  pull(y) |>
+  vs_shared_axis(step = 0.5)
+
 plot_data <- business_rate("Openings")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt,
+             limits = business_axis$limits, breaks = business_axis$breaks) +
   labs(
     title = "Number of business openings^1^ per 100 active businesses",            
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
@@ -1119,7 +1148,8 @@ cwr_interactive(
 
 plot_data <- business_rate("Closures")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.5), tip = business_rate_fmt,
+             limits = business_axis$limits, breaks = business_axis$breaks) +
   labs(
     title = "Number of business closings^1^ per 100 active businesses",            
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
@@ -1418,9 +1448,16 @@ market_alt <- function(plot_data, market_words) {
   )
 }
 
+# The three tabs share one axis, worked out from all three shares, so
+# switching tabs changes only the line (vs_shared_axis(), in the setup chunk)
+market_axis <- starts_intended_market |>
+  pull(percent) |>
+  vs_shared_axis(step = 10)
+
 plot_data <- market_share("Rental")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt,
+             limits = market_axis$limits, breaks = market_axis$breaks) +
   labs(
     title = "Rental, share of housing starts over the past 12 months, %",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
@@ -1444,7 +1481,8 @@ cwr_interactive(
 
 plot_data <- market_share("Condo")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt,
+             limits = market_axis$limits, breaks = market_axis$breaks) +
   labs(
     title = "Condo, share of housing starts over the past 12 months, %",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
@@ -1468,7 +1506,8 @@ cwr_interactive(
 
 plot_data <- market_share("Homeowner")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt) +
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 1), tip = market_fmt,
+             limits = market_axis$limits, breaks = market_axis$breaks) +
   labs(
     title = "Homeowner, share of housing starts over the past 12 months, %",   
     subtitle = str_glue("Most recent period available: {latest_period(plot_data)}"),
@@ -1583,13 +1622,18 @@ rms_alt <- function(plot_data, size, measure_words, fmt) {
 # The axis numbers are rounded finely (0.1, or $10 on the rent charts), since
 # the gridlines can fall on halves or quarters; cwr_right_axis() then drops
 # the zeros the numbers all share, so whole steps still read "1, 2, 3".
-# The rent changes start their axis at zero unless one goes below it
-from_zero <- \(plot_data) c(min(0, pull(plot_data, y), na.rm = TRUE), NA)
 dollars_1 <- label_dollar(accuracy = 1)
+
+# The four vacancy tabs share one axis from zero, worked out from all their
+# figures, so switching tabs changes only the lines (vs_shared_axis())
+vacancy_axis <- vacancy_rate |>
+  filter(bedroom_type %in% c("Total", "1 Bedroom", "2 Bedroom", "3 Bedroom +")) |>
+  pull(value) |>
+  vs_shared_axis(step = 1, zero = TRUE)
 
 plot_data <- rms_size(vacancy_rate, "Total")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = vacancy_axis$limits, breaks = vacancy_axis$breaks,
              tip = percent_1, when = october) +
   labs(
     title = "All units, vacancy rate, %",   
@@ -1614,7 +1658,7 @@ cwr_interactive(
 
 plot_data <- rms_size(vacancy_rate, "1 Bedroom")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = vacancy_axis$limits, breaks = vacancy_axis$breaks,
              tip = percent_1, when = october) +
   labs(
     title = "1 bedroom, vacancy rate, %",   
@@ -1639,7 +1683,7 @@ cwr_interactive(
 
 plot_data <- rms_size(vacancy_rate, "2 Bedroom")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = vacancy_axis$limits, breaks = vacancy_axis$breaks,
              tip = percent_1, when = october) +
   labs(
     title = "2 bedrooms, vacancy rate, %",   
@@ -1664,7 +1708,7 @@ cwr_interactive(
 
 plot_data <- rms_size(vacancy_rate, "3 Bedroom +")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = c(0, NA),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = vacancy_axis$limits, breaks = vacancy_axis$breaks,
              tip = percent_1, when = october) +
   labs(
     title = "3+ bedrooms, vacancy rate, %",   
@@ -1691,10 +1735,13 @@ cwr_interactive(
 ```{r}
 #| label: average-rent
 
+# Gridlines every $200 on all five tabs, so switching tabs keeps their
+# spacing. Each tab keeps its own range: one range for all would flatten the
+# studio and 1-bedroom lines (Greg, 2026-10-14).
 plot_data <- rms_size(average_rent, "Total")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01), breaks = breaks_width(200),
              tip = dollars_1, when = october) +
   labs(
     title = "All units, average monthly rent, $ thousands",   
@@ -1720,7 +1767,7 @@ cwr_interactive(
 plot_data <- rms_size(average_rent, "Studio")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01), breaks = breaks_width(200),
              tip = dollars_1, when = october) +
   labs(
     title = "Studio, average monthly rent, $ thousands",   
@@ -1746,7 +1793,7 @@ cwr_interactive(
 plot_data <- rms_size(average_rent, "1 Bedroom")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01), breaks = breaks_width(200),
              tip = dollars_1, when = october) +
   labs(
     title = "1 bedroom, average monthly rent, $ thousands",   
@@ -1772,7 +1819,7 @@ cwr_interactive(
 plot_data <- rms_size(average_rent, "2 Bedroom")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01), breaks = breaks_width(200),
              tip = dollars_1, when = october) +
   labs(
     title = "2 bedrooms, average monthly rent, $ thousands",   
@@ -1798,7 +1845,7 @@ cwr_interactive(
 plot_data <- rms_size(average_rent, "3 Bedroom +")
 
 # The axis is in thousands, so its numbers clear the ends of the lines
-p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01),
+p <- vs_line(plot_data, y_labels = label_number(scale = 1e-3, accuracy = 0.01), breaks = breaks_width(200),
              tip = dollars_1, when = october) +
   labs(
     title = "3+ bedrooms, average monthly rent, $ thousands",   
@@ -1827,9 +1874,17 @@ Too little of the data for studio and 3+ bedroom apartments was reliable enough 
 ```{r}
 #| label: rent-change
 
+# The three tabs share one axis, worked out from all their figures, so
+# switching tabs changes only the lines (vs_shared_axis(), in the setup chunk).
+# It starts at zero unless a change goes below it.
+rent_change_axis <- rent_change |>
+  filter(bedroom_type %in% c("Total", "1 Bedroom", "2 Bedroom")) |>
+  pull(value) |>
+  vs_shared_axis(step = 2.5, zero = TRUE)
+
 plot_data <- rms_size(rent_change, "Total")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = rent_change_axis$limits, breaks = rent_change_axis$breaks,
              tip = percent_change, when = october) +
   labs(
     title = "All units, same-sample year-over-year change in average rent, %",   
@@ -1854,7 +1909,7 @@ cwr_interactive(
 
 plot_data <- rms_size(rent_change, "1 Bedroom")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = rent_change_axis$limits, breaks = rent_change_axis$breaks,
              tip = percent_change, when = october) +
   labs(
     title = "1 bedroom, same-sample year-over-year change in average rent, %",   
@@ -1879,7 +1934,7 @@ cwr_interactive(
 
 plot_data <- rms_size(rent_change, "2 Bedroom")
 
-p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = from_zero(plot_data),
+p <- vs_line(plot_data, y_labels = label_number(accuracy = 0.1), limits = rent_change_axis$limits, breaks = rent_change_axis$breaks,
              tip = percent_change, when = october) +
   labs(
     title = "2 bedrooms, same-sample year-over-year change in average rent, %",   
