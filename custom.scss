@@ -637,17 +637,23 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   font-size: 0.9rem;
   text-align: left;
 }
-// Deep dives number their charts but rarely caption them, so the caption is
-// often just "Figure 3" - an anchor for @fig- references, not something to read.
-// Quarto marks that case .quarto-uncaptioned; keep it quiet and out of the way.
-.quarto-float-caption.quarto-uncaptioned {
+// Posts number their charts but rarely caption them, so the caption is
+// often just "Figure 3" - an anchor for @fig- references and the "Detailed
+// table sources" table, not something to read. Quarto marks that case
+// .quarto-uncaptioned; keep it quiet and out of the way. A tab of a tabset is
+// a sub-figure whose caption is just its letter, "(a)", and Quarto does not
+// mark it uncaptioned, so it is named here to look the same.
+.quarto-float-caption.quarto-uncaptioned,
+.quarto-subfloat-caption {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
 }
 // The image's own bottom margin and its paragraph's left 25px between a chart's
 // source line and its "Figure N"; drop both so the label sits just under it
 .quarto-float-fig:has(.quarto-uncaptioned) p:has(> picture, > img),
-.quarto-float-fig:has(.quarto-uncaptioned) img.figure-img {
+.quarto-float-fig:has(.quarto-uncaptioned) img.figure-img,
+.quarto-subfloat-fig p:has(> picture, > img),
+.quarto-subfloat-fig img.figure-img {
   margin-bottom: 0;
 }
 // Interactive charts (cwr_interactive() in R/theme_cwr.R) are drawn twice, like

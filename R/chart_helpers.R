@@ -179,6 +179,22 @@ cwr_label_repel <- function(..., bg.colour = "white", bg.r = 0.15, seed = 1,
 # model we fitted, several sources we combined. There the arithmetic is ours and is
 # worth standing behind. Where the line is a judgement call: say the source alone.
 #
+# `credit` may also be a description of that arithmetic, in place of TRUE
+# (Greg, 2026-10-14): the chart shows the same byline, and the "Detailed table
+# sources" table gives Charting Waterloo Region a row of its own for the
+# figure, after the publishers', saying what the site did to their numbers:
+#
+#   credit = "Calculated each district's share of commuters by main mode, and
+#             the 95% confidence intervals of those shares, from the published
+#             counts and bounds."
+#
+# Write what was done, not why, opening each sentence with a verb that says
+# exactly what (Greg, 2026-10-14): "Calculated each district's share ...",
+# "Grouped ... into three", "Combined ...", "Picked out the ten largest". Each
+# description ends with a period; cwr_detailed_sources_table() adds one if it
+# is missing. A chart credited with plain TRUE gets the row with an empty
+# cell, and cwr_detailed_sources_table() warns.
+#
 # `source` takes one source or several. Several are joined with commas. The label
 # is "Sources:" whenever the line names more than one, and **the byline counts**:
 # a chart that credits its own arithmetic beside a published table has two sources
@@ -204,6 +220,33 @@ cwr_label_repel <- function(..., bg.colour = "white", bg.r = 0.15, seed = 1,
 #
 # A plain vector is read as one publisher's items, so every caption with a
 # single publisher is written exactly as before.
+#
+# `details` moves the table numbers, report names and file names off the chart
+# and into the post's "Detailed table sources" table (Greg, 2026-10-14). The
+# chart then names only the publisher, and `source` holds just the name - one
+# string, or a list of names for several publishers - while `details` holds
+# what used to follow it, in the same shape: a string or a vector of items for
+# one publisher, a list with one element per publisher for several. Each item
+# is what the source line used to say - a table number, a report's name, a
+# file - not a table's title (Greg, 2026-10-14). Items may carry markdown
+# links, since they are printed in the table and never drawn on the chart:
+#
+#   cwr_caption(
+#     "Statistics Canada",
+#     details = c(
+#       "[Table 98-10-0459-01](https://...)",
+#       "2021 census boundary files"
+#     ),
+#     credit = TRUE
+#   )
+#   -> "Sources: Statistics Canada | *Charting Waterloo Region*" on the chart
+#   -> "Table 98-10-0459-01, 2021 census boundary files" in the table
+#
+# The details ride along on the caption string as an attribute, which ggplot
+# keeps; cwr_figure() and cwr_interactive() read it off the plot and log it
+# under the chart's id (cwr_log_sources() below), and
+# cwr_detailed_sources_table() prints the log. A caption without `details`
+# works as it always has, and is logged with its source line alone.
 #
 # `notes` takes footnotes to qualify something in the title or subtitle. They are
 # numbered here, in the order given, so a note and its key cannot drift apart;
@@ -238,14 +281,43 @@ cwr_label_repel <- function(..., bg.colour = "white", bg.r = 0.15, seed = 1,
 #     notes = c("Figures for 2020 are estimates",
 #               "Two industries suppressed by Statistics Canada")
 #   )
-cwr_caption <- function(source, credit = FALSE, notes = NULL, unnumbered = NULL) {
+cwr_caption <- function(source, credit = FALSE, notes = NULL, unnumbered = NULL,
+                        details = NULL) {
+  # `credit` given as a description of the site's own arithmetic: the byline
+  # goes on as for TRUE, and the description goes into the sources table
+  contribution <- if (is.character(credit)) str_flatten(credit, " ") else NA_character_
+  credit <- isTRUE(credit) || is.character(credit)
+
   # The byline is a source like any other, so it decides the plural too
   # One publisher unless a list says otherwise; commas within a publisher,
   # semicolons between publishers
   if (!is.list(source)) source <- list(source)
   label <- if (length(unlist(source)) > 1 || credit) "Sources: " else "Source: "
-  caption <- paste0(label, str_flatten(map_chr(source, \(items) str_flatten(items, ", ")), "; "))
+  publishers <- map_chr(source, \(items) str_flatten(items, ", "))
+  caption <- paste0(label, str_flatten(publishers, "; "))
   if (credit) caption <- paste0(caption, " | *Charting Waterloo Region*")
+
+  # One row per publisher for the "Detailed table sources" table: the name the
+  # chart shows, and its items, kept as a vector so that
+  # cwr_detailed_sources_table() can gather every item a figure takes from one
+  # publisher into one cell. With no `details`, the row carries the source
+  # line's own wording and no items, and cwr_detailed_sources_table() warns.
+  if (!is.null(details)) {
+    if (!is.list(details)) details <- list(details)
+    if (length(details) != length(publishers)) {
+      stop("cwr_caption(): `details` needs one element per publisher in `source` (",
+           length(publishers), "), not ", length(details), call. = FALSE)
+    }
+    sources <- tibble(source = publishers, details = map(details, as.character))
+  } else {
+    sources <- tibble(source = publishers, details = list(NA_character_))
+  }
+  sources$credit <- FALSE
+  # The site's own row, after the publishers', when the chart credits it
+  if (credit) {
+    sources <- add_row(sources, source = "Charting Waterloo Region",
+                       details = list(contribution), credit = TRUE)
+  }
 
   # The numbered notes, then the unnumbered ones. A note str_glue() leaves
   # empty (nothing to report this time) has length zero, so c() drops it.
@@ -263,7 +335,43 @@ cwr_caption <- function(source, credit = FALSE, notes = NULL, unnumbered = NULL)
     caption <- paste0(paste(lines, collapse = "<br>"), "<br><br>", caption)
   }
 
+  caption <- structure(caption, cwr_sources = sources)
+
+  # A gt table has no cwr_figure() to log its sources, so a caption written in
+  # a chunk labelled "tbl-..." - which is what makes Quarto number the table -
+  # logs itself under that label. Outside a render there is no label.
+  label <- knitr::opts_current$get("label")
+  if (isTRUE(str_starts(label, "tbl-"))) cwr_log_caption(caption, label)
+
   caption
+}
+
+# ---- The log behind "Detailed table sources" --------------------------------
+# Every chart cwr_figure(), cwr_interactive() or cwr_leaflet() draws during a
+# render adds its sources here, under its id, in the order the charts appear,
+# and so does every gt table's cwr_caption(), under its chunk's "tbl-" label.
+# cwr_detailed_sources_table() (post_sections.R) prints it at the foot of the
+# post, after every chart has run. A post renders in an R session of its own,
+# so the log starts empty for each post; running a chunk again in RStudio
+# replaces that chart's entry rather than adding a second one.
+#
+# `part_of` is the id of the figure a chart is a part of: each tab of a tabset
+# is a sub-figure, (a), (b), ..., of one numbered figure (see cwr_figure()).
+cwr_source_log <- new.env()
+cwr_source_log$charts <- list()
+
+cwr_log_sources <- function(plot, id, part_of = NULL) {
+  cwr_log_caption(plot$labels$caption, id, part_of)
+}
+
+# The same for a caption on its own: a leaflet map's or a gt table's
+cwr_log_caption <- function(caption, id, part_of = NULL) {
+  sources <- attr(caption, "cwr_sources")
+  # A chart with no cwr_caption() at all has nothing to list
+  if (is.null(sources)) return(invisible(NULL))
+  cwr_source_log$charts[[id]] <- mutate(sources, id = id, part_of = part_of %||% NA_character_,
+                                        .before = 1)
+  invisible(sources)
 }
 
 # Warn at render time when a chart's note keys and its numbered notes

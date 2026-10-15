@@ -42,11 +42,12 @@
 # Drafting (running the chunk in RStudio), it returns the desktop widget, which
 # RStudio shows in the Viewer pane; `draft_phone = TRUE` shows the phone one.
 #
-# Numbering and `caption` work as in cwr_figure(): a Deep dive gets the two
-# widgets inside a Quarto #fig- div, so "Figure 1" appears under the chart and
-# @fig-csi works in the prose; a Snapshot gets them bare. `number = TRUE` or
-# `FALSE` overrides the post type for one chart.
-cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
+# Numbering, `part_of` and `caption` work as in cwr_figure(): a post's chart
+# gets the two widgets inside a Quarto #fig- div, so "Figure 1" appears under
+# the chart and @fig-csi works in the prose; a standing page gets them bare.
+# `number = TRUE` or `FALSE` overrides that for one chart. Its sources go into
+# the "Detailed table sources" table, as a cwr_figure() chart's do.
+cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL, part_of = NULL,
                             width = 8.3, height = 5,
                             phone_width = 4.2, phone_height = height * 0.9,
                             phone = list(), phone_text_scale = 0.8, phone_point_scale = 0.65, phone_gap = 1,
@@ -61,11 +62,10 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   # Leader lines for value labels that need one (figures.R)
   plot <- cwr_add_point_leaders(plot)
 
-  # Snapshot or Deep dive, read from the post's categories (see cwr_figure())
-  if (is.null(number)) {
-    categories <- unlist(rmarkdown::metadata$categories)
-    number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
-  }
+  # Posts are numbered, standing pages are not (cwr_numbered(), figures.R),
+  # and a numbered chart's sources are logged for the sources table
+  number <- number %||% cwr_numbered()
+  if (number) cwr_log_sources(plot, id, part_of)
 
   phone_plot <- plot + cwr_phone_theme(phone_width)
   for (piece in phone) phone_plot <- phone_plot + piece
@@ -203,9 +203,9 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL,
   }
 
   # role="img" plus aria-label gives screen readers the alt text, as the
-  # PNG's alt attribute does for cwr_figure(). A Snapshot's outer div carries
-  # the id; in a Deep dive the Quarto div below carries it instead, since an
-  # id can appear only once on a page.
+  # PNG's alt attribute does for cwr_figure(). An unnumbered chart's outer div
+  # carries the id; a numbered one's Quarto div below carries it instead, since
+  # an id can appear only once on a page.
   widgets <- htmltools::div(
     id = if (number) NULL else id,
     htmltools::div(

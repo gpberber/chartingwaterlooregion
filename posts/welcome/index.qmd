@@ -193,7 +193,7 @@ p <- ggplot() +
   labs(
     title = "The townships cover vastly more territory than the cities",
     subtitle = "Land area, square km",
-    caption = cwr_caption("Statistics Canada, 2021 census boundary files")
+    caption = cwr_caption("Statistics Canada", details = "2021 census boundary files")
   ) +
   # theme_cwr() is built for charts with axes; a map wants none of them. Each
   # element is named individually because the theme sets them individually, and
@@ -359,9 +359,9 @@ p <- ggplot(population_bars, aes(x = population, y = district, fill = district_t
     title = "The townships are very sparsely populated compared to the cities",
     subtitle = "Estimated population, 2025",
     caption = cwr_caption(
-      c("Statistics Canada Table 17-10-0155-01",
-        "the 2021 census boundary files"),
-      credit = TRUE
+      "Statistics Canada",
+      details = c("Table 17-10-0155-01", "2021 census boundary files"),
+      credit = "Calculated each district's population density by dividing its July 1 population by its census land area."
     )
   ) +
   # Every bar carries its number, so the value axis and its gridlines are gone.
@@ -439,6 +439,9 @@ By the way, cows did not figure in this post when I conceived it. Not until I sa
 
 The population estimates above are for 2025, but the cow data is from 2021, so for a fair comparison, we'll use the 2021 census populations as well. On census day in 2021, just over 70,000 people lived in the townships. How many cows lived in them on that day? Click the other tab to find out.
 
+<!-- The two tabs are one figure: this div numbers the tabset, and each chart in it is a lettered part through cwr_figure(..., part_of = "fig-cattle-and-people"). -->
+
+::: {#fig-cattle-and-people}
 ::: panel-tabset
 ### People
 
@@ -527,11 +530,15 @@ p <- cattle_chart(show_cattle = FALSE) +
   labs(
     title = "In May 2021, the townships had more...",
     subtitle = "Townships, number of people, 11 May 2021",
-    caption = cwr_caption("Statistics Canada Table 98-10-0002-01", credit = TRUE)
+    caption = cwr_caption(
+      "Statistics Canada",
+      details = "Table 98-10-0002-01",
+      credit = "Added up the residents of the four townships on census day, 11 May 2021."
+    )
   )
 
 cwr_figure(
-  p, "fig-cattle-people",
+  p, "fig-cattle-people", part_of = "fig-cattle-and-people",
   alt = paste0(
     "The number of people living in North Dumfries, Wellesley, Wilmot and ",
     "Woolwich townships together on 11 May 2021, written large: ",
@@ -554,13 +561,14 @@ p <- cattle_chart(show_cattle = TRUE) +
     title = "In May 2021, the townships had more...cows than people!",
     subtitle = "Townships, number of people and cows, 11 May 2021",
     caption = cwr_caption(
-      c("Statistics Canada Tables 32-10-0370-01", "98-10-0002-01"),
-      credit = TRUE
+      "Statistics Canada",
+      details = c("Table 32-10-0370-01", "Table 98-10-0002-01"),
+      credit = "Added up the cattle and the residents of the four townships on census day, 11 May 2021, and calculated the number of cattle per hundred people."
     )
   )
 
 cwr_figure(
-  p, "fig-cattle",
+  p, "fig-cattle", part_of = "fig-cattle-and-people",
   alt = paste0(
     "The same figure for people, where the previous tab wrote it, with the ",
     "number of cattle on farms in those four townships on the same day beside ",
@@ -571,6 +579,7 @@ cwr_figure(
 )
 ```
 :::
+:::
 
 And there we have it: more cows than people lived in the townships on census day in 2021. What I thought was a joke turns out to be true!
 
@@ -580,6 +589,19 @@ In CWR's debut post, we learned that my family thought it was fun to jump in our
 
 ::: {#data-sources-and-reliability .callout-note collapse="true"}
 ## Data sources and reliability
+
+### Detailed table sources
+
+```{r}
+#| label: detailed-sources
+#| output: asis
+
+# Lists every chart's sources in full, by figure number. Each row comes from
+# the `details` and `credit` in that chart's own cwr_caption() - edit them
+# there, not here. It has to stay below the last chart, which is why it lives
+# in this box.
+cwr_detailed_sources_table()
+```
 
 ### Sources
 

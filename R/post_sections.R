@@ -87,6 +87,138 @@ cwr_sources_table <- function(slug, readme = cwr_page_readme(slug)) {
   invisible(table_lines)
 }
 
+# ---- Detailed table sources ---------------------------------------------------
+# A chart names only its publisher ("Source: Statistics Canada"); the table
+# numbers, report names and files behind it are listed here, figure by figure
+# (Greg, 2026-10-14). Nothing is typed twice: each chart's cwr_caption(details =
+# ) is logged when cwr_figure(), cwr_interactive() or cwr_leaflet() draws it,
+# and each gt table's when its cwr_caption() runs in its "tbl-" chunk
+# (cwr_log_caption(), chart_helpers.R); this prints the log. So it must come
+# after the last chart - the top of the "Data sources and reliability" box is
+# the place. Call it from a chunk with `#| output: asis`.
+#
+# Three columns: Figure (or "Figure or table" when gt tables are listed),
+# Source, Source details. The first cell is a Quarto cross-reference
+# (@fig-commuting, @tbl-watson-a2), which renders as "Figure 1" or "Table 1"
+# and links to it, so the numbers follow the charts wherever they move. Table
+# numbers are gathered and linked by cwr_join_source_items() below. Each figure
+# gets one row per publisher, and that row lists every item the figure takes
+# from the publisher - all its tables, reports and files, each once, separated
+# by commas as the source line used to be (Greg, 2026-10-14). A tabset
+# (cwr_figure(..., part_of = )) is one figure: its tabs' items are gathered
+# into the tabset's row, under its number. The site's own row comes last in
+# each figure, its descriptions each ending with a period and set apart by an
+# empty line.
+#
+# A chart whose caption has no `details` is listed with its source line's own
+# wording and an empty details cell, and the render warns, so a chart is never
+# missed. Printed to stderr like the other render warnings, so a chunk's
+# `warning: false` cannot hide it.
+cwr_detailed_sources_table <- function() {
+  charts <- cwr_source_log$charts
+  if (length(charts) == 0) {
+    message("cwr_detailed_sources_table(): no numbered charts have run yet, so ",
+            "there is nothing to list. It has to come after the last chart.")
+    return(invisible(NULL))
+  }
+  log <- bind_rows(charts)
+
+  # One item per line: a publisher's items arrive as a vector in `details`
+  log <- unnest_longer(log, details)
+
+  missing_details <- log |> filter(is.na(details), !credit) |> distinct(id) |> pull(id)
+  if (length(missing_details) > 0) {
+    cat("cwr_detailed_sources_table(): no source details for ",
+        str_flatten_comma(missing_details),
+        " - add cwr_caption(details = ) to the chart's chunk\n", sep = "", file = stderr())
+  }
+  missing_credit <- log |> filter(is.na(details), credit) |> distinct(id) |> pull(id)
+  if (length(missing_credit) > 0) {
+    cat("cwr_detailed_sources_table(): ", str_flatten_comma(missing_credit),
+        " credit Charting Waterloo Region without saying for what - give",
+        " cwr_caption(credit = ) a description in place of TRUE\n", sep = "", file = stderr())
+  }
+
+  # A tab is listed under its tabset, any other chart under its own id. Then
+  # one row per figure and publisher, in the order the charts appear (group_by()
+  # would sort them, so the groups are kept in order of first appearance), with
+  # each item once - the site's own row last in each figure. A publisher's
+  # items are table numbers and file names, joined with commas as the source
+  # line used to be. The site's are descriptions: each always ends with a
+  # period, added here if the chunk left it off, and two or more in one figure
+  # (the tabs of a tabset) are set apart by an empty line (Greg, 2026-10-14).
+  # <br><br> is how a markdown table cell spells an empty line.
+  full_stop <- \(x) if_else(str_ends(x, fixed(".")), x, str_c(x, "."))
+  rows <- log |>
+    mutate(figure = coalesce(part_of, id)) |>
+    mutate(figure = fct_inorder(figure), source = fct_inorder(source)) |>
+    group_by(figure, credit, source) |>
+    summarise(
+      details = if (first(credit)) {
+        str_flatten(full_stop(unique(na.omit(details))), "<br><br>")
+      } else {
+        cwr_join_source_items(unique(na.omit(details)))
+      },
+      .groups = "drop"
+    ) |>
+    arrange(figure, credit, source) |>
+    mutate(across(c(figure, source), as.character))
+
+  # "Figure", or "Figure or table" in a post whose gt tables are listed too
+  first_column <- if (any(str_starts(rows$figure, "tbl-"))) "Figure or table" else "Figure"
+
+  # A "|" inside a cell would end it early
+  escape <- \(x) str_replace_all(replace_na(x, ""), fixed("|"), "\\|")
+  table_lines <- c(
+    str_c("| ", first_column, " | Source | Source details |"),
+    "|--------|--------|----------------|",
+    str_c("| @", rows$figure, " | ", escape(rows$source), " | ", escape(rows$details), " |")
+  )
+  cat(table_lines, sep = "\n")
+  cat("\n")
+  invisible(rows)
+}
+
+# One publisher's items for one figure, as the Source details cell shows them.
+# Every item that is only Statistics Canada table numbers ("Table
+# 36-10-0468-01", "Tables 17-10-0152-01 and 17-10-0155-01") is gathered into
+# one "Tables A, B and C", each number once, where the first of them stood; a
+# tabset's tabs often share some tables and not others, and this lists the
+# lot without repeating any. Each table number is then linked to its page on
+# Statistics Canada's site, so a chunk writes the plain number. An item that
+# already carries a markdown link is left as it is. Items are separated by
+# commas, or by semicolons when an item has commas of its own.
+cwr_join_source_items <- function(items) {
+  number <- "\\d{2}-\\d{2}-\\d{4}-\\d{2}"
+  only_tables <- str_c("^Tables? ", number, "((,|,? and) ", number, ")*$")
+  is_table <- str_detect(items, only_tables)
+  if (any(is_table)) {
+    numbers <- unique(unlist(str_extract_all(items[is_table], number)))
+    tables <- if (length(numbers) == 1) {
+      str_c("Table ", numbers)
+    } else {
+      str_c("Tables ", str_flatten_comma(numbers, last = " and "))
+    }
+    # Everything before the first table item, the gathered tables, then the
+    # other items after it
+    first_table <- which(is_table)[1]
+    later <- seq_along(items) > first_table & !is_table
+    items <- c(head(items, first_table - 1), tables, items[later])
+  }
+  # Table 36-10-0468-01 lives at ...tv.action?pid=3610046801
+  link <- \(item) {
+    if (str_detect(item, fixed("]("))) return(item)
+    str_replace_all(item, number, \(n) str_c(
+      "[", n, "](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",
+      str_remove_all(n, "-"), ")"
+    ))
+  }
+  # Commas between items, unless an item has commas of its own ("1976 Census,
+  # Catalogue 92-804, Table 3"): then semicolons, so the items stay distinct
+  separator <- if (any(str_detect(items, ","))) "; " else ", "
+  str_flatten(map_chr(items, link), separator)
+}
+
 # ---- The post's key terms ------------------------------------------------------
 # The README's "## Key terms" table defines the terms used in the main body of
 # the post's charts - segment, legend, panel, axis and direct labels - and

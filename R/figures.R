@@ -1002,6 +1002,15 @@ cwr_phone_theme <- function(width = 4.2) {
   )
 }
 
+# Is this chart numbered? Every post's charts are, whatever the post type
+# (Greg, 2026-10-14). rmarkdown::metadata is the page's own YAML as R sees it
+# during the render: a post has `categories`, a standing page like Vital
+# Statistics has none, and outside a render (a chart tried in the console)
+# there is no metadata at all. Shared by cwr_figure() and cwr_interactive().
+cwr_numbered <- function() {
+  length(unlist(rmarkdown::metadata$categories)) > 0
+}
+
 # A chart drawn for the desktop column (8.3 in, 797 px) is shrunk to about
 # 40% on a phone, so its text becomes unreadable however large it is drawn.
 # Sites like Datawrapper solve this by redrawing the chart for the phone.
@@ -1035,19 +1044,36 @@ cwr_phone_theme <- function(width = 4.2) {
 # chart with no category axis (a line chart, a map), or to override the rule
 # for one chart on purpose.
 #
-# Numbering follows the post type, read from the first entry in the post's
-# `categories`, so there is nothing to set by hand:
+# Every chart is numbered, in Snapshots as well as Deep dives (Greg,
+# 2026-10-14; Snapshots used to go bare): a Quarto figure div carries the id,
+# which renders as a plain "Figure 1" underneath and makes @fig-answered work
+# in the prose. The number is also what the "Detailed table sources" table
+# lists each chart's sources under, since the chart itself now names only the
+# publisher (cwr_caption(details = )). Quarto produces the bare label by
+# itself when the div holds no caption paragraph, and marks it
+# .quarto-uncaptioned (styled in custom.scss). A standing page such as
+# Vital Statistics, which has no `categories`, stays unnumbered, and so does
+# a chart tried in the console. `number = TRUE` or `FALSE` overrides that for
+# one chart.
 #
-#   Snapshot   bare <picture>. No "Figure 1", nothing under the chart. A
-#              handful of charts read in five minutes do not need numbers, and
-#              the chart's own title and subtitle already say what it shows.
-#   Deep dive  a Quarto figure div carrying the id, which renders as a plain
-#              "Figure 1" underneath and makes @fig-answered work in the prose.
-#              Long posts need a way to point back at a chart from far below it.
+# A tabset is one figure, and each tab a sub-figure of it, (a), (b), ...
+# (Greg, 2026-10-14). The post wraps the tabset in a figure div of its own,
+# written by hand, and each tab's chart names that div in `part_of`:
 #
-# Quarto produces the bare label by itself when the div holds no caption
-# paragraph, and marks it .quarto-uncaptioned (styled in custom.scss).
-# `number = TRUE` or `FALSE` overrides the post type for one chart.
+#   ::: {#fig-flows}
+#   ::: panel-tabset
+#   ### Kitchener
+#   ```{r}
+#   cwr_figure(p, "fig-flows-kitchener", part_of = "fig-flows", alt = ...)
+#   ```
+#   ...
+#   :::
+#   :::
+#
+# Quarto numbers the outer div ("Figure 3", under the tabs) and letters the
+# charts inside it; "@fig-flows-kitchener" reads "Figure 3 (a)". `part_of`
+# draws nothing itself - it tells the sources table that the tabs belong
+# together, so tabs with the same sources share one row.
 #
 # `caption` is optional and usually left out: the source line is already drawn
 # inside the chart by cwr_caption(), and the subtitle carries the explanation.
@@ -1080,7 +1106,7 @@ cwr_phone_theme <- function(width = 4.2) {
 # ggplot pieces added to it with `+`, for example:
 #   phone = list(scale_x_date(date_breaks = "2 years", date_labels = "%Y"))
 #   phone = list(theme(legend.position = "none"))
-cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
+cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL, part_of = NULL,
                        width = 8.3, height = NULL,
                        phone_width = 4.2, phone_height = NULL,
                        phone = list(), phone_text_scale = 0.8, phone_point_scale = 0.65, phone_gap = 1,
@@ -1097,14 +1123,12 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL,
   # Leader lines for value labels that need one (cwr_add_point_leaders() above)
   plot <- cwr_add_point_leaders(plot)
 
-  # Snapshots go unnumbered, deep dives numbered. rmarkdown::metadata is the
-  # post's own YAML as R sees it during the render, so the first category - the
-  # post type - decides it and no post has to set anything. Outside a render (a
-  # chart tried in the console) there is no metadata, so nothing is numbered.
-  if (is.null(number)) {
-    categories <- unlist(rmarkdown::metadata$categories)
-    number <- length(categories) > 0 && identical(categories[[1]], "Deep dive")
-  }
+  # Posts are numbered, standing pages are not (cwr_numbered() below)
+  number <- number %||% cwr_numbered()
+
+  # The chart's sources, for the "Detailed table sources" table
+  # (chart_helpers.R). A chart left unnumbered has no number to list them under.
+  if (number) cwr_log_sources(plot, id, part_of)
 
   # Is this a render, or is somebody running the chunk in RStudio to see how the
   # chart looks?

@@ -197,10 +197,14 @@ cwr_text_on_fill <- function(values, low, high, limits, switch_at = 55) {
 # into HTML here. `alt` describes the map for screen readers, which announce
 # it as a figure.
 #
-# Use it in a chunk WITHOUT `output: asis`: it returns HTML tags, and knitr
-# then puts leaflet's JavaScript in the page itself. It is not numbered, so
-# it suits a Snapshot; a Deep dive needs a #fig- div around the chunk.
-cwr_leaflet <- function(map, title, subtitle, caption, alt) {
+# Use it in a chunk WITHOUT `output: asis`. `id` ("fig-...") numbers the map
+# like any chart (Greg, 2026-10-14): it goes in a Quarto figure div, so
+# "Figure 2" appears under it and @fig-... works in the prose, and its sources
+# go into the "Detailed table sources" table. `number` and `part_of` work as
+# in cwr_figure(). Without an id the map is drawn bare and unnumbered, as maps
+# were before, and is left out of that table.
+cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
+                        number = NULL, part_of = NULL) {
   # cwr_caption() writes markdown, the way ggtext reads it; commonmark turns
   # it into HTML. Its <p> wrapper is dropped so the margins below decide the
   # spacing.
@@ -215,7 +219,9 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
   # zoomed out to fit its width would otherwise leave empty country above and
   # below. singleton() writes these rules once however many maps a post has.
   css <- stringr::str_c(
-    ".cwr-leaflet { margin: 1.5rem 0; }",
+    # Left-aligned like a chart's text, also inside a numbered figure, whose
+    # Quarto div centres everything in it
+    ".cwr-leaflet { margin: 1.5rem 0; text-align: left; }",
     ".cwr-leaflet-title { font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 0.3rem; }",
     ".cwr-leaflet-subtitle { font-weight: 700; font-size: 0.85rem; line-height: 1.25; margin-bottom: 0.6rem; }",
     ".cwr-leaflet-caption { color: ", cowboysilver, "; font-size: 0.75rem; line-height: 1.4; margin-top: 0.5rem; }",
@@ -236,7 +242,7 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
     sep = "\n"
   )
 
-  htmltools::tagList(
+  page <- htmltools::tagList(
     htmltools::singleton(htmltools::tags$style(htmltools::HTML(css))),
     htmltools::tags$div(
       class = "cwr-leaflet",
@@ -247,6 +253,28 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt) {
       map,
       htmltools::tags$div(class = "cwr-leaflet-caption", htmltools::HTML(caption_html))
     )
+  )
+
+  # Numbered: posts are, standing pages are not (cwr_numbered(), figures.R),
+  # and a map with no id cannot be. Run in RStudio rather than rendered, the
+  # map is returned as it is so the Viewer pane shows it (the same test as
+  # cwr_figure()'s).
+  drafting <- !isTRUE(getOption("knitr.in.progress")) ||
+    isTRUE(getOption("rstudio.notebook.executing"))
+  number <- !is.null(id) && (number %||% cwr_numbered())
+  if (!number || drafting) return(page)
+
+  # Its sources, for the "Detailed table sources" table (chart_helpers.R)
+  cwr_log_caption(caption, id, part_of)
+
+  # The same figure div as cwr_interactive(): renderTags() turns the map into
+  # one HTML string plus the JavaScript files it needs; the HTML goes in a
+  # ```{=html} block inside the #fig- div, and the files go to knitr through
+  # `meta`, so leaflet's scripts still reach the page.
+  rendered <- htmltools::renderTags(page)
+  knitr::asis_output(
+    paste0("::: {#", id, "}\n```{=html}\n", rendered$html, "\n```\n:::\n"),
+    meta = rendered$dependencies
   )
 }
 
