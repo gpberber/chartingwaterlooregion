@@ -61,6 +61,8 @@ cwr_interactive <- function(plot, id, alt, caption = NULL, number = NULL, part_o
 
   # Leader lines for value labels that need one (figures.R)
   plot <- cwr_add_point_leaders(plot)
+  # Points drawn over the zero line and other reference lines (figures.R)
+  plot <- cwr_points_over_lines(plot)
 
   # Posts are numbered, standing pages are not (cwr_numbered(), figures.R),
   # and a numbered chart's sources are logged for the sources table

@@ -487,6 +487,27 @@ cwr_add_point_leaders <- function(plot) {
   plot
 }
 
+# Points sit on top of the zero line (Greg, 2026-11-05: a dumbbell's dot at 0
+# was half hidden under the black x = 0 line). ggplot2 draws layers in the
+# order they were added with `+`, so a geom_hline() or geom_vline() written
+# after geom_point() is painted over the points. This moves every such
+# reference line that comes after the first point layer to just before it:
+# the lines keep their place above anything drawn earlier (bars, areas,
+# gridline guides), and every point is drawn over them. cwr_right_axis()
+# already puts its own baseline first, so this catches the lines a chart adds
+# by hand. cwr_figure() and cwr_interactive() run it, so a chart adds nothing.
+# (ggiraph's interactive points are GeomPoint underneath, so they count too.)
+cwr_points_over_lines <- function(plot) {
+  is_point <- map_lgl(plot$layers, \(layer) inherits(layer$geom, "GeomPoint"))
+  if (!any(is_point)) return(plot)
+  first_point <- which(is_point)[1]
+  is_line <- map_lgl(plot$layers, \(layer) inherits(layer$geom, c("GeomHline", "GeomVline")))
+  move <- which(is_line & seq_along(plot$layers) > first_point)
+  if (length(move) == 0) return(plot)
+  plot$layers <- append(plot$layers[-move], plot$layers[move], after = first_point - 1)
+  plot
+}
+
 # Finds every label layer made from cwr_line_labels() or cwr_point_labels()
 # and works out its labels for both drawings: the phone first, where labels
 # are largest against the chart, then the desktop at the phone's spots and
@@ -1122,6 +1143,8 @@ cwr_figure <- function(plot, id, alt, caption = NULL, number = NULL, part_of = N
 
   # Leader lines for value labels that need one (cwr_add_point_leaders() above)
   plot <- cwr_add_point_leaders(plot)
+  # Points drawn over the zero line and other reference lines (above)
+  plot <- cwr_points_over_lines(plot)
 
   # Posts are numbered, standing pages are not (cwr_numbered() below)
   number <- number %||% cwr_numbered()

@@ -202,9 +202,10 @@ cwr_text_on_fill <- function(values, low, high, limits, switch_at = 55) {
 # "Figure 2" appears under it and @fig-... works in the prose, and its sources
 # go into the "Detailed table sources" table. `number` and `part_of` work as
 # in cwr_figure(). Without an id the map is drawn bare and unnumbered, as maps
-# were before, and is left out of that table.
+# were before, and is left out of that table. `legend` takes a key from
+# cwr_map_key() (below), set out between the subtitle and the map.
 cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
-                        number = NULL, part_of = NULL) {
+                        number = NULL, part_of = NULL, legend = NULL) {
   # cwr_caption() writes markdown, the way ggtext reads it; commonmark turns
   # it into HTML. Its <p> wrapper is dropped so the margins below decide the
   # spacing.
@@ -227,9 +228,42 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
     ".cwr-leaflet-caption { color: ", cowboysilver, "; font-size: 0.75rem; line-height: 1.4; margin-top: 0.5rem; }",
     # cwr_hover_box()'s corner box: the legend's own look (leaflet's "info"
     # class), with a width range so it does not jump about as the text changes
-    ".cwr-leaflet .cwr-hover-box { font-size: 13px; line-height: 1.35; min-width: 150px; max-width: 230px; }",
+    ".cwr-leaflet .cwr-hover-box { font-size: 13px; line-height: 1.35; min-width: 150px; max-width: 260px; }",
     # ...and the tooltips whose text it shows stay hidden
     ".cwr-leaflet .cwr-hover-boxed .leaflet-tooltip { display: none; }",
+    # A small table in a hover (a measure's two years and their change): no
+    # lines, the numbers right-aligned under their years, the row names left,
+    # and a note under it a little smaller and greyer. Its text is the box's
+    # own size (font-size: inherit), the same as the lines above and below
+    # it - Quarto's site-wide `table` rule would otherwise make it larger
+    # (Greg, 2026-11-03)
+    ".cwr-leaflet .cwr-hover-table { border-collapse: collapse; margin-top: 2px; font-size: inherit; }",
+    ".cwr-leaflet .cwr-hover-table th, .cwr-leaflet .cwr-hover-table td { padding: 0 0 0 8px; text-align: right; white-space: nowrap; }",
+    ".cwr-leaflet .cwr-hover-table th:first-child, .cwr-leaflet .cwr-hover-table td:first-child { padding-left: 0; text-align: left; }",
+    ".cwr-leaflet .cwr-hover-table th { font-weight: 700; }",
+    ".cwr-leaflet .cwr-hover-note { font-size: 0.85em; color: #666; margin-top: 2px; }",
+    # A table and its note in one wrapper (.cwr-hover-figures) as wide as the
+    # table: the note takes no width of its own (width 0) and then fills the
+    # wrapper (min-width 100%), so it wraps at the table's right edge instead
+    # of running past it
+    ".cwr-leaflet .cwr-hover-figures { width: fit-content; }",
+    ".cwr-leaflet .cwr-hover-figures .cwr-hover-note { width: 0; min-width: 100%; }",
+    # cwr_map_key()'s key above a map (Greg, 2026-11-03): centred, its title
+    # bold, a row of wide swatches with their labels under them and group
+    # headings over them. Every group has a heading line (blank where it has
+    # no heading), so the swatches line up across the groups; a group's width
+    # is set in its own style, in proportion to its swatches
+    ".cwr-map-key { max-width: 720px; margin: 0 auto 0.6rem; text-align: center; font-size: 0.75rem; line-height: 1.2; }",
+    ".cwr-map-key-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.35rem; }",
+    ".cwr-map-key-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px; }",
+    ".cwr-map-key-group { display: flex; flex-direction: column; min-width: 0; }",
+    ".cwr-map-key-heading { margin-bottom: 3px; }",
+    ".cwr-map-key-items { display: flex; gap: 2px; }",
+    ".cwr-map-key-item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }",
+    ".cwr-map-key-swatch { display: block; height: 14px; }",
+    ".cwr-map-key-label { margin-top: 3px; }",
+    # The class set apart (not built up), a swatch's width further along
+    ".cwr-map-key-apart { margin-left: 16px; }",
     "@media (max-width: 767px) {",
     ".cwr-leaflet-title { font-size: 0.95rem; }",
     ".cwr-leaflet-subtitle { font-size: 0.75rem; }",
@@ -237,7 +271,17 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
     ".cwr-leaflet .leaflet { height: 440px !important; }",
     ".cwr-leaflet .legend { font-size: 11px; line-height: 15px; padding: 4px 6px; }",
     ".cwr-leaflet .legend i { width: 15px; height: 15px; }",
-    ".cwr-leaflet .cwr-hover-box { font-size: 11px; line-height: 15px; padding: 4px 6px; min-width: 0; max-width: 170px; }",
+    ".cwr-leaflet .cwr-hover-box { font-size: 11px; line-height: 15px; padding: 4px 6px; min-width: 0; max-width: 210px; }",
+    # The key's text steps down like the chart text; the class set apart moves
+    # to a line of its own under the row, its label beside its swatch
+    ".cwr-map-key { font-size: 0.65rem; }",
+    ".cwr-map-key-title { font-size: 0.75rem; }",
+    ".cwr-map-key-swatch { height: 12px; }",
+    ".cwr-map-key-apart { flex: 0 0 100% !important; margin: 6px 0 0 0; }",
+    ".cwr-map-key-apart .cwr-map-key-heading { display: none; }",
+    ".cwr-map-key-apart .cwr-map-key-item { flex-direction: row; align-items: center; justify-content: center; }",
+    ".cwr-map-key-apart .cwr-map-key-swatch { width: 40px; flex: none; }",
+    ".cwr-map-key-apart .cwr-map-key-label { margin: 0 0 0 6px; }",
     "}",
     sep = "\n"
   )
@@ -250,6 +294,7 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
       `aria-label` = alt,
       htmltools::tags$div(class = "cwr-leaflet-title", htmltools::HTML(title)),
       htmltools::tags$div(class = "cwr-leaflet-subtitle", htmltools::HTML(subtitle)),
+      legend,
       map,
       htmltools::tags$div(class = "cwr-leaflet-caption", htmltools::HTML(caption_html))
     )
@@ -275,6 +320,54 @@ cwr_leaflet <- function(map, title, subtitle, caption, alt, id = NULL,
   knitr::asis_output(
     paste0("::: {#", id, "}\n```{=html}\n", rendered$html, "\n```\n:::\n"),
     meta = rendered$dependencies
+  )
+}
+
+# A map's key set out above it in one row, like a chart's legend, instead of
+# leaflet's legend box in a corner of the map, where on a phone it covered the
+# hover box (Greg, 2026-11-03). Pass it to cwr_leaflet()'s `legend`, which
+# sets it between the subtitle and the map; cwr_leaflet()'s styles lay it out.
+#
+# `labels` are written under the swatches and `colours` fill them (hex codes,
+# with the shading's opacity built in as two more digits, as adjustcolor()
+# gives them, so a swatch looks as the shade does over a pale street).
+# `groups` heads runs of swatches side by side ("Loss" over the reds); NA
+# leaves a swatch with no heading. `apart` marks the classes that stand to one
+# side, after a gap (a grey "Not built up"); on a phone they take a line of
+# their own. Alternative: leaflet's addLegend(), a box in a map corner.
+cwr_map_key <- function(title, labels, colours, groups = NA, apart = FALSE) {
+  key <- tibble::tibble(label = labels, colour = colours, group = groups, apart = apart) |>
+    # One block per run of the same heading (side-by-side NAs make one block)
+    dplyr::mutate(block = dplyr::consecutive_id(.data$group, .data$apart))
+  headed <- any(!is.na(groups))
+
+  blocks <- key |>
+    dplyr::group_split(.data$block) |>
+    purrr::map(\(block) {
+      htmltools::tags$div(
+        class = paste("cwr-map-key-group", if (block$apart[1]) "cwr-map-key-apart"),
+        # As wide as its share of the swatches
+        style = stringr::str_glue("flex: {nrow(block)} 1 0;"),
+        # A blank heading (a non-breaking space) holds the line where a group
+        # has none, so every group's swatches start at the same height
+        if (headed) htmltools::tags$div(class = "cwr-map-key-heading", dplyr::coalesce(block$group[1], " ")),
+        htmltools::tags$div(
+          class = "cwr-map-key-items",
+          purrr::map2(block$label, block$colour, \(label, colour) {
+            htmltools::tags$div(
+              class = "cwr-map-key-item",
+              htmltools::tags$span(class = "cwr-map-key-swatch", style = paste0("background: ", colour, ";")),
+              htmltools::tags$span(class = "cwr-map-key-label", label)
+            )
+          })
+        )
+      )
+    })
+
+  htmltools::tags$div(
+    class = "cwr-map-key",
+    htmltools::tags$div(class = "cwr-map-key-title", title),
+    htmltools::tags$div(class = "cwr-map-key-row", blocks)
   )
 }
 

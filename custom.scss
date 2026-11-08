@@ -665,6 +665,91 @@ figure figcaption, .figure-caption, .quarto-float-caption {
   .cwr-interactive-desktop { display: none; }
   .cwr-interactive-phone { display: block; }
 }
+
+// A thin silver box round every chart, with "Figure N" inside it (Greg,
+// 2026-10-28; tried on the Waterloo population post first). The line is a
+// tabset's own (Bootstrap's 1px #dee2e6), so a tabbed figure and a plain one
+// look alike. The sides keep the tabset's 1em of padding; the top and bottom
+// have half that, since Greg wanted less space above the title and below
+// "Figure N". Charts only: gt tables (figure.quarto-float-tbl) and slide or
+// photo images (.cwr-source, .cwr-photo, which have frames of their own) are
+// left out, and so are figures inside a tabset, which is already their box.
+div.quarto-float.quarto-figure:not(:has(.panel-tabset, img.cwr-source, img.cwr-photo)):not(.panel-tabset div) > figure.quarto-float-fig {
+  border: 1px solid #dee2e6;
+  padding: 0.5em 1em;
+
+  > figcaption { margin-bottom: 0; }
+
+  // A chart draws its title and sources a little in from its own edge
+  // (theme_cwr()'s 6pt side plot.margin on an 8.3in image, 8pt on the 4.2in
+  // phone version). Measured from the PNGs, the first letter sits 1.1% of the
+  // image's width in on desktop and 2.8% on the phone. The chart fills the
+  // box's width, so a percentage padding keeps "Figure N" in line with that
+  // text at any screen size. Interactive charts are drawn at the same sizes.
+  // 767.98px is where cwr_figure()'s <picture> swaps to the phone PNG.
+  &:has(picture, .cwr-interactive) > figcaption {
+    padding-left: 1.1%;
+    @media (max-width: 767.98px) { padding-left: 2.8%; }
+  }
+}
+
+// A tabbed figure (a ::: {#fig-...} div round a panel-tabset, each tab passing
+// `part_of =`): the box is the tabset's own, which would stop above
+// "Figure N". Its bottom is opened and its sides carried down round the
+// caption instead.
+div.quarto-float.quarto-figure:has(.panel-tabset) {
+  .panel-tabset .tab-content {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-top: 0.5em;   // half the padding above the title, as above
+    padding-bottom: 0;
+  }
+  > figure > figcaption {
+    border: 1px solid #dee2e6;
+    border-top: none;
+    // 1.05rem is the body text's 1em, the tabset's own padding; the caption's
+    // smaller font would make 1em narrower and pull "Figure N" out of line.
+    padding: 0 1.05rem 0.525rem;
+    margin: 0;
+  }
+  // Each tab's own "(a)" line is hidden and the space it took closed up, so
+  // "Figure N" sits just under the open tab's sources line, as it does under
+  // an ordinary chart. The letter moves onto that line (below).
+  .panel-tabset .quarto-float.quarto-figure { margin-bottom: 0; }
+  .panel-tabset .quarto-subfloat-caption { display: none; }
+
+  // Tabs of charts: "Figure N" in line with the chart's text, as above. Here
+  // the caption's percentage is of the whole figure, so the chart's width is
+  // worked out from it: less the tabset's padding (1.05rem a side) and lines.
+  &:has(.tab-pane picture, .tab-pane .cwr-interactive) > figure > figcaption {
+    padding-left: calc(1.05rem + 0.011 * (100% - 2.1rem - 2px));
+    @media (max-width: 767.98px) {
+      padding-left: calc(1.05rem + 0.028 * (100% - 2.1rem - 2px));
+    }
+  }
+
+  // The open tab's letter joins the figure number on one line: "Figure 1 (a)".
+  // CSS cannot read the hidden "(a)", so the letter comes from the tab's place
+  // in the tabset; seven tabs covers the Region's three cities and four
+  // townships.
+  $tab-letters: a, b, c, d, e, f, g;
+  @for $i from 1 through length($tab-letters) {
+    &:has(.panel-tabset .tab-pane.active:nth-child(#{$i})) > figure > figcaption::after {
+      content: " (#{nth($tab-letters, $i)})";
+    }
+  }
+}
+
+// A leaflet map's wrapper (R/maps.R) and an interactive chart leave space
+// above or below themselves for when they stand alone. Inside a box the box's
+// padding does that job: no space above, and half a rem kept above
+// "Figure N" for a map (an interactive chart's own bottom margin is enough).
+div.quarto-float.quarto-figure > figure .cwr-leaflet {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+div.quarto-float.quarto-figure > figure .cwr-interactive { margin-bottom: 0; }
+
 .gt_table { font-family: inherit; }
 // Notes and sources left-justified (Greg, 2026-10-04): a tbl- table sits in
 // Quarto's centred figure block, and gt sets no alignment of its own on them,
